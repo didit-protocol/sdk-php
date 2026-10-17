@@ -243,7 +243,7 @@ final class RuntimeEndpointsTest extends TestCase
             'expires_in' => 1800,
         ]));
 
-        $stepUp = $this->issuer->auth()->createStepUp(self::ACCESS_TOKEN, StepUp::ACTION_PAYOUT, 'https://app.example.com/payouts/confirm', '900.00', 'USD');
+        $stepUp = $this->issuer->auth()->createStepUp(self::ACCESS_TOKEN, StepUp::ACTION_PAYOUT, '900.00', 'USD', 'https://app.example.com/payouts/confirm');
 
         $request = $this->issuer->http->last();
         self::assertSame('POST', $request->getMethod());
@@ -273,7 +273,7 @@ final class RuntimeEndpointsTest extends TestCase
     {
         $this->issuer->http->on('POST', self::STEP_UP_URL, TestIssuer::json(200, ['required' => false]));
 
-        $stepUp = $this->issuer->auth()->createStepUp(self::ACCESS_TOKEN, StepUp::ACTION_BANK, 'https://app.example.com/settings/bank');
+        $stepUp = $this->issuer->auth()->createStepUp(self::ACCESS_TOKEN, StepUp::ACTION_BANK, returnTo: 'https://app.example.com/settings/bank');
 
         self::assertSame('{"action":"bank","return_to":"https://app.example.com/settings/bank"}', (string) $this->issuer->http->last()->getBody());
         self::assertFalse($stepUp->required);
@@ -283,12 +283,21 @@ final class RuntimeEndpointsTest extends TestCase
         self::assertFalse($stepUp->isApproved());
     }
 
+    public function testCreateStepUpWithoutReturnToSendsOnlyTheAction(): void
+    {
+        $this->issuer->http->on('POST', self::STEP_UP_URL, TestIssuer::json(200, ['required' => false]));
+
+        $this->issuer->auth()->createStepUp(self::ACCESS_TOKEN, StepUp::ACTION_CONTACT);
+
+        self::assertSame('{"action":"contact"}', (string) $this->issuer->http->last()->getBody());
+    }
+
     public function testCreateStepUpValidationError(): void
     {
         $this->issuer->http->on('POST', self::STEP_UP_URL, TestIssuer::json(400, ['return_to' => 'invalid_redirect_uri']));
 
         try {
-            $this->issuer->auth()->createStepUp(self::ACCESS_TOKEN, StepUp::ACTION_CONTACT, 'https://elsewhere.example/');
+            $this->issuer->auth()->createStepUp(self::ACCESS_TOKEN, StepUp::ACTION_CONTACT, returnTo: 'https://elsewhere.example/');
             self::fail('Expected a BadRequestException.');
         } catch (BadRequestException $e) {
             self::assertSame(['return_to' => 'invalid_redirect_uri'], $e->body);

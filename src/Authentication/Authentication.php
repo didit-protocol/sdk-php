@@ -313,13 +313,14 @@ final class Authentication
      * status is `approved`.
      *
      * @param string $action `payout`, `bank` or `contact` (see the `StepUp::ACTION_*` constants)
-     * @param string $returnTo where the person returns; must be one of the application's redirect URIs
      * @param string|null $amount required for `payout`: a decimal string with up to two decimals, such as `"900.00"`
      * @param string|null $currency ISO 4217 code of the amount; defaults to the payout rule's currency
+     * @param string|null $returnTo where the person returns; must be one of the application's redirect URIs.
+     *                              The issuer currently answers 400 without it, so pass it.
      *
      * @throws ApiStatusException|ApiConnectionException
      */
-    public function createStepUp(string $accessToken, string $action, string $returnTo, ?string $amount = null, ?string $currency = null): StepUp
+    public function createStepUp(string $accessToken, string $action, ?string $amount = null, ?string $currency = null, ?string $returnTo = null): StepUp
     {
         $body = ['action' => $action];
         if (null !== $amount) {
@@ -328,7 +329,9 @@ final class Authentication
         if (null !== $currency) {
             $body['currency'] = $currency;
         }
-        $body['return_to'] = $returnTo;
+        if (null !== $returnTo) {
+            $body['return_to'] = $returnTo;
+        }
 
         $response = $this->send('POST', $this->issuer . '/step-up/', accessToken: $accessToken, json: $body);
         $this->jsonObject($response);
