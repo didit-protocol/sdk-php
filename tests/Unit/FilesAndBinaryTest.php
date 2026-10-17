@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Unit;
 
-use Didit\Core\BinaryContent;
-use Didit\Core\NoContent;
+use Didit\Core\Multipart;
 use Didit\Exception\NotFoundException;
 use Didit\File;
 use Didit\Tests\Support\Http;
@@ -36,7 +35,8 @@ final class FilesAndBinaryTest extends TestCase
 
     protected function tearDown(): void
     {
-        foreach (glob($this->dir . '/*') ?: [] as $file) {
+        $files = glob($this->dir . '/*');
+        foreach (false === $files ? [] : $files as $file) {
             unlink($file);
         }
         rmdir($this->dir);
@@ -144,10 +144,14 @@ final class FilesAndBinaryTest extends TestCase
         self::assertSame(['file:file:image/heic:memory-bytes'], $fields['ref_image']);
     }
 
-    public function testFileFromStreamRejectsOtherValues(): void
+    public function testFileFromStreamRejectsAClosedResource(): void
     {
+        $handle = fopen('php://memory', 'rb');
+        self::assertIsResource($handle);
+        fclose($handle);
+
         $this->expectException(\InvalidArgumentException::class);
-        File::fromStream('not a stream');
+        File::fromStream($handle);
     }
 
     public function testMultipartBoundaryAndPartLayout(): void
@@ -195,7 +199,7 @@ final class FilesAndBinaryTest extends TestCase
         self::assertStringNotContainsString("\r\nX-Injected", $body);
     }
 
-    public function testMultipartFieldEncoding(): void
+    public function testMultipartFieldEncodingThroughAnOperation(): void
     {
         $this->support->http->queueJson(200, self::OK);
 
@@ -205,11 +209,7 @@ final class FilesAndBinaryTest extends TestCase
             'face_match_score_decline_threshold' => 0.85,
             'rotate_image' => true,
             'save_api_request' => false,
-            'vendor_data' => null,
-            'metadata' => ['user' => ['id' => 42, 'tags' => ['a', 'b']], 'flow' => 'onboarding', 'empty' => []],
-            'labels' => ['first', 'second', 3],
-            'objects' => [['k' => 1], ['k' => 2]],
-            'captured_at' => new \DateTimeImmutable('2026-03-01T12:00:00+02:00'),
+            'metadata' => ['user' => ['id' => 42, 'tags' => ['a', 'b']], 'flow' => 'onboarding'],
         ]);
 
         $request = $this->support->http->lastRequest();
@@ -219,13 +219,40 @@ final class FilesAndBinaryTest extends TestCase
             'face_match_score_decline_threshold' => ['0.85'],
             'rotate_image' => ['true'],
             'save_api_request' => ['false'],
-            'metadata' => ['{"user":{"id":42,"tags":["a","b"]},"flow":"onboarding","empty":[]}'],
-            'labels' => ['first', 'second', '3'],
-            'objects' => ['[{"k":1},{"k":2}]'],
-            'captured_at' => ['2026-03-01T12:00:00+02:00'],
-        ], Http::multipartFields($request), 'null is left out, lists of scalars repeat, objects are JSON');
-        self::assertStringNotContainsString('name="vendor_data"', (string) $request->getBody());
-        self::assertStringNotContainsString("name=\"metadata\"\r\nContent-Type", (string) $request->getBody(), 'text parts carry no content type');
+            'metadata' => ['{"user":{"id":42,"tags":["a","b"]},"flow":"onboarding"}'],
+        ], Http::multipartFields($request), 'booleans as true/false, objects as one JSON text field');
+        self::assertStringContainsString("Content-Disposition: form-data; name=\"metadata\"\r\n\r\n{", (string) $request->getBody(), 'text parts carry no content type');
+    }
+
+    public function testMultipartEncodingRules(): void
+    {
+        $body = Multipart::encode([
+            'vendor_data' => null,
+            'count' => 3,
+            'ratio' => 1.0,
+            'labels' => ['first', 'second', 3, true],
+            'files' => [File::fromBytes('a', 'a.png'), File::fromBytes('b', 'b.png')],
+            'objects' => [['k' => 1], ['k' => 2]],
+            'metadata' => [],
+            'captured_at' => new \DateTimeImmutable('2026-03-01T12:00:00+02:00'),
+            7 => 'numeric name',
+        ], 'B');
+
+        self::assertSame(
+            self::textPart('count', '3')
+            . self::textPart('ratio', '1.0')
+            . self::textPart('labels', 'first') . self::textPart('labels', 'second') . self::textPart('labels', '3') . self::textPart('labels', 'true')
+            . "--B\r\nContent-Disposition: form-data; name=\"files\"; filename=\"a.png\"\r\nContent-Type: image/png\r\n\r\na\r\n"
+            . "--B\r\nContent-Disposition: form-data; name=\"files\"; filename=\"b.png\"\r\nContent-Type: image/png\r\n\r\nb\r\n"
+            . self::textPart('objects', '[{"k":1},{"k":2}]')
+            . self::textPart('captured_at', '2026-03-01T12:00:00+02:00')
+            . self::textPart('7', 'numeric name')
+            . "--B--\r\n",
+            $body,
+            'null and empty lists are left out, lists of scalars and files repeat, lists of objects are JSON',
+        );
+        self::assertTrue(Multipart::containsFile(['files' => [File::fromBytes('a')]]), 'a file inside a list counts');
+        self::assertFalse(Multipart::containsFile(['metadata' => ['nested' => File::fromBytes('a')]]), 'only top-level files and lists of files');
     }
 
     public function testJsonOrMultipartOperationStaysJsonWithoutFiles(): void
@@ -267,16 +294,11 @@ final class FilesAndBinaryTest extends TestCase
     {
         $client = $this->support->client();
 
-        foreach ([
-            ['workflow_id' => 'wf', 'metadata' => ['scan' => File::fromBytes('x', 'x.png')]],
-            ['workflow_id' => 'wf', 'metadata' => ['scan' => Utils::streamFor('x')]],
-        ] as $params) {
-            try {
-                $client->sessions->create($params);
-                self::fail('the file was accepted');
-            } catch (\InvalidArgumentException $e) {
-                self::assertStringContainsString('multipart', $e->getMessage());
-            }
+        foreach ([File::fromBytes('x', 'x.png'), Utils::streamFor('x')] as $file) {
+            $error = self::thrown(static fn () => $client->sessions->create(['workflow_id' => 'wf', 'metadata' => ['scan' => $file]]));
+
+            self::assertInstanceOf(\InvalidArgumentException::class, $error);
+            self::assertStringContainsString('multipart', $error->getMessage());
         }
         self::assertSame([], $this->support->http->requests);
     }
@@ -293,7 +315,6 @@ final class FilesAndBinaryTest extends TestCase
         self::assertSame('/v3/session/abc/generate-pdf/', $request->getUri()->getPath());
         self::assertSame('application/pdf, application/json', $request->getHeaderLine('Accept'));
         self::assertFalse($request->hasHeader('Content-Type'));
-        self::assertInstanceOf(BinaryContent::class, $result);
         self::assertSame($pdf, $result->contents());
         self::assertSame($pdf, $result->contents(), 'contents can be read twice');
         self::assertSame($pdf, $result->stream()->getContents(), 'the stream is rewound');
@@ -340,10 +361,8 @@ final class FilesAndBinaryTest extends TestCase
     {
         $this->support->http->queue(204, '', ['X-Request-Id' => 'req_204']);
 
-        $result = $this->support->client()->cases->delete('case-1');
+        $raw = $this->support->client()->cases->delete('case-1')->rawResponse();
 
-        self::assertInstanceOf(NoContent::class, $result);
-        $raw = $result->rawResponse();
         self::assertNotNull($raw);
         self::assertSame(204, $raw->status);
         self::assertSame('req_204', $raw->requestId);
@@ -352,6 +371,25 @@ final class FilesAndBinaryTest extends TestCase
         self::assertSame('', $raw->body());
         self::assertNull($raw->parsedBody());
         self::assertSame('DELETE', $this->support->http->lastRequest()->getMethod());
+    }
+
+    private static function textPart(string $name, string $value): string
+    {
+        return "--B\r\nContent-Disposition: form-data; name=\"{$name}\"\r\n\r\n{$value}\r\n";
+    }
+
+    /**
+     * @param \Closure(): mixed $call
+     */
+    private static function thrown(\Closure $call): ?\Throwable
+    {
+        try {
+            $call();
+        } catch (\Throwable $e) {
+            return $e;
+        }
+
+        return null;
     }
 
     private function tempFile(string $name, string $contents): string

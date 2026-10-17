@@ -217,16 +217,14 @@ final class HeadersAndConfigTest extends TestCase
     {
         $client = $this->support->client()->withOptions(applicationId: '');
 
-        try {
-            $client->cases->list();
-            self::fail('no exception');
-        } catch (ConfigurationException $e) {
-            self::assertStringContainsString('DIDIT_APPLICATION_ID', $e->getMessage());
-        } catch (\InvalidArgumentException $e) {
-            self::markTestIncomplete('bug: withOptions(applicationId: \'\') keeps the empty string, so an application-scoped call fails with InvalidArgumentException "' . $e->getMessage() . '" instead of the ConfigurationException DESIGN section 4 requires.');
-        } finally {
-            self::assertSame([], $this->support->http->requests);
+        $error = self::thrown(static fn () => $client->cases->list());
+
+        self::assertSame([], $this->support->http->requests);
+        if ($error instanceof \InvalidArgumentException) {
+            self::markTestIncomplete('bug: withOptions(applicationId: \'\') keeps the empty string, so an application-scoped call fails with InvalidArgumentException "' . $error->getMessage() . '" instead of the ConfigurationException DESIGN section 4 requires.');
         }
+        self::assertInstanceOf(ConfigurationException::class, $error);
+        self::assertStringContainsString('DIDIT_APPLICATION_ID', $error->getMessage());
     }
 
     public function testAccountOperationsGoToTheAccountBaseUrlWithoutTheApiKey(): void
@@ -304,6 +302,20 @@ final class HeadersAndConfigTest extends TestCase
     private static function client(MockHttpClient $http): DiditClient
     {
         return new DiditClient(httpClient: $http, requestFactory: new HttpFactory(), streamFactory: new HttpFactory());
+    }
+
+    /**
+     * @param \Closure(): mixed $call
+     */
+    private static function thrown(\Closure $call): ?\Throwable
+    {
+        try {
+            $call();
+        } catch (\Throwable $e) {
+            return $e;
+        }
+
+        return null;
     }
 
     private static function dump(RequestInterface $request): string
