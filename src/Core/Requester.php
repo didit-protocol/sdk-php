@@ -164,11 +164,16 @@ final class Requester
         if (isset($link['host'])) {
             $linkScheme = strtolower($link['scheme'] ?? '');
             $baseScheme = strtolower($base['scheme']);
-            $sameHost = strtolower($link['host']) === strtolower($base['host'])
-                && self::port($link['port'] ?? null, $linkScheme) === self::port($base['port'] ?? null, $baseScheme);
-            // An http link on the same host is followed over the configured https origin.
-            $sameScheme = $linkScheme === $baseScheme || ('http' === $linkScheme && 'https' === $baseScheme && null === ($link['port'] ?? null));
-            if (!$sameHost || !$sameScheme || isset($link['user']) || isset($link['pass'])) {
+            $sameHost = strtolower($link['host']) === strtolower($base['host']);
+            $basePort = self::port($base['port'] ?? null, $baseScheme);
+            if ($linkScheme === $baseScheme) {
+                $sameOrigin = $sameHost && self::port($link['port'] ?? null, $linkScheme) === $basePort;
+            } else {
+                // An http link to the same host is followed over the configured https origin.
+                $sameOrigin = $sameHost && 'http' === $linkScheme && 'https' === $baseScheme
+                    && !isset($link['port']) && 443 === $basePort;
+            }
+            if (!$sameOrigin || isset($link['user']) || isset($link['pass'])) {
                 throw new DiditException('Refusing to follow a pagination link to another origin.');
             }
         }
@@ -314,15 +319,13 @@ final class Requester
             'X-Didit-Client' => 'php/' . Version::VERSION,
         ];
         foreach ($options->defaultHeaders as $name => $value) {
-            $headers[$name] = $value;
+            // The SDK owns the credential headers.
+            if (!\in_array(strtolower($name), ['x-api-key', 'authorization'], true)) {
+                $headers[$name] = $value;
+            }
         }
         foreach ($operationHeaders as $name => $value) {
             $headers[$name] = $value;
-        }
-        foreach (array_keys($headers) as $name) {
-            if (\in_array(strtolower($name), ['x-api-key', 'authorization'], true)) {
-                unset($headers[$name]);
-            }
         }
 
         switch ($operation->auth) {
