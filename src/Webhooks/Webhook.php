@@ -220,7 +220,7 @@ final class Webhook
     }
 
     /**
-     * @param array<string, mixed>        $payload
+     * @param array<string, mixed> $payload
      * @param array<string, list<string>> $headers
      */
     private static function checkTimestamp(array $payload, array $headers, int $tolerance, ?int $now): void
@@ -253,8 +253,8 @@ final class Webhook
      * whose value is the HMAC of its signed message under one of the secrets.
      *
      * @param array<string, list<string>> $headers
-     * @param array<string, string|null>  $signed  header name => signed message (null when it cannot be built)
-     * @param list<string>                $secrets
+     * @param array<string, string|null> $signed header name => signed message (null when it cannot be built)
+     * @param list<string> $secrets
      */
     private static function findMatch(array $headers, array $signed, array $secrets): ?string
     {
@@ -324,7 +324,7 @@ final class Webhook
         }
         $checked = $parsed
             ? [self::HEADER_SIGNATURE_V2, self::HEADER_SIGNATURE_V2_PREVIOUS]
-            : ($allowSimple ? self::SIGNATURE_HEADERS : array_slice(self::SIGNATURE_HEADERS, 0, 4));
+            : ($allowSimple ? self::SIGNATURE_HEADERS : \array_slice(self::SIGNATURE_HEADERS, 0, 4));
         if ([] === array_intersect($present, $checked)) {
             $message = $parsed
                 ? 'verifyParsed() can check only X-Signature-V2, and the request has none; pass the raw body to verify() instead.'

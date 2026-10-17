@@ -15,7 +15,7 @@ use Didit\Webhooks\Event;
  * `X-Didit-Unsigned-Callback: true`, type in `event_type`), so
  * {@see \Didit\Webhooks\Webhook::verify()} rejects it with
  * `missing_signature`. Build it with
- * {@see \Didit\Webhooks\Event::fromPayload()} and treat its content as
+ * {@see Event::fromPayload()} and treat its content as
  * untrusted: fetch the result from the API before acting on it.
  */
 final class KybRegistrySearchResolvedEvent extends Event

@@ -593,7 +593,8 @@ def _response(reg: Registry, o: Operation, prefix: str) -> Response:
 
 def _one_response(reg: Registry, doc: Document, o: Operation, status: str, ct: str, schema: Any, hint: str) -> Response:
     if ct == "":
-        return Response("none", status=status)
+        # 204 has no body; any other status documented without a schema is read as raw JSON.
+        return Response("none" if status in ("204", "205") else "json", status=status)
     if ct != "application/json":
         return Response("binary", status=status, content_type=ct)
     if schema is None:

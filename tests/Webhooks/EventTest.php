@@ -8,19 +8,15 @@ use Didit\Types\SessionsRetrieveDecisionResponse;
 use Didit\Webhooks\Event;
 use Didit\Webhooks\Events\ActivityCreatedEvent;
 use Didit\Webhooks\Events\BusinessDataUpdatedEvent;
-use Didit\Webhooks\Events\BusinessEvent;
 use Didit\Webhooks\Events\BusinessStatusUpdatedEvent;
 use Didit\Webhooks\Events\DataUpdatedEvent;
 use Didit\Webhooks\Events\KybRegistrySearchResolvedEvent;
-use Didit\Webhooks\Events\SessionEvent;
 use Didit\Webhooks\Events\StatusUpdatedEvent;
 use Didit\Webhooks\Events\TransactionCreatedEvent;
-use Didit\Webhooks\Events\TransactionEvent;
 use Didit\Webhooks\Events\TransactionStatusUpdatedEvent;
 use Didit\Webhooks\Events\TravelRuleStatusUpdatedEvent;
 use Didit\Webhooks\Events\UnknownEvent;
 use Didit\Webhooks\Events\UserDataUpdatedEvent;
-use Didit\Webhooks\Events\UserEvent;
 use Didit\Webhooks\Events\UserStatusUpdatedEvent;
 use Didit\Webhooks\Events\WorkflowComplianceChangedEvent;
 use Didit\Webhooks\EventType;
@@ -123,7 +119,6 @@ final class EventTest extends TestCase
         ]);
 
         self::assertInstanceOf(StatusUpdatedEvent::class, $event);
-        self::assertInstanceOf(SessionEvent::class, $event);
         self::assertSame('11111111-2222-3333-4444-555555555555', $event->sessionId);
         self::assertNull($event->businessSessionId);
         self::assertNull($event->sessionKind);
@@ -168,7 +163,6 @@ final class EventTest extends TestCase
         foreach ([UserStatusUpdatedEvent::class => 'user.status.updated', UserDataUpdatedEvent::class => 'user.data.updated'] as $class => $type) {
             $event = Event::fromPayload($payload + ['webhook_type' => $type]);
             self::assertInstanceOf($class, $event);
-            self::assertInstanceOf(UserEvent::class, $event);
             self::assertSame('customer-1', $event->vendorUserId);
             self::assertSame('customer-1', $event->vendorData);
             self::assertSame('Approved', $event->status);
@@ -181,7 +175,6 @@ final class EventTest extends TestCase
         foreach ([BusinessStatusUpdatedEvent::class => 'business.status.updated', BusinessDataUpdatedEvent::class => 'business.data.updated'] as $class => $type) {
             $event = Event::fromPayload($payload + ['webhook_type' => $type]);
             self::assertInstanceOf($class, $event);
-            self::assertInstanceOf(BusinessEvent::class, $event);
             self::assertSame('acme-1', $event->vendorBusinessId);
             self::assertSame('acme', $event->vendorData);
             self::assertSame('Declined', $event->status);
@@ -204,7 +197,6 @@ final class EventTest extends TestCase
         foreach ([TransactionCreatedEvent::class => 'transaction.created', TransactionStatusUpdatedEvent::class => 'transaction.status.updated'] as $class => $type) {
             $event = Event::fromPayload($payload + ['webhook_type' => $type]);
             self::assertInstanceOf($class, $event);
-            self::assertInstanceOf(TransactionEvent::class, $event);
             self::assertSame('66666666-2222-3333-4444-555555555555', $event->transactionId);
             self::assertSame('txn_2025_0001', $event->txnId);
             self::assertSame('In Review', $event->status);

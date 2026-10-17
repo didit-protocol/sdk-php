@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Resources\Account;
 
 use Didit\Core\BaseResource;
-use Didit\Core\NoContent;
+use Didit\Core\JsonResponse;
 use Didit\Core\Operation;
 use Didit\Exception\DiditException;
 use Didit\Params;
@@ -35,7 +35,7 @@ final class Applications extends BaseResource
      *
      * @throws DiditException
      */
-    public function list(string $orgId, ?RequestOptions $options = null): NoContent
+    public function list(string $orgId, ?RequestOptions $options = null): JsonResponse
     {
         $response = $this->requester->request(new Operation(
             method: 'GET',
@@ -44,7 +44,7 @@ final class Applications extends BaseResource
             base: 'account',
         ), ['org_id' => $orgId], [], $options);
 
-        return NoContent::fromResponse($response);
+        return JsonResponse::fromResponse($response);
     }
 
     /**

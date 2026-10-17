@@ -242,14 +242,14 @@ final class CanonicalJsonTest extends TestCase
 
     public function testFloatsDoNotDependOnPrecisionSettings(): void
     {
-        $precision = ini_get('precision');
-        $serializePrecision = ini_get('serialize_precision');
+        $precision = \ini_get('precision');
+        $serializePrecision = \ini_get('serialize_precision');
         ini_set('precision', '3');
         ini_set('serialize_precision', '5');
         try {
             self::assertSame('[0.30000000000000004,1.5e-05,123456789.123]', CanonicalJson::canonicalize('[0.30000000000000004,1.5e-05,123456789.123]'));
             self::assertSame('0.30000000000000004', CanonicalJson::pythonRepr(0.1 + 0.2));
-            self::assertSame('5', ini_get('serialize_precision'));
+            self::assertSame('5', \ini_get('serialize_precision'));
         } finally {
             ini_set('precision', $precision);
             ini_set('serialize_precision', $serializePrecision);
