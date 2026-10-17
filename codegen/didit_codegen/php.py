@@ -504,10 +504,7 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
     doc.append("@throws DiditException")
     if o.deprecated or o.op.get("deprecated"):
         doc.append("")
-        if o.deprecated:
-            doc.append(f"@deprecated This operation was removed from the API{(' on ' + o.removed_note) if o.removed_note else ''}; this method will be deleted in the next minor version.")
-        else:
-            doc.append("@deprecated The API marks this operation as deprecated.")
+        doc.append("@deprecated " + annotation_text(_deprecation(o)))
     lines.append(docblock(doc, "    ").rstrip("\n"))
 
     args = [f"{pp.php} ${pp.var}" for pp in om.path_params]
@@ -585,6 +582,17 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
     if "Types\\" in text:
         imports.add("Didit\\Types")
     return lines, imports, om.body_alias
+
+
+def _deprecation(o) -> str:
+    if o.renamed_to is not None:
+        n = o.renamed_to
+        accessor = "->".join(naming.camel(seg) for seg in n.resource.split("."))
+        return f"Renamed to `$didit->{accessor}->{naming.camel(n.method)}()`; this alias will be deleted in the next minor version."
+    if o.deprecated:
+        on = f" on {o.removed_note}" if o.removed_note else ""
+        return f"This operation was removed from the API{on}; this method will be deleted in the next minor version."
+    return "The API marks this operation as deprecated."
 
 
 def _params_required(om: OpModel) -> bool:

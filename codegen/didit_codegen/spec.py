@@ -65,6 +65,7 @@ class Operation:
     naming: Naming
     deprecated: bool = False
     removed_note: str | None = None
+    renamed_to: Naming | None = None  # set on the deprecated alias of a renamed operation
     parameters: list[dict[str, Any]] = field(default_factory=list)
 
     @property
@@ -139,12 +140,21 @@ def load(root: Path) -> Spec:
             f"openapi/overlay.json (or x-didit-sdk upstream), see docs/DESIGN.md section 4:\n{lines}"
         )
 
-    present = {o.key for o in operations}
+    present = {o.key: o for o in operations}
     for entry in deprecated:
         key = entry["key"]
+        if entry.get("alias"):
+            alias = _alias(entry, present.get(key))
+            if alias is not None:
+                operations.append(alias)
+            continue
         if key in present:
             continue  # the operation came back upstream
-        doc = account if key.startswith("account ") else verification
+        base = account if key.startswith("account ") else verification
+        # The entry carries the component schemas its operation used, so it
+        # builds without the upstream document it was removed from, and its
+        # types keep their component names.
+        doc = Document(base.name, {"components": entry.get("components", {})})
         method, path = key.removeprefix("account ").split(" ", 1)
         op = entry["operation"]
         operations.append(
@@ -158,6 +168,21 @@ def load(root: Path) -> Spec:
     for o in operations:
         o.parameters = _parameters(o)
     return Spec(root, verification, account, overlay, deprecated, operations)
+
+
+def _alias(entry: dict[str, Any], current: Operation | None) -> Operation | None:
+    """The previous SDK name of a renamed operation, kept as a deprecated method."""
+    if current is None or not current.naming.server:
+        return None
+    old = _naming_from(entry["x-didit-sdk"], current.key)
+    n = current.naming
+    if (old.resource, old.method) == (n.resource, n.method):
+        return None  # the rename was reverted
+    return Operation(
+        current.key, current.doc, current.http_method, current.path, current.op, current.path_item,
+        Naming(old.resource, old.method, n.auth, n.server, n.scope),
+        deprecated=True, removed_note=entry.get("removed_on"), renamed_to=n,
+    )
 
 
 def _parameters(o: Operation) -> list[dict[str, Any]]:

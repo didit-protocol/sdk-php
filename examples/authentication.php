@@ -18,6 +18,7 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use Didit\Authentication\Authentication;
 use Didit\Authentication\TokenVerificationException;
+use Didit\Exception\AuthenticationException;
 use Didit\Exception\DiditException;
 
 $env = static function (string $name): ?string {
@@ -62,8 +63,10 @@ try {
     echo "\nValid access token for {$claims->sub} (session {$claims->sid})\n";
     echo "  client_id:   {$claims->clientId}\n";
     echo "  vendor_data: {$claims->vendorData}\n";
-    echo '  signed in with: ' . implode(', ', $claims->amr ?? []) . "\n";
-    echo '  expires:     ' . date('c', $claims->exp ?? 0) . "\n";
+    echo '  signed in:   ' . implode(', ', $claims->amr ?? []) . "\n";
+    if (null !== $claims->exp) {
+        echo '  expires:     ' . date('c', $claims->exp) . "\n";
+    }
     if (null !== $claims->org) {
         echo "  organization: {$claims->org->id} as {$claims->org->role}\n";
     }
@@ -77,8 +80,13 @@ try {
     // Tokens stay valid offline until they expire. For sensitive actions, ask the
     // issuer whether the session is still alive (it fails at once after a sign-out).
     if (\in_array('--check-session', $argv, true)) {
-        $session = $auth->getSession($token);
-        echo "  live session: {$session->sid}, expires {$session->expiresAt?->format('c')}\n";
+        try {
+            $session = $auth->getSession($token);
+            echo "  session:     {$session->sid} is active\n";
+        } catch (AuthenticationException) {
+            fwrite(\STDERR, "The session was signed out or revoked.\n");
+            exit(1);
+        }
     }
 } catch (TokenVerificationException $e) {
     // `reason` is machine-readable: expired, invalid_signature, invalid_audience, ...
