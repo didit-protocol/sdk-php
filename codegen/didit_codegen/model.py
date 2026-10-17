@@ -172,7 +172,7 @@ class Registry:
         nullable = bool(schema.get("nullable"))
 
         if "$ref" in schema:
-            t = self._convert_ref(doc, schema["$ref"], mode, origin)
+            t = self._convert_ref(doc, schema["$ref"], hint, mode, origin)
             t.nullable = t.nullable or nullable
             return t
 
@@ -227,10 +227,11 @@ class Registry:
             return Scalar("bool", nullable=nullable)
         return AnyT(nullable=nullable)
 
-    def _convert_ref(self, doc: Document, ref: str, mode: str, origin: str) -> T:
+    def _convert_ref(self, doc: Document, ref: str, hint: str, mode: str, origin: str) -> T:
         target = doc.resolve(ref)
         if not ref.startswith(REF_PREFIX):
-            return self._convert(doc, target, naming.class_name(ref.rsplit("/", 1)[-1]), mode, ref)
+            # A reference into another operation: named after where it is used first.
+            return self._convert(doc, target, hint, mode, f"{doc.name}:{ref}")
         component = ref[len(REF_PREFIX):]
         name = naming.class_name(component)
         target_d = doc.deref(target)
