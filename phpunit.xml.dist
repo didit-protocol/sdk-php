@@ -25,9 +25,16 @@
             <directory>tests/Live</directory>
         </testsuite>
     </testsuites>
+    <!-- Coverage measures the hand-written core; the generated layer is covered by tests/Generated. -->
     <source>
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <directory>src/Resources</directory>
+            <directory>src/Types</directory>
+            <file>src/DiditClient.php</file>
+            <file>src/Params.php</file>
+        </exclude>
     </source>
 </phpunit>
