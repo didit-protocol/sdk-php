@@ -45,7 +45,7 @@ final class Users extends BaseResource
      * @return Page<Types\UserListItem>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -67,7 +67,7 @@ final class Users extends BaseResource
      * @param string $vendorData your unique identifier for the user, a free-form string (NOT a UUID)
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieve(string $vendorData, ?RequestOptions $options = null): Types\UserDetailItem
     {
@@ -94,7 +94,7 @@ final class Users extends BaseResource
      * @param UsersUpdateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function update(
         string $vendorData,
@@ -124,7 +124,7 @@ final class Users extends BaseResource
      * @param string $vendorData your unique identifier for the user, a free-form string (NOT a UUID)
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function generatePdf(string $vendorData, ?RequestOptions $options = null): BinaryContent
     {
@@ -151,7 +151,7 @@ final class Users extends BaseResource
      * @param UsersBatchDeleteParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function batchDelete(array $params = [], ?RequestOptions $options = null): Types\UsersBatchDeleteResponse
     {
@@ -179,7 +179,7 @@ final class Users extends BaseResource
      * @param UsersSetAmlMonitoringParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function setAmlMonitoring(
         array $params,
@@ -210,7 +210,7 @@ final class Users extends BaseResource
      * @param UsersUpdateStatusParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function updateStatus(
         string $vendorData,
@@ -238,7 +238,7 @@ final class Users extends BaseResource
      * @param UsersCreateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\UserDetailItem
     {
@@ -266,7 +266,7 @@ final class Users extends BaseResource
      * @param UsersUploadFaceParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function uploadFace(
         string $diditInternalId,
@@ -297,7 +297,7 @@ final class Users extends BaseResource
      * @param UsersSetOngoingMonitoringParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function setOngoingMonitoring(
         array $params,
@@ -327,7 +327,7 @@ final class Users extends BaseResource
      * @param string $jobId monitoring job UUID returned by the toggle endpoint
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieveOngoingMonitoringJob(
         string $jobId,
@@ -352,7 +352,7 @@ final class Users extends BaseResource
      * @param string $vendorUserUuid vendor user UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listNetworks(
         string $vendorUserUuid,

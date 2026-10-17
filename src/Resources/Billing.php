@@ -51,7 +51,7 @@ final class Billing extends BaseResource
      * @param BillingTopUpParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function topUp(array $params, ?RequestOptions $options = null): Types\BillingTopUpResponse
     {

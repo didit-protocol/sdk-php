@@ -296,6 +296,11 @@ final class Requester
             if (null === $value || '' === (string) $value) {
                 throw new \InvalidArgumentException(\sprintf('Missing path parameter "%s".', $match[1]));
             }
+            // rawurlencode() keeps dots, and HTTP clients collapse "." and ".."
+            // segments, which would send the request to another endpoint.
+            if ('.' === (string) $value || '..' === (string) $value) {
+                throw new \InvalidArgumentException(\sprintf('Path parameter "%s" must not be "." or "..".', $match[1]));
+            }
 
             return rawurlencode((string) $value);
         }, $operation->path);

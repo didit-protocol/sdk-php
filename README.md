@@ -160,7 +160,7 @@ try {
 Failed requests are retried up to `maxRetries` times (default 2) with exponential backoff from 0.5 s with full jitter, capped at 8 s, honouring `Retry-After` (capped at 60 s).
 `GET`, `HEAD`, `PUT` and `DELETE` are retried on connection errors, timeouts, 408, 429 and 5xx.
 `POST` and `PATCH` are never retried once the request may have reached the server (a 5xx or a read timeout); they are retried only when the connection failed before sending, or on 429.
-`timeout` (default 60 s) applies to each attempt and is set natively on Guzzle and Symfony HttpClient; with another PSR-18 client, configure the timeout on that client.
+`timeout` (default 60 s) applies to each attempt and is set natively on Guzzle and Symfony HttpClient 6.2 or later; with another PSR-18 client (or an older Symfony HttpClient), configure the timeout on that client.
 
 ## Pagination
 

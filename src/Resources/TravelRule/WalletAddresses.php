@@ -37,7 +37,7 @@ final class WalletAddresses extends BaseResource
      * @return Page<Types\WalletAddressEntry>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -59,7 +59,7 @@ final class WalletAddresses extends BaseResource
      * @param WalletAddressEntryCreate $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\WalletAddressEntry
     {
@@ -84,7 +84,7 @@ final class WalletAddresses extends BaseResource
      * @param WalletAddressEntryUpdate $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function update(
         string $entryUuid,
@@ -109,7 +109,7 @@ final class WalletAddresses extends BaseResource
      * `DELETE /v3/travel-rule/wallet-addresses/{entry_uuid}/`
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function delete(string $entryUuid, ?RequestOptions $options = null): NoContent
     {

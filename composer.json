@@ -54,7 +54,7 @@
     "suggest": {
         "ext-openssl": "Required by Didit\\Authentication to verify ES256 access and ID tokens.",
         "guzzlehttp/guzzle": "The recommended PSR-18 HTTP client; the SDK applies its timeouts natively.",
-        "symfony/http-client": "An alternative PSR-18 HTTP client; the SDK applies its timeouts natively."
+        "symfony/http-client": "An alternative PSR-18 HTTP client; the SDK applies its timeouts natively from version 6.2."
     },
     "autoload": {
         "psr-4": {

@@ -37,7 +37,7 @@ final class ReportTemplates extends BaseResource
      * @return Page<Types\ReportTemplateDetail>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -63,7 +63,7 @@ final class ReportTemplates extends BaseResource
      * @param ReportTemplatesCreateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\ReportTemplateDetail
     {
@@ -88,7 +88,7 @@ final class ReportTemplates extends BaseResource
      * @param string $templateUuid report template UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieve(string $templateUuid, ?RequestOptions $options = null): Types\ReportTemplateDetail
     {
@@ -112,7 +112,7 @@ final class ReportTemplates extends BaseResource
      * @param ReportTemplatesUpdateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function update(
         string $templateUuid,
@@ -140,7 +140,7 @@ final class ReportTemplates extends BaseResource
      * @param string $templateUuid report template UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function delete(string $templateUuid, ?RequestOptions $options = null): NoContent
     {

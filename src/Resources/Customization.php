@@ -54,7 +54,7 @@ final class Customization extends BaseResource
      * @param CustomizationUpdateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function update(array $params = [], ?RequestOptions $options = null): Types\BrandingCustomization
     {

@@ -41,7 +41,7 @@ final class Blueprints extends BaseResource
      * @return Page<Types\CaseBlueprintListItem>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -66,7 +66,7 @@ final class Blueprints extends BaseResource
      * @param CasesBlueprintsCreateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\CaseBlueprintDetail
     {
@@ -92,7 +92,7 @@ final class Blueprints extends BaseResource
      * @param string $blueprintUuid blueprint UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieve(string $blueprintUuid, ?RequestOptions $options = null): Types\CaseBlueprintDetail
     {
@@ -116,7 +116,7 @@ final class Blueprints extends BaseResource
      * @param CasesBlueprintsUpdateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function update(
         string $blueprintUuid,
@@ -148,7 +148,7 @@ final class Blueprints extends BaseResource
      * @param string $blueprintUuid blueprint UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function delete(string $blueprintUuid, ?RequestOptions $options = null): NoContent
     {
@@ -193,7 +193,7 @@ final class Blueprints extends BaseResource
      * @param CasesBlueprintsInstallPresetsParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function installPresets(
         array $params = [],
@@ -218,7 +218,7 @@ final class Blueprints extends BaseResource
      * @param CasePublicationPolicyDraftPreconditionRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function publish(
         string $blueprintUuid,
@@ -242,7 +242,7 @@ final class Blueprints extends BaseResource
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/draft/`
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieveDraft(
         string $blueprintUuid,
@@ -266,7 +266,7 @@ final class Blueprints extends BaseResource
      * @param CasePublicationPolicyDraftWriteRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function saveDraft(
         string $blueprintUuid,
@@ -293,7 +293,7 @@ final class Blueprints extends BaseResource
      * @param CasePublicationPolicyDraftPreconditionRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function discardDraft(string $blueprintUuid, array $params, ?RequestOptions $options = null): NoContent
     {
@@ -318,7 +318,7 @@ final class Blueprints extends BaseResource
      * @return Page<Types\CasePublicationPolicyRevision>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listHistory(string $blueprintUuid, array $params = [], ?RequestOptions $options = null): Page
     {

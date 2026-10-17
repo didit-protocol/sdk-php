@@ -15,7 +15,7 @@ python3 --version         # 3.10 or newer, for the generator (standard library o
 |---|---|---|
 | `openapi/verification.json`, `openapi/account.json`, `openapi/webhook-vectors.json` | Upstream copies | Never (spec sync only) |
 | `openapi/overlay.json` | SDK naming (`x-didit-sdk`) for operations that do not carry it upstream yet | Yes |
-| `openapi/deprecated-operations.json` | Operations removed upstream, kept as deprecated methods for one minor version | Spec sync only |
+| `openapi/deprecated-operations.json` | Operations removed upstream, renamed, or no longer server operations, kept as deprecated methods for one minor version | Spec sync only |
 | `codegen/` | The generator (Python) and its tests | Yes |
 | `src/Resources/`, `src/Types/`, `src/DiditClient.php`, `src/Params.php`, `tests/Generated/` | Generated layer | Never |
 | `src/Core/`, `src/Exception/`, `src/Webhooks/`, `src/Authentication/`, `src/File.php`, `src/RequestOptions.php`, `src/Version.php` | Hand-written core | Yes |
@@ -40,6 +40,7 @@ Unit tests never touch the network. Live smoke tests run only when `DIDIT_SANDBO
 The API surface comes from the OpenAPI contract published at docs.didit.me (mintlify-docs).
 To add or change an endpoint, change the backend and the OpenAPI document there; the daily spec sync (`.github/workflows/spec-sync.yml`) then opens a `chore(spec): sync API spec YYYY-MM-DD` pull request here and in the other six SDKs.
 A new server operation without SDK naming fails the generator with a message that names it: add an entry to `openapi/overlay.json` (or `x-didit-sdk` upstream).
+When a sync breaks the SDK surface (a method deprecated or deleted, a field removed), its commit and pull request end with a `BREAKING CHANGE:` footer, so Release Please never ships it in a patch release; keep that footer when you merge.
 
 A change to hand-written core behaviour that DESIGN.md describes (client options, errors, retries, pagination, webhooks, Authentication) is made in all seven SDK repositories, one pull request each, and DESIGN.md is updated in all seven in the same words.
 
@@ -56,7 +57,7 @@ Nothing is released before the first release is approved (not before the 2026-11
 
 1. Release Please (`.github/workflows/release-please.yml`) keeps a release pull request open with the next version and changelog. It runs only when the repository variable `RELEASES_ENABLED` is `true`.
 2. Merging that pull request tags `vX.Y.Z` and publishes a GitHub release.
-3. `.github/workflows/publish.yml` checks that the tag equals `Didit\Version::VERSION`, runs the tests and PHPStan, builds the archive Composer installs, attests its build provenance (GitHub artifact attestations), attaches it to the release and asks Packagist to update.
+3. `.github/workflows/publish.yml` (also gated on `RELEASES_ENABLED`, and skipped for prereleases) checks that the tag equals `Didit\Version::VERSION`, runs the tests and PHPStan, builds the archive Composer installs, attests its build provenance (GitHub artifact attestations), attaches it to the release and asks Packagist to update.
 
 ### One-time registry setup (a maintainer, before the first release)
 

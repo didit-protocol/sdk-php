@@ -37,7 +37,7 @@ final class Notes extends BaseResource
      * @param NetworksNotesDeleteParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function delete(
         string $networkUuid,
@@ -69,7 +69,7 @@ final class Notes extends BaseResource
      * @return Page<Types\NetworkNote>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(string $networkUuid, array $params = [], ?RequestOptions $options = null): Page
     {
@@ -96,7 +96,7 @@ final class Notes extends BaseResource
      * @param NetworksNotesCreateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(string $networkUuid, array $params, ?RequestOptions $options = null): Types\NetworkNote
     {

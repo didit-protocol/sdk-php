@@ -40,7 +40,7 @@ final class RoutingRules extends BaseResource
      * @return Page<Types\RoutingPublicationPolicyRevision>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listHistory(string $recordUuid, array $params = [], ?RequestOptions $options = null): Page
     {
@@ -60,7 +60,7 @@ final class RoutingRules extends BaseResource
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/`
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieve(string $recordUuid, ?RequestOptions $options = null): Types\CaseRoutingRule
     {
@@ -83,7 +83,7 @@ final class RoutingRules extends BaseResource
      * @param CaseRoutingRuleUpdate $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function update(
         string $recordUuid,
@@ -113,7 +113,7 @@ final class RoutingRules extends BaseResource
      * @return Page<Types\CaseRoutingRule>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -136,7 +136,7 @@ final class RoutingRules extends BaseResource
      * @param CaseRoutingRuleCreate $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\CaseRoutingRule
     {
@@ -160,7 +160,7 @@ final class RoutingRules extends BaseResource
      * @param RoutingPublicationPolicyDraftPreconditionRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function publish(
         string $recordUuid,
@@ -184,7 +184,7 @@ final class RoutingRules extends BaseResource
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/draft/`
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieveDraft(
         string $recordUuid,
@@ -208,7 +208,7 @@ final class RoutingRules extends BaseResource
      * @param RoutingPublicationPolicyDraftWriteRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function saveDraft(
         string $recordUuid,
@@ -235,7 +235,7 @@ final class RoutingRules extends BaseResource
      * @param RoutingPublicationPolicyDraftPreconditionRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function discardDraft(string $recordUuid, array $params, ?RequestOptions $options = null): NoContent
     {
@@ -261,7 +261,7 @@ final class RoutingRules extends BaseResource
      * @param CaseRoutingPreviewRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function preview(array $params, ?RequestOptions $options = null): Types\CaseRoutingPreview
     {

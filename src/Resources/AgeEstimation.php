@@ -33,7 +33,7 @@ final class AgeEstimation extends BaseResource
      * @param AgeEstimationEstimateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function estimate(array $params, ?RequestOptions $options = null): Types\AgeEstimationEstimateResponse
     {

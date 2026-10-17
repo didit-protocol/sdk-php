@@ -15,9 +15,9 @@ useDefault = true
 [allowlist]
 description = "Upstream OpenAPI copies and synthetic webhook test secrets"
 paths = [
-  '''(^|/)openapi/verification\.json$''',
-  '''(^|/)openapi/account\.json$''',
-  '''(^|/)openapi/webhook-vectors\.json$''',
+  '''^openapi/verification\.json$''',
+  '''^openapi/account\.json$''',
+  '''^openapi/webhook-vectors\.json$''',
 ]
 regexTarget = "match"
 regexes = [

@@ -22,7 +22,8 @@ final class StderrLogger extends AbstractLogger
         $line = \sprintf('[didit] %s %s', \is_string($level) ? $level : 'debug', (string) $message);
         $stream = \defined('STDERR') ? \STDERR : fopen('php://stderr', 'w');
         if (false !== $stream) {
-            fwrite($stream, $line . \PHP_EOL);
+            // "\n" rather than PHP_EOL, so the output is the same on every platform.
+            fwrite($stream, $line . "\n");
         }
     }
 }

@@ -20,13 +20,19 @@ final class Json
 
     /**
      * @param mixed $hint where the value holds JSON objects (see {@see Operation::$jsonHints})
+     *
+     * @throws \InvalidArgumentException when the value cannot be encoded (NAN, INF, invalid UTF-8)
      */
     public static function encode(mixed $value, mixed $hint = null): string
     {
-        return json_encode(
-            self::prepare($value, $hint),
-            \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_PRESERVE_ZERO_FRACTION,
-        );
+        try {
+            return json_encode(
+                self::prepare($value, $hint),
+                \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_PRESERVE_ZERO_FRACTION,
+            );
+        } catch (\JsonException $e) {
+            throw new \InvalidArgumentException('The request body cannot be encoded as JSON: ' . $e->getMessage(), 0, $e);
+        }
     }
 
     /**

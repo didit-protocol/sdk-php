@@ -12,6 +12,7 @@ use Didit\Exception\ApiConnectionException;
 use Didit\Exception\NotFoundException;
 use Didit\File;
 use Didit\Tests\Support\MockHttpClient;
+use Didit\Tests\Support\PhpProcess;
 use Didit\Tests\Support\TestClient;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\HttpFactory;
@@ -181,7 +182,7 @@ final class LoggingTest extends TestCase
 
     public function testStderrLoggerFormat(): void
     {
-        $output = self::runPhp(<<<'PHP'
+        $output = PhpProcess::run(<<<'PHP'
             $logger = new Didit\Core\StderrLogger();
             $logger->debug('GET /v3/sessions/ 200 12ms request_id=req_1');
             $logger->warning(new class implements Stringable {
@@ -207,12 +208,12 @@ final class LoggingTest extends TestCase
             $client->sessions->retrieveDecision('abc');
             PHP;
 
-        $output = self::runPhp($code, ['DIDIT_LOG' => 'debug']);
+        $output = PhpProcess::run($code, ['DIDIT_LOG' => 'debug']);
         self::assertSame('', $output['stdout']);
         self::assertMatchesRegularExpression('#^\[didit\] debug GET /v3/session/abc/decision/ 200 \d+ms request_id=req_env\n$#', $output['stderr']);
         self::assertStringNotContainsString('test_api_key_123', $output['stderr']);
 
-        self::assertSame(['stdout' => '', 'stderr' => ''], self::runPhp($code), 'silent without DIDIT_LOG');
+        self::assertSame(['stdout' => '', 'stderr' => ''], PhpProcess::run($code), 'silent without DIDIT_LOG');
     }
 
     private function logger(): LoggerInterface
@@ -273,37 +274,5 @@ final class LoggingTest extends TestCase
     {
         putenv('DIDIT_LOG');
         unset($_ENV['DIDIT_LOG'], $_SERVER['DIDIT_LOG']);
-    }
-
-    /**
-     * Runs PHP code in a child process with the autoloader and returns its output.
-     *
-     * @param array<string, string> $env
-     *
-     * @return array{stdout: string, stderr: string}
-     */
-    private static function runPhp(string $code, array $env = []): array
-    {
-        $autoload = \dirname(__DIR__, 2) . '/vendor/autoload.php';
-        $script = 'require ' . var_export($autoload, true) . ";\n" . $code;
-        $environment = getenv();
-        unset($environment['DIDIT_LOG'], $environment['DIDIT_API_KEY']);
-        $process = proc_open(
-            [\PHP_BINARY, '-d', 'display_errors=stderr', '-r', $script],
-            [1 => ['pipe', 'w'], 2 => ['pipe', 'w']],
-            $pipes,
-            null,
-            $env + $environment,
-        );
-        self::assertIsResource($process);
-        $stdout = stream_get_contents($pipes[1]);
-        $stderr = stream_get_contents($pipes[2]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        self::assertSame(0, proc_close($process), "child process failed:\n{$stdout}\n{$stderr}");
-        self::assertIsString($stdout);
-        self::assertIsString($stderr);
-
-        return ['stdout' => $stdout, 'stderr' => $stderr];
     }
 }

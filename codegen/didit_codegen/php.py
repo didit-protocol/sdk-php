@@ -504,7 +504,7 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
     doc.append("")
     doc.append("@throws DiditException")
     if om.path_params or om.body_alias:
-        doc.append("@throws \\InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded")
+        doc.append("@throws \\InvalidArgumentException when a path parameter is empty, \".\" or \"..\", or a parameter value cannot be encoded")
     if o.deprecated or o.op.get("deprecated"):
         doc.append("")
         doc.append("@deprecated " + annotation_text(_deprecation(o)))
@@ -594,6 +594,8 @@ def _deprecation(o: Operation) -> str:
         return f"Renamed to `$didit->{accessor}->{naming.camel(n.method)}()`; this alias will be deleted in the next minor version."
     if o.deprecated:
         on = f" on {o.removed_note}" if o.removed_note else ""
+        if o.not_server:
+            return f"This operation stopped being a server operation{on}; this method will be deleted in the next minor version."
         return f"This operation was removed from the API{on}; this method will be deleted in the next minor version."
     return "The API marks this operation as deprecated."
 

@@ -66,7 +66,7 @@ final class TravelRule extends BaseResource
      * @param TravelRuleSettingsUpdate $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function updateSettings(array $params = [], ?RequestOptions $options = null): Types\TravelRuleSettingsDetail
     {
@@ -92,7 +92,7 @@ final class TravelRule extends BaseResource
      * @return Page<Types\VaspDirectoryEntry>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listVasps(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -116,7 +116,7 @@ final class TravelRule extends BaseResource
      * @param TravelRuleInboundRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function registerInbound(array $params, ?RequestOptions $options = null): Types\TravelRuleInboundResponse
     {
@@ -143,7 +143,7 @@ final class TravelRule extends BaseResource
      * @param TravelRuleWidgetSessionCreate $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function createWidgetSession(
         array $params,
