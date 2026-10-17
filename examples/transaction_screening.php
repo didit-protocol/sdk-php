@@ -50,7 +50,7 @@ try {
     $uuid = $transaction->uuid ?? throw new UnexpectedValueException('The response has no uuid.');
     $detail = $didit->transactions->retrieve($uuid);
     echo "  {$detail->direction} {$detail->amount} {$detail->currency}: "
-        . \count($detail->alerts ?? []) . ' alerts, ' . \count($detail->ruleRuns ?? []) . " rule runs\n";
+        . count($detail->alerts ?? []) . ' alerts, ' . count($detail->ruleRuns ?? []) . " rule runs\n";
 
     // The list endpoint pages with limit/offset and has no server-side filters,
     // so filter while iterating.

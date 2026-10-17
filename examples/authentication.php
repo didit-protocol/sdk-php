@@ -79,7 +79,7 @@ try {
 
     // Tokens stay valid offline until they expire. For sensitive actions, ask the
     // issuer whether the session is still alive (it fails at once after a sign-out).
-    if (\in_array('--check-session', $argv, true)) {
+    if (in_array('--check-session', $argv, true)) {
         try {
             $session = $auth->getSession($token);
             echo "  session:     {$session->sid} is active\n";

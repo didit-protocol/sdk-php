@@ -41,8 +41,8 @@ function requestHeaders(): array
 {
     $all = getallheaders();
     $headers = [];
-    foreach (\is_array($all) ? $all : [] as $name => $value) {
-        if (\is_string($name) && \is_string($value)) {
+    foreach (is_array($all) ? $all : [] as $name => $value) {
+        if (is_string($name) && is_string($value)) {
             $headers[$name] = $value;
         }
     }
@@ -98,7 +98,7 @@ try {
     // During a secret rotation, pass both secrets: [$newSecret, $oldSecret].
     $event = Webhook::verify($body, requestHeaders(), $secret);
 } catch (WebhookVerificationException $e) {
-    $signatureProblem = \in_array($e->reason, [
+    $signatureProblem = in_array($e->reason, [
         WebhookVerificationException::MISSING_SIGNATURE,
         WebhookVerificationException::INVALID_SIGNATURE,
     ], true);
