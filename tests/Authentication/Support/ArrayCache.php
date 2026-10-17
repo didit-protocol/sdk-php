@@ -15,8 +15,8 @@ final class ArrayCache implements CacheInterface
     /** @var array<string, array{mixed, float|null}> */
     public array $items = [];
 
-    /** @var list<string> */
-    public array $keysWritten = [];
+    /** @var list<string> Every key the SDK used, valid or not. */
+    public array $keysUsed = [];
 
     public bool $broken = false;
 
@@ -49,7 +49,6 @@ final class ArrayCache implements CacheInterface
         if ($ttl instanceof \DateInterval) {
             throw new \LogicException('The SDK passes integer TTLs.');
         }
-        $this->keysWritten[] = $key;
         $this->items[$key] = [unserialize(serialize($value)), null === $ttl ? null : ($this->clock)() + $ttl];
 
         return true;
@@ -107,6 +106,7 @@ final class ArrayCache implements CacheInterface
 
     private function check(string $key): void
     {
+        $this->keysUsed[] = $key;
         if ($this->broken) {
             throw new \RuntimeException('Cache backend is down.');
         }

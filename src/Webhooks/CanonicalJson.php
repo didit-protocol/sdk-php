@@ -588,8 +588,8 @@ final class CanonicalJson
     }
 
     /**
-     * Fallback for hosts that disable `ini_set`: the first correctly rounded
-     * precision that reads back as the same float.
+     * Fallback for hosts that disable `ini_set`: the fewest digits that read
+     * back as the same float, found by trying each precision in turn.
      */
     private static function roundTripTextWithoutIni(float $value): string
     {
@@ -597,6 +597,17 @@ final class CanonicalJson
             $text = strtr(\sprintf('%.' . $precision . 'e', $value), ',', '.');
             if ((float) $text === $value) {
                 return $text;
+            }
+            // Just above a power of two the gap below is half the gap above, so
+            // the nearest decimal can miss while a neighbour still reads back.
+            [$mantissa, $exponent] = explode('e', $text);
+            $digits = (int) str_replace('.', '', $mantissa);
+            $scale = (int) $exponent - $precision;
+            foreach ([$digits + 1, $digits - 1] as $neighbour) {
+                $candidate = $neighbour . 'e' . $scale;
+                if ($neighbour > 0 && (float) $candidate === $value) {
+                    return $candidate;
+                }
             }
         }
 

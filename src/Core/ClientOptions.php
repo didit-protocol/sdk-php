@@ -101,6 +101,7 @@ final class ClientOptions
      */
     public function __debugInfo(): array
     {
+        /** @var array<string, mixed> $info */
         $info = get_object_vars($this);
         $info['apiKey'] = null === $this->apiKey ? null : '[redacted]';
         $info['accountToken'] = null === $this->accountToken ? null : '[redacted]';
