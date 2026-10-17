@@ -34,7 +34,9 @@ def sentence(text: str) -> str:
     text = text.strip()
     if not text:
         return text
-    text = text.replace("*/", "*&#47;").replace("—", ", ").replace("–", "-")
+    text = text.replace("*/", "*&#47;")
+    # No em or en dashes in generated docs.
+    text = re.sub(r"\s*\u2014\s*", ", ", text).replace("\u2013", "-")
     if text[-1] not in ".!?:":
         text += "."
     return text
