@@ -198,8 +198,9 @@ final class ContractTest extends TestCase
                 }
                 continue;
             }
-            if (!isset($present[$key])) {
-                $operations[] = $entry; // removed upstream, still exposed as deprecated
+            if (!\is_string($present[$key] ?? null)) {
+                // Removed upstream, or no longer a server operation: still exposed as deprecated.
+                $operations[] = $entry;
             }
         }
 
