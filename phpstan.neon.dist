@@ -12,6 +12,10 @@ parameters:
         - src
         - tests
         - examples
+    # Framework webhook examples need Laravel or Symfony, which are not dependencies.
+    excludePaths:
+        - examples/webhooks/laravel
+        - examples/webhooks/symfony
     tmpDir: .phpstan.cache
     # The generated DiditClient::initResources() runs once, from the constructor or BaseClient::fromRequester().
     additionalConstructors:
