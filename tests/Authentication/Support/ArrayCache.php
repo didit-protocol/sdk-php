@@ -43,7 +43,7 @@ final class ArrayCache implements CacheInterface
         return $value;
     }
 
-    public function set(string $key, mixed $value, null|int|\DateInterval $ttl = null): bool
+    public function set(string $key, mixed $value, int|\DateInterval|null $ttl = null): bool
     {
         $this->check($key);
         if ($ttl instanceof \DateInterval) {
@@ -76,7 +76,7 @@ final class ArrayCache implements CacheInterface
     /**
      * @param iterable<mixed, mixed> $values
      */
-    public function setMultiple(iterable $values, null|int|\DateInterval $ttl = null): bool
+    public function setMultiple(iterable $values, int|\DateInterval|null $ttl = null): bool
     {
         throw new \LogicException('Not used by the SDK.');
     }

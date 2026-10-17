@@ -239,7 +239,7 @@ final class TokenVerificationTest extends TestCase
         self::assertSame($now - 59, $auth->verifyAccessToken($valid)->exp);
 
         $expired = $this->issuer->sign($this->issuer->accessClaims(['iat' => $now - 400, 'exp' => $now - 60]));
-        $this->assertRejected(TokenVerificationException::EXPIRED, fn () => $auth->verifyAccessToken($expired));
+        $this->assertRejected(TokenVerificationException::EXPIRED, static fn () => $auth->verifyAccessToken($expired));
     }
 
     public function testNotBeforeInTheFutureIsRejected(): void
@@ -248,7 +248,7 @@ final class TokenVerificationTest extends TestCase
         $auth = $this->issuer->auth();
 
         $token = $this->issuer->sign($this->issuer->accessClaims(['nbf' => $now + 61]));
-        $this->assertRejected(TokenVerificationException::NOT_YET_VALID, fn () => $auth->verifyAccessToken($token));
+        $this->assertRejected(TokenVerificationException::NOT_YET_VALID, static fn () => $auth->verifyAccessToken($token));
 
         $withinLeeway = $this->issuer->sign($this->issuer->accessClaims(['nbf' => $now + 60]));
         self::assertSame($now + 60, $auth->verifyAccessToken($withinLeeway)['nbf']);
@@ -260,7 +260,7 @@ final class TokenVerificationTest extends TestCase
         $auth = $this->issuer->auth();
 
         $token = $this->issuer->sign($this->issuer->accessClaims(['iat' => $now + 61]));
-        $this->assertRejected(TokenVerificationException::ISSUED_IN_FUTURE, fn () => $auth->verifyAccessToken($token));
+        $this->assertRejected(TokenVerificationException::ISSUED_IN_FUTURE, static fn () => $auth->verifyAccessToken($token));
 
         $withinLeeway = $this->issuer->sign($this->issuer->accessClaims(['iat' => $now + 60]));
         self::assertSame($now + 60, $auth->verifyAccessToken($withinLeeway)->iat);
@@ -273,12 +273,12 @@ final class TokenVerificationTest extends TestCase
             $claims = $this->issuer->accessClaims();
             unset($claims[$name]);
             $token = $this->issuer->sign($claims);
-            $this->assertRejected(TokenVerificationException::INVALID_CLAIM, fn () => $auth->verifyAccessToken($token));
+            $this->assertRejected(TokenVerificationException::INVALID_CLAIM, static fn () => $auth->verifyAccessToken($token));
         }
         foreach (['exp', 'iat', 'nbf'] as $name) {
             foreach (['1792233974', true, null, [1]] as $value) {
                 $token = $this->issuer->sign($this->issuer->accessClaims([$name => $value]));
-                $this->assertRejected(TokenVerificationException::INVALID_CLAIM, fn () => $auth->verifyAccessToken($token));
+                $this->assertRejected(TokenVerificationException::INVALID_CLAIM, static fn () => $auth->verifyAccessToken($token));
             }
         }
     }
@@ -407,23 +407,23 @@ final class TokenVerificationTest extends TestCase
 
         // Fetched less than a minute ago: no refetch.
         $this->issuer->now += 30;
-        $this->assertRejected(TokenVerificationException::UNKNOWN_KEY, fn () => $auth->verifyAccessToken($unknown));
+        $this->assertRejected(TokenVerificationException::UNKNOWN_KEY, static fn () => $auth->verifyAccessToken($unknown));
         self::assertSame(1, $this->issuer->http->count('GET', TestIssuer::JWKS_URL));
 
         // A minute after the last fetch: exactly one refetch.
         $this->issuer->now += 30;
-        $this->assertRejected(TokenVerificationException::UNKNOWN_KEY, fn () => $auth->verifyAccessToken($unknown));
+        $this->assertRejected(TokenVerificationException::UNKNOWN_KEY, static fn () => $auth->verifyAccessToken($unknown));
         self::assertSame(2, $this->issuer->http->count('GET', TestIssuer::JWKS_URL));
 
         // Many unknown kids in the next minute: still no refetch.
         for ($i = 0; $i < 5; ++$i) {
             $this->issuer->now += 10;
-            $this->assertRejected(TokenVerificationException::UNKNOWN_KEY, fn () => $auth->verifyAccessToken($unknown));
+            $this->assertRejected(TokenVerificationException::UNKNOWN_KEY, static fn () => $auth->verifyAccessToken($unknown));
         }
         self::assertSame(2, $this->issuer->http->count('GET', TestIssuer::JWKS_URL));
 
         $this->issuer->now += 10;
-        $this->assertRejected(TokenVerificationException::UNKNOWN_KEY, fn () => $auth->verifyAccessToken($unknown));
+        $this->assertRejected(TokenVerificationException::UNKNOWN_KEY, static fn () => $auth->verifyAccessToken($unknown));
         self::assertSame(3, $this->issuer->http->count('GET', TestIssuer::JWKS_URL));
     }
 

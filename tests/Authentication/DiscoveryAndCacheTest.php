@@ -132,7 +132,7 @@ final class DiscoveryAndCacheTest extends TestCase
         $auth->jwks();
         self::assertSame(1, $this->issuer->http->count('GET', TestIssuer::JWKS_URL));
 
-        $this->issuer->now += 1;
+        ++$this->issuer->now;
         $auth->jwks();
         self::assertSame(2, $this->issuer->http->count('GET', TestIssuer::JWKS_URL));
         // The discovery document has its own lifetime (300 s).
@@ -149,7 +149,7 @@ final class DiscoveryAndCacheTest extends TestCase
         $auth->discovery();
         self::assertSame(1, $this->issuer->http->count('GET', TestIssuer::DISCOVERY_URL));
 
-        $this->issuer->now += 1;
+        ++$this->issuer->now;
         $auth->discovery();
         self::assertSame(2, $this->issuer->http->count('GET', TestIssuer::DISCOVERY_URL));
     }
@@ -198,7 +198,7 @@ final class DiscoveryAndCacheTest extends TestCase
         $this->issuer->now += 3599;
         $auth->discovery();
         self::assertSame(2, $this->issuer->http->count('GET', TestIssuer::DISCOVERY_URL));
-        $this->issuer->now += 1;
+        ++$this->issuer->now;
         $auth->discovery();
         self::assertSame(3, $this->issuer->http->count('GET', TestIssuer::DISCOVERY_URL));
     }
