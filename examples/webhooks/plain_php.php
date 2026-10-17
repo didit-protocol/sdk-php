@@ -32,6 +32,25 @@ function respond(int $status, array $body): never
 }
 
 /**
+ * The request headers from getallheaders() (php -S, PHP-FPM, Apache), names
+ * in any case.
+ *
+ * @return array<string, string>
+ */
+function requestHeaders(): array
+{
+    $all = getallheaders();
+    $headers = [];
+    foreach (\is_array($all) ? $all : [] as $name => $value) {
+        if (\is_string($name) && \is_string($value)) {
+            $headers[$name] = $value;
+        }
+    }
+
+    return $headers;
+}
+
+/**
  * Your business logic. Didit retries a delivery until it gets a 2xx, so make
  * this idempotent: `$event->eventId` is the same on every retry.
  */
@@ -77,7 +96,7 @@ if (false === $body) {
 try {
     // The raw body, exactly as received: do not decode and re-encode it first.
     // During a secret rotation, pass both secrets: [$newSecret, $oldSecret].
-    $event = Webhook::verify($body, getallheaders(), $secret);
+    $event = Webhook::verify($body, requestHeaders(), $secret);
 } catch (WebhookVerificationException $e) {
     $signatureProblem = \in_array($e->reason, [
         WebhookVerificationException::MISSING_SIGNATURE,

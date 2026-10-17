@@ -9,6 +9,9 @@ use Psr\SimpleCache\CacheInterface;
 /**
  * An in-memory PSR-16 cache that honours TTLs against a test clock and
  * rejects keys PSR-16 does not guarantee.
+ *
+ * Parameters are untyped so the class implements psr/simple-cache 1, 2 and 3
+ * alike (composer.json allows all three).
  */
 final class ArrayCache implements CacheInterface
 {
@@ -27,7 +30,11 @@ final class ArrayCache implements CacheInterface
     {
     }
 
-    public function get(string $key, mixed $default = null): mixed
+    /**
+     * @param string $key
+     * @param mixed $default
+     */
+    public function get($key, $default = null): mixed
     {
         $this->check($key);
         if (!isset($this->items[$key])) {
@@ -43,7 +50,12 @@ final class ArrayCache implements CacheInterface
         return $value;
     }
 
-    public function set(string $key, mixed $value, int|\DateInterval|null $ttl = null): bool
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @param int|\DateInterval|null $ttl
+     */
+    public function set($key, $value, $ttl = null): bool
     {
         $this->check($key);
         if ($ttl instanceof \DateInterval) {
@@ -54,7 +66,10 @@ final class ArrayCache implements CacheInterface
         return true;
     }
 
-    public function delete(string $key): bool
+    /**
+     * @param string $key
+     */
+    public function delete($key): bool
     {
         unset($this->items[$key]);
 
@@ -68,25 +83,38 @@ final class ArrayCache implements CacheInterface
         return true;
     }
 
-    public function getMultiple(iterable $keys, mixed $default = null): iterable
+    /**
+     * @param iterable<string> $keys
+     * @param mixed $default
+     *
+     * @return iterable<string, mixed>
+     */
+    public function getMultiple($keys, $default = null): iterable
     {
         throw new \LogicException('Not used by the SDK.');
     }
 
     /**
      * @param iterable<mixed, mixed> $values
+     * @param int|\DateInterval|null $ttl
      */
-    public function setMultiple(iterable $values, int|\DateInterval|null $ttl = null): bool
+    public function setMultiple($values, $ttl = null): bool
     {
         throw new \LogicException('Not used by the SDK.');
     }
 
-    public function deleteMultiple(iterable $keys): bool
+    /**
+     * @param iterable<string> $keys
+     */
+    public function deleteMultiple($keys): bool
     {
         throw new \LogicException('Not used by the SDK.');
     }
 
-    public function has(string $key): bool
+    /**
+     * @param string $key
+     */
+    public function has($key): bool
     {
         return null !== $this->get($key);
     }
