@@ -31,6 +31,7 @@ final class FaceMatch extends BaseResource
      * @param FaceMatchCompareParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function compare(array $params, ?RequestOptions $options = null): Types\FaceMatchCompareResponse
     {

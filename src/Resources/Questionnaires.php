@@ -39,6 +39,7 @@ final class Questionnaires extends BaseResource
      * @return Page<Types\QuestionnaireListItem>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -60,6 +61,7 @@ final class Questionnaires extends BaseResource
      * @param SimpleQuestionnaireRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\QuestionnaireDetail
     {
@@ -84,6 +86,7 @@ final class Questionnaires extends BaseResource
      * @param string $questionnaireUuid per-version UUID of the questionnaire (the `uuid` value returned by the list endpoint, also returned as `questionnaire_id` on detail endpoints)
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieve(string $questionnaireUuid, ?RequestOptions $options = null): Types\QuestionnaireDetail
     {
@@ -112,6 +115,7 @@ final class Questionnaires extends BaseResource
      * @param SimpleQuestionnaireUpdateRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function update(
         string $questionnaireUuid,
@@ -141,6 +145,7 @@ final class Questionnaires extends BaseResource
      * @param string $questionnaireUuid per-version UUID of the questionnaire to delete
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function delete(string $questionnaireUuid, ?RequestOptions $options = null): NoContent
     {

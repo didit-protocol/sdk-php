@@ -12,7 +12,8 @@ use Psr\Http\Message\StreamInterface;
  *
  * Scalars are sent as text fields (booleans as `true`/`false`), files as file
  * parts, lists of scalars or files as repeated fields, and objects or lists
- * of objects as a JSON text field. Null values are left out.
+ * of objects as a JSON text field. Null values and empty lists are left out;
+ * an empty array in an object field is sent as `{}`.
  *
  * @internal
  */
@@ -56,13 +57,21 @@ final class Multipart
             if (null === $value) {
                 continue;
             }
+            $hint = $hints[$name] ?? null;
+            if ([] === $value) {
+                // An empty object field is sent as `{}`; an empty list has no multipart form.
+                if (\is_array($hint) && \in_array($hint[0] ?? null, ['o', 'm'], true)) {
+                    $body .= self::part($boundary, $name, $value, $hint);
+                }
+                continue;
+            }
             if (\is_array($value) && array_is_list($value) && self::isFlatList($value)) {
                 foreach ($value as $item) {
                     $body .= self::part($boundary, $name, $item);
                 }
                 continue;
             }
-            $body .= self::part($boundary, $name, $value, $hints[$name] ?? null);
+            $body .= self::part($boundary, $name, $value, $hint);
         }
 
         return $body . '--' . $boundary . "--\r\n";

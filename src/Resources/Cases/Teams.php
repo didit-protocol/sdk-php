@@ -36,6 +36,7 @@ final class Teams extends BaseResource
      * @return Page<Types\CaseReviewTeam>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -57,6 +58,7 @@ final class Teams extends BaseResource
      * @param CaseReviewTeamCreate $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\CaseReviewTeam
     {
@@ -79,6 +81,7 @@ final class Teams extends BaseResource
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/teams/{record_uuid}/`
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieve(string $recordUuid, ?RequestOptions $options = null): Types\CaseReviewTeam
     {
@@ -101,6 +104,7 @@ final class Teams extends BaseResource
      * @param CaseReviewTeamUpdate $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function update(
         string $recordUuid,

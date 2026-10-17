@@ -118,7 +118,7 @@ final class HttpTransport
     private static function sanitize(string $message): string
     {
         // Never echo URLs with query strings or credentials back to the caller.
-        $message = (string) preg_replace('#https?://[^\s"\']+#i', '<url>', $message);
+        $message = (string) preg_replace('#https?://[^\s"\'<>()\[\]]+#i', '<url>', $message);
 
         return \strlen($message) > 300 ? substr($message, 0, 300) . '...' : $message;
     }

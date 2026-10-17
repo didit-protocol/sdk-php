@@ -34,6 +34,7 @@ final class Phone extends BaseResource
      * @param PhoneRiskRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function assessRisk(array $params, ?RequestOptions $options = null): Types\PhoneRiskResponse
     {
@@ -58,6 +59,7 @@ final class Phone extends BaseResource
      * @param PhoneSendCodeParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function sendCode(array $params, ?RequestOptions $options = null): Types\PhoneVerificationSendResponse
     {
@@ -83,6 +85,7 @@ final class Phone extends BaseResource
      * @param PhoneCheckCodeParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function checkCode(array $params, ?RequestOptions $options = null): Types\PhoneVerificationCheckResponse
     {

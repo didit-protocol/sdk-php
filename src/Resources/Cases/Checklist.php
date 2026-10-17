@@ -35,6 +35,7 @@ final class Checklist extends BaseResource
      * @return ListResponse<Types\CaseChecklistItem>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function list(string $caseUuid, ?RequestOptions $options = null): ListResponse
     {
@@ -60,6 +61,7 @@ final class Checklist extends BaseResource
      * @param CasesChecklistToggleItemParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function toggleItem(
         string $caseUuid,

@@ -33,6 +33,7 @@ final class ProofOfAddress extends BaseResource
      * @param ProofOfAddressVerifyParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function verify(array $params, ?RequestOptions $options = null): Types\ProofOfAddressVerifyResponse
     {

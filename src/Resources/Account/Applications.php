@@ -34,6 +34,7 @@ final class Applications extends BaseResource
      * @param string $orgId UUID of the organization
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function list(string $orgId, ?RequestOptions $options = null): JsonResponse
     {
@@ -59,6 +60,7 @@ final class Applications extends BaseResource
      * @param ApplicationCreateRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(string $orgId, array $params = [], ?RequestOptions $options = null): Types\Application
     {
@@ -85,6 +87,7 @@ final class Applications extends BaseResource
      * @param string $appId UUID of the application whose credentials you want to read
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieve(string $orgId, string $appId, ?RequestOptions $options = null): Types\Application
     {
@@ -111,6 +114,7 @@ final class Applications extends BaseResource
      * @param ApplicationUpdateRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function update(
         string $orgId,

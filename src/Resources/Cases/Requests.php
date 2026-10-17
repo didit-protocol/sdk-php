@@ -35,6 +35,7 @@ final class Requests extends BaseResource
      * @return Page<Types\CustomerMessagingCaseRequest>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function list(string $caseUuid, array $params = [], ?RequestOptions $options = null): Page
     {
@@ -59,6 +60,7 @@ final class Requests extends BaseResource
      * @param CustomerMessagingCaseRequestConfirmRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(
         string $caseUuid,
@@ -82,6 +84,7 @@ final class Requests extends BaseResource
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/{request_uuid}/cancel/`
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function cancel(
         string $caseUuid,
@@ -104,6 +107,7 @@ final class Requests extends BaseResource
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/options/`
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieveOptions(
         string $caseUuid,
@@ -125,6 +129,7 @@ final class Requests extends BaseResource
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/{request_uuid}/attachment/`
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieveAttachment(
         string $caseUuid,
@@ -154,6 +159,7 @@ final class Requests extends BaseResource
      * @param CustomerMessagingCaseRequestPreviewRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function preview(
         string $caseUuid,

@@ -28,6 +28,7 @@ final class FraudChecks extends BaseResource
      * `GET /v3/fraud/checks/{check_id}/`
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieve(string $checkId, ?RequestOptions $options = null): Types\FraudCheckResponse
     {
@@ -51,6 +52,7 @@ final class FraudChecks extends BaseResource
      * @param FraudCheckRequestRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\FraudCheckResponse
     {
@@ -74,6 +76,7 @@ final class FraudChecks extends BaseResource
      * @param FraudCheckRequestRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function plan(array $params, ?RequestOptions $options = null): Types\FraudCheckPlan
     {

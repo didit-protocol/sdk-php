@@ -44,6 +44,7 @@ final class Businesses extends BaseResource
      * @return Page<Types\BusinessListItem>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -65,6 +66,7 @@ final class Businesses extends BaseResource
      * @param string $vendorData your unique identifier for the business, a free-form string (NOT a UUID), matched exactly as sent
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieve(string $vendorData, ?RequestOptions $options = null): Types\BusinessDetailItem
     {
@@ -89,6 +91,7 @@ final class Businesses extends BaseResource
      * @param BusinessesUpdateParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function update(
         string $vendorData,
@@ -118,6 +121,7 @@ final class Businesses extends BaseResource
      * @param BusinessesUpdateStatusParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function updateStatus(
         string $vendorData,
@@ -144,6 +148,7 @@ final class Businesses extends BaseResource
      * @param BusinessesBatchDeleteParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function batchDelete(
         array $params = [],
@@ -173,6 +178,7 @@ final class Businesses extends BaseResource
      * @param BusinessesSetAmlMonitoringParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function setAmlMonitoring(
         array $params,
@@ -203,6 +209,7 @@ final class Businesses extends BaseResource
      * @param BusinessesCreateParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(array $params = [], ?RequestOptions $options = null): Types\BusinessDetailItem
     {
@@ -228,6 +235,7 @@ final class Businesses extends BaseResource
      * @param BusinessesSetOngoingMonitoringParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function setOngoingMonitoring(
         array $params,
@@ -257,6 +265,7 @@ final class Businesses extends BaseResource
      * @param string $jobId monitoring job UUID returned by the toggle endpoint
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieveOngoingMonitoringJob(
         string $jobId,
@@ -284,6 +293,7 @@ final class Businesses extends BaseResource
      * @param BusinessesSetSessionOngoingMonitoringParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function setSessionOngoingMonitoring(
         array $params,
@@ -313,6 +323,7 @@ final class Businesses extends BaseResource
      * @param string $jobId monitoring job UUID returned by the toggle endpoint
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieveSessionOngoingMonitoringJob(
         string $jobId,
@@ -337,6 +348,7 @@ final class Businesses extends BaseResource
      * @param string $vendorBusinessUuid vendor business UUID
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function listNetworks(
         string $vendorBusinessUuid,

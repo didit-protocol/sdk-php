@@ -37,6 +37,7 @@ final class Notes extends BaseResource
      * @return Page<Types\CaseCollaborationCaseNote>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function list(string $caseUuid, array $params = [], ?RequestOptions $options = null): Page
     {
@@ -60,6 +61,7 @@ final class Notes extends BaseResource
      * @param CaseCollaborationCaseNoteCreateRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(
         string $caseUuid,
@@ -89,6 +91,7 @@ final class Notes extends BaseResource
      * @param CaseCollaborationPatchedCaseNoteUpdateRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function update(
         string $caseUuid,
@@ -113,6 +116,7 @@ final class Notes extends BaseResource
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/notes/{note_uuid}/`
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function delete(string $caseUuid, string $noteUuid, ?RequestOptions $options = null): NoContent
     {
@@ -136,6 +140,7 @@ final class Notes extends BaseResource
      * @param CasesNotesRetrieveAttachmentUrlParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieveAttachmentUrl(
         string $caseUuid,
@@ -164,6 +169,7 @@ final class Notes extends BaseResource
      * @param CasesNotesCreateAttachmentUploadParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function createAttachmentUpload(
         string $caseUuid,

@@ -36,6 +36,7 @@ final class RegulatoryReports extends BaseResource
      * @return Page<Types\RegulatoryReportDetail>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function list(string $caseUuid, array $params = [], ?RequestOptions $options = null): Page
     {
@@ -60,6 +61,7 @@ final class RegulatoryReports extends BaseResource
      * @param CasesRegulatoryReportsCreateParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(
         string $caseUuid,

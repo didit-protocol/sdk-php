@@ -147,23 +147,13 @@ final class HeadersAndConfigTest extends TestCase
 
     public function testEmptyApiKeyFromWithOptionsIsAConfigurationError(): void
     {
-        $this->support->http->queueJson(200, []);
         $client = $this->support->client()->withOptions(apiKey: '');
 
-        try {
-            $client->billing->retrieveBalance();
-        } catch (ConfigurationException $e) {
-            self::assertStringContainsString('DIDIT_API_KEY', $e->getMessage());
-            self::assertSame([], $this->support->http->requests);
+        $error = self::thrown(static fn () => $client->billing->retrieveBalance());
 
-            return;
-        }
-
-        $sent = $this->support->http->lastRequest();
-        if ('' === $sent->getHeaderLine('x-api-key')) {
-            self::markTestIncomplete('bug: withOptions(apiKey: \'\') keeps the empty string (the constructor and RequestOptions treat it as absent), so the request is sent with an empty x-api-key header instead of failing with ConfigurationException.');
-        }
-        self::fail('the request was sent');
+        self::assertInstanceOf(ConfigurationException::class, $error);
+        self::assertStringContainsString('DIDIT_API_KEY', $error->getMessage());
+        self::assertSame([], $this->support->http->requests);
     }
 
     /**
@@ -225,9 +215,6 @@ final class HeadersAndConfigTest extends TestCase
         $error = self::thrown(static fn () => $client->cases->list());
 
         self::assertSame([], $this->support->http->requests);
-        if ($error instanceof \InvalidArgumentException) {
-            self::markTestIncomplete('bug: withOptions(applicationId: \'\') keeps the empty string, so an application-scoped call fails with InvalidArgumentException "' . $error->getMessage() . '" instead of the ConfigurationException DESIGN section 4 requires.');
-        }
         self::assertInstanceOf(ConfigurationException::class, $error);
         self::assertStringContainsString('DIDIT_APPLICATION_ID', $error->getMessage());
     }

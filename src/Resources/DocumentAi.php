@@ -35,6 +35,7 @@ final class DocumentAi extends BaseResource
      * @param DocumentAiAnalyzeParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function analyze(array $params, ?RequestOptions $options = null): Types\DocumentAiAnalyzeResponse
     {

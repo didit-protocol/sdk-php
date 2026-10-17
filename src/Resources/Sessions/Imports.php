@@ -39,6 +39,7 @@ final class Imports extends BaseResource
      * @param SessionsImportsCreateParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(array $params = [], ?RequestOptions $options = null): Types\SessionImportJob
     {
@@ -62,6 +63,7 @@ final class Imports extends BaseResource
      * @param SessionsImportsRetrieveTemplateParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieveTemplate(array $params = [], ?RequestOptions $options = null): BinaryContent
     {
@@ -85,6 +87,7 @@ final class Imports extends BaseResource
      * `GET /v3/session/imports/{importId}/`
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieve(string $importId, ?RequestOptions $options = null): Types\SessionImportJob
     {
@@ -109,6 +112,7 @@ final class Imports extends BaseResource
      * @return Page<Types\SessionImportError>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function listErrors(string $importId, array $params = [], ?RequestOptions $options = null): Page
     {

@@ -29,6 +29,7 @@ final class AmlMonitoring extends BaseResource
      * @param string $jobId the `job_id` returned by the toggle endpoint
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieveJob(string $jobId, ?RequestOptions $options = null): Types\AmlMonitoringRetrieveJobResponse
     {

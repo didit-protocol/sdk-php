@@ -40,6 +40,7 @@ final class Workflows extends BaseResource
      * @return Page<Types\WorkflowListItem>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -63,6 +64,7 @@ final class Workflows extends BaseResource
      * @param SimpleWorkflowRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): JsonResponse
     {
@@ -87,6 +89,7 @@ final class Workflows extends BaseResource
      * @param string $settingsUuid per-version UUID of the workflow (the `uuid` value returned by the list endpoint)
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieve(string $settingsUuid, ?RequestOptions $options = null): JsonResponse
     {
@@ -115,6 +118,7 @@ final class Workflows extends BaseResource
      * @param SimpleWorkflowUpdateRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function update(string $settingsUuid, array $params = [], ?RequestOptions $options = null): JsonResponse
     {
@@ -140,6 +144,7 @@ final class Workflows extends BaseResource
      * @param string $settingsUuid per-version UUID of the workflow to delete
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function delete(string $settingsUuid, ?RequestOptions $options = null): NoContent
     {

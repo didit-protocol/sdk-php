@@ -47,6 +47,7 @@ final class Account extends BaseResource
      * @param RegisterRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function register(array $params, ?RequestOptions $options = null): Types\RegisterResponse
     {
@@ -72,6 +73,7 @@ final class Account extends BaseResource
      * @param VerifyEmailRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function verifyEmail(array $params, ?RequestOptions $options = null): Types\VerifyEmailResponse
     {
@@ -98,6 +100,7 @@ final class Account extends BaseResource
      * @param LoginRequest $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function login(array $params, ?RequestOptions $options = null): Types\LoginResponse
     {
@@ -124,6 +127,7 @@ final class Account extends BaseResource
      * @param AccountResendOtpParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function resendOtp(array $params, ?RequestOptions $options = null): JsonResponse
     {

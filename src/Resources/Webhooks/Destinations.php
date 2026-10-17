@@ -61,6 +61,7 @@ final class Destinations extends BaseResource
      * @param WebhooksDestinationsCreateParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\WebhooksDestinationsCreateResponse
     {
@@ -85,6 +86,7 @@ final class Destinations extends BaseResource
      * @param string $destinationUuid UUID of the destination (the `uuid` returned from create / list)
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieve(
         string $destinationUuid,
@@ -110,6 +112,7 @@ final class Destinations extends BaseResource
      * @param WebhooksDestinationsUpdateParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function update(
         string $destinationUuid,
@@ -137,6 +140,7 @@ final class Destinations extends BaseResource
      * @param string $destinationUuid UUID of the destination to delete
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function delete(string $destinationUuid, ?RequestOptions $options = null): NoContent
     {

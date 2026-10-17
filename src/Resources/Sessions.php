@@ -63,6 +63,7 @@ final class Sessions extends BaseResource
      * @param SessionsCreateParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\SessionsCreateResponse
     {
@@ -91,6 +92,7 @@ final class Sessions extends BaseResource
      * @param SessionsRetrieveDecisionParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieveDecision(
         string $sessionId,
@@ -119,6 +121,7 @@ final class Sessions extends BaseResource
      * @param SessionsDeleteParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function delete(
         string $sessionId,
@@ -146,6 +149,7 @@ final class Sessions extends BaseResource
      * @param string $sessionId UUID of the User Verification (KYC) or Business Verification (KYB) session to render, the `session_id` returned by `POST /v3/session/`
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function generatePdf(string $sessionId, ?RequestOptions $options = null): BinaryContent
     {
@@ -172,6 +176,7 @@ final class Sessions extends BaseResource
      * @param SessionsUpdateStatusParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function updateStatus(
         string $sessionId,
@@ -201,6 +206,7 @@ final class Sessions extends BaseResource
      * @return Page<Types\SessionsListResponseResults>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -223,6 +229,7 @@ final class Sessions extends BaseResource
      * @param SessionsShareParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function share(
         string $sessionId,
@@ -249,6 +256,7 @@ final class Sessions extends BaseResource
      * @param SessionsImportSharedParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function importShared(array $params, ?RequestOptions $options = null): JsonResponse
     {
@@ -272,6 +280,7 @@ final class Sessions extends BaseResource
      * @param SessionsBatchDeleteParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function batchDelete(
         array $params = [],
@@ -301,6 +310,7 @@ final class Sessions extends BaseResource
      * @param string $jobId the `job_id` returned with the `202` from `POST /v3/sessions/delete/`
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieveDeletionJob(
         string $jobId,
@@ -329,6 +339,7 @@ final class Sessions extends BaseResource
      * @param SessionsUpdateDataParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function updateData(
         string $sessionId,
@@ -360,6 +371,7 @@ final class Sessions extends BaseResource
      * @param SessionsUpdateFeatureStatusParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function updateFeatureStatus(
         string $sessionId,
@@ -390,6 +402,7 @@ final class Sessions extends BaseResource
      * @param SessionsUpdateAmlHitStatusParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function updateAmlHitStatus(string $sessionId, array $params, ?RequestOptions $options = null): JsonResponse
     {
@@ -416,6 +429,7 @@ final class Sessions extends BaseResource
      * @param SessionsBulkUpdateAmlHitStatusParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function bulkUpdateAmlHitStatus(
         string $sessionId,
@@ -447,6 +461,7 @@ final class Sessions extends BaseResource
      * @param SessionsUpdatePoaDataParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function updatePoaData(
         string $sessionId,
@@ -480,6 +495,7 @@ final class Sessions extends BaseResource
      * @param SessionsUpdateKybCompanyDataParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function updateKybCompanyData(
         string $sessionId,
@@ -511,6 +527,7 @@ final class Sessions extends BaseResource
      * @param SessionsUpdateKybPartyParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function updateKybParty(
         string $sessionId,
@@ -538,6 +555,7 @@ final class Sessions extends BaseResource
      * @param string $sessionId session UUID
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function listNetworks(string $sessionId, ?RequestOptions $options = null): Types\SessionsListNetworksResponse
     {
@@ -566,6 +584,7 @@ final class Sessions extends BaseResource
      * @param SessionsPreviewResubmissionParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function previewResubmission(
         string $sessionId,

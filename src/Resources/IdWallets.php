@@ -76,6 +76,7 @@ final class IdWallets extends BaseResource
      * @param string $requestId the request_id the start endpoint returned
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function retrieveVerification(
         string $requestId,
@@ -102,6 +103,7 @@ final class IdWallets extends BaseResource
      * @param string $requestId the request_id the start endpoint returned
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function pollVerification(
         string $requestId,
@@ -129,6 +131,7 @@ final class IdWallets extends BaseResource
      * @param string $requestId the request_id the start endpoint returned
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function cancelVerification(
         string $requestId,
@@ -157,6 +160,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartMitidParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startMitid(
         array $params,
@@ -188,6 +192,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartBankidSeParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startBankidSe(
         array $params,
@@ -219,6 +224,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartBankidNoParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startBankidNo(
         array $params,
@@ -250,6 +256,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartVippsParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startVipps(
         array $params,
@@ -281,6 +288,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartBuypassParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startBuypass(
         array $params,
@@ -312,6 +320,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartItsmeParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startItsme(
         array $params,
@@ -343,6 +352,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartIdinParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startIdin(
         array $params,
@@ -375,6 +385,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartFtnParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startFtn(
         array $params,
@@ -406,6 +417,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartPersonalausweisParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startPersonalausweis(
         array $params,
@@ -437,6 +449,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartFrejaidParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startFrejaid(
         array $params,
@@ -468,6 +481,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartUaePassParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startUaePass(
         array $params,
@@ -499,6 +513,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartGovbrParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startGovbr(
         array $params,
@@ -530,6 +545,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartOneidParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startOneid(
         array $params,
@@ -561,6 +577,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartGovukWalletParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startGovukWallet(
         array $params,
@@ -592,6 +609,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartSmartIdParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startSmartId(
         array $params,
@@ -624,6 +642,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartMobileIdParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startMobileId(
         array $params,
@@ -656,6 +675,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartIdcardEeParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startIdcardEe(
         array $params,
@@ -688,6 +708,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartEparakstsMobileParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startEparakstsMobile(
         array $params,
@@ -719,6 +740,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartBankidCzParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startBankidCz(
         array $params,
@@ -750,6 +772,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartMojeidParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startMojeid(
         array $params,
@@ -781,6 +804,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartDiiaParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startDiia(
         array $params,
@@ -812,6 +836,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartFranceconnectParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startFranceconnect(
         array $params,
@@ -843,6 +868,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartAudkenniParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startAudkenni(
         array $params,
@@ -874,6 +900,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartConnectidParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startConnectid(
         array $params,
@@ -905,6 +932,7 @@ final class IdWallets extends BaseResource
      * @param IdWalletsStartEudiParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function startEudi(
         array $params,

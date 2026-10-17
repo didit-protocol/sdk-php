@@ -35,6 +35,7 @@ final class Kyb extends BaseResource
      * @param KybSearchParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function search(array $params, ?RequestOptions $options = null): Types\KybSearchResponse
     {
@@ -61,6 +62,7 @@ final class Kyb extends BaseResource
      * @param KybSelectParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function select(array $params, ?RequestOptions $options = null): Types\KybSelectResponse
     {
@@ -85,6 +87,7 @@ final class Kyb extends BaseResource
      * @param KybListShareholdersParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function listShareholders(
         array $params,
@@ -115,6 +118,7 @@ final class Kyb extends BaseResource
      * @param KybListUbosParams $params
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
      */
     public function listUbos(
         array $params,
