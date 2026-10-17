@@ -169,7 +169,7 @@ final class Hydrate
         foreach ($data as $key => $element) {
             $converted = $item($element);
             if (null !== $converted) {
-                $out[(string) $key] = $converted;
+                $out[$key] = $converted;
             }
         }
 

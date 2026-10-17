@@ -403,7 +403,9 @@ final class Requester
             if (null === $value) {
                 continue;
             }
-            $pairs[] = rawurlencode((string) $key) . '=' . rawurlencode(self::scalarString($value, (string) $key));
+            // Integer-like keys arrive as int.
+            $key = "{$key}";
+            $pairs[] = rawurlencode($key) . '=' . rawurlencode(self::scalarString($value, $key));
         }
 
         return [] === $pairs ? '' : '?' . implode('&', $pairs);

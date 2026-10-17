@@ -50,7 +50,8 @@ final class Multipart
     {
         $body = '';
         foreach ($fields as $name => $value) {
-            $name = (string) $name;
+            // Integer-like keys arrive as int.
+            $name = "{$name}";
             if (null === $value) {
                 continue;
             }
@@ -69,7 +70,7 @@ final class Multipart
     private static function part(string $boundary, string $name, mixed $value): string
     {
         $disposition = 'form-data; name="' . self::escape($name) . '"';
-        if (self::isFile($value)) {
+        if ($value instanceof File || $value instanceof StreamInterface || \is_resource($value)) {
             $file = $value instanceof File ? $value : File::fromStream($value);
             $disposition .= '; filename="' . self::escape($file->filename) . '"';
             if (1 === preg_match('/[^\x20-\x7e]/', $file->filename)) {
