@@ -380,14 +380,13 @@ def _response_expr(r: Response, var: str = "$response") -> str:
     raise ValueError(r.kind)
 
 
-def emit_resource(node: ResourceNode, aliases: set[str]) -> str:
-    imports = {"Didit\\Core\\BaseResource", "Didit\\Exception\\DiditException", "Didit\\RequestOptions", "Didit\\Core\\Operation"}
+def emit_resource(node: ResourceNode) -> str:
+    imports = {"Didit\\Core\\BaseResource"}
     body: list[str] = []
     used_aliases: list[str] = []
 
     for child_name, child in node.children.items():
-        rel = _relative(node, child)
-        body.append(f"    public readonly {rel} ${naming.camel(child_name)};")
+        body.append(f"    public readonly {_relative(node, child)} ${naming.camel(child_name)};")
         body.append("")
     if node.children:
         imports.add("Didit\\Core\\Requester")
@@ -401,18 +400,15 @@ def emit_resource(node: ResourceNode, aliases: set[str]) -> str:
 
     for om in node.ops:
         method_lines, method_imports, alias = _emit_method(om)
-        imports |= method_imports
+        imports |= method_imports | {"Didit\\Exception\\DiditException", "Didit\\RequestOptions", "Didit\\Core\\Operation"}
         if alias and alias not in used_aliases:
             used_aliases.append(alias)
         body.extend(method_lines)
         body.append("")
     while body and body[-1] == "":
         body.pop()
-
-    if not node.ops:
-        imports.discard("Didit\\Exception\\DiditException")
-        imports.discard("Didit\\RequestOptions")
-        imports.discard("Didit\\Core\\Operation")
+    if used_aliases:
+        imports.add("Didit\\Params")
 
     lines = [HEADER, f"namespace {node.namespace};", ""]
     for imp in sorted(imports, key=lambda s: s.lower()):
@@ -426,19 +422,14 @@ def emit_resource(node: ResourceNode, aliases: set[str]) -> str:
     lines.append(docblock(doc).rstrip("\n"))
     lines.append(f"final class {node.short} extends BaseResource")
     lines.append("{")
-    for trait in CORE_TRAITS.get(node.path, []):
+    traits = CORE_TRAITS.get(node.path, [])
+    for trait in traits:
         lines.append(f"    use {trait};")
+    if traits and body:
         lines.append("")
     lines.extend(body)
     lines.append("}")
-    text = "\n".join(lines) + "\n"
-    if used_aliases:
-        text = text.replace("use Didit\\Core\\BaseResource;", "use Didit\\Core\\BaseResource;", 1)
-        # Params lives in the Didit namespace.
-        imports_block = sorted(imports | {"Didit\\Params"}, key=lambda s: s.lower())
-        head = [HEADER, f"namespace {node.namespace};", ""] + [f"use {i};" for i in imports_block] + [""]
-        text = "\n".join(head) + "\n".join(lines[3 + len(imports) + 1:]) + "\n"
-    return text
+    return "\n".join(lines) + "\n"
 
 
 def _relative(parent: ResourceNode, child: ResourceNode) -> str:
@@ -527,7 +518,6 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
 
     r = om.response
     if r.kind == "page":
-        imports.add("Didit\\Core\\Hydrate") if not isinstance(r.type, ModelT) or True else None
         lines.append(f"        return $this->requester->requestPage({operation}, {path_arr}, {params_var}, $options, {callable_for(r.type, 'Types\\\\')});")
         if isinstance(r.type, ModelT):
             has_types = True
