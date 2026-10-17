@@ -17,8 +17,8 @@ use Psr\Http\Message\ResponseInterface;
  * {@see ApiConnectionException} or {@see ApiTimeoutException}.
  *
  * PSR-18 has no timeout setting, so the timeout is applied natively for
- * Guzzle and Symfony HttpClient. With any other PSR-18 client, configure the
- * timeout on that client.
+ * Guzzle and Symfony HttpClient 6.2 or later. With any other PSR-18 client,
+ * configure the timeout on that client.
  *
  * The SDK never follows redirects, so credentials never reach another origin.
  *
@@ -53,7 +53,8 @@ final class HttpTransport
                     'allow_redirects' => false,
                 ]);
             }
-            if ($client instanceof \Symfony\Component\HttpClient\Psr18Client) {
+            // Psr18Client::withOptions() exists since Symfony 6.2.
+            if ($client instanceof \Symfony\Component\HttpClient\Psr18Client && method_exists($client, 'withOptions')) {
                 $client = $client->withOptions(['timeout' => $timeout, 'max_duration' => $timeout, 'max_redirects' => 0]);
             }
 

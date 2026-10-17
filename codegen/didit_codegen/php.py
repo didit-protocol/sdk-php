@@ -504,7 +504,7 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
     doc.append("")
     doc.append("@throws DiditException")
     if om.path_params or om.body_alias:
-        doc.append("@throws \\InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded")
+        doc.append("@throws \\InvalidArgumentException when a path parameter is empty, \".\" or \"..\", or a parameter value cannot be encoded")
     if o.deprecated or o.op.get("deprecated"):
         doc.append("")
         doc.append("@deprecated " + annotation_text(_deprecation(o)))
