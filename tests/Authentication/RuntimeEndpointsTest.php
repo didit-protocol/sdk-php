@@ -365,6 +365,22 @@ final class RuntimeEndpointsTest extends TestCase
     }
 
     /**
+     * HTTP clients collapse dot segments, so "step-up/../" would read `GET {issuer}/`.
+     */
+    public function testRetrieveStepUpRefusesDotSegments(): void
+    {
+        foreach (['.', '..'] as $id) {
+            try {
+                $this->issuer->auth()->retrieveStepUp(self::ACCESS_TOKEN, $id);
+                self::fail('Expected an InvalidArgumentException for ' . $id);
+            } catch (\InvalidArgumentException $e) {
+                self::assertSame('The step-up ID must not be "." or "..".', $e->getMessage());
+            }
+        }
+        self::assertSame(0, $this->issuer->http->total());
+    }
+
+    /**
      * @return iterable<string, array{int, mixed, class-string<ApiStatusException>}>
      */
     public static function errorStatuses(): iterable

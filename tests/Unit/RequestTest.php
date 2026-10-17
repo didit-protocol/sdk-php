@@ -9,6 +9,7 @@ use Didit\RequestOptions;
 use Didit\Tests\Support\Http;
 use Didit\Tests\Support\TestClient;
 use Didit\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -144,6 +145,40 @@ final class RequestTest extends TestCase
         $this->support->client()->users->retrieve('');
     }
 
+    /**
+     * @return iterable<string, array{string}>
+     */
+    public static function dotSegments(): iterable
+    {
+        yield 'dot' => ['.'];
+        yield 'dot-dot' => ['..'];
+    }
+
+    /**
+     * HTTP clients collapse dot segments: deleting note ".." would delete the case.
+     */
+    #[DataProvider('dotSegments')]
+    public function testDotSegmentPathParameterIsRejectedBeforeSending(string $id): void
+    {
+        try {
+            $this->support->client()->cases->notes->delete('CASE-123', $id);
+            self::fail('Expected an InvalidArgumentException.');
+        } catch (\InvalidArgumentException $e) {
+            self::assertSame('Path parameter "note_uuid" must not be "." or "..".', $e->getMessage());
+        }
+        self::assertSame([], $this->support->http->requests);
+    }
+
+    public function testPathParametersThatOnlyContainDotsAreSent(): void
+    {
+        $this->support->http->queueJson(200, [])->queueJson(200, []);
+        $this->support->client()->users->retrieve('...');
+        $this->support->client()->users->retrieve('.user');
+
+        self::assertSame('/v3/users/.../', $this->support->http->requests[0]->getUri()->getPath());
+        self::assertSame('/v3/users/.user/', $this->support->http->requests[1]->getUri()->getPath());
+    }
+
     public function testQueryValuesAreEncoded(): void
     {
         $this->support->http->queueJson(200, ['count' => 0, 'next' => null, 'previous' => null, 'results' => []]);
@@ -156,6 +191,18 @@ final class RequestTest extends TestCase
             ['limit' => '5', 'vendor_data' => 'a b&c', 'flag' => 'true', 'new_filter' => 'x'],
             Http::queryParams($this->support->http->lastRequest()),
         );
+    }
+
+    public function testUnencodableJsonBodyIsAnInvalidArgumentBeforeSending(): void
+    {
+        try {
+            $this->support->client()->sessions->create(['workflow_id' => 'wf', 'metadata' => ['score' => \NAN]]);
+            self::fail('Expected an InvalidArgumentException.');
+        } catch (\InvalidArgumentException $e) {
+            self::assertStringStartsWith('The request body cannot be encoded as JSON: ', $e->getMessage());
+            self::assertInstanceOf(\JsonException::class, $e->getPrevious());
+        }
+        self::assertSame([], $this->support->http->requests);
     }
 
     public function testJsonBodyEncoding(): void
