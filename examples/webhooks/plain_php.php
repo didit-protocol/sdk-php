@@ -66,9 +66,12 @@ if ('POST' !== ($_SERVER['REQUEST_METHOD'] ?? null)) {
 }
 
 $secret = getenv('DIDIT_WEBHOOK_SECRET');
-$body = file_get_contents('php://input');
-if (false === $secret || '' === $secret || false === $body) {
+if (false === $secret || '' === $secret) {
     respond(500, ['error' => 'DIDIT_WEBHOOK_SECRET is not set']);
+}
+$body = file_get_contents('php://input');
+if (false === $body) {
+    respond(400, ['error' => 'unreadable_body']);
 }
 
 try {

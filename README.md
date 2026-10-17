@@ -117,7 +117,7 @@ $decision['new_field'];         // array access by API name
 $decision->has('expected_details'); // sent at all, even as null?
 ```
 
-Enum fields are strings with known values as constants (for example `Didit\Types\SessionsListParamsStatus::APPROVED`); the API may add values, so keep a default branch.
+Enum fields are strings with known values as constants (for example `Didit\Types\SessionsListParamsSessionKind::BUSINESS`); the API may add values, so keep a default branch.
 
 ### Raw responses
 
