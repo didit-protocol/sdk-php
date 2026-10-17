@@ -10,7 +10,31 @@ Status: in development, not released.
 
 ## Toolchain
 
-Composer, PHPUnit, PHPStan level max, PHP-CS-Fixer, PSR-18/PSR-17 HTTP.
+Composer, PHPUnit, PHPStan level max, PHP-CS-Fixer, PSR-18/PSR-17 HTTP. The generator is Python 3.10+ (standard library only).
+
+## Commands
+
+```bash
+composer install                                 # install (PHP 8.1 to 8.4)
+composer generate                                # regenerate src/Resources, src/Types, src/DiditClient.php, src/Params.php, tests/Generated
+composer generate:check                          # fail when the committed generated code is stale
+composer test                                    # all unit tests (core, generated, contract, webhook vectors, Authentication)
+composer test:live                               # live sandbox smoke tests; skipped unless DIDIT_SANDBOX_API_KEY is set
+composer analyse                                 # type check: PHPStan level max over src, tests, examples
+composer lint                                    # PHP-CS-Fixer check (composer lint:fix to fix)
+python3 -m unittest discover -s codegen/tests    # generator tests
+python3 codegen/spec_sync.py                     # fetch upstream specs, update SOURCE.json, print the change summary
+composer validate --strict --no-check-lock       # package metadata
+```
+
+There is no build step: Packagist installs the tagged sources (see `.gitattributes` export-ignore).
+
+## Layout
+
+- Generated (never edit): `src/Resources/`, `src/Types/`, `src/DiditClient.php`, `src/Params.php`, `tests/Generated/`.
+- Hand-written core: `src/Core/` (client, transport, retries, pagination, files), `src/Exception/`, `src/Webhooks/` (DESIGN 9), `src/Authentication/` (DESIGN 10), `src/File.php`, `src/RequestOptions.php`, `src/Version.php`.
+- Tests: `tests/Unit`, `tests/Webhooks`, `tests/Authentication`, `tests/Generated`, `tests/Contract`, `tests/Live`.
+- CI: `.github/workflows/ci.yml` (PHP 8.1-8.4, lowest deps, macOS, Windows, PHPStan, PHP-CS-Fixer, generator check, core coverage 90 %, gitleaks), `spec-sync.yml` (daily), `release-please.yml` and `publish.yml` (gated, see CONTRIBUTING.md).
 
 ## Rules
 

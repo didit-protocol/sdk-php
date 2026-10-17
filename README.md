@@ -291,7 +291,8 @@ The `account` resource (sign up, sign in, organizations and applications) uses a
 ```php
 $login = $didit->account->login(['email' => $email, 'password' => $password]);
 $account = $didit->withOptions(accountToken: $login->accessToken);
-$account->account->applications->list();
+$account->account->organizations->list();
+$account->account->applications->list($organizationId);
 ```
 
 ## Language notes
