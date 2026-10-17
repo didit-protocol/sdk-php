@@ -120,7 +120,6 @@ final class DiscoveryAndCacheTest extends TestCase
     public function testDefaultPortAndHostCaseCountAsTheIssuerOrigin(): void
     {
         $this->issuer->discoveryOverrides = ['jwks_uri' => 'https://ACME.auth.didit.me:443/.well-known/jwks.json'];
-        $this->issuer->http->on('GET', 'https://ACME.auth.didit.me:443/.well-known/jwks.json', TestIssuer::json(200, $this->issuer->jwks()));
 
         self::assertSame('user-42', $this->issuer->auth()->verifyAccessToken($this->issuer->sign($this->issuer->accessClaims()))->vendorData);
     }
