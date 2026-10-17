@@ -11,7 +11,7 @@ export DIDIT_API_KEY=your-api-key
 php examples/quickstart.php
 ```
 
-Use the API key of a sandbox application while you try them: sandbox sessions, screenings and transactions are simulated and never billed.
+Use the API key of a sandbox application while you try them.
 In your own project, install the SDK with `composer require didit-protocol/sdk-php` and require your own `vendor/autoload.php`.
 
 ## Scripts
