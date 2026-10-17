@@ -24,6 +24,12 @@ def first_paragraph(text: str | None) -> str:
     return sentence(para)
 
 
+def first_sentence(text: str | None) -> str:
+    para = first_paragraph(text)
+    match = re.match(r"^(.+?[.!?])(\s|$)", para)
+    return match.group(1) if match else para
+
+
 def sentence(text: str) -> str:
     text = text.strip()
     if not text:
