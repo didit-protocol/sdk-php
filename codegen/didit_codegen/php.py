@@ -184,9 +184,12 @@ def json_hint(t: T) -> list | None:
     if isinstance(t, MapT):
         value = json_hint(t.value)
         return ["m", value] if value is not None else ["o"]
-    if isinstance(t, FreeObjT):
+    if isinstance(t, (FreeObjT, AnyT)):
+        # A field that takes any JSON value (`metadata`) is an object in practice.
         return ["o"]
     if isinstance(t, ArrayT):
+        if isinstance(t.item, AnyT):
+            return None
         item = json_hint(t.item)
         return ["l", item] if item is not None else None
     if isinstance(t, UnionT):
