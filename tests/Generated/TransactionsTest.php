@@ -159,7 +159,7 @@ final class TransactionsTest extends GeneratedTestCase
 
     public function testCreateSdkToken(): void
     {
-        $this->queueJson(201, '{"sdk_token":"q7Zt...urlsafe","expires_at":"2026-07-07T12:15:00Z"}');
+        $this->queueJson(201, '{"sdk_token":"sample-sdk-token","expires_at":"2026-07-07T12:15:00Z"}');
 
         $result = $this->client->transactions->createSdkToken([
             'vendor_data' => 'vendor_data-value',
@@ -176,8 +176,8 @@ final class TransactionsTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","ttl_seconds":1,"max_uses":1}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"sdk_token":"q7Zt...urlsafe","expires_at":"2026-07-07T12:15:00Z"}'), $result->toArray());
-        self::assertSame('q7Zt...urlsafe', $result->sdkToken);
+        self::assertSame($this->decoded('{"sdk_token":"sample-sdk-token","expires_at":"2026-07-07T12:15:00Z"}'), $result->toArray());
+        self::assertSame('sample-sdk-token', $result->sdkToken);
     }
 
     public function testListNetworks(): void

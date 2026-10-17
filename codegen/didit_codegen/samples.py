@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 from .model import (
@@ -20,6 +21,27 @@ class FileSample:
 
 
 UUID = "3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"
+
+
+# Fields whose spec examples look like credentials. Generated tests replace
+# their values, so no committed file carries a token-like string (the
+# repository's secret scan allowlists only openapi/).
+CREDENTIAL_KEY_RE = re.compile(r"(token|secret|secret_key|secret_shared_key|api_key|apikey|password|private_key)$", re.I)
+JWT_RE = re.compile(r"^eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*$")
+
+
+def scrub_credentials(value: Any, key: str = "") -> Any:
+    """``value`` with credential-like strings replaced by readable placeholders."""
+    if isinstance(value, dict):
+        return {k: scrub_credentials(v, str(k)) for k, v in value.items()}
+    if isinstance(value, list):
+        return [scrub_credentials(v, key) for v in value]
+    if isinstance(value, str) and value:
+        if JWT_RE.match(value):
+            return "sample-jwt"
+        if key and CREDENTIAL_KEY_RE.search(key):
+            return "sample-" + key.lower().replace("_", "-")
+    return value
 
 
 def scalar_sample(t: Scalar, wire: str, example: Any = None) -> Any:

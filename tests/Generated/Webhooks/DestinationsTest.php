@@ -36,7 +36,7 @@ final class DestinationsTest extends GeneratedTestCase
 
     public function testCreate(): void
     {
-        $this->queueJson(201, '{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","secret_shared_key":"tno2NTeRC1ZK3sBOYlBJDyEzBVENl3pQ1AcZyAW0xnQ","subscribed_events":["status.updated","data.updated"],"created_at":"2026-05-17T10:00:00Z","updated_at":"2026-05-17T10:00:00Z","summary":{"total_deliveries":0,"failed_deliveries":0,"error_rate_percentage":0,"min_response_time_ms":null,"avg_response_time_ms":null,"max_response_time_ms":null,"last_delivery_at":null}}');
+        $this->queueJson(201, '{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","secret_shared_key":"sample-secret-shared-key","subscribed_events":["status.updated","data.updated"],"created_at":"2026-05-17T10:00:00Z","updated_at":"2026-05-17T10:00:00Z","summary":{"total_deliveries":0,"failed_deliveries":0,"error_rate_percentage":0,"min_response_time_ms":null,"avg_response_time_ms":null,"max_response_time_ms":null,"last_delivery_at":null}}');
 
         $result = $this->client->webhooks->destinations->create([
             'label' => 'label-value',
@@ -57,13 +57,13 @@ final class DestinationsTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"label":"label-value","url":"https://example.com/callback","enabled":true,"webhook_version":"v1","subscribed_events":["status.updated"]}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","secret_shared_key":"tno2NTeRC1ZK3sBOYlBJDyEzBVENl3pQ1AcZyAW0xnQ","subscribed_events":["status.updated","data.updated"],"created_at":"2026-05-17T10:00:00Z","updated_at":"2026-05-17T10:00:00Z","summary":{"total_deliveries":0,"failed_deliveries":0,"error_rate_percentage":0,"min_response_time_ms":null,"avg_response_time_ms":null,"max_response_time_ms":null,"last_delivery_at":null}}'), $result->toArray());
+        self::assertSame($this->decoded('{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","secret_shared_key":"sample-secret-shared-key","subscribed_events":["status.updated","data.updated"],"created_at":"2026-05-17T10:00:00Z","updated_at":"2026-05-17T10:00:00Z","summary":{"total_deliveries":0,"failed_deliveries":0,"error_rate_percentage":0,"min_response_time_ms":null,"avg_response_time_ms":null,"max_response_time_ms":null,"last_delivery_at":null}}'), $result->toArray());
         self::assertSame('11111111-2222-3333-4444-555555555555', $result->uuid);
     }
 
     public function testRetrieve(): void
     {
-        $this->queueJson(200, '{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","secret_shared_key":"tno2NTeRC1ZK3sBOYlBJDyEzBVENl3pQ1AcZyAW0xnQ","subscribed_events":["status.updated","data.updated"],"created_at":"2026-01-04T08:00:00Z","updated_at":"2026-04-22T14:09:11Z","summary":{"total_deliveries":12453,"failed_deliveries":14,"error_rate_percentage":0,"min_response_time_ms":41,"avg_response_time_ms":187,"max_response_time_ms":2103,"last_delivery_at":"2026-05-17T09:21:18Z"}}');
+        $this->queueJson(200, '{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","secret_shared_key":"sample-secret-shared-key","subscribed_events":["status.updated","data.updated"],"created_at":"2026-01-04T08:00:00Z","updated_at":"2026-04-22T14:09:11Z","summary":{"total_deliveries":12453,"failed_deliveries":14,"error_rate_percentage":0,"min_response_time_ms":41,"avg_response_time_ms":187,"max_response_time_ms":2103,"last_delivery_at":"2026-05-17T09:21:18Z"}}');
 
         $result = $this->client->webhooks->destinations->retrieve('destinationUuid-1');
 
@@ -75,13 +75,13 @@ final class DestinationsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","secret_shared_key":"tno2NTeRC1ZK3sBOYlBJDyEzBVENl3pQ1AcZyAW0xnQ","subscribed_events":["status.updated","data.updated"],"created_at":"2026-01-04T08:00:00Z","updated_at":"2026-04-22T14:09:11Z","summary":{"total_deliveries":12453,"failed_deliveries":14,"error_rate_percentage":0,"min_response_time_ms":41,"avg_response_time_ms":187,"max_response_time_ms":2103,"last_delivery_at":"2026-05-17T09:21:18Z"}}'), $result->toArray());
+        self::assertSame($this->decoded('{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","secret_shared_key":"sample-secret-shared-key","subscribed_events":["status.updated","data.updated"],"created_at":"2026-01-04T08:00:00Z","updated_at":"2026-04-22T14:09:11Z","summary":{"total_deliveries":12453,"failed_deliveries":14,"error_rate_percentage":0,"min_response_time_ms":41,"avg_response_time_ms":187,"max_response_time_ms":2103,"last_delivery_at":"2026-05-17T09:21:18Z"}}'), $result->toArray());
         self::assertSame('11111111-2222-3333-4444-555555555555', $result->uuid);
     }
 
     public function testUpdate(): void
     {
-        $this->queueJson(200, '{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":false,"webhook_version":"v3","secret_shared_key":"tno2NTeRC1ZK3sBOYlBJDyEzBVENl3pQ1AcZyAW0xnQ","subscribed_events":["status.updated","data.updated"],"created_at":"2026-01-04T08:00:00Z","updated_at":"2026-05-17T11:02:55Z","summary":{"total_deliveries":12453,"failed_deliveries":14,"error_rate_percentage":0,"min_response_time_ms":41,"avg_response_time_ms":187,"max_response_time_ms":2103,"last_delivery_at":"2026-05-17T09:21:18Z"}}');
+        $this->queueJson(200, '{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":false,"webhook_version":"v3","secret_shared_key":"sample-secret-shared-key","subscribed_events":["status.updated","data.updated"],"created_at":"2026-01-04T08:00:00Z","updated_at":"2026-05-17T11:02:55Z","summary":{"total_deliveries":12453,"failed_deliveries":14,"error_rate_percentage":0,"min_response_time_ms":41,"avg_response_time_ms":187,"max_response_time_ms":2103,"last_delivery_at":"2026-05-17T09:21:18Z"}}');
 
         $result = $this->client->webhooks->destinations->update('destinationUuid-1', [
             'label' => 'label-value',
@@ -102,7 +102,7 @@ final class DestinationsTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"label":"label-value","url":"https://example.com/callback","enabled":true,"webhook_version":"v1","subscribed_events":["status.updated"]}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":false,"webhook_version":"v3","secret_shared_key":"tno2NTeRC1ZK3sBOYlBJDyEzBVENl3pQ1AcZyAW0xnQ","subscribed_events":["status.updated","data.updated"],"created_at":"2026-01-04T08:00:00Z","updated_at":"2026-05-17T11:02:55Z","summary":{"total_deliveries":12453,"failed_deliveries":14,"error_rate_percentage":0,"min_response_time_ms":41,"avg_response_time_ms":187,"max_response_time_ms":2103,"last_delivery_at":"2026-05-17T09:21:18Z"}}'), $result->toArray());
+        self::assertSame($this->decoded('{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":false,"webhook_version":"v3","secret_shared_key":"sample-secret-shared-key","subscribed_events":["status.updated","data.updated"],"created_at":"2026-01-04T08:00:00Z","updated_at":"2026-05-17T11:02:55Z","summary":{"total_deliveries":12453,"failed_deliveries":14,"error_rate_percentage":0,"min_response_time_ms":41,"avg_response_time_ms":187,"max_response_time_ms":2103,"last_delivery_at":"2026-05-17T09:21:18Z"}}'), $result->toArray());
         self::assertSame('11111111-2222-3333-4444-555555555555', $result->uuid);
     }
 

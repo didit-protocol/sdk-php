@@ -18,7 +18,7 @@ final class SessionsTest extends GeneratedTestCase
 {
     public function testCreate(): void
     {
-        $this->queueJson(201, '{"session_id":"11111111-2222-3333-4444-555555555555","session_number":43762,"session_token":"3FaJ9wLqX2Mz","url":"https://verify.didit.me/en/session/3FaJ9wLqX2Mz","vendor_data":"user-123","metadata":{"user_type":"premium","account_id":"ABC123"},"status":"Not Started","workflow_id":"11111111-2222-3333-4444-555555555555","workflow_version":3,"callback":"https://example.com/verification/callback"}');
+        $this->queueJson(201, '{"session_id":"11111111-2222-3333-4444-555555555555","session_number":43762,"session_token":"sample-session-token","url":"https://verify.didit.me/en/session/3FaJ9wLqX2Mz","vendor_data":"user-123","metadata":{"user_type":"premium","account_id":"ABC123"},"status":"Not Started","workflow_id":"11111111-2222-3333-4444-555555555555","workflow_version":3,"callback":"https://example.com/verification/callback"}');
 
         $result = $this->client->sessions->create([
             'workflow_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
@@ -65,7 +65,7 @@ final class SessionsTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"workflow_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","vendor_data":"vendor_data-value","callback":"callback-value","callback_method":"initiator","metadata":"metadata-value","language":"en","contact_details":{"email":"user@example.com","send_notification_emails":true,"email_lang":"en","phone":"phone-value"},"expected_details":{"first_name":"first_name-value","last_name":"last_name-value","date_of_birth":"2026-01-15","gender":"M","nationality":"nationality-value","country":"country-value","id_country":"id_country-value","poa_country":"poa_country-value","address":"address-value","identification_number":"identification_number-value","ip_address":"ip_address-value","expected_document_types":["P"],"company_name":"company_name-value","registry_country":"registry_country-value","registration_number":"registration_number-value"},"portrait_image":"ZmFrZQ==","sandbox_scenario":"sandbox_scenario-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"session_id":"11111111-2222-3333-4444-555555555555","session_number":43762,"session_token":"3FaJ9wLqX2Mz","url":"https://verify.didit.me/en/session/3FaJ9wLqX2Mz","vendor_data":"user-123","metadata":{"user_type":"premium","account_id":"ABC123"},"status":"Not Started","workflow_id":"11111111-2222-3333-4444-555555555555","workflow_version":3,"callback":"https://example.com/verification/callback"}'), $result->toArray());
+        self::assertSame($this->decoded('{"session_id":"11111111-2222-3333-4444-555555555555","session_number":43762,"session_token":"sample-session-token","url":"https://verify.didit.me/en/session/3FaJ9wLqX2Mz","vendor_data":"user-123","metadata":{"user_type":"premium","account_id":"ABC123"},"status":"Not Started","workflow_id":"11111111-2222-3333-4444-555555555555","workflow_version":3,"callback":"https://example.com/verification/callback"}'), $result->toArray());
         self::assertSame('11111111-2222-3333-4444-555555555555', $result->sessionId);
     }
 
@@ -233,7 +233,7 @@ final class SessionsTest extends GeneratedTestCase
 
     public function testShare(): void
     {
-        $this->queueJson(200, '{"share_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2lkIjoiMjBiYjNjM2ItNjE0Ni00MzlmLTg0YTQtYmQzMGQwMGFjNmEyIiwiZnJvbV9hcHBsaWNhdGlvbl9pZCI6ImRiZDIwZTM0LTQyZTktNGYyYy1iYTkxLWNmMDc2MjAxNmY2NCIsImZvcl9hcHBsaWNhdGlvbl9pZCI6ImE1ZjNiY2EyLTQ2ZTItNDExZS05MGVmLWE1ODA5MDBhNTdlZSIsImlhdCI6MTc1MzYzMDY2NiwiZXhwIjoxNzUzNjM0MjY2fQ.JJ9pNE_hqZsOtbR0XYZIWw4JzidjdEl279iUrsIkhGE","for_application_id":"a5f3bca2-46e2-411e-90ef-a580900a57ee","session_kind":"user"}');
+        $this->queueJson(200, '{"share_token":"sample-jwt","for_application_id":"a5f3bca2-46e2-411e-90ef-a580900a57ee","session_kind":"user"}');
 
         $result = $this->client->sessions->share('sessionId-1', [
             'for_application_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
@@ -249,8 +249,8 @@ final class SessionsTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"for_application_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","ttl_in_seconds":1}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"share_token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2lkIjoiMjBiYjNjM2ItNjE0Ni00MzlmLTg0YTQtYmQzMGQwMGFjNmEyIiwiZnJvbV9hcHBsaWNhdGlvbl9pZCI6ImRiZDIwZTM0LTQyZTktNGYyYy1iYTkxLWNmMDc2MjAxNmY2NCIsImZvcl9hcHBsaWNhdGlvbl9pZCI6ImE1ZjNiY2EyLTQ2ZTItNDExZS05MGVmLWE1ODA5MDBhNTdlZSIsImlhdCI6MTc1MzYzMDY2NiwiZXhwIjoxNzUzNjM0MjY2fQ.JJ9pNE_hqZsOtbR0XYZIWw4JzidjdEl279iUrsIkhGE","for_application_id":"a5f3bca2-46e2-411e-90ef-a580900a57ee","session_kind":"user"}'), $result->toArray());
-        self::assertSame('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzZXNzaW9uX2lkIjoiMjBiYjNjM2ItNjE0Ni00MzlmLTg0YTQtYmQzMGQwMGFjNmEyIiwiZnJvbV9hcHBsaWNhdGlvbl9pZCI6ImRiZDIwZTM0LTQyZTktNGYyYy1iYTkxLWNmMDc2MjAxNmY2NCIsImZvcl9hcHBsaWNhdGlvbl9pZCI6ImE1ZjNiY2EyLTQ2ZTItNDExZS05MGVmLWE1ODA5MDBhNTdlZSIsImlhdCI6MTc1MzYzMDY2NiwiZXhwIjoxNzUzNjM0MjY2fQ.JJ9pNE_hqZsOtbR0XYZIWw4JzidjdEl279iUrsIkhGE', $result->shareToken);
+        self::assertSame($this->decoded('{"share_token":"sample-jwt","for_application_id":"a5f3bca2-46e2-411e-90ef-a580900a57ee","session_kind":"user"}'), $result->toArray());
+        self::assertSame('sample-jwt', $result->shareToken);
     }
 
     public function testImportShared(): void

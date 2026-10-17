@@ -19,6 +19,7 @@ from .model import (
 from .php import HEADER, ResourceNode, walk
 from .samples import (
     FileSample, has_file, json_text, model_sample, php_literal, php_str, request_sample, response_sample,
+    scrub_credentials,
 )
 
 ORG_ID = "org-7f3a"
@@ -292,7 +293,7 @@ def _response_example(om: OpModel, r) -> Any:
         target = o.doc.deref(content["schema"])
         if isinstance(target, dict) and "example" in target:
             ex = target["example"]
-    return ex
+    return scrub_credentials(ex)
 
 
 def _scalar_check(model, data: dict[str, Any]) -> str | None:
