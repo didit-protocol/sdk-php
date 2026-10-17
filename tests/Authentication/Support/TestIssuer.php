@@ -32,7 +32,7 @@ final class TestIssuer
     /** @var list<string> Key IDs the JWKS publishes. */
     public array $published = [self::KID];
 
-    /** @var array<string, mixed> Extra JWKS entries, served after the published keys. */
+    /** @var list<mixed> Extra JWKS entries, served after the published keys. */
     public array $extraJwks = [];
 
     public ?string $jwksCacheControl = 'public, max-age=300';

@@ -348,7 +348,7 @@ final class TokenVerificationTest extends TestCase
         yield 'empty signature' => [static fn (string $t): string => substr($t, 0, (int) strrpos($t, '.') + 1)];
         yield 'space in header' => [static fn (string $t): string => ' ' . $t];
         yield 'impossible length' => [static fn (string $t): string => 'A.' . explode('.', $t)[1] . '.' . explode('.', $t)[2]];
-        yield 'non-canonical trailing bits' => [static fn (string $t): string => self::replaceSegment($t, 0, substr(explode('.', $t)[0], 0, -1) . self::nonCanonicalLast(explode('.', $t)[0]))];
+        yield 'non-canonical trailing bits' => [static fn (string $t): string => self::replaceSegment($t, 0, self::nonCanonical('{"alg":"ES256","kid":"k_test_primary","typ":"at+jwt"}'))];
         yield 'header not JSON' => [static fn (string $t): string => self::replaceSegment($t, 0, TestIssuer::b64('not json'))];
         yield 'header JSON list' => [static fn (string $t): string => self::replaceSegment($t, 0, TestIssuer::b64('["ES256"]'))];
         yield 'header JSON string' => [static fn (string $t): string => self::replaceSegment($t, 0, TestIssuer::b64('"ES256"'))];
@@ -483,15 +483,19 @@ final class TokenVerificationTest extends TestCase
     }
 
     /**
-     * A last character that sets bits the decoder must discard.
+     * The base64url of the JSON with stray bits set in its last character,
+     * which a strict decoder must refuse.
      */
-    private static function nonCanonicalLast(string $segment): string
+    private static function nonCanonical(string $json): string
     {
+        while (1 !== \strlen($json) % 3) {
+            $json .= ' ';
+        }
+        $encoded = TestIssuer::b64($json);
         $alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
-        $index = (int) strpos($alphabet, $segment[\strlen($segment) - 1]);
-        $unusedBits = 2 === \strlen($segment) % 4 ? 0x0F : 0x03;
+        $last = (int) strpos($alphabet, $encoded[\strlen($encoded) - 1]);
 
-        return $alphabet[$index | $unusedBits];
+        return substr($encoded, 0, -1) . $alphabet[$last | 0x0F];
     }
 
     /**

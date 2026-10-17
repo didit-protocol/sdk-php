@@ -60,8 +60,6 @@ final class HttpTransport
             return $client->sendRequest($request);
         } catch (ClientExceptionInterface $e) {
             throw self::connectionException($e);
-        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
-            throw self::connectionException($e);
         }
     }
 

@@ -60,14 +60,13 @@ abstract class BaseClient
             accountBaseUrl: $accountBaseUrl,
             accountToken: $accountToken,
         );
-        $this->requester = new Requester(
+        $this->initialize(new Requester(
             $options,
             new HttpTransport($httpClient),
             $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory(),
             $streamFactory ?? Psr17FactoryDiscovery::findStreamFactory(),
             $logger ?? self::loggerFromEnvironment(),
-        );
-        $this->initResources();
+        ));
     }
 
     /**
@@ -76,8 +75,7 @@ abstract class BaseClient
     public static function fromRequester(Requester $requester): static
     {
         $client = (new \ReflectionClass(static::class))->newInstanceWithoutConstructor();
-        $client->requester = $requester;
-        $client->initResources();
+        $client->initialize($requester);
 
         return $client;
     }
@@ -126,6 +124,12 @@ abstract class BaseClient
     }
 
     abstract protected function initResources(): void;
+
+    private function initialize(Requester $requester): void
+    {
+        $this->requester = $requester;
+        $this->initResources();
+    }
 
     private static function loggerFromEnvironment(): ?LoggerInterface
     {
