@@ -39,6 +39,7 @@ Unit tests never touch the network. Live smoke tests run only when `DIDIT_SANDBO
 
 The API surface comes from the OpenAPI contract published at docs.didit.me (mintlify-docs).
 To add or change an endpoint, change the backend and the OpenAPI document there; the daily spec sync (`.github/workflows/spec-sync.yml`) then opens a `chore(spec): sync API spec YYYY-MM-DD` pull request here and in the other six SDKs.
+Push any hand-written change the new spec needs to that pull request: once it holds a commit from someone else, later syncs add their commit on top (and list their changes in a comment) instead of rebuilding the branch from `main`.
 A new server operation without SDK naming fails the generator with a message that names it: add an entry to `openapi/overlay.json` (or `x-didit-sdk` upstream).
 When a sync breaks the SDK surface (a method deprecated or deleted, a field removed), its commit and pull request end with a `BREAKING CHANGE:` footer, so Release Please never ships it in a patch release; keep that footer when you merge.
 
@@ -55,9 +56,9 @@ A change to hand-written core behaviour that DESIGN.md describes (client options
 
 Nothing is released before the first release is approved (not before the 2026-11-01 Didit release). Until then the version stays 0.x and the repository stays private.
 
-1. Release Please (`.github/workflows/release-please.yml`) keeps a release pull request open with the next version and changelog. It runs only when the repository variable `RELEASES_ENABLED` is `true`.
-2. Merging that pull request tags `vX.Y.Z` and publishes a GitHub release.
-3. `.github/workflows/publish.yml` (also gated on `RELEASES_ENABLED`, and skipped for prereleases) checks that the tag equals `Didit\Version::VERSION`, runs the tests and PHPStan, builds the archive Composer installs, attests its build provenance (GitHub artifact attestations), attaches it to the release and asks Packagist to update.
+1. Release Please (`.github/workflows/release-please.yml`) keeps a release pull request open with the next version and changelog. It runs only when the repository variable `RELEASES_ENABLED` is `true`, and it never creates tags: Packagist publishes every tag it sees.
+2. Merging that pull request creates no tag yet. The merged pull request stays labelled `autorelease: pending`, and no new release pull request opens until it is tagged.
+3. `.github/workflows/publish.yml` (also gated on `RELEASES_ENABLED`) checks that `Didit\Version::VERSION` equals the release manifest, runs the tests and PHPStan on the merge commit, then waits for a reviewer of the `packagist` environment. Only after that approval does it create the `vX.Y.Z` tag and the GitHub release, attest the build provenance of a source archive (GitHub artifact attestations), attach it to the release and ask Packagist to update. If the checks fail or the approval is rejected, nothing is tagged: fix `main` or run Publish again from the Actions tab.
 
 ### One-time registry setup (a maintainer, before the first release)
 
