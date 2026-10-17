@@ -249,7 +249,7 @@ final class Webhook
         if (abs($now - $timestamp) > $tolerance) {
             throw new WebhookVerificationException(
                 WebhookVerificationException::TIMESTAMP_OUT_OF_TOLERANCE,
-                \sprintf('The webhook timestamp is %d seconds away from now, more than the %d seconds allowed.', abs($now - $timestamp), $tolerance),
+                \sprintf('The webhook timestamp is more than %d seconds away from now: a delayed or replayed delivery, or a server clock that is off.', $tolerance),
             );
         }
     }
