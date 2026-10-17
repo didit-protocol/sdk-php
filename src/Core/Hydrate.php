@@ -84,6 +84,7 @@ final class Hydrate
         if (!\is_array($value) || ([] !== $value && array_is_list($value))) {
             return null;
         }
+
         /** @var array<string, mixed> $value */
         return $value;
     }

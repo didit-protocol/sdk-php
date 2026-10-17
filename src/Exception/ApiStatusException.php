@@ -59,7 +59,7 @@ class ApiStatusException extends DiditException
 
     private static function buildMessage(RawResponse $response): string
     {
-        $message = sprintf('HTTP %d', $response->status);
+        $message = \sprintf('HTTP %d', $response->status);
         $reason = $response->reasonPhrase();
         if ('' !== $reason) {
             $message .= ' ' . $reason;
@@ -69,7 +69,7 @@ class ApiStatusException extends DiditException
             $message .= ': ' . $detail;
         }
         if (null !== $response->requestId) {
-            $message .= sprintf(' (request id %s)', $response->requestId);
+            $message .= \sprintf(' (request id %s)', $response->requestId);
         }
 
         return $message;
