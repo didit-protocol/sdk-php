@@ -32,7 +32,6 @@ final class ArrayCache implements CacheInterface
 
     /**
      * @param string $key
-     * @param mixed $default
      */
     public function get($key, $default = null): mixed
     {
@@ -52,7 +51,6 @@ final class ArrayCache implements CacheInterface
 
     /**
      * @param string $key
-     * @param mixed $value
      * @param int|\DateInterval|null $ttl
      */
     public function set($key, $value, $ttl = null): bool
@@ -85,7 +83,6 @@ final class ArrayCache implements CacheInterface
 
     /**
      * @param iterable<string> $keys
-     * @param mixed $default
      *
      * @return iterable<string, mixed>
      */
