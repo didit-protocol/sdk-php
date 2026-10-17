@@ -15,4 +15,4 @@ parameters:
     tmpDir: .phpstan.cache
     # Generated: DiditClient::initResources() runs once, from the constructor or BaseClient::fromRequester().
     additionalConstructors:
-        - Didit\DiditClient::initResources
+        - Didit\Core\BaseClient::initResources
