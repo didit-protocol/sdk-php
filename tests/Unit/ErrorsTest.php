@@ -194,7 +194,14 @@ final class ErrorsTest extends TestCase
 
     public function testApiKeyEchoedByTheServerIsNotInTheMessage(): void
     {
-        self::markTestIncomplete('bug: ApiStatusException::buildMessage() copies the response detail verbatim, so an API key echoed by the server lands in the exception message (DESIGN 6: never included in an error message).');
+        $this->support->http->queueJson(401, ['detail' => 'Invalid API key ' . TestClient::API_KEY . '.']);
+
+        $e = self::statusError(fn () => $this->client()->sessions->retrieveDecision('abc'));
+
+        if (str_contains($e->getMessage(), TestClient::API_KEY)) {
+            self::markTestIncomplete('bug: ApiStatusException::buildMessage() copies the response detail verbatim, so an API key echoed by the server lands in the exception message (DESIGN 6: never included in an error message).');
+        }
+        self::assertStringNotContainsString(TestClient::API_KEY, (string) $e);
     }
 
     public function testConfigurationErrorsNeverContainTheApiKey(): void
@@ -231,6 +238,7 @@ final class ErrorsTest extends TestCase
         if (str_contains($exported, TestClient::API_KEY)) {
             self::markTestIncomplete('bug: var_export() ignores __debugInfo(), so var_export($client) prints Requester -> ClientOptions::$apiKey and $accountToken in clear text.');
         }
+        self::assertStringNotContainsString(TestClient::API_KEY, $exported);
         self::assertStringNotContainsString(TestClient::ACCOUNT_TOKEN, $exported);
     }
 
