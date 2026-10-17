@@ -41,7 +41,7 @@ final class BiometricTemplates extends BaseResource
      * @return Page<Types\BiometricTemplatesListResponseResults>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -67,7 +67,7 @@ final class BiometricTemplates extends BaseResource
      * @param BiometricTemplatesCountParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function count(array $params = [], ?RequestOptions $options = null): Types\BiometricTemplatesCountResponse
     {
@@ -95,7 +95,7 @@ final class BiometricTemplates extends BaseResource
      * @param string $templateUuid template id, as returned in `biometric_template_uuid` by the session deletion endpoints, `biometric_template_id` on a Face Search match, or the list endpoint
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieve(
         string $templateUuid,
@@ -124,7 +124,7 @@ final class BiometricTemplates extends BaseResource
      * @param string $templateUuid template id, as returned in `biometric_template_uuid` by the session deletion endpoints, `biometric_template_id` on a Face Search match, or the list endpoint
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function delete(
         string $templateUuid,
@@ -153,7 +153,7 @@ final class BiometricTemplates extends BaseResource
      * @param BiometricTemplatesBatchDeleteParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function batchDelete(
         array $params = [],

@@ -38,7 +38,7 @@ final class RegulatoryReports extends BaseResource
      * @return Page<Types\RegulatoryReportDetail>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -61,7 +61,7 @@ final class RegulatoryReports extends BaseResource
      * @param RegulatoryReportsCreateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\RegulatoryReportDetail
     {
@@ -86,7 +86,7 @@ final class RegulatoryReports extends BaseResource
      * @param string $reportUuid report UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieve(string $reportUuid, ?RequestOptions $options = null): Types\RegulatoryReportDetail
     {
@@ -110,7 +110,7 @@ final class RegulatoryReports extends BaseResource
      * @param RegulatoryReportsUpdateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function update(
         string $reportUuid,
@@ -138,7 +138,7 @@ final class RegulatoryReports extends BaseResource
      * @param string $reportUuid report UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function delete(string $reportUuid, ?RequestOptions $options = null): NoContent
     {
@@ -165,7 +165,7 @@ final class RegulatoryReports extends BaseResource
      * @param string $reportUuid report UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function validate(
         string $reportUuid,
@@ -191,7 +191,7 @@ final class RegulatoryReports extends BaseResource
      * @param string $reportUuid report UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function finalize(string $reportUuid, ?RequestOptions $options = null): Types\RegulatoryReportDetail
     {
@@ -215,7 +215,7 @@ final class RegulatoryReports extends BaseResource
      * @param RegulatoryReportsRetrieveDownloadUrlParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieveDownloadUrl(
         string $reportUuid,

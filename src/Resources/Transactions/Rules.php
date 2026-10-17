@@ -43,7 +43,7 @@ final class Rules extends BaseResource
      * @return Page<Types\TransactionRuleDetail>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -67,7 +67,7 @@ final class Rules extends BaseResource
      * @param TransactionRuleCreateRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\TransactionRuleDetail
     {
@@ -91,7 +91,7 @@ final class Rules extends BaseResource
      * @param string $ruleUuid the rule's uuid from list or create
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieve(string $ruleUuid, ?RequestOptions $options = null): Types\TransactionRuleDetail
     {
@@ -116,7 +116,7 @@ final class Rules extends BaseResource
      * @param TransactionRuleUpdateRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function update(
         string $ruleUuid,
@@ -146,7 +146,7 @@ final class Rules extends BaseResource
      * @param string $ruleUuid the rule's uuid from list or create
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function delete(string $ruleUuid, ?RequestOptions $options = null): NoContent
     {
@@ -170,7 +170,7 @@ final class Rules extends BaseResource
      * @param TransactionRuleBacktestRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function backtest(array $params = [], ?RequestOptions $options = null): Types\TransactionRuleBacktestResult
     {
@@ -197,7 +197,7 @@ final class Rules extends BaseResource
      * @return Page<Types\TransactionRuleLibraryEntry>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listLibrary(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -219,7 +219,7 @@ final class Rules extends BaseResource
      * @param TransactionRuleInstallRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function installLibrary(
         array $params = [],
@@ -245,7 +245,7 @@ final class Rules extends BaseResource
      * @param TransactionRuleInstallRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function uninstallLibrary(
         array $params = [],

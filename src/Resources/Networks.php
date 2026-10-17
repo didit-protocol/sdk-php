@@ -48,7 +48,7 @@ final class Networks extends BaseResource
      * @return Page<Types\NetworkListItem>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -70,7 +70,7 @@ final class Networks extends BaseResource
      * @param string $networkUuid network UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieve(string $networkUuid, ?RequestOptions $options = null): Types\NetworkDetail
     {
@@ -96,7 +96,7 @@ final class Networks extends BaseResource
      * @param NetworksRetrieveGraphParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieveGraph(
         string $networkUuid,
@@ -124,7 +124,7 @@ final class Networks extends BaseResource
      * @param string $networkUuid network UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listMembers(string $networkUuid, ?RequestOptions $options = null): Types\NetworksListMembersResponse
     {
@@ -148,7 +148,7 @@ final class Networks extends BaseResource
      * @param string $networkUuid network UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listSignals(string $networkUuid, ?RequestOptions $options = null): Types\NetworksListSignalsResponse
     {
@@ -172,7 +172,7 @@ final class Networks extends BaseResource
      * @param string $networkUuid network UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieveTimeline(
         string $networkUuid,
@@ -198,7 +198,7 @@ final class Networks extends BaseResource
      * @param string $networkUuid network UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieveMap(string $networkUuid, ?RequestOptions $options = null): Types\NetworkMap
     {
@@ -225,7 +225,7 @@ final class Networks extends BaseResource
      * @param NetworksDownloadReportParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function downloadReport(
         string $networkUuid,

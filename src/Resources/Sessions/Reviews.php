@@ -37,7 +37,7 @@ final class Reviews extends BaseResource
      * @return Page<Types\ReviewItem>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(string $sessionId, array $params = [], ?RequestOptions $options = null): Page
     {
@@ -63,7 +63,7 @@ final class Reviews extends BaseResource
      * @param SessionsReviewsCreateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(
         string $sessionId,

@@ -50,7 +50,7 @@ final class Transactions extends BaseResource
      * @return Page<Types\TransactionsListResponseResults>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -75,7 +75,7 @@ final class Transactions extends BaseResource
      * @param TransactionsCreateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\TransactionDetail
     {
@@ -100,7 +100,7 @@ final class Transactions extends BaseResource
      * @param string $transactionId didit-stable transaction UUID (the `uuid` returned from create / list, **not** your `txn_id`)
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieve(string $transactionId, ?RequestOptions $options = null): Types\TransactionDetail
     {
@@ -127,7 +127,7 @@ final class Transactions extends BaseResource
      * @param TransactionsCreateSdkTokenParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function createSdkToken(
         array $params,
@@ -153,7 +153,7 @@ final class Transactions extends BaseResource
      * @param string $transactionUuid transaction UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listNetworks(
         string $transactionUuid,
@@ -180,7 +180,7 @@ final class Transactions extends BaseResource
      * @param string $transactionPartyUuid transaction party UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listPartyNetworks(
         string $transactionUuid,

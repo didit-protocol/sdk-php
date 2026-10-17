@@ -35,7 +35,7 @@ final class Links extends BaseResource
      * @return ListResponse<Types\CaseLink>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(string $caseUuid, ?RequestOptions $options = null): ListResponse
     {
@@ -60,7 +60,7 @@ final class Links extends BaseResource
      * @param CasesLinksCreateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(string $caseUuid, array $params, ?RequestOptions $options = null): Types\CaseLink
     {
@@ -85,7 +85,7 @@ final class Links extends BaseResource
      * @param string $linkUuid link UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function delete(string $caseUuid, string $linkUuid, ?RequestOptions $options = null): NoContent
     {

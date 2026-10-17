@@ -37,7 +37,7 @@ final class WalletScreening extends BaseResource
      * @param WalletScreeningScreenParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function screen(array $params, ?RequestOptions $options = null): Types\WalletScreeningResult
     {
@@ -64,7 +64,7 @@ final class WalletScreening extends BaseResource
      * @param WalletScreeningResult $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function screenPdf(array $params, ?RequestOptions $options = null): BinaryContent
     {

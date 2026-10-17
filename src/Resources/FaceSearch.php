@@ -32,7 +32,7 @@ final class FaceSearch extends BaseResource
      * @param FaceSearchSearchParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function search(array $params, ?RequestOptions $options = null): Types\FaceSearchSearchResponse
     {

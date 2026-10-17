@@ -34,7 +34,7 @@ final class Email extends BaseResource
      * @param EmailRiskRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function assessRisk(array $params, ?RequestOptions $options = null): Types\EmailRiskResponse
     {
@@ -59,7 +59,7 @@ final class Email extends BaseResource
      * @param EmailSendCodeParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function sendCode(array $params, ?RequestOptions $options = null): Types\EmailVerificationSendResponse
     {
@@ -86,7 +86,7 @@ final class Email extends BaseResource
      * @param EmailCheckCodeParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function checkCode(array $params, ?RequestOptions $options = null): Types\EmailVerificationCheckResponse
     {

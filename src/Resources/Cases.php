@@ -80,7 +80,7 @@ final class Cases extends BaseResource
      * @return Page<Types\CaseListItem>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function list(array $params = [], ?RequestOptions $options = null): Page
     {
@@ -103,7 +103,7 @@ final class Cases extends BaseResource
      * @param CasesCreateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function create(array $params, ?RequestOptions $options = null): Types\CaseDetail
     {
@@ -128,7 +128,7 @@ final class Cases extends BaseResource
      * @param string $caseUuid case UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieve(string $caseUuid, ?RequestOptions $options = null): Types\CaseDetail
     {
@@ -153,7 +153,7 @@ final class Cases extends BaseResource
      * @param CasesUpdateParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function update(string $caseUuid, array $params = [], ?RequestOptions $options = null): Types\CaseDetail
     {
@@ -177,7 +177,7 @@ final class Cases extends BaseResource
      * @param string $caseUuid case UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function delete(string $caseUuid, ?RequestOptions $options = null): NoContent
     {
@@ -202,7 +202,7 @@ final class Cases extends BaseResource
      * @param CasesAssignParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function assign(string $caseUuid, array $params, ?RequestOptions $options = null): Types\CaseDetail
     {
@@ -231,7 +231,7 @@ final class Cases extends BaseResource
      * @param CasesResolveParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function resolve(string $caseUuid, array $params, ?RequestOptions $options = null): Types\CaseDetail
     {
@@ -256,7 +256,7 @@ final class Cases extends BaseResource
      * @param string $caseUuid case UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function reopen(string $caseUuid, ?RequestOptions $options = null): Types\CaseDetail
     {
@@ -280,7 +280,7 @@ final class Cases extends BaseResource
      * @param string $caseUuid case UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function requestInfo(string $caseUuid, ?RequestOptions $options = null): Types\CaseDetail
     {
@@ -304,7 +304,7 @@ final class Cases extends BaseResource
      * @param string $caseUuid case UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function escalate(string $caseUuid, ?RequestOptions $options = null): Types\CaseDetail
     {
@@ -329,7 +329,7 @@ final class Cases extends BaseResource
      * @param CasesTransferParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function transfer(string $caseUuid, array $params, ?RequestOptions $options = null): Types\CaseDetail
     {
@@ -354,7 +354,7 @@ final class Cases extends BaseResource
      * @param string $caseUuid case UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function approveResolution(string $caseUuid, ?RequestOptions $options = null): Types\CaseDetail
     {
@@ -379,7 +379,7 @@ final class Cases extends BaseResource
      * @param CasesRejectResolutionParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function rejectResolution(
         string $caseUuid,
@@ -411,7 +411,7 @@ final class Cases extends BaseResource
      * @param CaseActionCaseEntityActionRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function applyEntityAction(
         string $caseUuid,
@@ -439,7 +439,7 @@ final class Cases extends BaseResource
      * @param string $caseUuid case UUID
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function print(string $caseUuid, ?RequestOptions $options = null): Types\CasesPrintResponse
     {
@@ -466,7 +466,7 @@ final class Cases extends BaseResource
      * @return Page<Types\CaseEvent>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listEvents(string $caseUuid, array $params = [], ?RequestOptions $options = null): Page
     {
@@ -490,7 +490,7 @@ final class Cases extends BaseResource
      * @return ListResponse<array<string, mixed>>
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listAmlHits(string $caseUuid, ?RequestOptions $options = null): ListResponse
     {
@@ -517,7 +517,7 @@ final class Cases extends BaseResource
      * @param CasesRetrieveStatisticsParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieveStatistics(
         array $params = [],
@@ -545,7 +545,7 @@ final class Cases extends BaseResource
      * @param CasesBulkUpdateStatusParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function bulkUpdateStatus(
         array $params,
@@ -572,7 +572,7 @@ final class Cases extends BaseResource
      * @param CasesBulkAssignParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function bulkAssign(array $params, ?RequestOptions $options = null): Types\CasesBulkAssignResponse
     {
@@ -598,7 +598,7 @@ final class Cases extends BaseResource
      * @param CasesListActionReceiptsParams $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function listActionReceipts(
         string $caseUuid,
@@ -625,7 +625,7 @@ final class Cases extends BaseResource
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/action-receipts/{receipt_uuid}/retry/`
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retryActionReceipt(
         string $caseUuid,
@@ -653,7 +653,7 @@ final class Cases extends BaseResource
      * @param CaseDuplicateCaseDuplicateQueryRequest $params
      *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty or a parameter value cannot be encoded
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function findDuplicates(
         array $params = [],
