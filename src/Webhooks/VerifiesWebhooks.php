@@ -21,7 +21,7 @@ trait VerifiesWebhooks
      * {@see Webhook::verify()}.
      *
      * @param array<string, string|list<string>>|MessageInterface $headers
-     * @param string|list<string>                                $secret
+     * @param string|array<string>                               $secret
      *
      * @throws WebhookVerificationException
      * @throws ConfigurationException
@@ -41,9 +41,9 @@ trait VerifiesWebhooks
      * Verifies a delivery from an already decoded body (`X-Signature-V2`
      * only) and returns the typed event; see {@see Webhook::verifyParsed()}.
      *
-     * @param array<string, mixed>|object                        $payload
+     * @param array<mixed>|object                                $payload
      * @param array<string, string|list<string>>|MessageInterface $headers
-     * @param string|list<string>                                $secret
+     * @param string|array<string>                               $secret
      *
      * @throws WebhookVerificationException
      * @throws ConfigurationException

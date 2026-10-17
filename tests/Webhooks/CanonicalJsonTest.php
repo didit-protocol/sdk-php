@@ -244,8 +244,6 @@ final class CanonicalJsonTest extends TestCase
     {
         $precision = ini_get('precision');
         $serializePrecision = ini_get('serialize_precision');
-        self::assertIsString($precision);
-        self::assertIsString($serializePrecision);
         ini_set('precision', '3');
         ini_set('serialize_precision', '5');
         try {

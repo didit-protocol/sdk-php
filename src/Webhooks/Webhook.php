@@ -79,7 +79,7 @@ final class Webhook
      *                                                                        `getallheaders()`, Laravel or Symfony
      *                                                                        `$request->headers->all()`, or any PSR-7
      *                                                                        request
-     * @param string|list<string>                                $secret      the destination's secret, or several during
+     * @param string|array<string>                               $secret      the destination's secret, or several during
      *                                                                        a rotation
      * @param int                                                $tolerance   maximum distance in seconds between the
      *                                                                        delivery's timestamp and now
@@ -145,11 +145,11 @@ final class Webhook
      * one no longer matches its signature. `X-Signature` and
      * `X-Signature-Simple` are never checked here.
      *
-     * @param array<string, mixed>|object                        $payload   the decoded JSON object: an array from
+     * @param array<mixed>|object                                $payload   the decoded JSON object: an array from
      *                                                                      `json_decode($body, true)` or a
      *                                                                      `stdClass` from `json_decode($body)`
      * @param array<string, string|list<string>>|MessageInterface $headers   the request headers, names in any case
-     * @param string|list<string>                                $secret    the destination's secret, or several
+     * @param string|array<string>                               $secret    the destination's secret, or several
      *                                                                      during a rotation
      * @param int                                                $tolerance maximum distance in seconds between the
      *                                                                      delivery's timestamp and now

@@ -445,7 +445,7 @@ final class WebhookTest extends TestCase
         // json_decode() turns the big integer into a float, so the parsed payload no longer matches.
         self::assertRejected(
             WebhookVerificationException::INVALID_SIGNATURE,
-            static fn () => Webhook::verifyParsed((array) json_decode($body, true), $headers, self::SECRET, now: self::NOW),
+            static fn () => Webhook::verifyParsed(json_decode($body, true), $headers, self::SECRET, now: self::NOW),
         );
     }
 
@@ -459,7 +459,6 @@ final class WebhookTest extends TestCase
         self::assertTrue($fromArray->bodyAuthenticated());
 
         $object = json_decode(self::BODY);
-        self::assertInstanceOf(\stdClass::class, $object);
         $fromObject = Webhook::verifyParsed($object, $headers, self::SECRET, now: self::NOW);
         self::assertSame(self::payload(), $fromObject->toArray());
     }
@@ -485,12 +484,11 @@ final class WebhookTest extends TestCase
         $body = '{"metadata":{},"timestamp":1760702400,"webhook_type":"status.updated"}';
         $headers = ['X-Signature-V2' => self::sign($body)];
         $object = json_decode($body);
-        self::assertInstanceOf(\stdClass::class, $object);
 
         self::assertSame('X-Signature-V2', Webhook::verifyParsed($object, $headers, self::SECRET, now: self::NOW)->verifiedWith());
         self::assertRejected(
             WebhookVerificationException::INVALID_SIGNATURE,
-            static fn () => Webhook::verifyParsed((array) json_decode($body, true), $headers, self::SECRET, now: self::NOW),
+            static fn () => Webhook::verifyParsed(json_decode($body, true), $headers, self::SECRET, now: self::NOW),
         );
     }
 
@@ -558,11 +556,7 @@ final class WebhookTest extends TestCase
      */
     private static function payload(): array
     {
-        $payload = json_decode(self::BODY, true);
-        self::assertIsArray($payload);
-
-        /** @var array<string, mixed> $payload */
-        return $payload;
+        return json_decode(self::BODY, true);
     }
 
     private static function sign(string $message, string $secret = self::SECRET): string
