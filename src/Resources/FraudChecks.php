@@ -58,7 +58,7 @@ final class FraudChecks extends BaseResource
             method: 'POST',
             path: '/v3/fraud/checks/',
             bodyTypes: ['json', 'multipart', 'form'],
-            jsonHints: ['subject' => ['o', ['identifiers' => ['l', ['o']], 'attributes' => ['o']]], 'context' => ['o'], 'checks' => ['o'], 'metadata' => ['o']],
+            jsonHints: ['subject' => ['o', ['identifiers' => ['l', ['o']], 'attributes' => ['o']]], 'context' => ['o'], 'checks' => ['o']],
         ), [], $params, $options);
 
         return Types\FraudCheckResponse::fromResponse($response);
@@ -81,7 +81,7 @@ final class FraudChecks extends BaseResource
             method: 'POST',
             path: '/v3/fraud/checks/plan/',
             bodyTypes: ['json', 'multipart', 'form'],
-            jsonHints: ['subject' => ['o', ['identifiers' => ['l', ['o']], 'attributes' => ['o']]], 'context' => ['o'], 'checks' => ['o'], 'metadata' => ['o']],
+            jsonHints: ['subject' => ['o', ['identifiers' => ['l', ['o']], 'attributes' => ['o']]], 'context' => ['o'], 'checks' => ['o']],
         ), [], $params, $options);
 
         return Types\FraudCheckPlan::fromResponse($response);

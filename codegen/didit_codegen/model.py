@@ -69,7 +69,8 @@ class FreeObjT(T):
 
 @dataclass
 class AnyT(T):
-    pass
+    # The spec's example is a JSON object, so an empty PHP array means `{}`.
+    object_example: bool = False
 
 
 @dataclass
@@ -225,7 +226,7 @@ class Registry:
             return Scalar("float", schema.get("format"), nullable=nullable)
         if typ == "boolean":
             return Scalar("bool", nullable=nullable)
-        return AnyT(nullable=nullable)
+        return AnyT(nullable=nullable, object_example=isinstance(schema.get("example"), dict))
 
     def _convert_ref(self, doc: Document, ref: str, hint: str, mode: str, origin: str) -> T:
         target = doc.resolve(ref)
