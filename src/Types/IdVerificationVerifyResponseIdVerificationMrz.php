@@ -11,8 +11,8 @@ use Didit\Core\Hydrate;
 
 /**
  * Parsed machine-readable zone. An **empty object** (`{}`) when the document has no MRZ or it could
- * not be read ,  also check the `warnings` list in that case. Dates inside the MRZ use the raw
- * `YYMMDD` format.
+ * not be read, also check the `warnings` list in that case. Dates inside the MRZ use the raw `YYMMDD`
+ * format.
  */
 final class IdVerificationVerifyResponseIdVerificationMrz extends BaseModel
 {

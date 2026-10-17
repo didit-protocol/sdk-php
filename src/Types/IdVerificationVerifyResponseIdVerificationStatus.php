@@ -7,8 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `Approved` when no warning resolves to a decline; `Declined` otherwise ,  the `warnings` list
- * explains why.
+ * `Approved` when no warning resolves to a decline; `Declined` otherwise, the `warnings` list explains
+ * why.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

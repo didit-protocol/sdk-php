@@ -30,10 +30,10 @@ final class AgeEstimationEstimateResponseAgeEstimation extends BaseModel
     public readonly ?string $method;
 
     /**
-     * Passive-liveness score from 0 to 100 ,  the model's confidence that the photo shows a live person.
+     * Passive-liveness score from 0 to 100, the model's confidence that the photo shows a live person.
      * Compared against `face_liveness_score_decline_threshold`; at or below it the call declines with
-     * `LOW_LIVENESS_SCORE`. `null` when the liveness model returns no confidence ,  the call still
-     * declines with `LOW_LIVENESS_SCORE` because null is treated as 0 for the threshold comparison.
+     * `LOW_LIVENESS_SCORE`. `null` when the liveness model returns no confidence, the call still declines
+     * with `LOW_LIVENESS_SCORE` because null is treated as 0 for the threshold comparison.
      */
     public readonly ?float $score;
 

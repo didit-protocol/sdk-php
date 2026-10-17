@@ -7,10 +7,10 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `False Positive` ,  `match_score` below `aml_match_score_threshold`, excluded from risk assessment.
- * `Unreviewed` ,  possible match awaiting review. `Confirmed Match` / `Inconclusive` ,  set manually
- * by a reviewer (via the Business Console) on saved sessions; that review capability is not part of
- * this spec.
+ * `False Positive`, `match_score` below `aml_match_score_threshold`, excluded from risk assessment.
+ * `Unreviewed`, possible match awaiting review. `Confirmed Match` / `Inconclusive`, set manually by a
+ * reviewer (via the Business Console) on saved sessions; that review capability is not part of this
+ * spec.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

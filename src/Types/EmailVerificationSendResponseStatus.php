@@ -7,10 +7,10 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `Success` ,  OTP emailed to a new verification (billed). `Retry` ,  fresh OTP emailed for the
- * pending verification created by a previous send (free). `Undeliverable` ,  the address failed
- * deliverability validation or the message could not be sent; the verification is immediately
- * finalized as `Declined` and nothing is billed.
+ * `Success`, OTP emailed to a new verification (billed). `Retry`, fresh OTP emailed for the pending
+ * verification created by a previous send (free). `Undeliverable`, the address failed deliverability
+ * validation or the message could not be sent; the verification is immediately finalized as `Declined`
+ * and nothing is billed.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

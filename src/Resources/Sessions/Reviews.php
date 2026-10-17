@@ -31,7 +31,7 @@ final class Reviews extends BaseResource
      *
      * `GET /v3/sessions/{session_id}/reviews/`
      *
-     * @param string $sessionId UUID of the User Verification (KYC) session.
+     * @param string $sessionId UUID of the User Verification (KYC) session
      * @param SessionsReviewsListParams $params
      *
      * @return Page<Types\ReviewItem>
@@ -51,14 +51,14 @@ final class Reviews extends BaseResource
      * Add a review note to a session's audit trail.
      *
      * Append a note to a User Verification (KYC) session's review / activity feed. **This endpoint only
-     * records an entry ,  it never changes the session.** The session's `status` is left untouched, no
+     * records an entry, it never changes the session.** The session's `status` is left untouched, no
      * status-transition validation runs, and no webhook fires. To actually approve, decline, or re-open a
      * session (which also writes a fully-attributed `STATUS_UPDATED` entry to this feed), use `PATCH
      * /v3/session/{session_id}/update-status/` instead.
      *
      * `POST /v3/sessions/{session_id}/reviews/`
      *
-     * @param string $sessionId UUID of the User Verification (KYC) session.
+     * @param string $sessionId UUID of the User Verification (KYC) session
      * @param SessionsReviewsCreateParams $params
      *
      * @throws DiditException

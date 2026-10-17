@@ -11,7 +11,7 @@ use Didit\Core\Hydrate;
 
 /**
  * Event-specific payload. Send events carry `status`, `reason`; code-check events carry `code_tried`,
- * `status`; final status events carry `reason` ,  or `null` when there is no reason to report (e.g.
+ * `status`; final status events carry `reason`, or `null` when there is no reason to report (e.g.
  * `EMAIL_VERIFICATION_APPROVED`).
  */
 final class SessionsRetrieveDecisionResponseEmailVerificationsLifecycleDetails extends BaseModel

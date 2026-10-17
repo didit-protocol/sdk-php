@@ -90,7 +90,7 @@ final class BiometricTemplates extends BaseResource
      *
      * `GET /v3/biometric-templates/{template_uuid}/`
      *
-     * @param string $templateUuid Template id, as returned in `biometric_template_uuid` by the session deletion endpoints, `biometric_template_id` on a Face Search match, or the list endpoint.
+     * @param string $templateUuid template id, as returned in `biometric_template_uuid` by the session deletion endpoints, `biometric_template_id` on a Face Search match, or the list endpoint
      *
      * @throws DiditException
      */
@@ -118,7 +118,7 @@ final class BiometricTemplates extends BaseResource
      *
      * `DELETE /v3/biometric-templates/{template_uuid}/`
      *
-     * @param string $templateUuid Template id, as returned in `biometric_template_uuid` by the session deletion endpoints, `biometric_template_id` on a Face Search match, or the list endpoint.
+     * @param string $templateUuid template id, as returned in `biometric_template_uuid` by the session deletion endpoints, `biometric_template_id` on a Face Search match, or the list endpoint
      *
      * @throws DiditException
      */

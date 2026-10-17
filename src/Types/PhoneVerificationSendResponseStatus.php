@@ -7,9 +7,9 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `Success` ,  OTP sent to a new verification. `Retry` ,  OTP re-sent for the pending verification
- * created by a previous send. `Blocked` ,  the anti-fraud layer refused to send; the verification is
- * immediately finalized as `Declined` and nothing is billed.
+ * `Success`, OTP sent to a new verification. `Retry`, OTP re-sent for the pending verification created
+ * by a previous send. `Blocked`, the anti-fraud layer refused to send; the verification is immediately
+ * finalized as `Declined` and nothing is billed.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

@@ -48,12 +48,12 @@ final class Kyb extends BaseResource
     }
 
     /**
-     * KYB registry company select ,  Lite tier (standalone).
+     * KYB registry company select, Lite tier (standalone).
      *
-     * Retrieve the **Lite** registry profile of one candidate returned by `POST /v3/kyb/search/` , 
-     * company details, registered address, identifiers, status, activity and the officers, plus the raw
-     * registry payload. Shareholders and ultimate beneficial owners are sold by `POST
-     * /v3/kyb/shareholders/` and `POST /v3/kyb/ubo/`.
+     * Retrieve the **Lite** registry profile of one candidate returned by `POST /v3/kyb/search/`, company
+     * details, registered address, identifiers, status, activity and the officers, plus the raw registry
+     * payload. Shareholders and ultimate beneficial owners are sold by `POST /v3/kyb/shareholders/` and
+     * `POST /v3/kyb/ubo/`.
      *
      * `POST /v3/kyb/select/`
      *

@@ -21,14 +21,14 @@ final class SessionsUpdatePoaDataResponse extends BaseModel
     public readonly ?string $issuingState;
 
     /**
-     * POA document category. Values are uppercase ,  lowercase variants like `utility_bill` return `400`.
+     * POA document category. Values are uppercase, lowercase variants like `utility_bill` return `400`.
      *
      * Known values: {@see SessionsUpdatePoaDataResponseDocumentType}.
      */
     public readonly ?string $documentType;
 
     /**
-     * Language of the document, typically an ISO 639-1 code (e.g. `es`). Free text ,  not validated as a
+     * Language of the document, typically an ISO 639-1 code (e.g. `es`). Free text, not validated as a
      * language code.
      */
     public readonly ?string $documentLanguage;
@@ -60,7 +60,7 @@ final class SessionsUpdatePoaDataResponse extends BaseModel
 
     /**
      * Current structured address, or `null` when none exists. Includes the recomputed `formatted_address`
-     * alongside the seven editable keys. Returned as stored ,  after a server-side geocode it can contain
+     * alongside the seven editable keys. Returned as stored, after a server-side geocode it can contain
      * bookkeeping keys (e.g. `raw_results`) alongside the editable keys.
      */
     public readonly ?SessionsUpdatePoaDataResponsePoaParsedAddress $poaParsedAddress;

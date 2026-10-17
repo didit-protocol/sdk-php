@@ -18,8 +18,8 @@ final class SessionsRetrieveDecisionResponsePhoneVerifications extends BaseModel
     public readonly ?string $nodeId;
 
     /**
-     * Feature-level status of this phone verification step. Independent of the top-level session `status`
-     * ,  a session can reach its overall decision while an individual feature stays `In Review`.
+     * Feature-level status of this phone verification step. Independent of the top-level session `status`,
+     * a session can reach its overall decision while an individual feature stays `In Review`.
      *
      * Known values: {@see SessionsRetrieveDecisionResponsePhoneVerificationsStatus}.
      */
@@ -76,7 +76,7 @@ final class SessionsRetrieveDecisionResponsePhoneVerifications extends BaseModel
      * Matches found for this phone number. Each match has a `source`: `session` (another verification
      * session in your application matched on the same number, returned with
      * `session_id`/`session_number`/`vendor_data`/`verification_date`) or `list_entry` (the number is on
-     * an org-managed allow/block list ,  see `/management-api/lists/overview`). Cross-session matches use
+     * an org-managed allow/block list, see `/management-api/lists/overview`). Cross-session matches use
      * different `vendor_data` and are capped at 5.
      *
      * @var list<SessionsRetrieveDecisionResponsePhoneVerificationsMatches>|null

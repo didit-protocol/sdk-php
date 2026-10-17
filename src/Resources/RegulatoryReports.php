@@ -80,7 +80,7 @@ final class RegulatoryReports extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/`
      *
-     * @param string $reportUuid Report UUID.
+     * @param string $reportUuid report UUID
      *
      * @throws DiditException
      */
@@ -102,7 +102,7 @@ final class RegulatoryReports extends BaseResource
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/`
      *
-     * @param string $reportUuid Report UUID.
+     * @param string $reportUuid report UUID
      * @param RegulatoryReportsUpdateParams $params
      *
      * @throws DiditException
@@ -129,7 +129,7 @@ final class RegulatoryReports extends BaseResource
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/`
      *
-     * @param string $reportUuid Report UUID.
+     * @param string $reportUuid report UUID
      *
      * @throws DiditException
      */
@@ -155,7 +155,7 @@ final class RegulatoryReports extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/validate/`
      *
-     * @param string $reportUuid Report UUID.
+     * @param string $reportUuid report UUID
      *
      * @throws DiditException
      */
@@ -180,7 +180,7 @@ final class RegulatoryReports extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/finalize/`
      *
-     * @param string $reportUuid Report UUID.
+     * @param string $reportUuid report UUID
      *
      * @throws DiditException
      */
@@ -202,7 +202,7 @@ final class RegulatoryReports extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/download-url/`
      *
-     * @param string $reportUuid Report UUID.
+     * @param string $reportUuid report UUID
      * @param RegulatoryReportsRetrieveDownloadUrlParams $params
      *
      * @throws DiditException

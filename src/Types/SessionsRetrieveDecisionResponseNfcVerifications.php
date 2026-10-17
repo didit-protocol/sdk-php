@@ -10,7 +10,7 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * One NFC report ,  the full report for a single ePassport chip read.
+ * One NFC report, the full report for a single ePassport chip read.
  */
 final class SessionsRetrieveDecisionResponseNfcVerifications extends BaseModel
 {
@@ -21,8 +21,8 @@ final class SessionsRetrieveDecisionResponseNfcVerifications extends BaseModel
     public readonly ?string $nodeId;
 
     /**
-     * Feature-level status of this NFC step. Independent of the top-level session `status` ,  a session
-     * can reach its overall decision while an individual feature stays `In Review`.
+     * Feature-level status of this NFC step. Independent of the top-level session `status`, a session can
+     * reach its overall decision while an individual feature stays `In Review`.
      *
      * Known values: {@see SessionsRetrieveDecisionResponseNfcVerificationsStatus}.
      */

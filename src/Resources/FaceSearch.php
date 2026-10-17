@@ -23,9 +23,9 @@ final class FaceSearch extends BaseResource
     /**
      * Face Search.
      *
-     * Search a face image (1:N) against your application's face search index ,  faces enrolled from
+     * Search a face image (1:N) against your application's face search index, faces enrolled from
      * verification sessions, saved standalone API calls, direct user-profile face uploads, and your
-     * block/allow lists ,  and get back ranked similarity matches plus blocklist and duplicate warnings.
+     * block/allow lists, and get back ranked similarity matches plus blocklist and duplicate warnings.
      *
      * `POST /v3/face-search/`
      *

@@ -30,7 +30,7 @@ final class Links extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/links/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      *
      * @return ListResponse<Types\CaseLink>
      *
@@ -55,7 +55,7 @@ final class Links extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/links/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesLinksCreateParams $params
      *
      * @throws DiditException
@@ -79,8 +79,8 @@ final class Links extends BaseResource
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/links/{link_uuid}/`
      *
-     * @param string $caseUuid Case UUID.
-     * @param string $linkUuid Link UUID.
+     * @param string $caseUuid case UUID
+     * @param string $linkUuid link UUID
      *
      * @throws DiditException
      */

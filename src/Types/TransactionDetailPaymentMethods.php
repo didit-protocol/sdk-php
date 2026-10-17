@@ -24,7 +24,7 @@ final class TransactionDetailPaymentMethods extends BaseModel
     public readonly ?string $label;
 
     /**
-     * SHA-256 over `type:account_id:issuing_country` ,  stable identifier to correlate reuse of the same
+     * SHA-256 over `type:account_id:issuing_country`, stable identifier to correlate reuse of the same
      * instrument.
      */
     public readonly ?string $fingerprint;

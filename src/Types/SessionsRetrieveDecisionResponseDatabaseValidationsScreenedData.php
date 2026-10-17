@@ -10,7 +10,7 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * The input data used for validation. Fields vary by country ,  see the Database Validation docs
+ * The input data used for validation. Fields vary by country, see the Database Validation docs
  * (`/core-technology/database-validation/overview`) for country-specific formats.
  */
 final class SessionsRetrieveDecisionResponseDatabaseValidationsScreenedData extends BaseModel

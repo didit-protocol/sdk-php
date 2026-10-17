@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * How this match was reached: `ip_address` (shared IP address ,  network co-location, not a
+ * How this match was reached: `ip_address` (shared IP address, network co-location, not a
  * device-identity claim), `persistent_id` (exact stored persistent device identifier), `legacy_fp`
  * (legacy `didit-fp-*` device-fingerprint hash), or `recovered_high` (high-confidence fuzzy
  * fingerprint-recovery hit). Lower-confidence recovery candidates surface as risk warnings only, never

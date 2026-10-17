@@ -15,34 +15,34 @@ use Didit\Core\Hydrate;
 final class ProofOfAddressVerifyResponsePoa extends BaseModel
 {
     /**
-     * `Approved` when no warning resolves to a decline; `Declined` otherwise ,  the `warnings` list
-     * explains why.
+     * `Approved` when no warning resolves to a decline; `Declined` otherwise, the `warnings` list explains
+     * why.
      *
      * Known values: {@see ProofOfAddressVerifyResponsePoaStatus}.
      */
     public readonly ?string $status;
 
     /**
-     * Country the document was issued in, as extracted from the document ,  usually ISO 3166-1 alpha-3
-     * (e.g. `ARG`).
+     * Country the document was issued in, as extracted from the document, usually ISO 3166-1 alpha-3 (e.g.
+     * `ARG`).
      */
     public readonly ?string $issuingState;
 
     /**
      * Detected document category. `UNKNOWN` means the document could not be classified as an acceptable
-     * Proof of Address and auto-declines with `INVALID_DOCUMENT_TYPE`. Never null ,  classification
-     * failures fall back to `UNKNOWN`.
+     * Proof of Address and auto-declines with `INVALID_DOCUMENT_TYPE`. Never null, classification failures
+     * fall back to `UNKNOWN`.
      *
      * Known values: {@see ProofOfAddressVerifyResponsePoaDocumentType}.
      */
     public readonly ?string $documentType;
 
     /**
-     * Finer-grained classification within `document_type` ,  e.g. `ELECTRICITY_BILL`, `WATER_BILL`,
+     * Finer-grained classification within `document_type`, e.g. `ELECTRICITY_BILL`, `WATER_BILL`,
      * `GAS_BILL`, `INTERNET_BILL`, `PHONE_BILL` (utility bills); `ACCOUNT_STATEMENT`,
      * `CREDIT_CARD_STATEMENT` (bank statements); `TAX_ASSESSMENT`, `RESIDENCY_CERTIFICATE` (government
-     * documents). `UNKNOWN` when no subtype could be determined. Never null ,  classification failures
-     * fall back to `UNKNOWN`.
+     * documents). `UNKNOWN` when no subtype could be determined. Never null, classification failures fall
+     * back to `UNKNOWN`.
      */
     public readonly ?string $documentSubtype;
 
@@ -53,7 +53,7 @@ final class ProofOfAddressVerifyResponsePoa extends BaseModel
     public readonly ?string $issuer;
 
     /**
-     * Document issue date (`YYYY-MM-DD`). `null` when it could not be extracted ,  that declines with
+     * Document issue date (`YYYY-MM-DD`). `null` when it could not be extracted, that declines with
      * `UNABLE_TO_EXTRACT_ISSUE_DATE` on this endpoint.
      */
     public readonly ?string $issueDate;

@@ -41,8 +41,8 @@ final class SessionsRetrieveDecisionResponseEmailVerificationsMatches extends Ba
     /**
      * Where this match came from. `session` means another verification session in your application matched
      * on this value. `list_entry` means the value was hit against an org-managed list
-     * (allowlist/blocklist) ,  see the management API lists overview at `/management-api/lists/overview`
-     * for how to manage those lists.
+     * (allowlist/blocklist), see the management API lists overview at `/management-api/lists/overview` for
+     * how to manage those lists.
      *
      * Known values: {@see SessionsRetrieveDecisionResponseEmailVerificationsMatchesSource}.
      */

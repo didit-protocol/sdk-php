@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Always `session` for device/IP matches ,  every match is another verification session in your
+ * Always `session` for device/IP matches, every match is another verification session in your
  * application.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.

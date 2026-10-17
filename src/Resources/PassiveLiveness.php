@@ -23,8 +23,8 @@ final class PassiveLiveness extends BaseResource
     /**
      * Passive Liveness.
      *
-     * Detect presentation attacks ,  printed photos, screen replays, masks, deepfakes ,  from a single
-     * face image. No video, motion, or user interaction required.
+     * Detect presentation attacks, printed photos, screen replays, masks, deepfakes, from a single face
+     * image. No video, motion, or user interaction required.
      *
      * `POST /v3/passive-liveness/`
      *

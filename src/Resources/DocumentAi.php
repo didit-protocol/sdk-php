@@ -23,8 +23,8 @@ final class DocumentAi extends BaseResource
     /**
      * Document AI (custom field extraction + tamper checks).
      *
-     * Extract the fields **you** define from any supporting document ,  payslips, proof of funds,
-     * source-of-wealth letters, tax statements, contracts, invoices ,  in one call. Send the file plus a
+     * Extract the fields **you** define from any supporting document, payslips, proof of funds,
+     * source-of-wealth letters, tax statements, contracts, invoices, in one call. Send the file plus a
      * `fields` definition (key, name, extraction instruction, type) and get back typed values (`text`,
      * `number`, `date` as `YYYY-MM-DD`), an optional name-match score against the expected person or
      * company, PDF/EXIF tamper signals, an `Approved`/`Declined`/`In Review` `status`, and a `warnings`

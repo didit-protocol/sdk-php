@@ -8,10 +8,10 @@ namespace Didit\Types;
 
 /**
  * Language code (ISO 639-1) for email notifications. Controls the language of all email communications
- * (e.g., "en", "es", "fr"). There is no stored default ,  when omitted, the verification invite email
+ * (e.g., "en", "es", "fr"). There is no stored default, when omitted, the verification invite email
  * simply falls back to English (`en`) at send time. The enum below is a snapshot; the live source of
- * truth for accepted values is the [supported languages](/integration/supported-languages) doc , 
- * always consult it before relying on a specific code.
+ * truth for accepted values is the [supported languages](/integration/supported-languages) doc, always
+ * consult it before relying on a specific code.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

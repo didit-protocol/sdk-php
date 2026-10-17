@@ -32,7 +32,6 @@ final class Notes extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/notes/`
      *
-     * @param string $caseUuid
      * @param CasesNotesListParams $params
      *
      * @return Page<Types\CaseCollaborationCaseNote>
@@ -58,7 +57,6 @@ final class Notes extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/notes/`
      *
-     * @param string $caseUuid
      * @param CaseCollaborationCaseNoteCreateRequest $params
      *
      * @throws DiditException
@@ -87,8 +85,6 @@ final class Notes extends BaseResource
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/notes/{note_uuid}/`
      *
-     * @param string $caseUuid
-     * @param string $noteUuid
      * @param CaseCollaborationPatchedCaseNoteUpdateRequest $params
      *
      * @throws DiditException
@@ -115,9 +111,6 @@ final class Notes extends BaseResource
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/notes/{note_uuid}/`
      *
-     * @param string $caseUuid
-     * @param string $noteUuid
-     *
      * @throws DiditException
      */
     public function delete(string $caseUuid, string $noteUuid, ?RequestOptions $options = null): NoContent
@@ -138,7 +131,7 @@ final class Notes extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/notes/presign/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesNotesRetrieveAttachmentUrlParams $params
      *
      * @throws DiditException
@@ -166,7 +159,7 @@ final class Notes extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/notes/presign/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesNotesCreateAttachmentUploadParams $params
      *
      * @throws DiditException

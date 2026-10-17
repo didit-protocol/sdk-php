@@ -20,7 +20,7 @@ final class SessionsRetrieveDecisionResponseIpAnalysesMatches extends BaseModel
     /** Sequential number of the matching session. */
     public readonly ?int $sessionNumber;
 
-    /** `vendor_data` of the matching session ,  always different from the current session's vendor user. */
+    /** `vendor_data` of the matching session, always different from the current session's vendor user. */
     public readonly ?string $vendorData;
 
     /** Creation date of the matching session (`YYYY-MM-DDTHH:MM:SSZ`). */
@@ -34,7 +34,7 @@ final class SessionsRetrieveDecisionResponseIpAnalysesMatches extends BaseModel
     public readonly ?string $matchType;
 
     /**
-     * How this match was reached: `ip_address` (shared IP address ,  network co-location, not a
+     * How this match was reached: `ip_address` (shared IP address, network co-location, not a
      * device-identity claim), `persistent_id` (exact stored persistent device identifier), `legacy_fp`
      * (legacy `didit-fp-*` device-fingerprint hash), or `recovered_high` (high-confidence fuzzy
      * fingerprint-recovery hit). Lower-confidence recovery candidates surface as risk warnings only, never
@@ -46,7 +46,7 @@ final class SessionsRetrieveDecisionResponseIpAnalysesMatches extends BaseModel
 
     /**
      * The value that matched: the shared IP address, the persistent device identifier or legacy
-     * fingerprint hash, or ,  for `recovered_high` ,  the UUID of the recovered device.
+     * fingerprint hash, or, for `recovered_high`, the UUID of the recovered device.
      */
     public readonly ?string $matchedValue;
 
@@ -60,7 +60,7 @@ final class SessionsRetrieveDecisionResponseIpAnalysesMatches extends BaseModel
     public readonly ?string $apiService;
 
     /**
-     * Always `session` for device/IP matches ,  every match is another verification session in your
+     * Always `session` for device/IP matches, every match is another verification session in your
      * application.
      *
      * Known values: {@see SessionsRetrieveDecisionResponseIpAnalysesMatchesSource}.
@@ -97,8 +97,8 @@ final class SessionsRetrieveDecisionResponseIpAnalysesMatches extends BaseModel
     public readonly ?float $recoverySimilarity;
 
     /**
-     * Whether the TLS JA4 fingerprints of the two observations agree ,  a server-observed signal the
-     * browser cannot spoof. Present only when `match_source` is `recovered_high`.
+     * Whether the TLS JA4 fingerprints of the two observations agree, a server-observed signal the browser
+     * cannot spoof. Present only when `match_source` is `recovered_high`.
      */
     public readonly ?bool $tlsJa4Corroborated;
 

@@ -10,7 +10,7 @@ from .model import (
     AnyT, ArrayT, DateTimeT, Enum, EnumT, FileT, FreeObjT, MapT, Model, ModelT, OpModel, Response, Scalar, Shape,
     ShapeT, T, UnionT,
 )
-from .text import docblock, first_paragraph, first_sentence, php_string, sentence, wrap
+from .text import annotation_text, docblock, first_paragraph, first_sentence, php_string, sentence, wrap
 
 TYPES_NS = "Types\\"
 
@@ -458,8 +458,9 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
     doc.append(f"`{o.http_method} {o.path}`")
     doc.append("")
     for pp in om.path_params:
-        pdesc = first_sentence(pp.description)
-        doc.append(f"@param {pp.php} ${pp.var}" + (f" {pdesc}" if pdesc else ""))
+        pdesc = annotation_text(first_sentence(pp.description))
+        if pdesc:
+            doc.append(f"@param {pp.php} ${pp.var} {pdesc}")
     if om.body_alias:
         doc.append(f"@param {om.body_alias} $params")
     native_ret, ret_doc = return_type(om.response)

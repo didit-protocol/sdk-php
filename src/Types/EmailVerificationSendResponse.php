@@ -22,10 +22,10 @@ final class EmailVerificationSendResponse extends BaseModel
     public readonly ?string $requestId;
 
     /**
-     * `Success` ,  OTP emailed to a new verification (billed). `Retry` ,  fresh OTP emailed for the
-     * pending verification created by a previous send (free). `Undeliverable` ,  the address failed
-     * deliverability validation or the message could not be sent; the verification is immediately
-     * finalized as `Declined` and nothing is billed.
+     * `Success`, OTP emailed to a new verification (billed). `Retry`, fresh OTP emailed for the pending
+     * verification created by a previous send (free). `Undeliverable`, the address failed deliverability
+     * validation or the message could not be sent; the verification is immediately finalized as `Declined`
+     * and nothing is billed.
      *
      * Known values: {@see EmailVerificationSendResponseStatus}.
      */

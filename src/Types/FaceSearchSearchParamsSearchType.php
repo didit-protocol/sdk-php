@@ -9,7 +9,7 @@ namespace Didit\Types;
 /**
  * Search policy. `most_similar` (default) ranks every enrolled face in your application by similarity.
  * `blocklisted_or_approved` restricts candidates to blocklisted faces, allowlisted faces, faces from
- * approved sessions, and imported user-profile faces ,  with blocklisted entries ranked first.
+ * approved sessions, and imported user-profile faces, with blocklisted entries ranked first.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

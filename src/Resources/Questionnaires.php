@@ -80,7 +80,7 @@ final class Questionnaires extends BaseResource
      *
      * `GET /v3/questionnaires/{questionnaire_uuid}/`
      *
-     * @param string $questionnaireUuid Per-version UUID of the questionnaire (the `uuid` value returned by the list endpoint, also returned as `questionnaire_id` on detail endpoints).
+     * @param string $questionnaireUuid per-version UUID of the questionnaire (the `uuid` value returned by the list endpoint, also returned as `questionnaire_id` on detail endpoints)
      *
      * @throws DiditException
      */
@@ -107,7 +107,7 @@ final class Questionnaires extends BaseResource
      *
      * `PATCH /v3/questionnaires/{questionnaire_uuid}/`
      *
-     * @param string $questionnaireUuid Per-version UUID of the questionnaire to update.
+     * @param string $questionnaireUuid per-version UUID of the questionnaire to update
      * @param SimpleQuestionnaireUpdateRequest $params
      *
      * @throws DiditException
@@ -136,7 +136,7 @@ final class Questionnaires extends BaseResource
      *
      * `DELETE /v3/questionnaires/{questionnaire_uuid}/`
      *
-     * @param string $questionnaireUuid Per-version UUID of the questionnaire to delete.
+     * @param string $questionnaireUuid per-version UUID of the questionnaire to delete
      *
      * @throws DiditException
      */

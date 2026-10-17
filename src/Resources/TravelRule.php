@@ -42,7 +42,6 @@ final class TravelRule extends BaseResource
      *
      * `GET /v3/travel-rule/settings/`
      *
-     *
      * @throws DiditException
      */
     public function retrieveSettings(?RequestOptions $options = null): Types\TravelRuleSettingsDetail
@@ -58,9 +57,9 @@ final class TravelRule extends BaseResource
     /**
      * Update Travel Rule settings.
      *
-     * Upsert the application's Travel Rule settings and VASP profile. Partial update ,  only send the
-     * fields you want to change. Setting `is_enabled: true` requires a non-blank `legal_name` (already
-     * stored or included in the same request), otherwise returns 400.
+     * Upsert the application's Travel Rule settings and VASP profile. Partial update, only send the fields
+     * you want to change. Setting `is_enabled: true` requires a non-blank `legal_name` (already stored or
+     * included in the same request), otherwise returns 400.
      *
      * `PUT /v3/travel-rule/settings/`
      *

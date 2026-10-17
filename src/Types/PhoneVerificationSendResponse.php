@@ -22,9 +22,9 @@ final class PhoneVerificationSendResponse extends BaseModel
     public readonly ?string $requestId;
 
     /**
-     * `Success` ,  OTP sent to a new verification. `Retry` ,  OTP re-sent for the pending verification
-     * created by a previous send. `Blocked` ,  the anti-fraud layer refused to send; the verification is
-     * immediately finalized as `Declined` and nothing is billed.
+     * `Success`, OTP sent to a new verification. `Retry`, OTP re-sent for the pending verification created
+     * by a previous send. `Blocked`, the anti-fraud layer refused to send; the verification is immediately
+     * finalized as `Declined` and nothing is billed.
      *
      * Known values: {@see PhoneVerificationSendResponseStatus}.
      */

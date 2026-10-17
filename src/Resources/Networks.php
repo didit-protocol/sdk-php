@@ -66,7 +66,7 @@ final class Networks extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/`
      *
-     * @param string $networkUuid Network UUID.
+     * @param string $networkUuid network UUID
      *
      * @throws DiditException
      */
@@ -90,7 +90,7 @@ final class Networks extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/graph/`
      *
-     * @param string $networkUuid Network UUID.
+     * @param string $networkUuid network UUID
      * @param NetworksRetrieveGraphParams $params
      *
      * @throws DiditException
@@ -118,7 +118,7 @@ final class Networks extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/members/`
      *
-     * @param string $networkUuid Network UUID.
+     * @param string $networkUuid network UUID
      *
      * @throws DiditException
      */
@@ -141,7 +141,7 @@ final class Networks extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/signals/`
      *
-     * @param string $networkUuid Network UUID.
+     * @param string $networkUuid network UUID
      *
      * @throws DiditException
      */
@@ -164,7 +164,7 @@ final class Networks extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/timeline/`
      *
-     * @param string $networkUuid Network UUID.
+     * @param string $networkUuid network UUID
      *
      * @throws DiditException
      */
@@ -189,7 +189,7 @@ final class Networks extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/map/`
      *
-     * @param string $networkUuid Network UUID.
+     * @param string $networkUuid network UUID
      *
      * @throws DiditException
      */
@@ -214,7 +214,7 @@ final class Networks extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/report/`
      *
-     * @param string $networkUuid Network UUID.
+     * @param string $networkUuid network UUID
      * @param NetworksDownloadReportParams $params
      *
      * @throws DiditException

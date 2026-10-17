@@ -90,7 +90,7 @@ final class SessionsRetrieveDecisionResponseKeyPeopleChecksRegistryOfficers exte
     public readonly ?array $verificationWorkflowFeatures;
 
     /**
-     * Stable internal identifier of the verified individual behind the child session ,  useful for
+     * Stable internal identifier of the verified individual behind the child session, useful for
      * cross-session linking. `null` when no child session exists or the user has not been resolved yet.
      */
     public readonly ?string $diditInternalId;

@@ -29,7 +29,7 @@ final class ProofOfAddressVerifyResponsePoaWarnings extends BaseModel
     public readonly ?string $feature;
 
     /**
-     * Extra context for some risks ,  e.g. `POA_DOCUMENT_EXPIRED` includes `expiration_reason`
+     * Extra context for some risks, e.g. `POA_DOCUMENT_EXPIRED` includes `expiration_reason`
      * (`printed_expiration` or `age_window`), `document_type`, `document_subtype`, and `issue_date`, plus
      * `expiration_date` on the `printed_expiration` path or `max_age_months` on the `age_window` path;
      * `SUSPECTED_DOCUMENT_MANIPULATION` includes `reason` and `detection_method`. `null` for most risks.
@@ -40,7 +40,7 @@ final class ProofOfAddressVerifyResponsePoaWarnings extends BaseModel
 
     /**
      * Severity. `error` warnings drive `status` to `Declined`; `information` entries are advisory and
-     * never decline on their own. (`warning` is not produced by this endpoint ,  its options only accept
+     * never decline on their own. (`warning` is not produced by this endpoint, its options only accept
      * `DECLINE` or `NO_ACTION`.).
      *
      * Known values: {@see ProofOfAddressVerifyResponsePoaWarningsLogType}.

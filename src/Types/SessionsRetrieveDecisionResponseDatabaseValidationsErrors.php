@@ -10,9 +10,8 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * The upstream service's error object spread as-is ,  its keys vary by service (commonly a
- * message/code and any provider-specific details) ,  plus `service_id` identifying the service that
- * errored.
+ * The upstream service's error object spread as-is, its keys vary by service (commonly a message/code
+ * and any provider-specific details), plus `service_id` identifying the service that errored.
  */
 final class SessionsRetrieveDecisionResponseDatabaseValidationsErrors extends BaseModel
 {

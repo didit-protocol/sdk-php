@@ -21,7 +21,7 @@ final class SessionsRetrieveDecisionResponseKeyPeopleChecksSubmittedParties exte
     public readonly ?string $entityType;
 
     /**
-     * Always `USER` here ,  this bucket only contains parties entered or confirmed by the end user in the
+     * Always `USER` here, this bucket only contains parties entered or confirmed by the end user in the
      * Key People flow (registry-discovered people appear under `registry`).
      *
      * Known values: {@see SessionsRetrieveDecisionResponseKeyPeopleChecksSubmittedPartiesSource}.

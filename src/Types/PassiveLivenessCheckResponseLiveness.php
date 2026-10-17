@@ -43,7 +43,7 @@ final class PassiveLivenessCheckResponseLiveness extends BaseModel
      * Risk signals. `error` severity (declines): `NO_FACE_DETECTED`, `LOW_LIVENESS_SCORE` (score at or
      * below the threshold), `LIVENESS_FACE_ATTACK`, `FACE_IN_BLOCKLIST`, `POSSIBLE_FACE_IN_BLOCKLIST`.
      * `warning` severity (review, no decline): `MULTIPLE_FACES_DETECTED`. `information` severity (no
-     * decline): `DUPLICATED_FACE`, `POSSIBLE_DUPLICATED_FACE` ,  the same face already appeared in another
+     * decline): `DUPLICATED_FACE`, `POSSIBLE_DUPLICATED_FACE`, the same face already appeared in another
      * approved session.
      *
      * @var list<PassiveLivenessCheckResponseLivenessWarnings>|null

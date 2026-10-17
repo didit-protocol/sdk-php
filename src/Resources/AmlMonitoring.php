@@ -26,7 +26,7 @@ final class AmlMonitoring extends BaseResource
      *
      * `GET /v3/aml-monitoring/jobs/{job_id}/`
      *
-     * @param string $jobId The `job_id` returned by the toggle endpoint.
+     * @param string $jobId the `job_id` returned by the toggle endpoint
      *
      * @throws DiditException
      */

@@ -28,11 +28,10 @@ final class Destinations extends BaseResource
      * List webhook destinations.
      *
      * List all webhook destinations (unpaginated array, oldest first). Each row includes URL, subscribed
-     * events, and delivery health metrics. The signing secret is NOT included in the list ,  fetch a
-     * single destination (`GET /v3/webhook/destinations/{destination_uuid}/`) to read `secret_shared_key`.
+     * events, and delivery health metrics. The signing secret is NOT included in the list, fetch a single
+     * destination (`GET /v3/webhook/destinations/{destination_uuid}/`) to read `secret_shared_key`.
      *
      * `GET /v3/webhook/destinations/`
-     *
      *
      * @return ListResponse<Types\WebhooksDestinationsListResponse>
      *
@@ -83,7 +82,7 @@ final class Destinations extends BaseResource
      *
      * `GET /v3/webhook/destinations/{destination_uuid}/`
      *
-     * @param string $destinationUuid UUID of the destination (the `uuid` returned from create / list).
+     * @param string $destinationUuid UUID of the destination (the `uuid` returned from create / list)
      *
      * @throws DiditException
      */
@@ -102,12 +101,12 @@ final class Destinations extends BaseResource
     /**
      * Update webhook destination.
      *
-     * Update a webhook destination. **`subscribed_events` is REPLACED wholesale, not merged** ,  fetch
+     * Update a webhook destination. **`subscribed_events` is REPLACED wholesale, not merged**, fetch
      * first, append, resend. Secret is not rotated.
      *
      * `PATCH /v3/webhook/destinations/{destination_uuid}/`
      *
-     * @param string $destinationUuid UUID of the destination to update.
+     * @param string $destinationUuid UUID of the destination to update
      * @param WebhooksDestinationsUpdateParams $params
      *
      * @throws DiditException
@@ -135,7 +134,7 @@ final class Destinations extends BaseResource
      *
      * `DELETE /v3/webhook/destinations/{destination_uuid}/`
      *
-     * @param string $destinationUuid UUID of the destination to delete.
+     * @param string $destinationUuid UUID of the destination to delete
      *
      * @throws DiditException
      */

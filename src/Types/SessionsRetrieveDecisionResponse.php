@@ -37,7 +37,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?string $sessionUrl;
 
     /**
-     * Overall lifecycle status of the session ,  the rolled-up workflow result. Terminal values are
+     * Overall lifecycle status of the session, the rolled-up workflow result. Terminal values are
      * `Approved`, `Declined`, `In Review`, `Expired`, `Kyc Expired`, and `Abandoned`; `Not Started`, `In
      * Progress`, `Awaiting User`, and `Resubmitted` indicate the session is still moving through the
      * workflow.
@@ -47,7 +47,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?string $status;
 
     /**
-     * Stable identifier of the workflow group that produced this session. Workflows are versioned ,  this
+     * Stable identifier of the workflow group that produced this session. Workflows are versioned, this
      * value identifies the workflow itself, not the specific version.
      */
     public readonly ?string $workflowId;
@@ -74,7 +74,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?array $metadata;
 
     /**
-     * Expected details supplied at session creation ,  used for cross-validation against extracted data
+     * Expected details supplied at session creation, used for cross-validation against extracted data
      * (KYC) or to pre-fill the company registry search (KYB). Echoes back exactly the keys that were
      * provided; `null` when none were supplied. KYC sessions carry the person fields; Business (KYB)
      * sessions carry `company_name`, `registry_country` and `registration_number`.
@@ -93,7 +93,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
 
     /**
      * **Array of ID verification (OCR) reports** produced by ID-document steps in the workflow graph.
-     * Always a JSON array ,  read `id_verifications[0]` and iterate if your workflow can run more than one
+     * Always a JSON array, read `id_verifications[0]` and iterate if your workflow can run more than one
      * ID check (for example a primary check plus a step-up). `null` until at least one ID step has
      * produced data. Each item is the full report, including `node_id`, feature-level `status`, extracted
      * document fields, image URLs, quality scores, MRZ, address parsing, cross-session matches, and
@@ -118,7 +118,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
 
     /**
      * **Array of NFC / ePassport reports** produced by NFC steps in the workflow graph. **This is always a
-     * JSON array, never a singular `nfc` object** ,  read `nfc_verifications[0]` and iterate if your
+     * JSON array, never a singular `nfc` object**, read `nfc_verifications[0]` and iterate if your
      * workflow can run NFC more than once. `null` until at least one NFC step has produced data. Each item
      * is the full report, including `node_id`, feature-level `status`, `chip_data`, `authenticity` (SOD +
      * DG integrity), `certificate_summary`, and `warnings[]`.
@@ -128,9 +128,9 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?array $nfcVerifications;
 
     /**
-     * **Array of liveness reports** produced by liveness steps in the workflow graph. Always a JSON array
-     * ,  never a singular `liveness` object. `null` until at least one liveness step has produced data.
-     * Each item is the full report, including `node_id`, feature-level `status`, `method`, `score`,
+     * **Array of liveness reports** produced by liveness steps in the workflow graph. Always a JSON array,
+     * never a singular `liveness` object. `null` until at least one liveness step has produced data. Each
+     * item is the full report, including `node_id`, feature-level `status`, `method`, `score`,
      * `reference_image`, `video_url`, optional `age_estimation`, cross-session `matches[]`, and
      * `warnings[]`.
      *
@@ -140,16 +140,16 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
 
     /**
      * **Array of face-match reports** produced by face-match steps in the workflow graph. Always a JSON
-     * array ,  never a singular `face_match` object. `null` until at least one face-match step has
-     * produced data. Each item is the full report, including `node_id`, feature-level `status`, similarity
-     * `score`, `source_image`, `target_image`, and `warnings[]`.
+     * array, never a singular `face_match` object. `null` until at least one face-match step has produced
+     * data. Each item is the full report, including `node_id`, feature-level `status`, similarity `score`,
+     * `source_image`, `target_image`, and `warnings[]`.
      *
      * @var list<SessionsRetrieveDecisionResponseFaceMatches>|null
      */
     public readonly ?array $faceMatches;
 
     /**
-     * **Array of phone verification reports** ,  always a JSON array, never a singular `phone` object.
+     * **Array of phone verification reports**, always a JSON array, never a singular `phone` object.
      * `null` until at least one phone step has produced data. Each item is the full report, including
      * `node_id`, feature-level `status`, the phone number and country metadata, `lifecycle[]`,
      * `matches[]`, and `warnings[]`.
@@ -159,7 +159,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?array $phoneVerifications;
 
     /**
-     * **Array of email verification reports** ,  always a JSON array, never a singular `email` object.
+     * **Array of email verification reports**, always a JSON array, never a singular `email` object.
      * `null` until at least one email step has produced data. Each item is the full report, including
      * `node_id`, feature-level `status`, the email address, breach data, `lifecycle[]`, `matches[]`, and
      * `warnings[]`.
@@ -169,7 +169,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?array $emailVerifications;
 
     /**
-     * **Array of Proof of Address (POA) reports** ,  always a JSON array, never a singular `poa` object.
+     * **Array of Proof of Address (POA) reports**, always a JSON array, never a singular `poa` object.
      * `null` until at least one POA step has produced data. Each item is the full report, including
      * `node_id`, feature-level `status`, the document file URL, issuer, dates, parsed address, and
      * `warnings[]`.
@@ -179,7 +179,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?array $poaVerifications;
 
     /**
-     * **Document AI reports grouped by workflow node** ,  always a JSON array, never a singular object.
+     * **Document AI reports grouped by workflow node**, always a JSON array, never a singular object.
      * `null` until at least one Document AI step has produced data. Present only when `session_kind =
      * user`. Each item is a node group with an aggregate `status`, the `node_id`, an `items[]` array of
      * the per-document results (extracted data keyed by the configured field key), and `warnings`.
@@ -189,7 +189,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?array $documentAiDocuments;
 
     /**
-     * **Array of questionnaire response reports** ,  always a JSON array, never a singular `questionnaire`
+     * **Array of questionnaire response reports**, always a JSON array, never a singular `questionnaire`
      * object. `null` until at least one questionnaire step has produced data. Each item is the full
      * report, including `node_id`, the questionnaire metadata, sections with form elements, and the user's
      * answers.
@@ -199,8 +199,8 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?array $questionnaireResponses;
 
     /**
-     * **Array of AML screening reports** ,  always a JSON array, never a singular `aml` object. `null`
-     * until at least one AML step has produced data. Each item is the full report, including `node_id`,
+     * **Array of AML screening reports**, always a JSON array, never a singular `aml` object. `null` until
+     * at least one AML step has produced data. Each item is the full report, including `node_id`,
      * feature-level `status`, `total_hits`, `entity_type`, `hits[]`, `score`, `screened_data`,
      * `is_ongoing_monitoring_enabled`, and `warnings[]`.
      *
@@ -209,7 +209,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?array $amlScreenings;
 
     /**
-     * **Array of Device & IP Analysis reports** ,  always a JSON array, never a singular `ip_analysis`
+     * **Array of Device & IP Analysis reports**, always a JSON array, never a singular `ip_analysis`
      * object. `null` until at least one IP-analysis step has produced data. Each item is the full report,
      * including `node_id`, feature-level `status`, IP and geolocation data, device fingerprint, and
      * `warnings[]`. Entries with duplicate `(node_id, ip_address, device_fingerprint)` are deduplicated
@@ -220,7 +220,7 @@ final class SessionsRetrieveDecisionResponse extends BaseModel
     public readonly ?array $ipAnalyses;
 
     /**
-     * **Array of Database Validation reports** ,  always a JSON array, never a singular
+     * **Array of Database Validation reports**, always a JSON array, never a singular
      * `database_validation` object. `null` until at least one DB validation step has produced data. Each
      * item is the full report, including `node_id`, feature-level `status`, `screened_data`, the
      * per-service `validations[]` (each with its registry `source_data`), and `warnings[]`. The

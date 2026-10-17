@@ -7,8 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Sex as printed on the document: `M` (male), `F` (female), or `U` (unknown). Any other value , 
- * including `X` ,  returns `400`.
+ * Sex as printed on the document: `M` (male), `F` (female), or `U` (unknown). Any other value,
+ * including `X`, returns `400`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

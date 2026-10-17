@@ -30,7 +30,7 @@ final class RegulatoryReports extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/regulatory-reports/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesRegulatoryReportsListParams $params
      *
      * @return Page<Types\RegulatoryReportDetail>
@@ -56,7 +56,7 @@ final class RegulatoryReports extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/regulatory-reports/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesRegulatoryReportsCreateParams $params
      *
      * @throws DiditException

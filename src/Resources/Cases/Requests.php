@@ -30,7 +30,6 @@ final class Requests extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/`
      *
-     * @param string $caseUuid
      * @param CasesRequestsListParams $params
      *
      * @return Page<Types\CustomerMessagingCaseRequest>
@@ -57,7 +56,6 @@ final class Requests extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/`
      *
-     * @param string $caseUuid
      * @param CustomerMessagingCaseRequestConfirmRequest $params
      *
      * @throws DiditException
@@ -83,9 +81,6 @@ final class Requests extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/{request_uuid}/cancel/`
      *
-     * @param string $caseUuid
-     * @param string $requestUuid
-     *
      * @throws DiditException
      */
     public function cancel(
@@ -108,8 +103,6 @@ final class Requests extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/options/`
      *
-     * @param string $caseUuid
-     *
      * @throws DiditException
      */
     public function retrieveOptions(
@@ -130,9 +123,6 @@ final class Requests extends BaseResource
      * /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/{request_uuid}/attachment/.
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/{request_uuid}/attachment/`
-     *
-     * @param string $caseUuid
-     * @param string $requestUuid
      *
      * @throws DiditException
      */
@@ -161,7 +151,6 @@ final class Requests extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/preview/`
      *
-     * @param string $caseUuid
      * @param CustomerMessagingCaseRequestPreviewRequest $params
      *
      * @throws DiditException

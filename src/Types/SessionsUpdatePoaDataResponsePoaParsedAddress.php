@@ -11,7 +11,7 @@ use Didit\Core\Hydrate;
 
 /**
  * Current structured address, or `null` when none exists. Includes the recomputed `formatted_address`
- * alongside the seven editable keys. Returned as stored ,  after a server-side geocode it can contain
+ * alongside the seven editable keys. Returned as stored, after a server-side geocode it can contain
  * bookkeeping keys (e.g. `raw_results`) alongside the editable keys.
  */
 final class SessionsUpdatePoaDataResponsePoaParsedAddress extends BaseModel

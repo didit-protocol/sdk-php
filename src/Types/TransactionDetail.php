@@ -190,7 +190,7 @@ final class TransactionDetail extends BaseModel
     public readonly ?array $alerts;
 
     /**
-     * Per-rule execution results ,  which rule fired, with what score impact.
+     * Per-rule execution results, which rule fired, with what score impact.
      *
      * @var list<TransactionDetailRuleRuns>|null
      */

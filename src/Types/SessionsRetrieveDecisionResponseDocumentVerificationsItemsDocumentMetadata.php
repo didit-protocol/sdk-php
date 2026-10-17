@@ -63,7 +63,7 @@ final class SessionsRetrieveDecisionResponseDocumentVerificationsItemsDocumentMe
     /** Whether metadata indicates the file passed through a known image/PDF editor. */
     public readonly ?bool $processedByKnownEditor;
 
-    /** Whether creation and modification dates differ ,  a possible (but not conclusive) editing signal. */
+    /** Whether creation and modification dates differ, a possible (but not conclusive) editing signal. */
     public readonly ?bool $hasDifferentCreationModDate;
 
     /**

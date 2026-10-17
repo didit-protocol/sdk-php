@@ -35,7 +35,7 @@ final class Users extends BaseResource
      *
      * List [users](/entities/users) Didit assembles from KYC sessions sharing the same `vendor_data`
      * (free-form string, NOT a UUID), plus users created via the API. Paginated, ordered by
-     * `last_session_at` desc. This endpoint does not support filtering or search parameters ,  fetch pages
+     * `last_session_at` desc. This endpoint does not support filtering or search parameters, fetch pages
      * and filter client-side.
      *
      * `GET /v3/users/`
@@ -63,7 +63,7 @@ final class Users extends BaseResource
      *
      * `GET /v3/users/{vendor_data}/`
      *
-     * @param string $vendorData Your unique identifier for the user ,  a free-form string (NOT a UUID).
+     * @param string $vendorData your unique identifier for the user, a free-form string (NOT a UUID)
      *
      * @throws DiditException
      */
@@ -83,12 +83,12 @@ final class Users extends BaseResource
      * Partial update of a user: `display_name`, `full_name`, `date_of_birth`, `status`, `metadata`,
      * `approved_emails`/`approved_phones`/`issuing_states`. `metadata` fully replaces. **Note:** unlike
      * [Update User Status](#patch-/v3/users/-vendor_data-/update-status/), changing `status` here does NOT
-     * record a status-change activity and does NOT sync the system blocklist ,  use the dedicated
+     * record a status-change activity and does NOT sync the system blocklist, use the dedicated
      * update-status endpoint for `BLOCKED`/unblock flows.
      *
      * `PATCH /v3/users/{vendor_data}/`
      *
-     * @param string $vendorData Your unique identifier for the user (free-form string, NOT a UUID).
+     * @param string $vendorData your unique identifier for the user (free-form string, NOT a UUID)
      * @param UsersUpdateParams $params
      *
      * @throws DiditException
@@ -117,7 +117,7 @@ final class Users extends BaseResource
      *
      * `GET /v3/users/{vendor_data}/generate-pdf/`
      *
-     * @param string $vendorData Your unique identifier for the user ,  a free-form string (NOT a UUID).
+     * @param string $vendorData your unique identifier for the user, a free-form string (NOT a UUID)
      *
      * @throws DiditException
      */
@@ -135,11 +135,11 @@ final class Users extends BaseResource
     /**
      * Batch delete users.
      *
-     * **Permanently delete** users ,  the user records are removed permanently. For everyday blocking
-     * prefer [Update User Status](#patch-/v3/users/-vendor_data-/update-status/) with `BLOCKED`. Select
-     * users with `vendor_data_list`, with `didit_internal_id_list`, or with both at once; or pass
-     * `delete_all: true`. The Console's `filter_*` batch params are rejected with a `400` rather than
-     * ignored, so a narrowed intent can never turn into a full wipe.
+     * **Permanently delete** users, the user records are removed permanently. For everyday blocking prefer
+     * [Update User Status](#patch-/v3/users/-vendor_data-/update-status/) with `BLOCKED`. Select users
+     * with `vendor_data_list`, with `didit_internal_id_list`, or with both at once; or pass `delete_all:
+     * true`. The Console's `filter_*` batch params are rejected with a `400` rather than ignored, so a
+     * narrowed intent can never turn into a full wipe.
      *
      * `POST /v3/users/delete/`
      *
@@ -193,13 +193,13 @@ final class Users extends BaseResource
     /**
      * Update user status.
      *
-     * Flip only the lifecycle `status` of a user ,  `ACTIVE`/`FLAGGED`/`BLOCKED` (NOT session statuses).
+     * Flip only the lifecycle `status` of a user, `ACTIVE`/`FLAGGED`/`BLOCKED` (NOT session statuses).
      * `BLOCKED` adds the `vendor_data` to the system blocklist; moving away from `BLOCKED` removes that
      * entry. Each change is recorded as a `STATUS_CHANGED` activity on the user.
      *
      * `PATCH /v3/users/{vendor_data}/update-status/`
      *
-     * @param string $vendorData Your unique identifier for the user.
+     * @param string $vendorData your unique identifier for the user
      * @param UsersUpdateStatusParams $params
      *
      * @throws DiditException
@@ -252,7 +252,7 @@ final class Users extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/vendor-users/by-id/{didit_internal_id}/faces/upload/`
      *
-     * @param string $diditInternalId Didit's internal User UUID, returned as `didit_internal_id` by `GET /v3/users/{vendor_data}/` and `POST /v3/users/create/`.
+     * @param string $diditInternalId didit's internal User UUID, returned as `didit_internal_id` by `GET /v3/users/{vendor_data}/` and `POST /v3/users/create/`
      * @param UsersUploadFaceParams $params
      *
      * @throws DiditException
@@ -312,7 +312,7 @@ final class Users extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/vendor-users/toggle-ongoing-monitoring/{job_id}/`
      *
-     * @param string $jobId Monitoring job UUID returned by the toggle endpoint.
+     * @param string $jobId monitoring job UUID returned by the toggle endpoint
      *
      * @throws DiditException
      */
@@ -336,7 +336,7 @@ final class Users extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/users/{vendor_user_uuid}/networks/`
      *
-     * @param string $vendorUserUuid Vendor user UUID.
+     * @param string $vendorUserUuid vendor user UUID
      *
      * @throws DiditException
      */

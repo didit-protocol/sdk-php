@@ -9,7 +9,7 @@ namespace Didit\Types;
 /**
  * Optional status label to record on the entry. Accepts any session status value, case-sensitive
  * (`"approved"` is rejected with `400`). Recording a status here does **not** change the session's
- * actual status ,  use the update-status endpoint for that.
+ * actual status, use the update-status endpoint for that.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

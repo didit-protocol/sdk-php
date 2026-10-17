@@ -31,7 +31,7 @@ final class SessionsRetrieveDecisionResponseDocumentVerificationsItems extends B
     public readonly ?string $documentSubtype;
 
     /**
-     * Alias of `document_type` ,  the group name used by `groups` and `required_groups`.
+     * Alias of `document_type`, the group name used by `groups` and `required_groups`.
      *
      * Known values: {@see SessionsRetrieveDecisionResponseDocumentVerificationsItemsDocumentGroup}.
      */

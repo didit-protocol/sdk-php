@@ -53,8 +53,8 @@ final class WalletScreening extends BaseResource
      * Render a wallet-screening result as a PDF.
      *
      * Stateless companion to `POST /v3/wallet-screening/`: repost the exact JSON body that endpoint
-     * returned ,  including the `report_signature` it added ,  and get back a Didit-branded PDF of the
-     * same result. No provider is called and nothing is billed or persisted; this only re-renders a result
+     * returned, including the `report_signature` it added, and get back a Didit-branded PDF of the same
+     * result. No provider is called and nothing is billed or persisted; this only re-renders a result
      * Didit already produced. The signature ties the PDF to an unmodified result: editing `risk_score`,
      * `severity`, `sanctions_hit`, or any other signed field before reposting fails with `400`.
      *

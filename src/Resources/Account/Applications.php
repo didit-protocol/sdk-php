@@ -26,13 +26,12 @@ final class Applications extends BaseResource
      * List the organization's applications.
      *
      * List every application in the organization. Use this to discover `app_id` values when recovering
-     * credentials from a new machine ,  follow with `GET
-     * /organizations/me/{org_id}/applications/{app_id}/` for the API key. Requires an owner or admin
-     * Bearer token.
+     * credentials from a new machine, follow with `GET /organizations/me/{org_id}/applications/{app_id}/`
+     * for the API key. Requires an owner or admin Bearer token.
      *
      * `GET /organizations/me/{org_id}/applications/`
      *
-     * @param string $orgId UUID of the organization.
+     * @param string $orgId UUID of the organization
      *
      * @throws DiditException
      */
@@ -56,7 +55,7 @@ final class Applications extends BaseResource
      *
      * `POST /organizations/me/{org_id}/applications/`
      *
-     * @param string $orgId UUID of the organization.
+     * @param string $orgId UUID of the organization
      * @param ApplicationCreateRequest $params
      *
      * @throws DiditException
@@ -82,8 +81,8 @@ final class Applications extends BaseResource
      *
      * `GET /organizations/me/{org_id}/applications/{app_id}/`
      *
-     * @param string $orgId UUID of the organization that owns the application.
-     * @param string $appId UUID of the application whose credentials you want to read.
+     * @param string $orgId UUID of the organization that owns the application
+     * @param string $appId UUID of the application whose credentials you want to read
      *
      * @throws DiditException
      */
@@ -107,8 +106,8 @@ final class Applications extends BaseResource
      *
      * `PATCH /organizations/me/{org_id}/applications/{app_id}/`
      *
-     * @param string $orgId UUID of the organization that owns the application.
-     * @param string $appId UUID of the application to update.
+     * @param string $orgId UUID of the organization that owns the application
+     * @param string $appId UUID of the application to update
      * @param ApplicationUpdateRequest $params
      *
      * @throws DiditException

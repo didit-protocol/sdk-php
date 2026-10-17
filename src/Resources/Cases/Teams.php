@@ -77,8 +77,6 @@ final class Teams extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/teams/{record_uuid}/`
      *
-     * @param string $recordUuid
-     *
      * @throws DiditException
      */
     public function retrieve(string $recordUuid, ?RequestOptions $options = null): Types\CaseReviewTeam
@@ -99,7 +97,6 @@ final class Teams extends BaseResource
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/cases/teams/{record_uuid}/`
      *
-     * @param string $recordUuid
      * @param CaseReviewTeamUpdate $params
      *
      * @throws DiditException

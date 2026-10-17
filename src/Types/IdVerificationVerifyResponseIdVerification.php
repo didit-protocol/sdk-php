@@ -15,8 +15,8 @@ use Didit\Core\Hydrate;
 final class IdVerificationVerifyResponseIdVerification extends BaseModel
 {
     /**
-     * `Approved` when no warning resolves to a decline; `Declined` otherwise ,  the `warnings` list
-     * explains why.
+     * `Approved` when no warning resolves to a decline; `Declined` otherwise, the `warnings` list explains
+     * why.
      *
      * Known values: {@see IdVerificationVerifyResponseIdVerificationStatus}.
      */
@@ -129,8 +129,8 @@ final class IdVerificationVerifyResponseIdVerification extends BaseModel
 
     /**
      * Parsed machine-readable zone. An **empty object** (`{}`) when the document has no MRZ or it could
-     * not be read ,  also check the `warnings` list in that case. Dates inside the MRZ use the raw
-     * `YYMMDD` format.
+     * not be read, also check the `warnings` list in that case. Dates inside the MRZ use the raw `YYMMDD`
+     * format.
      */
     public readonly ?IdVerificationVerifyResponseIdVerificationMrz $mrz;
 

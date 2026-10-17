@@ -63,8 +63,8 @@ final class SessionsRetrieveDecisionResponseIdVerificationsExtraFields extends B
 
     /**
      * First name in Latin script. Populated when `preferred_characters=non_latin` and a Latin version is
-     * present on the document, or ,  as a transliteration fallback ,  when `preferred_characters=latin`
-     * but the document only carries non-Latin text.
+     * present on the document, or, as a transliteration fallback, when `preferred_characters=latin` but
+     * the document only carries non-Latin text.
      */
     public readonly ?string $firstNameLatin;
 

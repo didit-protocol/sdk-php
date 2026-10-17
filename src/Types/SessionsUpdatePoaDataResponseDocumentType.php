@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * POA document category. Values are uppercase ,  lowercase variants like `utility_bill` return `400`.
+ * POA document category. Values are uppercase, lowercase variants like `utility_bill` return `400`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

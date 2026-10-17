@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Always `USER` here ,  this bucket only contains parties entered or confirmed by the end user in the
+ * Always `USER` here, this bucket only contains parties entered or confirmed by the end user in the
  * Key People flow (registry-discovered people appear under `registry`).
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.

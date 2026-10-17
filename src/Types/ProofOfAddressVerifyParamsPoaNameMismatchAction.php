@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Accepted but **currently not applied** ,  name-mismatch warnings (`NAME_MISMATCH_WITH_PROVIDED`)
+ * Accepted but **currently not applied**, name-mismatch warnings (`NAME_MISMATCH_WITH_PROVIDED`)
  * follow `poa_address_mismatch_action` instead. Set `poa_address_mismatch_action` to control both name
  * and address mismatch behavior.
  *

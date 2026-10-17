@@ -12,8 +12,8 @@ use Didit\Core\Hydrate;
 /**
  * How `match_score` was computed. Name, date of birth, and country each contribute `<component>_score`
  * × `<component>_weight_normalized` points; weights are re-normalized when a component is missing from
- * the screened data. The document number is not weighted ,  it acts as a 'golden key': `MATCH`
- * overrides the score to 100, `NEUTRAL` leaves it unchanged, `HARD_MISMATCH` applies a penalty.
+ * the screened data. The document number is not weighted, it acts as a 'golden key': `MATCH` overrides
+ * the score to 100, `NEUTRAL` leaves it unchanged, `HARD_MISMATCH` applies a penalty.
  */
 final class AmlScreenResponseAmlHitsScoreBreakdown extends BaseModel
 {
@@ -63,7 +63,7 @@ final class AmlScreenResponseAmlHitsScoreBreakdown extends BaseModel
     /** Human-readable description of the document-number effect. */
     public readonly ?string $documentNumberEffect;
 
-    /** Final weighted match score (0-100) ,  mirrors `match_score`. */
+    /** Final weighted match score (0-100), mirrors `match_score`. */
     public readonly ?int $totalScore;
 
     /**

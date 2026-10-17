@@ -65,8 +65,8 @@ final class SessionsUpdateDataResponse extends BaseModel
     public readonly ?string $lastName;
 
     /**
-     * Sex as printed on the document: `M` (male), `F` (female), or `U` (unknown). Any other value , 
-     * including `X` ,  returns `400`.
+     * Sex as printed on the document: `M` (male), `F` (female), or `U` (unknown). Any other value,
+     * including `X`, returns `400`.
      *
      * Known values: {@see SessionsUpdateDataResponseGender}.
      */
@@ -83,7 +83,7 @@ final class SessionsUpdateDataResponse extends BaseModel
     public readonly ?string $placeOfBirth;
 
     /**
-     * Nationality as printed on the document. Free text up to 32 characters ,  typically an ISO 3166-1
+     * Nationality as printed on the document. Free text up to 32 characters, typically an ISO 3166-1
      * alpha-3 code (e.g. `ESP`), but not validated as one.
      */
     public readonly ?string $nationality;

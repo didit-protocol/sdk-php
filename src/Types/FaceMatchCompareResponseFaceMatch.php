@@ -23,7 +23,7 @@ final class FaceMatchCompareResponseFaceMatch extends BaseModel
     public readonly ?string $status;
 
     /**
-     * Similarity score from 0 to 100 ,  the model's confidence that both images depict the same person.
+     * Similarity score from 0 to 100, the model's confidence that both images depict the same person.
      * Rounded to two decimals only when `save_api_request` is true; with `save_api_request=false` the raw
      * float is returned. `null` when no face pair could be scored (with the default
      * `save_api_request=true`); with `save_api_request=false` the same condition can surface as `score:
@@ -38,8 +38,8 @@ final class FaceMatchCompareResponseFaceMatch extends BaseModel
     public readonly ?FaceMatchCompareResponseFaceMatchRefImage $refImage;
 
     /**
-     * Empty on a clean approval. `NO_REFERENCE_IMAGE` (`error`) ,  no face pair could be scored;
-     * `LOW_FACE_MATCH_SIMILARITY` (`error`) ,  score at or below the decline threshold. Any of these sets
+     * Empty on a clean approval. `NO_REFERENCE_IMAGE` (`error`), no face pair could be scored;
+     * `LOW_FACE_MATCH_SIMILARITY` (`error`), score at or below the decline threshold. Any of these sets
      * `status` to `Declined`.
      *
      * @var list<FaceMatchCompareResponseFaceMatchWarnings>|null

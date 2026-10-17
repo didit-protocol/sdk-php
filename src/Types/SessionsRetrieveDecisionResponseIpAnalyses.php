@@ -19,7 +19,7 @@ final class SessionsRetrieveDecisionResponseIpAnalyses extends BaseModel
 
     /**
      * Feature-level status of this Device & IP Analysis entry. Independent of the top-level session
-     * `status` ,  a session can reach its overall decision while an individual feature stays `In Review`.
+     * `status`, a session can reach its overall decision while an individual feature stays `In Review`.
      *
      * Known values: {@see SessionsRetrieveDecisionResponseIpAnalysesStatus}.
      */

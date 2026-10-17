@@ -23,7 +23,7 @@ final class IdVerification extends BaseResource
     /**
      * ID Verification (document OCR + fraud checks).
      *
-     * OCR an identity document and run document fraud checks in one call ,  returns the extracted holder
+     * OCR an identity document and run document fraud checks in one call, returns the extracted holder
      * fields, the parsed MRZ, an `Approved`/`Declined` `status`, and a `warnings` list explaining every
      * issue found. Supports 14,000+ document types from 220+ countries and territories.
      *

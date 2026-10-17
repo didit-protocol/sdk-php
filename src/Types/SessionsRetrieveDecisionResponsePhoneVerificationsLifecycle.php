@@ -23,7 +23,7 @@ final class SessionsRetrieveDecisionResponsePhoneVerificationsLifecycle extends 
     /**
      * Event-specific payload. Send events carry `status`, `reason`, `channel`, `actual_channel`; delivery
      * events carry `channel`, `status`; code-check events carry `code_tried`, `status`; final status
-     * events carry `reason` ,  or `null` when there is no reason to report (e.g.
+     * events carry `reason`, or `null` when there is no reason to report (e.g.
      * `PHONE_VERIFICATION_APPROVED`).
      */
     public readonly ?SessionsRetrieveDecisionResponsePhoneVerificationsLifecycleDetails $details;

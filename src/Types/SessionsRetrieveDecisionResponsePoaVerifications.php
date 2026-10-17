@@ -18,8 +18,8 @@ final class SessionsRetrieveDecisionResponsePoaVerifications extends BaseModel
     public readonly ?string $nodeId;
 
     /**
-     * Feature-level status of this Proof of Address step. Independent of the top-level session `status` , 
-     * a session can reach its overall decision while an individual feature stays `In Review`.
+     * Feature-level status of this Proof of Address step. Independent of the top-level session `status`, a
+     * session can reach its overall decision while an individual feature stays `In Review`.
      *
      * Known values: {@see SessionsRetrieveDecisionResponsePoaVerificationsStatus}.
      */

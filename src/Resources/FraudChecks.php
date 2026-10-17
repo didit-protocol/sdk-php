@@ -27,8 +27,6 @@ final class FraudChecks extends BaseResource
      *
      * `GET /v3/fraud/checks/{check_id}/`
      *
-     * @param string $checkId
-     *
      * @throws DiditException
      */
     public function retrieve(string $checkId, ?RequestOptions $options = null): Types\FraudCheckResponse

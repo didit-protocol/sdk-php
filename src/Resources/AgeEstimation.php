@@ -23,10 +23,10 @@ final class AgeEstimation extends BaseResource
     /**
      * Age Estimation (face age + passive liveness).
      *
-     * Estimate a person's age from a single face photo and run a passive liveness check in the same call ,
+     * Estimate a person's age from a single face photo and run a passive liveness check in the same call,
      * returns the model-predicted `age_estimation` (in years), a liveness `score` (0-100), and an
      * `Approved`/`Declined` `status`. The age is **model-predicted from the face, not verified against a
-     * document** ,  use it for age gates and low-friction checks, not as legal proof of age.
+     * document**, use it for age gates and low-friction checks, not as legal proof of age.
      *
      * `POST /v3/age-estimation/`
      *

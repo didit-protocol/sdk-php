@@ -68,7 +68,7 @@ final class SessionsRetrieveDecisionResponsePoaVerificationsDocumentMetadata ext
     /** Whether the file metadata indicates processing by a known document editor. */
     public readonly ?bool $processedByKnownEditor;
 
-    /** Whether the creation and modification dates differ ,  a common manipulation signal. */
+    /** Whether the creation and modification dates differ, a common manipulation signal. */
     public readonly ?bool $hasDifferentCreationModDate;
 
     /**

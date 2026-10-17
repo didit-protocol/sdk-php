@@ -33,8 +33,7 @@ final class Notes extends BaseResource
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/notes/{note_uuid}/`
      *
-     * @param string $networkUuid Network UUID.
-     * @param string $noteUuid
+     * @param string $networkUuid network UUID
      * @param NetworksNotesDeleteParams $params
      *
      * @throws DiditException
@@ -63,7 +62,7 @@ final class Notes extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/notes/`
      *
-     * @param string $networkUuid Network UUID.
+     * @param string $networkUuid network UUID
      * @param NetworksNotesListParams $params
      *
      * @return Page<Types\NetworkNote>
@@ -91,7 +90,7 @@ final class Notes extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/notes/`
      *
-     * @param string $networkUuid Network UUID.
+     * @param string $networkUuid network UUID
      * @param NetworksNotesCreateParams $params
      *
      * @throws DiditException

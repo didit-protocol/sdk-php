@@ -24,8 +24,8 @@ final class DocumentAiAnalyzeResponseDocumentAi extends BaseModel
     public readonly ?string $status;
 
     /**
-     * One entry per requested field key. Values are typed per the field `type` ,  strings for `text`,
-     * numbers for `number`, `YYYY-MM-DD` strings for `date` ,  or `null` when the value could not be read.
+     * One entry per requested field key. Values are typed per the field `type`, strings for `text`,
+     * numbers for `number`, `YYYY-MM-DD` strings for `date`, or `null` when the value could not be read.
      *
      * @var array<string, mixed>|null
      */
@@ -49,7 +49,7 @@ final class DocumentAiAnalyzeResponseDocumentAi extends BaseModel
 
     /**
      * Fuzzy similarity (0-100) between `name_on_document` and the expected person/company name. Returned
-     * whenever both a name value and an expected name exist ,  on matches **and** mismatches; `null`
+     * whenever both a name value and an expected name exist, on matches **and** mismatches; `null`
      * otherwise.
      */
     public readonly ?float $nameMatchScore;

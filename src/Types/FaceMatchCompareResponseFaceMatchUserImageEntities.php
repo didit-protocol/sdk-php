@@ -26,7 +26,7 @@ final class FaceMatchCompareResponseFaceMatchUserImageEntities extends BaseModel
     public readonly ?float $confidence;
 
     /**
-     * Model-estimated age of the detected face, in years. Informational only ,  it does not affect the
+     * Model-estimated age of the detected face, in years. Informational only, it does not affect the
      * face-match decision.
      */
     public readonly ?float $age;
@@ -34,7 +34,7 @@ final class FaceMatchCompareResponseFaceMatchUserImageEntities extends BaseModel
     /** Model-predicted gender of the detected face (`male` or `female`). Informational only. */
     public readonly ?string $gender;
 
-    /** Reserved field ,  always `null` in responses from this endpoint. */
+    /** Reserved field, always `null` in responses from this endpoint. */
     public readonly ?string $race;
 
     /**

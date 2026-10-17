@@ -63,6 +63,12 @@ def php_string(value: str) -> str:
 
 def docblock(lines: list[str], indent: str = "") -> str:
     """A ``/** ... */`` block; an empty string in ``lines`` is a blank line."""
+    collapsed: list[str] = []
+    for line in lines:
+        if line == "" and collapsed and collapsed[-1] == "":
+            continue
+        collapsed.append(line)
+    lines = collapsed
     while lines and lines[-1] == "":
         lines.pop()
     while lines and lines[0] == "":
@@ -74,3 +80,14 @@ def docblock(lines: list[str], indent: str = "") -> str:
         out.append(f"{indent} *" if line == "" else f"{indent} * {line}")
     out.append(f"{indent} */")
     return "\n".join(out) + "\n"
+
+
+def annotation_text(text: str) -> str:
+    """Description after ``@param $x``, written the way PHP-CS-Fixer's
+    ``phpdoc_annotation_without_dot`` leaves it."""
+    text = text.strip()
+    if re.search(r"\.\s*$", text) and not re.search(r"\.(?!\s*$)", text):
+        text = re.sub(r"\.\s*$", "", text)
+        if len(text) > 1 and text[0].isupper() and (text[1].islower() or text[1] == " "):
+            text = text[0].lower() + text[1:]
+    return text

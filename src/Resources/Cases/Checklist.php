@@ -30,7 +30,7 @@ final class Checklist extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/checklist/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      *
      * @return ListResponse<Types\CaseChecklistItem>
      *
@@ -55,8 +55,8 @@ final class Checklist extends BaseResource
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/checklist/{item_uuid}/`
      *
-     * @param string $caseUuid Case UUID.
-     * @param string $itemUuid Checklist item UUID.
+     * @param string $caseUuid case UUID
+     * @param string $itemUuid checklist item UUID
      * @param CasesChecklistToggleItemParams $params
      *
      * @throws DiditException

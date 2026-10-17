@@ -79,7 +79,6 @@ final class WalletAddresses extends BaseResource
      *
      * `PATCH /v3/travel-rule/wallet-addresses/{entry_uuid}/`
      *
-     * @param string $entryUuid
      * @param WalletAddressEntryUpdate $params
      *
      * @throws DiditException
@@ -105,8 +104,6 @@ final class WalletAddresses extends BaseResource
      * re-registration.
      *
      * `DELETE /v3/travel-rule/wallet-addresses/{entry_uuid}/`
-     *
-     * @param string $entryUuid
      *
      * @throws DiditException
      */

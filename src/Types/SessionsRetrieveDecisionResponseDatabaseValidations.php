@@ -20,7 +20,7 @@ final class SessionsRetrieveDecisionResponseDatabaseValidations extends BaseMode
     /**
      * ISO 3166-1 alpha-3 code of the country whose government/registry sources were queried (e.g. `BRA`,
      * `MEX`, `ESP`, `NGA`, `IDN`). Database Validation covers 60+ countries across the Americas, Europe,
-     * Africa, the Middle East and Asia-Pacific, plus global multi-country sources ,  coverage expands
+     * Africa, the Middle East and Asia-Pacific, plus global multi-country sources, coverage expands
      * regularly, so treat the value as an open set rather than a fixed enum.
      */
     public readonly ?string $issuingState;
@@ -36,7 +36,7 @@ final class SessionsRetrieveDecisionResponseDatabaseValidations extends BaseMode
     public readonly ?string $validationType;
 
     /**
-     * The input data used for validation. Fields vary by country ,  see the Database Validation docs
+     * The input data used for validation. Fields vary by country, see the Database Validation docs
      * (`/core-technology/database-validation/overview`) for country-specific formats.
      */
     public readonly ?SessionsRetrieveDecisionResponseDatabaseValidationsScreenedData $screenedData;
@@ -68,7 +68,7 @@ final class SessionsRetrieveDecisionResponseDatabaseValidations extends BaseMode
     public readonly ?string $matchType;
 
     /**
-     * Feature-level status of this database validation. Independent of the top-level session `status` ,  a
+     * Feature-level status of this database validation. Independent of the top-level session `status`, a
      * session can reach its overall decision while an individual feature stays `In Review`.
      *
      * Known values: {@see SessionsRetrieveDecisionResponseDatabaseValidationsStatus}.

@@ -18,8 +18,8 @@ final class SessionsRetrieveDecisionResponseAmlScreenings extends BaseModel
     public readonly ?string $nodeId;
 
     /**
-     * Feature-level status of this AML screening. Independent of the top-level session `status` ,  a
-     * session can reach its overall decision while an individual feature stays `In Review`.
+     * Feature-level status of this AML screening. Independent of the top-level session `status`, a session
+     * can reach its overall decision while an individual feature stays `In Review`.
      *
      * Known values: {@see SessionsRetrieveDecisionResponseAmlScreeningsStatus}.
      */
@@ -35,7 +35,7 @@ final class SessionsRetrieveDecisionResponseAmlScreenings extends BaseModel
     public readonly ?array $hits;
 
     /**
-     * Overall AML screening score ,  the highest risk score across all hits (float, 0-100). `null` until
+     * Overall AML screening score, the highest risk score across all hits (float, 0-100). `null` until
      * computed.
      */
     public readonly ?float $score;

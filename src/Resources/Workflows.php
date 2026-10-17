@@ -54,8 +54,8 @@ final class Workflows extends BaseResource
      * Create workflow.
      *
      * Create a simple workflow. Send `features` in execution order (ordering rules apply); defaults to
-     * `published` v1. The body accepts ONLY the fields listed in `SimpleWorkflowRequest` ,  any other key
-     * (including `workflow_type`) is rejected with a 400. Not idempotent ,  each call creates a new
+     * `published` v1. The body accepts ONLY the fields listed in `SimpleWorkflowRequest`, any other key
+     * (including `workflow_type`) is rejected with a 400. Not idempotent, each call creates a new
      * workflow. Maximum 50 workflows per application.
      *
      * `POST /v3/workflows/`
@@ -83,7 +83,7 @@ final class Workflows extends BaseResource
      *
      * `GET /v3/workflows/{settings_uuid}/`
      *
-     * @param string $settingsUuid Per-version UUID of the workflow (the `uuid` value returned by the list endpoint).
+     * @param string $settingsUuid per-version UUID of the workflow (the `uuid` value returned by the list endpoint)
      *
      * @throws DiditException
      */
@@ -110,7 +110,7 @@ final class Workflows extends BaseResource
      *
      * `PATCH /v3/workflows/{settings_uuid}/`
      *
-     * @param string $settingsUuid Per-version UUID of the workflow to update.
+     * @param string $settingsUuid per-version UUID of the workflow to update
      * @param SimpleWorkflowUpdateRequest $params
      *
      * @throws DiditException
@@ -135,7 +135,7 @@ final class Workflows extends BaseResource
      *
      * `DELETE /v3/workflows/{settings_uuid}/`
      *
-     * @param string $settingsUuid Per-version UUID of the workflow to delete.
+     * @param string $settingsUuid per-version UUID of the workflow to delete
      *
      * @throws DiditException
      */

@@ -8,7 +8,7 @@ namespace Didit\Types;
 
 /**
  * Preferred delivery channel. If the channel is unavailable for the destination country or number, the
- * message automatically falls back to SMS ,  the send still reports `Success`.
+ * message automatically falls back to SMS, the send still reports `Success`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

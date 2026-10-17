@@ -52,7 +52,6 @@ final class IdWallets extends BaseResource
      *
      * `GET /v3/id-verification/wallets/`
      *
-     *
      * @throws DiditException
      */
     public function list(?RequestOptions $options = null): Types\DigitalIdWalletApiWalletCatalogResponse
@@ -74,7 +73,7 @@ final class IdWallets extends BaseResource
      *
      * `GET /v3/id-verification/wallets/verifications/{request_id}/`
      *
-     * @param string $requestId The request_id the start endpoint returned.
+     * @param string $requestId the request_id the start endpoint returned
      *
      * @throws DiditException
      */
@@ -100,7 +99,7 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/verifications/{request_id}/poll/`
      *
-     * @param string $requestId The request_id the start endpoint returned.
+     * @param string $requestId the request_id the start endpoint returned
      *
      * @throws DiditException
      */
@@ -127,7 +126,7 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/verifications/{request_id}/cancel/`
      *
-     * @param string $requestId The request_id the start endpoint returned.
+     * @param string $requestId the request_id the start endpoint returned
      *
      * @throws DiditException
      */

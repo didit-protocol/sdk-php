@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * What to do when the carrier lookup reports a virtual line type ,  `voip`, `isp`, or `vpn`
+ * What to do when the carrier lookup reports a virtual line type, `voip`, `isp`, or `vpn`
  * (`phone.is_virtual`). `DECLINE` flips the final `status` to `Declined`; `NO_ACTION` records the risk
  * in `phone.warnings`.
  *

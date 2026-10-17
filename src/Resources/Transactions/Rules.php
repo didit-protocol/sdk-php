@@ -85,7 +85,7 @@ final class Rules extends BaseResource
      *
      * `GET /v3/transactions/rules/{rule_uuid}/`
      *
-     * @param string $ruleUuid The rule's uuid from list or create.
+     * @param string $ruleUuid the rule's uuid from list or create
      *
      * @throws DiditException
      */
@@ -108,7 +108,7 @@ final class Rules extends BaseResource
      *
      * `PATCH /v3/transactions/rules/{rule_uuid}/`
      *
-     * @param string $ruleUuid The rule's uuid from list or create.
+     * @param string $ruleUuid the rule's uuid from list or create
      * @param TransactionRuleUpdateRequest $params
      *
      * @throws DiditException
@@ -137,7 +137,7 @@ final class Rules extends BaseResource
      *
      * `DELETE /v3/transactions/rules/{rule_uuid}/`
      *
-     * @param string $ruleUuid The rule's uuid from list or create.
+     * @param string $ruleUuid the rule's uuid from list or create
      *
      * @throws DiditException
      */

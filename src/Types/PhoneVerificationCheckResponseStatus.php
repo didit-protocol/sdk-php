@@ -7,9 +7,9 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `Approved` ,  correct code, no declining risk. `Declined` ,  terminal: a declining risk matched or
- * the attempt budget (3) was exhausted. `Failed` ,  wrong code, attempts remaining. `Expired or Not
- * Found` ,  no pending verification for this number in the last 5 minutes.
+ * `Approved`, correct code, no declining risk. `Declined`, terminal: a declining risk matched or the
+ * attempt budget (3) was exhausted. `Failed`, wrong code, attempts remaining. `Expired or Not Found`,
+ * no pending verification for this number in the last 5 minutes.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

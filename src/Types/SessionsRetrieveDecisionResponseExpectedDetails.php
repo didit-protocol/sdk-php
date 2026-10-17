@@ -10,7 +10,7 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Expected details supplied at session creation ,  used for cross-validation against extracted data
+ * Expected details supplied at session creation, used for cross-validation against extracted data
  * (KYC) or to pre-fill the company registry search (KYB). Echoes back exactly the keys that were
  * provided; `null` when none were supplied. KYC sessions carry the person fields; Business (KYB)
  * sessions carry `company_name`, `registry_country` and `registration_number`.

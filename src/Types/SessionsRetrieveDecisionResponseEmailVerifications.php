@@ -18,8 +18,8 @@ final class SessionsRetrieveDecisionResponseEmailVerifications extends BaseModel
     public readonly ?string $nodeId;
 
     /**
-     * Feature-level status of this email verification step. Independent of the top-level session `status`
-     * ,  a session can reach its overall decision while an individual feature stays `In Review`.
+     * Feature-level status of this email verification step. Independent of the top-level session `status`,
+     * a session can reach its overall decision while an individual feature stays `In Review`.
      *
      * Known values: {@see SessionsRetrieveDecisionResponseEmailVerificationsStatus}.
      */
@@ -68,7 +68,7 @@ final class SessionsRetrieveDecisionResponseEmailVerifications extends BaseModel
      * Matches found for this email address. Each match has a `source`: `session` (another verification
      * session in your application matched on the same email, returned with
      * `session_id`/`session_number`/`vendor_data`/`verification_date`) or `list_entry` (the email is on an
-     * org-managed allow/block list ,  see `/management-api/lists/overview`). Cross-session matches use
+     * org-managed allow/block list, see `/management-api/lists/overview`). Cross-session matches use
      * different `vendor_data` and are capped at 5.
      *
      * @var list<SessionsRetrieveDecisionResponseEmailVerificationsMatches>|null

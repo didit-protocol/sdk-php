@@ -8,8 +8,8 @@ namespace Didit\Types;
 
 /**
  * Detected document category. `UNKNOWN` means the document could not be classified as an acceptable
- * Proof of Address and auto-declines with `INVALID_DOCUMENT_TYPE`. Never null ,  classification
- * failures fall back to `UNKNOWN`.
+ * Proof of Address and auto-declines with `INVALID_DOCUMENT_TYPE`. Never null, classification failures
+ * fall back to `UNKNOWN`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

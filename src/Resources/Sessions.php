@@ -78,7 +78,7 @@ final class Sessions extends BaseResource
     /**
      * Retrieve the full decision for a verification session.
      *
-     * Retrieve the complete decision report for a verification session ,  the rolled-up session `status`
+     * Retrieve the complete decision report for a verification session, the rolled-up session `status`
      * plus one report per verification feature the workflow executed. This is the canonical read endpoint
      * for both User Verification (KYC) and Business Verification (KYB) sessions: the same path serves
      * both, and the top-level `session_kind` discriminator tells you which shape you received (`"user"` or
@@ -86,7 +86,7 @@ final class Sessions extends BaseResource
      *
      * `GET /v3/session/{sessionId}/decision/`
      *
-     * @param string $sessionId UUID of the verification session whose decision you want to retrieve.
+     * @param string $sessionId UUID of the verification session whose decision you want to retrieve
      * @param SessionsRetrieveDecisionParams $params
      *
      * @throws DiditException
@@ -114,7 +114,7 @@ final class Sessions extends BaseResource
      *
      * `DELETE /v3/session/{sessionId}/delete/`
      *
-     * @param string $sessionId UUID (`session_id`) of the User Verification (KYC) or Business Verification (KYB) session to delete, as returned when the session was created.
+     * @param string $sessionId UUID (`session_id`) of the User Verification (KYC) or Business Verification (KYB) session to delete, as returned when the session was created
      * @param SessionsDeleteParams $params
      *
      * @throws DiditException
@@ -137,12 +137,12 @@ final class Sessions extends BaseResource
      * Download a PDF report for a verification session.
      *
      * Render and download a compliance-ready PDF report for a finished verification session. The same path
-     * serves both User Verification (KYC) and Business Verification (KYB) sessions ,  the server resolves
+     * serves both User Verification (KYC) and Business Verification (KYB) sessions, the server resolves
      * the `sessionId` against both session types and picks the matching report template.
      *
      * `GET /v3/session/{sessionId}/generate-pdf/`
      *
-     * @param string $sessionId UUID of the User Verification (KYC) or Business Verification (KYB) session to render ,  the `session_id` returned by `POST /v3/session/`.
+     * @param string $sessionId UUID of the User Verification (KYC) or Business Verification (KYB) session to render, the `session_id` returned by `POST /v3/session/`
      *
      * @throws DiditException
      */
@@ -167,7 +167,7 @@ final class Sessions extends BaseResource
      *
      * `PATCH /v3/session/{sessionId}/update-status/`
      *
-     * @param string $sessionId UUID of the verification session to update.
+     * @param string $sessionId UUID of the verification session to update
      * @param SessionsUpdateStatusParams $params
      *
      * @throws DiditException
@@ -217,7 +217,7 @@ final class Sessions extends BaseResource
      *
      * `POST /v3/session/{sessionId}/share/`
      *
-     * @param string $sessionId UUID of the source verification session to mint a token for.
+     * @param string $sessionId UUID of the source verification session to mint a token for
      * @param SessionsShareParams $params
      *
      * @throws DiditException
@@ -240,7 +240,7 @@ final class Sessions extends BaseResource
      * Redeem a share token to clone a verification session into your application.
      *
      * Redeem a share token to clone a KYC or KYB session into the calling application with a fresh
-     * `session_id`. Not idempotent ,  a token redeems once per receiver.
+     * `session_id`. Not idempotent, a token redeems once per receiver.
      *
      * `POST /v3/session/import-shared/`
      *
@@ -296,7 +296,7 @@ final class Sessions extends BaseResource
      *
      * `GET /v3/sessions/delete/{job_id}/`
      *
-     * @param string $jobId The `job_id` returned with the `202` from `POST /v3/sessions/delete/`.
+     * @param string $jobId the `job_id` returned with the `202` from `POST /v3/sessions/delete/`
      *
      * @throws DiditException
      */
@@ -315,15 +315,15 @@ final class Sessions extends BaseResource
     /**
      * Update KYC data extracted from the ID document on a verification session.
      *
-     * Correct the identity fields that were extracted (OCR / NFC) from the user's ID document ,  misread
-     * names, dates, document numbers, and so on ,  after the verification has finished. Typical callers
-     * are a compliance analyst working from your own back office, or an automated reconciliation job.
-     * Every field in the body is optional: only the keys you send are written, everything else is left
-     * untouched (`PATCH` semantics).
+     * Correct the identity fields that were extracted (OCR / NFC) from the user's ID document, misread
+     * names, dates, document numbers, and so on, after the verification has finished. Typical callers are
+     * a compliance analyst working from your own back office, or an automated reconciliation job. Every
+     * field in the body is optional: only the keys you send are written, everything else is left untouched
+     * (`PATCH` semantics).
      *
      * `PATCH /v3/session/{sessionId}/update-data/`
      *
-     * @param string $sessionId UUID of the User Verification (KYC) session whose extracted document data you are correcting.
+     * @param string $sessionId UUID of the User Verification (KYC) session whose extracted document data you are correcting
      * @param SessionsUpdateDataParams $params
      *
      * @throws DiditException
@@ -352,8 +352,8 @@ final class Sessions extends BaseResource
      *
      * `PATCH /v3/session/{sessionId}/features/{nodeId}/update-status/`
      *
-     * @param string $sessionId UUID of the verification session.
-     * @param string $nodeId Workflow graph node ID of the feature to update (for example `feature_ocr_1`).
+     * @param string $sessionId UUID of the verification session
+     * @param string $nodeId workflow graph node ID of the feature to update (for example `feature_ocr_1`)
      * @param SessionsUpdateFeatureStatusParams $params
      *
      * @throws DiditException
@@ -378,12 +378,12 @@ final class Sessions extends BaseResource
      *
      * Set the review status of a **single AML hit** (a potential sanction / PEP / watchlist /
      * adverse-media match) returned by AML screening, without changing the overall session decision.
-     * Identify the hit by its `hit_id` (the `id` of an entry in the AML check's `hits` array ,  see the
+     * Identify the hit by its `hit_id` (the `id` of an entry in the AML check's `hits` array, see the
      * session decision).
      *
      * `PATCH /v3/session/{sessionId}/update-aml-hit-status/`
      *
-     * @param string $sessionId UUID of the verification session.
+     * @param string $sessionId UUID of the verification session
      * @param SessionsUpdateAmlHitStatusParams $params
      *
      * @throws DiditException
@@ -409,7 +409,7 @@ final class Sessions extends BaseResource
      *
      * `PATCH /v3/session/{sessionId}/bulk-update-aml-hit-status/`
      *
-     * @param string $sessionId UUID of the verification session.
+     * @param string $sessionId UUID of the verification session
      * @param SessionsBulkUpdateAmlHitStatusParams $params
      *
      * @throws DiditException
@@ -432,14 +432,14 @@ final class Sessions extends BaseResource
     /**
      * Update Proof of Address data extracted from the POA document on a verification session.
      *
-     * Correct the fields extracted from the user's Proof of Address document ,  utility bill, bank
-     * statement, or other address evidence ,  after the verification has finished: issuer, dates, the
+     * Correct the fields extracted from the user's Proof of Address document, utility bill, bank
+     * statement, or other address evidence, after the verification has finished: issuer, dates, the
      * printed name, the address itself, and banking details. Every field in the body is optional: only the
      * keys you send are written, everything else is left untouched (`PATCH` semantics).
      *
      * `PATCH /v3/session/{sessionId}/update-poa-data/`
      *
-     * @param string $sessionId UUID of the User Verification (KYC) session whose attached POA record you are correcting.
+     * @param string $sessionId UUID of the User Verification (KYC) session whose attached POA record you are correcting
      * @param SessionsUpdatePoaDataParams $params
      *
      * @throws DiditException
@@ -462,15 +462,15 @@ final class Sessions extends BaseResource
     /**
      * Update registry-extracted company data on a Business Verification (KYB) session.
      *
-     * Correct the registry-extracted company data on a Business Verification (KYB) session ,  company
-     * name, registration number, addresses, status, contact details ,  identified by `companyUuid`.
-     * Typical callers are a compliance analyst fixing a registry misread, or your back office syncing
-     * corrected company data. Every field in the body is optional (`PATCH` semantics); an empty JSON body
-     * (`{}`) is a no-op that simply echoes the current company record.
+     * Correct the registry-extracted company data on a Business Verification (KYB) session, company name,
+     * registration number, addresses, status, contact details, identified by `companyUuid`. Typical
+     * callers are a compliance analyst fixing a registry misread, or your back office syncing corrected
+     * company data. Every field in the body is optional (`PATCH` semantics); an empty JSON body (`{}`) is
+     * a no-op that simply echoes the current company record.
      *
      * `PATCH /v3/session/{sessionId}/kyb/{companyUuid}/update-data/`
      *
-     * @param string $sessionId UUID of the parent Business Verification (KYB) session.
+     * @param string $sessionId UUID of the parent Business Verification (KYB) session
      * @param string $companyUuid UUID of the company record to update (`registry_checks[].company.uuid` on the business session decision).
      * @param SessionsUpdateKybCompanyDataParams $params
      *
@@ -501,7 +501,7 @@ final class Sessions extends BaseResource
      *
      * `PATCH /v3/session/{sessionId}/kyb/parties/{partyUuid}/`
      *
-     * @param string $sessionId UUID of the parent Business Verification (KYB) session.
+     * @param string $sessionId UUID of the parent Business Verification (KYB) session
      * @param string $partyUuid UUID of the Key People party to update (`key_people_checks[].submitted.parties[].uuid` on the business session decision).
      * @param SessionsUpdateKybPartyParams $params
      *
@@ -530,7 +530,7 @@ final class Sessions extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/sessions/{session_id}/networks/`
      *
-     * @param string $sessionId Session UUID.
+     * @param string $sessionId session UUID
      *
      * @throws DiditException
      */
@@ -557,7 +557,7 @@ final class Sessions extends BaseResource
      *
      * `POST /v3/session/{sessionId}/resubmission-preview/`
      *
-     * @param string $sessionId UUID of the verification session to update.
+     * @param string $sessionId UUID of the verification session to update
      * @param SessionsPreviewResubmissionParams $params
      *
      * @throws DiditException

@@ -79,12 +79,10 @@ final class Imports extends BaseResource
      * Retrieve a verification import job.
      *
      * Retrieve import progress counters and terminal status for one job. Poll until `status` is
-     * `COMPLETED` or `FAILED`; `failed_count` > 0 means some rows were rejected ,  list them via the
-     * errors endpoint.
+     * `COMPLETED` or `FAILED`; `failed_count` > 0 means some rows were rejected, list them via the errors
+     * endpoint.
      *
      * `GET /v3/session/imports/{importId}/`
-     *
-     * @param string $importId
      *
      * @throws DiditException
      */
@@ -106,7 +104,6 @@ final class Imports extends BaseResource
      *
      * `GET /v3/session/imports/{importId}/errors/`
      *
-     * @param string $importId
      * @param SessionsImportsListErrorsParams $params
      *
      * @return Page<Types\SessionImportError>

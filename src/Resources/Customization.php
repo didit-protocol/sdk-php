@@ -29,7 +29,6 @@ final class Customization extends BaseResource
      *
      * `GET /v3/customization/`
      *
-     *
      * @throws DiditException
      */
     public function retrieve(?RequestOptions $options = null): Types\BrandingCustomization
@@ -47,7 +46,7 @@ final class Customization extends BaseResource
      *
      * Partial update of the application's white-label branding. Send `application/json` to change colors,
      * fonts, radii and UI options, or `multipart/form-data` to upload logo images. Only the fields you
-     * include are changed. Custom domain and white-label email cannot be set through this endpoint ,  use
+     * include are changed. Custom domain and white-label email cannot be set through this endpoint, use
      * the Business Console for those.
      *
      * `PATCH /v3/customization/`

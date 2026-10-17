@@ -15,16 +15,16 @@ use Didit\Core\Hydrate;
 final class EmailVerificationCheckResponse extends BaseModel
 {
     /**
-     * On `Approved`/`Declined`: the session id of the matched verification ,  identical to the
-     * `request_id` returned by `POST /v3/email/send/`. On `Failed` and `Expired or Not Found`: a random
-     * one-off UUID that cannot be looked up later.
+     * On `Approved`/`Declined`: the session id of the matched verification, identical to the `request_id`
+     * returned by `POST /v3/email/send/`. On `Failed` and `Expired or Not Found`: a random one-off UUID
+     * that cannot be looked up later.
      */
     public readonly ?string $requestId;
 
     /**
-     * `Approved` ,  correct code, no declining risk. `Declined` ,  terminal: a declining risk matched or
-     * the attempt budget (3) was exhausted. `Failed` ,  wrong code, attempts remaining. `Expired or Not
-     * Found` ,  no pending verification for this address in the last 5 minutes.
+     * `Approved`, correct code, no declining risk. `Declined`, terminal: a declining risk matched or the
+     * attempt budget (3) was exhausted. `Failed`, wrong code, attempts remaining. `Expired or Not Found`,
+     * no pending verification for this address in the last 5 minutes.
      *
      * Known values: {@see EmailVerificationCheckResponseStatus}.
      */

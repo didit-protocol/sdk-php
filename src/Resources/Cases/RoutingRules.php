@@ -35,7 +35,6 @@ final class RoutingRules extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/history/`
      *
-     * @param string $recordUuid
      * @param CasesRoutingRulesListHistoryParams $params
      *
      * @return Page<Types\RoutingPublicationPolicyRevision>
@@ -59,8 +58,6 @@ final class RoutingRules extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/`
      *
-     * @param string $recordUuid
-     *
      * @throws DiditException
      */
     public function retrieve(string $recordUuid, ?RequestOptions $options = null): Types\CaseRoutingRule
@@ -81,7 +78,6 @@ final class RoutingRules extends BaseResource
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/`
      *
-     * @param string $recordUuid
      * @param CaseRoutingRuleUpdate $params
      *
      * @throws DiditException
@@ -154,7 +150,6 @@ final class RoutingRules extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/publish/`
      *
-     * @param string $recordUuid
      * @param RoutingPublicationPolicyDraftPreconditionRequest $params
      *
      * @throws DiditException
@@ -180,8 +175,6 @@ final class RoutingRules extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/draft/`
      *
-     * @param string $recordUuid
-     *
      * @throws DiditException
      */
     public function retrieveDraft(
@@ -203,7 +196,6 @@ final class RoutingRules extends BaseResource
      *
      * `PUT /v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/draft/`
      *
-     * @param string $recordUuid
      * @param RoutingPublicationPolicyDraftWriteRequest $params
      *
      * @throws DiditException
@@ -229,7 +221,6 @@ final class RoutingRules extends BaseResource
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/draft/`
      *
-     * @param string $recordUuid
      * @param RoutingPublicationPolicyDraftPreconditionRequest $params
      *
      * @throws DiditException

@@ -17,7 +17,7 @@ final class SessionsRetrieveDecisionResponseReviews extends BaseModel
     /**
      * Who performed the review. Usually the console reviewer's identifier (their email), but the value is
      * `"API Client"` for status updates made with an API key and `"Unknown"` when no actor could be
-     * resolved ,  so do not parse this field as an email address.
+     * resolved, so do not parse this field as an email address.
      */
     public readonly ?string $user;
 

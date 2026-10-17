@@ -23,8 +23,8 @@ final class ProofOfAddress extends BaseResource
     /**
      * Proof of Address (document OCR + address checks).
      *
-     * Extract and validate a Proof of Address document ,  utility bills, bank statements, and
-     * government-issued documents ,  in one call. Returns the issuer, issue/expiry dates, the holder name,
+     * Extract and validate a Proof of Address document, utility bills, bank statements, and
+     * government-issued documents, in one call. Returns the issuer, issue/expiry dates, the holder name,
      * the raw and parsed/geocoded address, an `Approved`/`Declined` `status`, and a `warnings` list
      * explaining every issue found.
      *

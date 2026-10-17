@@ -73,7 +73,7 @@ final class ReviewItem extends BaseModel
     public readonly ?string $comment;
 
     /**
-     * Console users `@email`-mentioned in the comment. Always empty for entries created via this API , 
+     * Console users `@email`-mentioned in the comment. Always empty for entries created via this API,
      * mention processing is a Console-only feature.
      *
      * @var list<string>|null

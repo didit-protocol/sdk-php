@@ -27,7 +27,6 @@ final class Organizations extends BaseResource
      *
      * `GET /organizations/me/`
      *
-     *
      * @return ListResponse<Types\Organization>
      *
      * @throws DiditException

@@ -40,7 +40,7 @@ final class IdVerificationVerifyResponseIdVerificationWarnings extends BaseModel
 
     /**
      * Severity. `error` warnings drive `status` to `Declined`; `information` entries are advisory and
-     * never decline on their own. (`warning` is not produced by this endpoint ,  its options only accept
+     * never decline on their own. (`warning` is not produced by this endpoint, its options only accept
      * `DECLINE` or `NO_ACTION`.).
      *
      * Known values: {@see IdVerificationVerifyResponseIdVerificationWarningsLogType}.

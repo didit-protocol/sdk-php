@@ -32,7 +32,7 @@ final class TravelRule extends BaseResource
      *
      * `PATCH /v3/transactions/{transaction_id}/travel-rule/`
      *
-     * @param string $transactionId Didit-stable transaction UUID that owns the transfer.
+     * @param string $transactionId didit-stable transaction UUID that owns the transfer
      * @param TravelRuleTransferPatchRequest $params
      *
      * @throws DiditException
@@ -60,7 +60,7 @@ final class TravelRule extends BaseResource
      *
      * `POST /v3/transactions/{transaction_id}/travel-rule/ownership/`
      *
-     * @param string $transactionId Didit-stable transaction UUID that owns the transfer (the beneficiary side's transaction).
+     * @param string $transactionId didit-stable transaction UUID that owns the transfer (the beneficiary side's transaction)
      * @param TravelRuleOwnershipConfirmRequest $params
      *
      * @throws DiditException

@@ -94,7 +94,7 @@ final class Transactions extends BaseResource
      *
      * `GET /v3/transactions/{transaction_id}/`
      *
-     * @param string $transactionId Didit-stable transaction UUID (the `uuid` returned from create / list, **not** your `txn_id`).
+     * @param string $transactionId didit-stable transaction UUID (the `uuid` returned from create / list, **not** your `txn_id`)
      *
      * @throws DiditException
      */
@@ -145,7 +145,7 @@ final class Transactions extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/transactions/{transaction_uuid}/networks/`
      *
-     * @param string $transactionUuid Transaction UUID.
+     * @param string $transactionUuid transaction UUID
      *
      * @throws DiditException
      */
@@ -170,8 +170,8 @@ final class Transactions extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/transactions/{transaction_uuid}/parties/{transaction_party_uuid}/networks/`
      *
-     * @param string $transactionUuid Transaction UUID.
-     * @param string $transactionPartyUuid Transaction party UUID.
+     * @param string $transactionUuid transaction UUID
+     * @param string $transactionPartyUuid transaction party UUID
      *
      * @throws DiditException
      */

@@ -75,8 +75,8 @@ final class EmailVerificationCheckResponseEmail extends BaseModel
     /**
      * Other sessions of your application (KYC, KYB, or API) where the same email address was used by a
      * different user (different `vendor_data`). Up to 5 entries; a synthetic list-entry blocklist match is
-     * prepended when present (and only when no session-derived blocklisted email exists) , 
-     * session-derived matches keep created_at order. Empty array when there are no matches.
+     * prepended when present (and only when no session-derived blocklisted email exists), session-derived
+     * matches keep created_at order. Empty array when there are no matches.
      *
      * @var list<EmailVerificationCheckResponseEmailMatches>|null
      */

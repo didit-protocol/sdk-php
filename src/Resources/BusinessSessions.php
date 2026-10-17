@@ -24,7 +24,7 @@ final class BusinessSessions extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/business-sessions/{business_session_id}/networks/`
      *
-     * @param string $businessSessionId Business session UUID.
+     * @param string $businessSessionId business session UUID
      *
      * @throws DiditException
      */

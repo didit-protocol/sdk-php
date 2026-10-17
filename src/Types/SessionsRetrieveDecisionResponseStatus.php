@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Overall lifecycle status of the session ,  the rolled-up workflow result. Terminal values are
+ * Overall lifecycle status of the session, the rolled-up workflow result. Terminal values are
  * `Approved`, `Declined`, `In Review`, `Expired`, `Kyc Expired`, and `Abandoned`; `Not Started`, `In
  * Progress`, `Awaiting User`, and `Resubmitted` indicate the session is still moving through the
  * workflow.

@@ -37,7 +37,7 @@ final class KybListShareholdersResponse202KybRegistry extends BaseModel
 
     /**
      * `true` once the registry returned the full profile. `false` when the registry was still processing
-     * after polling ,  the stored record completes automatically once the registry resolves.
+     * after polling, the stored record completes automatically once the registry resolves.
      */
     public readonly ?bool $dataResolved;
 
@@ -71,7 +71,7 @@ final class KybListShareholdersResponse202KybRegistry extends BaseModel
     /** Registry verification status, when available. */
     public readonly ?string $verificationStatus;
 
-    /** Always `true` for this endpoint ,  the profile was retrieved from an official registry. */
+    /** Always `true` for this endpoint, the profile was retrieved from an official registry. */
     public readonly ?bool $isFromRegistry;
 
     /**
@@ -113,8 +113,8 @@ final class KybListShareholdersResponse202KybRegistry extends BaseModel
 
     /**
      * EU VAT number, when collected during the hosted registry step or edited afterwards. At select time
-     * this is typically not yet set ,  VAT and tax ID validation runs when the end user submits the
-     * registry step in the hosted flow.
+     * this is typically not yet set, VAT and tax ID validation runs when the end user submits the registry
+     * step in the hosted flow.
      */
     public readonly ?string $vatNumber;
 

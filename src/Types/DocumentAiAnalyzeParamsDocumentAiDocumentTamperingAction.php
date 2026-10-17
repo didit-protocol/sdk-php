@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * What to do when PDF/EXIF forensics suspect manipulation ,  modified after digital signing, known PDF
+ * What to do when PDF/EXIF forensics suspect manipulation, modified after digital signing, known PDF
  * editor, overlay-text manipulation, suspicious re-export, image anomalies
  * (`DOCUMENT_AI_SUSPECTED_MANIPULATION`).
  *

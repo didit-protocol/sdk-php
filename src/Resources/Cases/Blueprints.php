@@ -86,7 +86,7 @@ final class Blueprints extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/`
      *
-     * @param string $blueprintUuid Blueprint UUID.
+     * @param string $blueprintUuid blueprint UUID
      *
      * @throws DiditException
      */
@@ -108,7 +108,7 @@ final class Blueprints extends BaseResource
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/`
      *
-     * @param string $blueprintUuid Blueprint UUID.
+     * @param string $blueprintUuid blueprint UUID
      * @param CasesBlueprintsUpdateParams $params
      *
      * @throws DiditException
@@ -139,7 +139,7 @@ final class Blueprints extends BaseResource
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/`
      *
-     * @param string $blueprintUuid Blueprint UUID.
+     * @param string $blueprintUuid blueprint UUID
      *
      * @throws DiditException
      */
@@ -161,7 +161,6 @@ final class Blueprints extends BaseResource
      * with their content_config and whether each is already installed on this application.
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/presets/`
-     *
      *
      * @throws DiditException
      */
@@ -208,7 +207,6 @@ final class Blueprints extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/publish/`
      *
-     * @param string $blueprintUuid
      * @param CasePublicationPolicyDraftPreconditionRequest $params
      *
      * @throws DiditException
@@ -234,8 +232,6 @@ final class Blueprints extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/draft/`
      *
-     * @param string $blueprintUuid
-     *
      * @throws DiditException
      */
     public function retrieveDraft(
@@ -257,7 +253,6 @@ final class Blueprints extends BaseResource
      *
      * `PUT /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/draft/`
      *
-     * @param string $blueprintUuid
      * @param CasePublicationPolicyDraftWriteRequest $params
      *
      * @throws DiditException
@@ -283,7 +278,6 @@ final class Blueprints extends BaseResource
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/draft/`
      *
-     * @param string $blueprintUuid
      * @param CasePublicationPolicyDraftPreconditionRequest $params
      *
      * @throws DiditException
@@ -306,7 +300,6 @@ final class Blueprints extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/history/`
      *
-     * @param string $blueprintUuid
      * @param CasesBlueprintsListHistoryParams $params
      *
      * @return Page<Types\CasePublicationPolicyRevision>

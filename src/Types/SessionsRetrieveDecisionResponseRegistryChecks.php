@@ -10,8 +10,8 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * One company registry check ,  the full company-registry payload enriched with ownership structure
- * and warnings. Present only when `session_kind = business`.
+ * One company registry check, the full company-registry payload enriched with ownership structure and
+ * warnings. Present only when `session_kind = business`.
  */
 final class SessionsRetrieveDecisionResponseRegistryChecks extends BaseModel
 {

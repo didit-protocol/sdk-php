@@ -23,7 +23,7 @@ final class DatabaseValidation extends BaseResource
     /**
      * Database Validation (standalone).
      *
-     * Validate a person's identity data against official government and registry sources ,  CPF in Brazil,
+     * Validate a person's identity data against official government and registry sources, CPF in Brazil,
      * RENAPER in Argentina, DNI registries in Spain and Peru, INE in Mexico, and 100+ more services across
      * 60+ countries.
      *

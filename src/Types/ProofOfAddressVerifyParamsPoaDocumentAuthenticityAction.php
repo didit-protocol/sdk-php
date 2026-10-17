@@ -7,8 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * What to do when document manipulation is suspected (`SUSPECTED_DOCUMENT_MANIPULATION`) ,  e.g. the
- * PDF was modified after digital signing, processed by a known PDF editor, shows overlay-text
+ * What to do when document manipulation is suspected (`SUSPECTED_DOCUMENT_MANIPULATION`), e.g. the PDF
+ * was modified after digital signing, processed by a known PDF editor, shows overlay-text
  * manipulation, or has inconsistent EXIF dates.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.

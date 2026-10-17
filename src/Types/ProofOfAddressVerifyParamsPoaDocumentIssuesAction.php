@@ -7,8 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * What to do on file-integrity problems ,  in practice only `DOCUMENT_METADATA_MISMATCH` is produced
- * by this endpoint.
+ * What to do on file-integrity problems, in practice only `DOCUMENT_METADATA_MISMATCH` is produced by
+ * this endpoint.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

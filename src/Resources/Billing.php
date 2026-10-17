@@ -24,10 +24,9 @@ final class Billing extends BaseResource
      * Get credit balance.
      *
      * Get current pre-paid credit balance in USD (organization-wide) plus auto-refill config. Amounts are
-     * decimal strings ,  parse with a decimal library.
+     * decimal strings, parse with a decimal library.
      *
      * `GET /v3/billing/balance/`
-     *
      *
      * @throws DiditException
      */

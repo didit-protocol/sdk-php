@@ -122,7 +122,7 @@ final class Cases extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      *
      * @throws DiditException
      */
@@ -145,7 +145,7 @@ final class Cases extends BaseResource
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesUpdateParams $params
      *
      * @throws DiditException
@@ -169,7 +169,7 @@ final class Cases extends BaseResource
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      *
      * @throws DiditException
      */
@@ -192,7 +192,7 @@ final class Cases extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/assign/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesAssignParams $params
      *
      * @throws DiditException
@@ -220,7 +220,7 @@ final class Cases extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/resolve/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesResolveParams $params
      *
      * @throws DiditException
@@ -245,7 +245,7 @@ final class Cases extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/reopen/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      *
      * @throws DiditException
      */
@@ -268,7 +268,7 @@ final class Cases extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/request-info/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      *
      * @throws DiditException
      */
@@ -291,7 +291,7 @@ final class Cases extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/escalate/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      *
      * @throws DiditException
      */
@@ -314,7 +314,7 @@ final class Cases extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/transfer/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesTransferParams $params
      *
      * @throws DiditException
@@ -339,7 +339,7 @@ final class Cases extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/approve/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      *
      * @throws DiditException
      */
@@ -362,7 +362,7 @@ final class Cases extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/reject-approval/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesRejectResolutionParams $params
      *
      * @throws DiditException
@@ -394,7 +394,6 @@ final class Cases extends BaseResource
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/entity-actions/`
      *
-     * @param string $caseUuid
      * @param CaseActionCaseEntityActionRequest $params
      *
      * @throws DiditException
@@ -422,7 +421,7 @@ final class Cases extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/print/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      *
      * @throws DiditException
      */
@@ -445,7 +444,7 @@ final class Cases extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/events/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      * @param CasesListEventsParams $params
      *
      * @return Page<Types\CaseEvent>
@@ -469,7 +468,7 @@ final class Cases extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/aml/`
      *
-     * @param string $caseUuid Case UUID.
+     * @param string $caseUuid case UUID
      *
      * @return ListResponse<array<string, mixed>>
      *
@@ -575,7 +574,6 @@ final class Cases extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/action-receipts/`
      *
-     * @param string $caseUuid
      * @param CasesListActionReceiptsParams $params
      *
      * @throws DiditException
@@ -603,9 +601,6 @@ final class Cases extends BaseResource
      * Applied actions return their receipt without executing again. Case closure is independent.
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/action-receipts/{receipt_uuid}/retry/`
-     *
-     * @param string $caseUuid
-     * @param string $receiptUuid
      *
      * @throws DiditException
      */
@@ -656,7 +651,6 @@ final class Cases extends BaseResource
      * Requires `list:cases` for the requested application.
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/cases/reviewers/`
-     *
      *
      * @throws DiditException
      */

@@ -82,7 +82,7 @@ final class ReportTemplates extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/report-templates/{template_uuid}/`
      *
-     * @param string $templateUuid Report template UUID.
+     * @param string $templateUuid report template UUID
      *
      * @throws DiditException
      */
@@ -104,7 +104,7 @@ final class ReportTemplates extends BaseResource
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/report-templates/{template_uuid}/`
      *
-     * @param string $templateUuid Report template UUID.
+     * @param string $templateUuid report template UUID
      * @param ReportTemplatesUpdateParams $params
      *
      * @throws DiditException
@@ -131,7 +131,7 @@ final class ReportTemplates extends BaseResource
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/report-templates/{template_uuid}/`
      *
-     * @param string $templateUuid Report template UUID.
+     * @param string $templateUuid report template UUID
      *
      * @throws DiditException
      */

@@ -10,7 +10,7 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Full KYB company record ,  the same shape as the `company` object inside `registry_checks[]` on the
+ * Full KYB company record, the same shape as the `company` object inside `registry_checks[]` on the
  * business session decision.
  */
 final class SessionsUpdateKybCompanyDataResponse extends BaseModel
@@ -31,7 +31,7 @@ final class SessionsUpdateKybCompanyDataResponse extends BaseModel
     public readonly ?string $registryStatus;
 
     /**
-     * `true` when the company data is complete ,  always `true` for manual-entry companies; for
+     * `true` when the company data is complete, always `true` for manual-entry companies; for
      * registry-sourced companies, `true` once the registry fetch resolved.
      */
     public readonly ?bool $dataResolved;
@@ -54,7 +54,7 @@ final class SessionsUpdateKybCompanyDataResponse extends BaseModel
     /** The `incorporation_date` field. */
     public readonly ?string $incorporationDate;
 
-    /** Canonical registered address ,  updated when you send `legal_address`. */
+    /** Canonical registered address, updated when you send `legal_address`. */
     public readonly ?string $registeredAddress;
 
     /** The `tax_number` field. */

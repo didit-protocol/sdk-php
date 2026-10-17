@@ -10,7 +10,7 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * One face-match report ,  the full report.
+ * One face-match report, the full report.
  */
 final class SessionsRetrieveDecisionResponseFaceMatches extends BaseModel
 {
@@ -18,7 +18,7 @@ final class SessionsRetrieveDecisionResponseFaceMatches extends BaseModel
     public readonly ?string $nodeId;
 
     /**
-     * Feature-level status of this face-match step. Independent of the top-level session `status` ,  a
+     * Feature-level status of this face-match step. Independent of the top-level session `status`, a
      * session can reach its overall decision while an individual feature stays `In Review`.
      *
      * Known values: {@see SessionsRetrieveDecisionResponseFaceMatchesStatus}.

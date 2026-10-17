@@ -15,8 +15,8 @@ use Didit\Core\Hydrate;
 final class KybSearchResponseKybRegistryCompanies extends BaseModel
 {
     /**
-     * Handle for this candidate ,  pass it to `POST /v3/kyb/select/` to retrieve the full profile.
-     * Ephemeral and scoped to this search: do not store it long-term; re-search to get a fresh one.
+     * Handle for this candidate, pass it to `POST /v3/kyb/select/` to retrieve the full profile. Ephemeral
+     * and scoped to this search: do not store it long-term; re-search to get a fresh one.
      */
     public readonly ?string $kybResponseId;
 
@@ -36,7 +36,7 @@ final class KybSearchResponseKybRegistryCompanies extends BaseModel
     public readonly ?string $riskLevel;
 
     /**
-     * Always `pending` for search candidates ,  the full company profile is only fetched (and billed) when
+     * Always `pending` for search candidates, the full company profile is only fetched (and billed) when
      * you select the candidate.
      */
     public readonly ?string $fetchStatus;

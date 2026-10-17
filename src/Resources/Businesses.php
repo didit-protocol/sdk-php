@@ -34,7 +34,7 @@ final class Businesses extends BaseResource
      *
      * List [businesses](/entities/businesses) Didit assembles from KYB sessions sharing the same
      * `vendor_data` (free-form string, NOT a UUID), plus businesses created via the API. Paginated,
-     * ordered by `last_session_at` desc. This endpoint does not support filtering or search parameters , 
+     * ordered by `last_session_at` desc. This endpoint does not support filtering or search parameters,
      * fetch pages and filter client-side.
      *
      * `GET /v3/businesses/`
@@ -62,7 +62,7 @@ final class Businesses extends BaseResource
      *
      * `GET /v3/businesses/{vendor_data}/`
      *
-     * @param string $vendorData Your unique identifier for the business ,  a free-form string (NOT a UUID), matched exactly as sent.
+     * @param string $vendorData your unique identifier for the business, a free-form string (NOT a UUID), matched exactly as sent
      *
      * @throws DiditException
      */
@@ -85,7 +85,7 @@ final class Businesses extends BaseResource
      *
      * `PATCH /v3/businesses/{vendor_data}/`
      *
-     * @param string $vendorData Your unique identifier for the business (free-form string, NOT a UUID).
+     * @param string $vendorData your unique identifier for the business (free-form string, NOT a UUID)
      * @param BusinessesUpdateParams $params
      *
      * @throws DiditException
@@ -107,13 +107,13 @@ final class Businesses extends BaseResource
     /**
      * Update business status.
      *
-     * Flip only the lifecycle `status` of a business ,  VendorBusinessStatusChoices
+     * Flip only the lifecycle `status` of a business, VendorBusinessStatusChoices
      * (`ACTIVE`/`FLAGGED`/`BLOCKED`, NOT session statuses). `BLOCKED` adds `vendor_data` to the system
      * blocklist.
      *
      * `PATCH /v3/businesses/{vendor_data}/update-status/`
      *
-     * @param string $vendorData Your unique identifier for the business (free-form string, NOT a UUID).
+     * @param string $vendorData your unique identifier for the business (free-form string, NOT a UUID)
      * @param BusinessesUpdateStatusParams $params
      *
      * @throws DiditException
@@ -135,7 +135,7 @@ final class Businesses extends BaseResource
     /**
      * Batch delete businesses.
      *
-     * **Permanently delete** businesses ,  this cannot be undone. For blocking prefer [Update Business
+     * **Permanently delete** businesses, this cannot be undone. For blocking prefer [Update Business
      * Status](#patch-/v3/businesses/-vendor_data-/update-status/) with `BLOCKED`.
      *
      * `POST /v3/businesses/delete/`
@@ -193,7 +193,7 @@ final class Businesses extends BaseResource
      * Create business.
      *
      * Pre-create a [business](/entities/businesses) *without* a KYB session. All fields are optional, but
-     * you should always send `vendor_data` ,  without it the record cannot be linked to sessions or
+     * you should always send `vendor_data`, without it the record cannot be linked to sessions or
      * transactions. When provided, `vendor_data` must be unique among non-deleted businesses (exact match;
      * conflicts return 400). Not idempotent.
      *
@@ -252,7 +252,7 @@ final class Businesses extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/vendor-businesses/toggle-ongoing-monitoring/{job_id}/`
      *
-     * @param string $jobId Monitoring job UUID returned by the toggle endpoint.
+     * @param string $jobId monitoring job UUID returned by the toggle endpoint
      *
      * @throws DiditException
      */
@@ -308,7 +308,7 @@ final class Businesses extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/businesses/toggle-ongoing-monitoring/{job_id}/`
      *
-     * @param string $jobId Monitoring job UUID returned by the toggle endpoint.
+     * @param string $jobId monitoring job UUID returned by the toggle endpoint
      *
      * @throws DiditException
      */
@@ -332,7 +332,7 @@ final class Businesses extends BaseResource
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/businesses/{vendor_business_uuid}/networks/`
      *
-     * @param string $vendorBusinessUuid Vendor business UUID.
+     * @param string $vendorBusinessUuid vendor business UUID
      *
      * @throws DiditException
      */

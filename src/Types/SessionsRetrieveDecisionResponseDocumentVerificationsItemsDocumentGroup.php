@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Alias of `document_type` ,  the group name used by `groups` and `required_groups`.
+ * Alias of `document_type`, the group name used by `groups` and `required_groups`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

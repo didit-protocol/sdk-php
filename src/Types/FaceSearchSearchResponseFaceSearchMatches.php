@@ -27,10 +27,10 @@ final class FaceSearchSearchResponseFaceSearchMatches extends BaseModel
     public readonly ?float $similarityPercentage;
 
     /**
-     * Where the matched face was enrolled from: `session` ,  a verification session or a saved standalone
-     * API call; `imported` ,  a face uploaded directly to a User profile; `list_entry` ,  a face attached
-     * to one of your lists; `retained_template` ,  an image-free biometric template stored on a User,
-     * listed under `/v3/biometric-templates/`.
+     * Where the matched face was enrolled from: `session`, a verification session or a saved standalone
+     * API call; `imported`, a face uploaded directly to a User profile; `list_entry`, a face attached to
+     * one of your lists; `retained_template`, an image-free biometric template stored on a User, listed
+     * under `/v3/biometric-templates/`.
      *
      * Known values: {@see FaceSearchSearchResponseFaceSearchMatchesSource}.
      */

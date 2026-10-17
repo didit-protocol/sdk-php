@@ -27,7 +27,7 @@ final class DatabaseValidationValidateResponseDatabaseValidationWarnings extends
      */
     public readonly ?array $additionalData;
 
-    /** `warning`, `information`, or `error` ,  how the risk affected the outcome. */
+    /** `warning`, `information`, or `error`, how the risk affected the outcome. */
     public readonly ?string $logType;
 
     /** One-line human-readable summary. */

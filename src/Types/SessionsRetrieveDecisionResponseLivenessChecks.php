@@ -10,7 +10,7 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * One liveness report ,  the full report for a single liveness pass.
+ * One liveness report, the full report for a single liveness pass.
  */
 final class SessionsRetrieveDecisionResponseLivenessChecks extends BaseModel
 {
@@ -18,8 +18,8 @@ final class SessionsRetrieveDecisionResponseLivenessChecks extends BaseModel
     public readonly ?string $nodeId;
 
     /**
-     * Feature-level status of this liveness step. Independent of the top-level session `status` ,  a
-     * session can reach its overall decision while an individual feature stays `In Review`.
+     * Feature-level status of this liveness step. Independent of the top-level session `status`, a session
+     * can reach its overall decision while an individual feature stays `In Review`.
      *
      * Known values: {@see SessionsRetrieveDecisionResponseLivenessChecksStatus}.
      */

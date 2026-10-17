@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Feature-level status of this database validation. Independent of the top-level session `status` ,  a
+ * Feature-level status of this database validation. Independent of the top-level session `status`, a
  * session can reach its overall decision while an individual feature stays `In Review`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
