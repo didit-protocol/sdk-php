@@ -66,6 +66,7 @@ class Operation:
     deprecated: bool = False
     removed_note: str | None = None
     renamed_to: Naming | None = None  # set on the deprecated alias of a renamed operation
+    not_server: bool = False  # set on a deprecated method whose operation is upstream but no longer a server operation
     parameters: list[dict[str, Any]] = field(default_factory=list)
 
     @property
@@ -148,7 +149,8 @@ def load(root: Path) -> Spec:
             if alias is not None:
                 operations.append(alias)
             continue
-        if key in present:
+        current = present.get(key)
+        if current is not None and current.naming.server:
             continue  # the operation came back upstream
         base = account if key.startswith("account ") else verification
         # The entry carries the component schemas its operation used, so it
@@ -160,7 +162,7 @@ def load(root: Path) -> Spec:
         operations.append(
             Operation(
                 key, doc, method, path, op, {"parameters": []}, _naming_from(entry["x-didit-sdk"], key),
-                deprecated=True, removed_note=entry.get("removed_on"),
+                deprecated=True, removed_note=entry.get("removed_on"), not_server=current is not None,
             )
         )
 
