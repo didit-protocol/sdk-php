@@ -14,6 +14,7 @@ use Didit\Tests\Support\MockHttpClient;
 use Didit\Tests\Support\TestClient;
 use Didit\Version;
 use GuzzleHttp\Psr7\HttpFactory;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\RequestInterface;
 
@@ -169,10 +170,7 @@ final class HeadersAndConfigTest extends TestCase
         yield 'both ids' => [null, null];
     }
 
-    /**
-     * @dataProvider missingScopeIds
-     */
-    #[\PHPUnit\Framework\Attributes\DataProvider('missingScopeIds')]
+    #[DataProvider('missingScopeIds')]
     public function testApplicationScopedOperationWithoutIdsFailsBeforeSending(?string $organizationId, ?string $applicationId): void
     {
         $client = $this->support->client(TestClient::options(organizationId: $organizationId, applicationId: $applicationId));
