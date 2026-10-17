@@ -73,7 +73,7 @@ final class Rules extends BaseResource
             method: 'POST',
             path: '/v3/transactions/rules/',
             bodyTypes: ['json'],
-            jsonHints: ['scope' => ['o'], 'conditions' => ['l', ['o']], 'aggregation' => ['l', ['o', ['filters' => ['o']]]], 'actions' => ['l', ['o']], 'metadata' => ['o']],
+            jsonHints: ['scope' => ['o'], 'conditions' => ['l', ['o', ['value' => ['o']]]], 'aggregation' => ['l', ['o', ['filters' => ['o']]]], 'actions' => ['l', ['o']], 'metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\TransactionRuleDetail::fromResponse($response);
@@ -123,7 +123,7 @@ final class Rules extends BaseResource
             method: 'PATCH',
             path: '/v3/transactions/rules/{rule_uuid}/',
             bodyTypes: ['json'],
-            jsonHints: ['scope' => ['o'], 'conditions' => ['l', ['o']], 'aggregation' => ['l', ['o', ['filters' => ['o']]]], 'actions' => ['l', ['o']], 'metadata' => ['o']],
+            jsonHints: ['scope' => ['o'], 'conditions' => ['l', ['o', ['value' => ['o']]]], 'aggregation' => ['l', ['o', ['filters' => ['o']]]], 'actions' => ['l', ['o']], 'metadata' => ['o']],
         ), ['rule_uuid' => $ruleUuid], $params, $options);
 
         return Types\TransactionRuleDetail::fromResponse($response);
@@ -172,7 +172,7 @@ final class Rules extends BaseResource
             method: 'POST',
             path: '/v3/transactions/rules/backtest/',
             bodyTypes: ['json'],
-            jsonHints: ['conditions' => ['l', ['o']], 'aggregation' => ['l', ['o', ['filters' => ['o']]]], 'scope' => ['o']],
+            jsonHints: ['conditions' => ['l', ['o', ['value' => ['o']]]], 'aggregation' => ['l', ['o', ['filters' => ['o']]]], 'scope' => ['o']],
         ), [], $params, $options);
 
         return Types\TransactionRuleBacktestResult::fromResponse($response);

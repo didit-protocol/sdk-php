@@ -70,7 +70,7 @@ final class Sessions extends BaseResource
             method: 'POST',
             path: '/v3/session/',
             bodyTypes: ['json'],
-            jsonHints: ['contact_details' => ['o'], 'expected_details' => ['o']],
+            jsonHints: ['metadata' => ['o'], 'contact_details' => ['o'], 'expected_details' => ['o']],
         ), [], $params, $options);
 
         return Types\SessionsCreateResponse::fromResponse($response);
