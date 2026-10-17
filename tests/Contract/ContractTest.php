@@ -69,7 +69,9 @@ final class ContractTest extends TestCase
             str_starts_with($operation['key'], 'account ') ? ++$account : ++$verification;
         }
         $accountOperations = 0;
-        foreach (self::json('account.json')['paths'] ?? [] as $item) {
+        $paths = self::json('account.json')['paths'] ?? [];
+        self::assertIsArray($paths);
+        foreach ($paths as $item) {
             self::assertIsArray($item);
             $accountOperations += \count(array_intersect(array_keys($item), self::HTTP_METHODS));
         }
@@ -191,7 +193,7 @@ final class ContractTest extends TestCase
             if (true === ($deprecated['alias'] ?? false)) {
                 // The previous name of a renamed operation, while the operation still exists under its new name.
                 $current = $present[$key] ?? null;
-                if (\is_string($current) && $current !== $entry['resource'] . '.' . $entry['method']) {
+                if (\is_string($current) && $entry['resource'] . '.' . $entry['method'] !== $current) {
                     $operations[] = $entry;
                 }
                 continue;
