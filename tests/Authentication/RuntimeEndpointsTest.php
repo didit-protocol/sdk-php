@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Authentication;
 
-use Didit\Authentication\SessionOrganization;
 use Didit\Authentication\StepUp;
-use Didit\Authentication\TokenSet;
 use Didit\Authentication\VerifiedClaims;
 use Didit\Authentication\WalletVerification;
 use Didit\Exception\ApiStatusException;
@@ -56,7 +54,6 @@ final class RuntimeEndpointsTest extends TestCase
             'redirect_uri' => 'https://app.example.com/auth/callback?x=1&y=2',
         ], self::form($request));
 
-        self::assertInstanceOf(TokenSet::class, $tokens);
         self::assertSame('access.jwt', $tokens->accessToken);
         self::assertSame('id.jwt', $tokens->idToken);
         self::assertSame('N4yZTl6y24YKYq77X_SOrBn1q2Lit81WBQMOay7dq_IVfTnxyY8ZGcJk-6-fcmWW', $tokens->refreshToken);
@@ -167,7 +164,6 @@ final class RuntimeEndpointsTest extends TestCase
         self::assertSame('2026-11-16T10:41:14+00:00', $session->expiresAt->format(\DATE_ATOM));
         self::assertSame('https://app.example.com/', $session->postLogoutRedirectUri);
         self::assertIsArray($session->organizations);
-        self::assertInstanceOf(SessionOrganization::class, $session->organizations[0]);
         self::assertSame('Northwind', $session->organizations[0]->organizationName);
         self::assertSame('admin', $session->organizations[0]->role);
         self::assertNotNull($session->organizations[0]->customRole);

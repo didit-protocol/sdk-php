@@ -70,33 +70,20 @@ final class ArrayCache implements CacheInterface
 
     public function getMultiple(iterable $keys, mixed $default = null): iterable
     {
-        $out = [];
-        foreach ($keys as $key) {
-            $out[$key] = $this->get($key, $default);
-        }
-
-        return $out;
+        throw new \LogicException('Not used by the SDK.');
     }
 
     /**
-     * @param iterable<string, mixed> $values
+     * @param iterable<mixed, mixed> $values
      */
     public function setMultiple(iterable $values, null|int|\DateInterval $ttl = null): bool
     {
-        foreach ($values as $key => $value) {
-            $this->set($key, $value, $ttl);
-        }
-
-        return true;
+        throw new \LogicException('Not used by the SDK.');
     }
 
     public function deleteMultiple(iterable $keys): bool
     {
-        foreach ($keys as $key) {
-            $this->delete($key);
-        }
-
-        return true;
+        throw new \LogicException('Not used by the SDK.');
     }
 
     public function has(string $key): bool

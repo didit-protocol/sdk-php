@@ -56,6 +56,11 @@ final class FakeHttpClient implements ClientInterface
         return $answer instanceof \Closure ? $answer($request) : $answer;
     }
 
+    public function total(): int
+    {
+        return \count($this->requests);
+    }
+
     public function count(string $method, string $url): int
     {
         $count = 0;

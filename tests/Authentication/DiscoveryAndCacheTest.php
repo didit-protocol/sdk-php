@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Authentication;
 
-use Didit\Authentication\JsonWebKey;
 use Didit\Authentication\TokenVerificationException;
 use Didit\Exception\ApiConnectionException;
 use Didit\Exception\ConfigurationException;
@@ -45,7 +44,6 @@ final class DiscoveryAndCacheTest extends TestCase
         $jwks = $auth->jwks();
         self::assertIsArray($jwks->keys);
         self::assertCount(1, $jwks->keys);
-        self::assertInstanceOf(JsonWebKey::class, $jwks->keys[0]);
         self::assertSame(TestIssuer::KID, $jwks->keys[0]->kid);
         self::assertSame('EC', $jwks->keys[0]->kty);
         self::assertSame('P-256', $jwks->keys[0]->crv);
@@ -211,18 +209,18 @@ final class DiscoveryAndCacheTest extends TestCase
         $token = $this->issuer->sign($this->issuer->accessClaims());
 
         $this->issuer->auth($cache)->verifyAccessToken($token);
-        self::assertCount(2, $this->issuer->http->requests);
+        self::assertSame(2, $this->issuer->http->total());
 
         // A new instance, as in the next PHP-FPM request: no requests at all.
         $this->issuer->now += 200;
         self::assertSame('user-42', $this->issuer->auth($cache)->verifyAccessToken($token)->vendorData);
         self::assertSame(TestIssuer::ISSUER, $this->issuer->auth($cache)->discovery()->issuer);
-        self::assertCount(2, $this->issuer->http->requests);
+        self::assertSame(2, $this->issuer->http->total());
 
         // The entries expire with the response's max-age.
         $this->issuer->now += 100;
         $this->issuer->auth($cache)->verifyAccessToken($this->issuer->sign($this->issuer->accessClaims()));
-        self::assertCount(4, $this->issuer->http->requests);
+        self::assertSame(4, $this->issuer->http->total());
     }
 
     public function testCacheKeysAreSafeForEveryPsr16Implementation(): void
@@ -344,7 +342,7 @@ final class DiscoveryAndCacheTest extends TestCase
         } catch (\Didit\Exception\ApiStatusException $e) {
             self::assertSame(302, $e->status);
         }
-        self::assertCount(2, $this->issuer->http->requests);
+        self::assertSame(2, $this->issuer->http->total());
     }
 
     public function testNonJsonSuccessIsAnError(): void

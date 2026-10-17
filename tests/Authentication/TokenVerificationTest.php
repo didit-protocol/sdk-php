@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Authentication;
 
-use Didit\Authentication\AccessTokenClaims;
 use Didit\Authentication\ActorClaim;
 use Didit\Authentication\OrganizationClaim;
 use Didit\Authentication\TokenVerificationException;
@@ -28,7 +27,6 @@ final class TokenVerificationTest extends TestCase
 
         $claims = $this->issuer->auth()->verifyAccessToken($token, TestIssuer::AUDIENCE);
 
-        self::assertInstanceOf(AccessTokenClaims::class, $claims);
         self::assertSame(TestIssuer::ISSUER, $claims->iss);
         self::assertSame(TestIssuer::AUDIENCE, $claims->aud);
         self::assertSame(TestIssuer::AUDIENCE, $claims->clientId);
