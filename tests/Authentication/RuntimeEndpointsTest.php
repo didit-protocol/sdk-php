@@ -292,6 +292,19 @@ final class RuntimeEndpointsTest extends TestCase
         self::assertSame('{"action":"contact"}', (string) $this->issuer->http->last()->getBody());
     }
 
+    public function testTokensEchoedInAnErrorAreRedactedFromTheMessage(): void
+    {
+        $this->issuer->http->on('POST', TestIssuer::TOKEN_URL, TestIssuer::json(400, ['error' => 'invalid_grant: test-refresh-token-1 was already used']));
+
+        try {
+            $this->issuer->auth()->refresh('test-refresh-token-1');
+            self::fail('Expected a BadRequestException.');
+        } catch (BadRequestException $e) {
+            self::assertSame('HTTP 400 Bad Request: invalid_grant: [redacted] was already used', $e->getMessage());
+            self::assertSame(['error' => 'invalid_grant: test-refresh-token-1 was already used'], $e->body, 'the body stays as the server sent it');
+        }
+    }
+
     public function testCreateStepUpValidationError(): void
     {
         $this->issuer->http->on('POST', self::STEP_UP_URL, TestIssuer::json(400, ['return_to' => 'invalid_redirect_uri']));

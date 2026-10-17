@@ -315,6 +315,26 @@ final class ErrorsTest extends TestCase
         }
     }
 
+    public function testUrlSanitisingKeepsTheSurroundingText(): void
+    {
+        $this->support->http->queueException(self::networkError('TLS failure (see https://curl.se/libcurl/c/libcurl-errors.html) for <https://verification.didit.me/v3/x/>'));
+
+        try {
+            $this->client()->sessions->retrieveDecision('abc');
+            self::fail('no exception');
+        } catch (ApiConnectionException $e) {
+            self::assertSame('Connection error: TLS failure (see <url>) for <<url>>', $e->getMessage());
+        }
+    }
+
+    public function testCredentialsCannotBeSerialized(): void
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Didit credentials cannot be serialized.');
+
+        serialize(TestClient::options());
+    }
+
     public function testLongTransportMessagesAreTruncated(): void
     {
         $this->support->http->queueException(self::networkError('Connection reset by peer ' . str_repeat('z', 400)));

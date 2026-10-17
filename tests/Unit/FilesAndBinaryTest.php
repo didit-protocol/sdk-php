@@ -253,6 +253,26 @@ final class FilesAndBinaryTest extends TestCase
         self::assertFalse(Multipart::containsFile(['metadata' => ['nested' => File::fromBytes('a')]]), 'only top-level files and lists of files');
     }
 
+    public function testEmptyObjectFieldIsSentAsAnEmptyJsonObject(): void
+    {
+        $this->support->http->queueJson(200, self::OK);
+
+        $this->support->client()->passiveLiveness->check([
+            'user_image' => File::fromBytes('u', 'u.png'),
+            'metadata' => [],
+        ]);
+
+        self::assertSame([
+            'user_image' => ['file:u.png:image/png:u'],
+            'metadata' => ['{}'],
+        ], Http::multipartFields($this->support->http->lastRequest()), 'the same input sends {} in a JSON body');
+        self::assertSame(
+            self::textPart('metadata', '{}') . "--B--\r\n",
+            Multipart::encode(['metadata' => [], 'labels' => []], 'B', ['metadata' => ['o']]),
+            'an empty list still has no multipart form',
+        );
+    }
+
     public function testJsonOrMultipartOperationStaysJsonWithoutFiles(): void
     {
         $this->support->http->queueJson(200, ['color_primary' => '#112233']);
