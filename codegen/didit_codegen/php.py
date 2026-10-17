@@ -10,6 +10,7 @@ from .model import (
     AnyT, ArrayT, DateTimeT, Enum, EnumT, FileT, FreeObjT, MapT, Model, ModelT, OpModel, Response, Scalar, Shape,
     ShapeT, T, UnionT,
 )
+from .spec import Operation
 from .text import annotation_text, docblock, first_paragraph, first_sentence, php_string, sentence, wrap
 
 TYPES_NS = "Types\\"
@@ -584,7 +585,7 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
     return lines, imports, om.body_alias
 
 
-def _deprecation(o) -> str:
+def _deprecation(o: Operation) -> str:
     if o.renamed_to is not None:
         n = o.renamed_to
         accessor = "->".join(naming.camel(seg) for seg in n.resource.split("."))
