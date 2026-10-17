@@ -85,7 +85,9 @@ abstract class BaseClient
 
     /**
      * A copy of this client with some options changed; null keeps the current
-     * value. The copy shares the HTTP client.
+     * value and an empty string removes it (so a call that needs it fails with
+     * a ConfigurationException instead of sending an empty credential). The
+     * copy shares the HTTP client.
      *
      * @param array<string, string>|null $defaultHeaders replaces the default headers
      */
@@ -104,12 +106,12 @@ abstract class BaseClient
     ): static {
         $current = $this->requester->options;
         $options = new ClientOptions(
-            apiKey: $apiKey ?? $current->apiKey,
+            apiKey: self::override($apiKey, $current->apiKey()),
             baseUrl: null === $baseUrl ? $current->baseUrl : ClientOptions::normalizeBaseUrl($baseUrl),
             accountBaseUrl: null === $accountBaseUrl ? $current->accountBaseUrl : ClientOptions::normalizeBaseUrl($accountBaseUrl),
-            organizationId: $organizationId ?? $current->organizationId,
-            applicationId: $applicationId ?? $current->applicationId,
-            accountToken: $accountToken ?? $current->accountToken,
+            organizationId: self::override($organizationId, $current->organizationId),
+            applicationId: self::override($applicationId, $current->applicationId),
+            accountToken: self::override($accountToken, $current->accountToken()),
             timeout: $timeout ?? $current->timeout,
             maxRetries: $maxRetries ?? $current->maxRetries,
             defaultHeaders: $defaultHeaders ?? $current->defaultHeaders,
@@ -127,6 +129,18 @@ abstract class BaseClient
     }
 
     abstract protected function initResources(): void;
+
+    /**
+     * null keeps the current value, an empty string removes it.
+     */
+    private static function override(#[\SensitiveParameter] ?string $value, #[\SensitiveParameter] ?string $current): ?string
+    {
+        return match ($value) {
+            null => $current,
+            '' => null,
+            default => $value,
+        };
+    }
 
     private static function loggerFromEnvironment(): ?LoggerInterface
     {

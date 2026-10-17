@@ -43,7 +43,7 @@ final class ClientOptionsTest extends TestCase
     {
         $options = ClientOptions::resolve();
 
-        self::assertNull($options->apiKey);
+        self::assertNull($options->apiKey());
         self::assertSame('https://verification.didit.me', $options->baseUrl);
         self::assertSame('https://apx.didit.me/auth/v2', $options->accountBaseUrl);
         self::assertSame(60.0, $options->timeout);
@@ -60,7 +60,7 @@ final class ClientOptionsTest extends TestCase
 
         $options = ClientOptions::resolve();
 
-        self::assertSame('env_key', $options->apiKey);
+        self::assertSame('env_key', $options->apiKey());
         self::assertSame('env_org', $options->organizationId);
         self::assertSame('env_app', $options->applicationId);
     }
@@ -69,8 +69,8 @@ final class ClientOptionsTest extends TestCase
     {
         putenv('DIDIT_API_KEY=env_key');
 
-        self::assertSame('explicit', ClientOptions::resolve(apiKey: 'explicit')->apiKey);
-        self::assertSame('env_key', ClientOptions::resolve(apiKey: '')->apiKey);
+        self::assertSame('explicit', ClientOptions::resolve(apiKey: 'explicit')->apiKey());
+        self::assertSame('env_key', ClientOptions::resolve(apiKey: '')->apiKey());
     }
 
     public function testBaseUrlTrailingSlashIsRemoved(): void
@@ -113,7 +113,7 @@ final class ClientOptionsTest extends TestCase
         $options = ClientOptions::resolve(apiKey: 'key', organizationId: 'org', defaultHeaders: ['X-A' => '1']);
         $merged = $options->merge(new RequestOptions(timeout: 5.0, headers: ['X-B' => '2'], applicationId: 'app'));
 
-        self::assertSame('key', $merged->apiKey);
+        self::assertSame('key', $merged->apiKey());
         self::assertSame('org', $merged->organizationId);
         self::assertSame('app', $merged->applicationId);
         self::assertSame(5.0, $merged->timeout);

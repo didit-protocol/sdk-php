@@ -740,7 +740,9 @@ final class Authentication
         $this->transport ??= new HttpTransport($this->httpClient);
         $response = new RawResponse($this->transport->send($request, $this->timeout), $method, (string) parse_url($url, \PHP_URL_PATH));
         if ($response->status < 200 || $response->status > 299) {
-            throw ApiStatusException::create($response);
+            // Tokens and codes never reach an exception message, even when echoed back.
+            $redact = array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null], 'is_string'));
+            throw ApiStatusException::create($response, $redact);
         }
 
         return $response;

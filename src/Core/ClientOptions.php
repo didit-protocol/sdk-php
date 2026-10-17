@@ -19,28 +19,46 @@ final class ClientOptions
     public const DEFAULT_TIMEOUT = 60.0;
     public const DEFAULT_MAX_RETRIES = 2;
 
+    private readonly ?Secret $apiKey;
+
+    private readonly ?Secret $accountToken;
+
     /**
      * @param array<string, string> $defaultHeaders
      */
     public function __construct(
         #[\SensitiveParameter]
-        public readonly ?string $apiKey,
+        ?string $apiKey,
         public readonly string $baseUrl,
         public readonly string $accountBaseUrl,
         public readonly ?string $organizationId,
         public readonly ?string $applicationId,
         #[\SensitiveParameter]
-        public readonly ?string $accountToken,
+        ?string $accountToken,
         public readonly float $timeout,
         public readonly int $maxRetries,
         public readonly array $defaultHeaders,
     ) {
+        $this->apiKey = null === $apiKey ? null : Secret::of($apiKey);
+        $this->accountToken = null === $accountToken ? null : Secret::of($accountToken);
         if ($timeout <= 0) {
             throw new ConfigurationException('timeout must be greater than 0 seconds.');
         }
         if ($maxRetries < 0) {
             throw new ConfigurationException('maxRetries must be 0 or more.');
         }
+    }
+
+    /** The API key, or null when none is configured. */
+    public function apiKey(): ?string
+    {
+        return $this->apiKey?->reveal();
+    }
+
+    /** The account token, or null when none is configured. */
+    public function accountToken(): ?string
+    {
+        return $this->accountToken?->reveal();
     }
 
     /**
@@ -84,12 +102,12 @@ final class ClientOptions
         }
 
         return new self(
-            apiKey: self::nonEmpty($options->apiKey) ?? $this->apiKey,
+            apiKey: self::nonEmpty($options->apiKey) ?? $this->apiKey(),
             baseUrl: null === $options->baseUrl ? $this->baseUrl : self::normalizeBaseUrl($options->baseUrl),
             accountBaseUrl: null === $options->accountBaseUrl ? $this->accountBaseUrl : self::normalizeBaseUrl($options->accountBaseUrl),
             organizationId: self::nonEmpty($options->organizationId) ?? $this->organizationId,
             applicationId: self::nonEmpty($options->applicationId) ?? $this->applicationId,
-            accountToken: self::nonEmpty($options->accountToken) ?? $this->accountToken,
+            accountToken: self::nonEmpty($options->accountToken) ?? $this->accountToken(),
             timeout: $options->timeout ?? $this->timeout,
             maxRetries: $options->maxRetries ?? $this->maxRetries,
             defaultHeaders: array_merge($this->defaultHeaders, $options->headers),

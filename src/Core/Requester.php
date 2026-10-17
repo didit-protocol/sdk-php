@@ -221,7 +221,7 @@ final class Requester
                 continue;
             }
 
-            throw ApiStatusException::create($response);
+            throw ApiStatusException::create($response, array_values(array_filter([$options->apiKey(), $options->accountToken()], 'is_string')));
         }
     }
 
@@ -330,16 +330,18 @@ final class Requester
 
         switch ($operation->auth) {
             case Operation::AUTH_API_KEY:
-                if (null === $options->apiKey) {
+                $apiKey = $options->apiKey();
+                if (null === $apiKey) {
                     throw new ConfigurationException('Missing API key: pass apiKey to DiditClient or set the DIDIT_API_KEY environment variable.');
                 }
-                $headers['x-api-key'] = $options->apiKey;
+                $headers['x-api-key'] = $apiKey;
                 break;
             case Operation::AUTH_ACCOUNT_TOKEN:
-                if (null === $options->accountToken) {
+                $accountToken = $options->accountToken();
+                if (null === $accountToken) {
                     throw new ConfigurationException('Missing account token: call $didit->account->login(...) and pass the access token as accountToken.');
                 }
-                $headers['Authorization'] = 'Bearer ' . $options->accountToken;
+                $headers['Authorization'] = 'Bearer ' . $accountToken;
                 break;
         }
 
