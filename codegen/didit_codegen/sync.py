@@ -172,6 +172,8 @@ def scrub_examples(node: Any, prop: str = "") -> Any:
             out[k] = [scrub_credentials(e, prop) for e in v]
         elif k == "properties" and isinstance(v, dict):
             out[k] = {name: scrub_examples(s, name) for name, s in v.items()}
+        elif k == "responses" and isinstance(v, dict):
+            out[k] = {status: scrub_examples(r, prop) for status, r in v.items()}
         else:
             out[k] = scrub_examples(v, prop)
     return out
@@ -338,7 +340,7 @@ class _Sync:
         idents = self._new_idents()
         for key in sorted(set(self.old_ops) & set(self.new_ops)):
             old, new = self.old_naming(key), self.new_naming(key)
-            if old is None or new is None or normalize_naming(old) == normalize_naming(new):
+            if not isinstance(old, dict) or not isinstance(new, dict) or normalize_naming(old) == normalize_naming(new):
                 continue
             old_name, new_name = ident(old), ident(new)
             if old_name and new_name is None:
