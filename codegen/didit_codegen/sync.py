@@ -366,6 +366,9 @@ class _Sync:
                         "deprecated_since": self.version,
                     })
                 self.report.naming.append(f"`{key}`: renamed from `{old_name}()` to `{new_name}()`")
+                self.report.breaking.append(
+                    f"`{key}`: `{old_name}()` renamed to `{new_name}()`; the old name is a deprecated alias until the next minor version"
+                )
                 self.report.deprecations.append(f"`{old_name}()` kept as a deprecated alias of `{new_name}()` for one minor version")
             if old.get("scope") != new.get("scope"):
                 self.report.breaking.append(f"`{key}` (`{new_name}`): scope changed from {old.get('scope')} to {new.get('scope')}")

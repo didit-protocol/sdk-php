@@ -199,17 +199,20 @@ final class LoggingTest extends TestCase
 
     public function testDiditLogDebugEndToEnd(): void
     {
-        $output = self::runPhp(<<<'PHP'
+        $code = <<<'PHP'
             $http = new Didit\Tests\Support\MockHttpClient();
             $http->queueJson(200, ['session_id' => 'abc'], ['X-Request-Id' => 'req_env']);
             $factory = new GuzzleHttp\Psr7\HttpFactory();
             $client = new Didit\DiditClient(apiKey: 'test_api_key_123', httpClient: $http, requestFactory: $factory, streamFactory: $factory);
             $client->sessions->retrieveDecision('abc');
-            PHP, ['DIDIT_LOG' => 'debug']);
+            PHP;
 
+        $output = self::runPhp($code, ['DIDIT_LOG' => 'debug']);
         self::assertSame('', $output['stdout']);
         self::assertMatchesRegularExpression('#^\[didit\] debug GET /v3/session/abc/decision/ 200 \d+ms request_id=req_env\n$#', $output['stderr']);
         self::assertStringNotContainsString('test_api_key_123', $output['stderr']);
+
+        self::assertSame(['stdout' => '', 'stderr' => ''], self::runPhp($code), 'silent without DIDIT_LOG');
     }
 
     private function logger(): LoggerInterface

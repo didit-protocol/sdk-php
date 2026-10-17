@@ -6,9 +6,10 @@ Usage:
 
 Updates openapi/verification.json, openapi/account.json and openapi/SOURCE.json
 when upstream changed, maintains openapi/overlay.json and
-openapi/deprecated-operations.json, and writes the pull request summary
-(Markdown, first line is the title). Prints "No upstream change" and writes
-nothing when there is nothing to do. Exit codes: 0 done, 1 download or input
+openapi/deprecated-operations.json (including deleting deprecated methods
+once they have shipped for one minor version), and writes the pull request
+summary (Markdown, first line is the title). Prints "No upstream change" and
+writes nothing when there is nothing to do. Exit codes: 0 done, 1 download or input
 error, 2 the new documents cannot be generated (for example an operation
 without SDK naming).
 """
