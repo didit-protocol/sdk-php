@@ -1,0 +1,477 @@
+"""Spec sync (docs/DESIGN.md section 3.1).
+
+Turns freshly downloaded upstream documents into the new contents of
+``openapi/`` (the upstream copies, ``SOURCE.json``, ``overlay.json`` and
+``deprecated-operations.json``) and a pull request summary. Pure: the caller
+downloads, validates and writes.
+"""
+
+from __future__ import annotations
+
+import copy
+import hashlib
+import json
+import re
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any
+
+from . import diff
+from .samples import scrub_credentials
+from .spec import Document, SpecError
+
+# file in openapi/ -> (upstream URL, file name in --offline-dir, document name, operation key prefix)
+UPSTREAM = {
+    "verification.json": ("https://docs.didit.me/openapi-25.json", "openapi-25.json", "verification", ""),
+    "account.json": ("https://docs.didit.me/openapi-auth.json", "openapi-auth.json", "account", "account "),
+}
+DEPRECATED_FILE = "deprecated-operations.json"
+DEPRECATED_DESCRIPTION = (
+    "Operations removed (or renamed) upstream that the SDK keeps as deprecated methods for one minor version. "
+    "Written by codegen/spec_sync.py, never by hand. A removal entry carries the old operation and the component "
+    "schemas it used; an alias entry keeps the previous SDK name of a renamed operation. See docs/DESIGN.md section 3.1."
+)
+NAMING_KEYS = ("resource", "method", "auth", "server", "scope")
+MAX_ITEMS = 100
+MAX_SUMMARY = 60000
+
+
+@dataclass
+class Report:
+    date: str
+    files: list[tuple[str, str, str]] = field(default_factory=list)  # (file, old sha256, new sha256)
+    added: list[str] = field(default_factory=list)
+    removed: list[str] = field(default_factory=list)
+    changed: list[str] = field(default_factory=list)
+    schemas: list[str] = field(default_factory=list)
+    breaking: list[str] = field(default_factory=list)
+    naming: list[str] = field(default_factory=list)
+    deprecations: list[str] = field(default_factory=list)
+
+    @property
+    def title(self) -> str:
+        return f"chore(spec): sync API spec {self.date}"
+
+
+@dataclass
+class Result:
+    files: dict[str, bytes | None]  # path under the root -> new content; None deletes the file
+    report: Report
+    upstream_changed: list[str]
+
+    @property
+    def summary(self) -> str:
+        return render(self.report)
+
+
+def sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+def package_version(root: Path) -> str:
+    text = (root / "src" / "Version.php").read_text("utf-8")
+    match = re.search(r"VERSION\s*=\s*'(\d+\.\d+\.\d+[^']*)'", text)
+    if match is None:
+        raise SpecError("src/Version.php: no `public const VERSION = 'x.y.z';`")
+    return match.group(1)
+
+
+def minor_of(version: str) -> tuple[int, int]:
+    match = re.match(r"^(\d+)\.(\d+)", version)
+    if match is None:
+        raise SpecError(f"not a semantic version: {version!r}")
+    return int(match.group(1)), int(match.group(2))
+
+
+def dump_like(original: str | None, data: Any) -> str:
+    """JSON text formatted like ``original`` (indent, trailing newline, escaping)."""
+    template = original or ""
+    match = re.search(r"\n( +)\S", template)
+    indent = len(match.group(1)) if match else 1
+    ensure_ascii = "\\u" in template and all(ord(c) < 128 for c in template)
+    text = json.dumps(data, indent=indent, ensure_ascii=ensure_ascii)
+    return text + "\n" if template.endswith("\n") else text
+
+
+def normalize_naming(raw: Any) -> Any:
+    """``x-didit-sdk`` with a stable key order and no empty ``scope``."""
+    if not isinstance(raw, dict):
+        return raw
+    out = {k: raw[k] for k in NAMING_KEYS if k in raw and not (k == "scope" and raw[k] is None)}
+    out.update({k: v for k, v in raw.items() if k not in NAMING_KEYS})
+    return out
+
+
+def ident(raw: Any) -> str | None:
+    """``sessions.imports.create`` for a server operation's naming, else None."""
+    if isinstance(raw, dict) and raw.get("server") is True and raw.get("resource") and raw.get("method"):
+        return f"{raw['resource']}.{raw['method']}"
+    return None
+
+
+# Freezing a removed operation ---------------------------------------------------
+
+
+def freeze_operation(doc: Document, op: dict[str, Any], item: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+    """``op`` made self-contained: every ``$ref`` inlined except component schemas,
+    which are returned (with everything they use) so the generator can keep their names."""
+    op = copy.deepcopy(op)
+    params = list(diff.merged_parameters(doc, op, item).values())
+    if params:
+        op["parameters"] = params
+    pending: list[str] = []
+    frozen = _inline(doc, op, pending, ())
+    schemas: dict[str, Any] = {}
+    while pending:
+        name = pending.pop()
+        if name in schemas:
+            continue
+        schemas[name] = _inline(doc, doc.resolve(diff.SCHEMA_REF + name), pending, ())
+    return scrub_examples(frozen), {k: scrub_examples(v) for k, v in sorted(schemas.items())}
+
+
+def _inline(doc: Document, node: Any, pending: list[str], stack: tuple[str, ...]) -> Any:
+    if isinstance(node, list):
+        return [_inline(doc, v, pending, stack) for v in node]
+    if not isinstance(node, dict):
+        return node
+    ref = node.get("$ref")
+    if isinstance(ref, str):
+        if ref.startswith(diff.SCHEMA_REF):
+            pending.append(ref[len(diff.SCHEMA_REF):])
+            return {k: _inline(doc, v, pending, stack) for k, v in node.items()}
+        if ref in stack:
+            raise SpecError(f"{doc.name}: recursive $ref {ref} cannot be inlined")
+        target = copy.deepcopy(doc.resolve(ref))
+        siblings = {k: v for k, v in node.items() if k != "$ref"}
+        merged = {**target, **siblings} if isinstance(target, dict) else target
+        return _inline(doc, merged, pending, stack + (ref,))
+    return {k: _inline(doc, v, pending, stack) for k, v in node.items()}
+
+
+def scrub_examples(node: Any, prop: str = "") -> Any:
+    """Credential-like example values replaced (``openapi/`` outside the upstream
+    copies is not allowlisted by the secret scan); the generated tests scrub the
+    same way, so the generated code does not change."""
+    if isinstance(node, list):
+        return [scrub_examples(v, prop) for v in node]
+    if not isinstance(node, dict):
+        return node
+    if isinstance(node.get("in"), str) and isinstance(node.get("name"), str):
+        prop = node["name"]
+    out: dict[str, Any] = {}
+    for k, v in node.items():
+        if k in ("example", "default"):
+            out[k] = scrub_credentials(v, prop)
+        elif k == "examples" and isinstance(v, dict):
+            out[k] = {
+                n: {**e, "value": scrub_credentials(e["value"], prop)} if isinstance(e, dict) and "value" in e else scrub_credentials(e, prop)
+                for n, e in v.items()
+            }
+        elif k == "examples" and isinstance(v, list):
+            out[k] = [scrub_credentials(e, prop) for e in v]
+        elif k == "properties" and isinstance(v, dict):
+            out[k] = {name: scrub_examples(s, name) for name, s in v.items()}
+        elif k == "responses" and isinstance(v, dict):
+            out[k] = {status: scrub_examples(r, prop) for status, r in v.items()}
+        else:
+            out[k] = scrub_examples(v, prop)
+    return out
+
+
+# The sync -------------------------------------------------------------------------
+
+
+class _Sync:
+    def __init__(self, root: Path, fetched: dict[str, bytes], date: str, fetched_at: str) -> None:
+        self.root = root
+        self.openapi = root / "openapi"
+        self.date = date
+        self.fetched_at = fetched_at
+        self.version = package_version(root)
+        self.report = Report(date)
+        self.old_bytes = {n: (self.openapi / n).read_bytes() for n in UPSTREAM}
+        self.new_bytes = dict(fetched)
+        self.old_docs = {n: Document(UPSTREAM[n][2], json.loads(self.old_bytes[n])) for n in UPSTREAM}
+        self.new_docs = {n: Document(UPSTREAM[n][2], json.loads(self.new_bytes[n])) for n in UPSTREAM}
+        self.old_ops = {k: (n, v) for n in UPSTREAM for k, v in diff.operations(self.old_docs[n], UPSTREAM[n][3]).items()}
+        self.new_ops = {k: (n, v) for n in UPSTREAM for k, v in diff.operations(self.new_docs[n], UPSTREAM[n][3]).items()}
+
+        self.overlay_text = (self.openapi / "overlay.json").read_text("utf-8")
+        self.overlay_file = json.loads(self.overlay_text)
+        self.original_overlay: dict[str, Any] = copy.deepcopy(self.overlay_file.get("operations", {}))
+        self.overlay: dict[str, Any] = self.overlay_file.setdefault("operations", {})
+
+        dep_path = self.openapi / DEPRECATED_FILE
+        self.dep_text = dep_path.read_text("utf-8") if dep_path.exists() else None
+        self.dep_file = json.loads(self.dep_text) if self.dep_text else {
+            "description": DEPRECATED_DESCRIPTION, "version": 1, "operations": [],
+        }
+        self.entries: list[dict[str, Any]] = self.dep_file.setdefault("operations", [])
+
+    # namings ---------------------------------------------------------------
+
+    def old_naming(self, key: str) -> Any:
+        _, (op, _) = self.old_ops[key]
+        return op.get("x-didit-sdk", self.original_overlay.get(key))
+
+    def new_naming(self, key: str) -> Any:
+        _, (op, _) = self.new_ops[key]
+        return op.get("x-didit-sdk", self.overlay.get(key))
+
+    def _new_idents(self) -> dict[str, str]:
+        out = {}
+        for key in self.new_ops:
+            i = ident(self.new_naming(key))
+            if i:
+                out[i] = key
+        return out
+
+    # steps -----------------------------------------------------------------
+
+    def run(self) -> Result:
+        upstream_changed = [n for n in UPSTREAM if self.new_bytes[n] != self.old_bytes[n]]
+        for n in upstream_changed:
+            self.report.files.append((n, sha256(self.old_bytes[n]), sha256(self.new_bytes[n])))
+        self.upstream_naming()
+        self.returning_operations()
+        self.expire_entries()
+        self.removed_operations()
+        self.renamed_operations()
+        self.describe_changes()
+        return Result(self.files(upstream_changed), self.report, upstream_changed)
+
+    def upstream_naming(self) -> None:
+        """Upstream ``x-didit-sdk`` wins and its overlay entry is deleted (DESIGN 3)."""
+        for key in list(self.overlay):
+            if key not in self.new_ops:
+                continue
+            upstream = self.new_ops[key][1][0].get("x-didit-sdk")
+            if upstream is None:
+                continue
+            entry = self.overlay.pop(key)
+            if normalize_naming(entry) == normalize_naming(upstream):
+                self.report.naming.append(f"`{key}`: overlay entry deleted, upstream carries the same `x-didit-sdk`")
+            else:
+                self.report.naming.append(
+                    f"`{key}`: overlay entry deleted, upstream `x-didit-sdk` differs and wins: "
+                    f"`{_compact(entry)}` -> `{_compact(upstream)}`"
+                )
+
+    def returning_operations(self) -> None:
+        """Deprecated operations that came back upstream are regular methods again."""
+        kept = []
+        for entry in self.entries:
+            key = entry["key"]
+            if entry.get("alias") or key not in self.new_ops:
+                kept.append(entry)
+                continue
+            upstream = self.new_ops[key][1][0].get("x-didit-sdk")
+            if upstream is None and key not in self.overlay:
+                self.overlay[key] = normalize_naming(entry["x-didit-sdk"])
+                self.report.naming.append(f"`{key}`: came back upstream without `x-didit-sdk`; overlay entry restored")
+            self.report.deprecations.append(
+                f"`{key}` came back upstream: `{ident(entry['x-didit-sdk']) or key}` is no longer deprecated"
+            )
+        self.entries[:] = kept
+
+    def expire_entries(self) -> None:
+        current = minor_of(self.version)
+        idents = self._new_idents()
+        kept = []
+        for entry in self.entries:
+            key, name = entry["key"], ident(entry["x-didit-sdk"]) or entry["key"]
+            since = entry.get("deprecated_since", self.version)
+            if minor_of(since) < current:
+                what = "alias" if entry.get("alias") else "method"
+                self.report.deprecations.append(f"`{name}()` deleted: deprecated {what} since {since}, one minor version has shipped")
+                self.report.breaking.append(f"`{name}()` deleted (deprecated since {since})")
+                continue
+            if entry.get("alias"):
+                current_name = ident(self.new_naming(key)) if key in self.new_ops else None
+                if current_name is None or current_name == name:
+                    self.report.deprecations.append(f"`{name}()` alias dropped: `{key}` is gone or carries that name again")
+                    continue
+            if name in idents and idents[name] != key:
+                self.report.deprecations.append(f"`{name}()` is now `{idents[name]}`: the deprecated copy of `{key}` is dropped")
+                continue
+            kept.append(entry)
+        self.entries[:] = kept
+
+    def removed_operations(self) -> None:
+        idents = self._new_idents()
+        for key in sorted(set(self.old_ops) - set(self.new_ops)):
+            naming = self.old_naming(key)
+            if key in self.overlay:
+                del self.overlay[key]
+                self.report.naming.append(f"`{key}`: overlay entry deleted, the operation was removed upstream")
+            name = ident(naming)
+            if name is None:
+                self.report.removed.append(f"`{key}`: not exposed by the server SDKs")
+                continue
+            if name in idents:
+                self.report.removed.append(f"`{key}` (`{name}`): moved to `{idents[name]}`, the method keeps its name")
+                continue
+            for alias in [e for e in self.entries if e["key"] == key and e.get("alias")]:
+                self.entries.remove(alias)
+                alias_name = ident(alias["x-didit-sdk"])
+                self.report.breaking.append(f"`{alias_name}()` deleted: deprecated alias of the removed operation `{key}`")
+            self.entries[:] = [e for e in self.entries if e["key"] != key]
+            doc_name = self.old_ops[key][0]
+            op, item = self.old_ops[key][1]
+            frozen, schemas = freeze_operation(self.old_docs[doc_name], op, item)
+            entry: dict[str, Any] = {
+                "key": key,
+                "x-didit-sdk": normalize_naming(naming),
+                "removed_on": self.date,
+                "deprecated_since": self.version,
+                "operation": frozen,
+            }
+            if schemas:
+                entry["components"] = {"schemas": schemas}
+            self.entries.append(entry)
+            self.report.removed.append(f"`{key}` (`{name}`): kept as a deprecated method for one minor version")
+            self.report.breaking.append(
+                f"`{key}` was removed upstream: `{name}()` is deprecated and will be deleted in the next minor version"
+            )
+            self.report.deprecations.append(f"`{name}()` deprecated: `{key}` was removed upstream on {self.date}")
+
+    def renamed_operations(self) -> None:
+        idents = self._new_idents()
+        for key in sorted(set(self.old_ops) & set(self.new_ops)):
+            old, new = self.old_naming(key), self.new_naming(key)
+            if not isinstance(old, dict) or not isinstance(new, dict) or normalize_naming(old) == normalize_naming(new):
+                continue
+            old_name, new_name = ident(old), ident(new)
+            if old_name and new_name is None:
+                self.report.breaking.append(f"`{key}`: no longer a server operation, `{old_name}()` is removed from the SDK")
+                continue
+            if old_name is None and new_name:
+                self.report.naming.append(f"`{key}`: now a server operation, `{new_name}()` added")
+                continue
+            if old_name is None:
+                continue
+            if old_name != new_name:
+                if old_name in idents:
+                    self.report.breaking.append(
+                        f"`{key}`: renamed from `{old_name}()` to `{new_name}()`; no alias, `{old_name}` now names `{idents[old_name]}`"
+                    )
+                    continue
+                if not any(e["key"] == key and e.get("alias") and ident(e["x-didit-sdk"]) == old_name for e in self.entries):
+                    self.entries.append({
+                        "key": key,
+                        "alias": True,
+                        "x-didit-sdk": normalize_naming(old),
+                        "removed_on": self.date,
+                        "deprecated_since": self.version,
+                    })
+                self.report.naming.append(f"`{key}`: renamed from `{old_name}()` to `{new_name}()`")
+                self.report.breaking.append(
+                    f"`{key}`: `{old_name}()` renamed to `{new_name}()`; the old name is a deprecated alias until the next minor version"
+                )
+                self.report.deprecations.append(f"`{old_name}()` kept as a deprecated alias of `{new_name}()` for one minor version")
+            if old.get("scope") != new.get("scope"):
+                self.report.breaking.append(f"`{key}` (`{new_name}`): scope changed from {old.get('scope')} to {new.get('scope')}")
+            if old.get("auth") != new.get("auth"):
+                self.report.naming.append(f"`{key}` (`{new_name}`): auth changed from {old.get('auth')} to {new.get('auth')}")
+
+    def describe_changes(self) -> None:
+        for key in sorted(set(self.new_ops) - set(self.old_ops)):
+            naming = self.new_naming(key)
+            if naming is None:
+                self.report.added.append(f"`{key}`: no SDK naming yet, add it to `openapi/overlay.json` or upstream")
+            elif ident(naming):
+                self.report.added.append(f"`{key}`: `{ident(naming)}()`")
+            else:
+                self.report.added.append(f"`{key}`: not exposed by the server SDKs")
+        for n in UPSTREAM:
+            old, new = self.old_docs[n], self.new_docs[n]
+            if self.old_bytes[n] == self.new_bytes[n]:
+                continue
+            for change in diff.changed_operations(old, new, UPSTREAM[n][3]):
+                naming = ident(self.new_naming(change.key))
+                label = f"`{change.key}`" + (f" (`{naming}`)" if naming else "")
+                line = f"{label}: {', '.join(change.parts)}" + (" (documentation only)" if change.docs_only else "")
+                details = [f"breaking: {b}" for b in change.breaking] + change.notes
+                self.report.changed.append(line + "".join(f"\n  - {d}" for d in details[:20]))
+                if naming:
+                    self.report.breaking.extend(f"`{naming}()` (`{change.key}`): {b}" for b in change.breaking)
+            prefix = "" if n == "verification.json" else "account: "
+            sc = diff.schema_changes(old, new)
+            for name in sc.added:
+                self.report.schemas.append(f"added `{prefix}{name}`")
+            for name in sc.removed:
+                self.report.schemas.append(f"removed `{prefix}{name}`")
+            for name, docs_only in sc.changed:
+                self.report.schemas.append(f"changed `{prefix}{name}`" + (" (documentation only)" if docs_only else ""))
+
+    # output ----------------------------------------------------------------
+
+    def files(self, upstream_changed: list[str]) -> dict[str, bytes | None]:
+        out: dict[str, bytes | None] = {}
+        for n in upstream_changed:
+            out[f"openapi/{n}"] = self.new_bytes[n]
+        if upstream_changed:
+            source_text = (self.openapi / "SOURCE.json").read_text("utf-8")
+            source = json.loads(source_text)
+            for n in upstream_changed:
+                entry = source.setdefault(n, {})
+                entry["url"] = UPSTREAM[n][0]
+                entry["sha256"] = sha256(self.new_bytes[n])
+                entry["fetched_at"] = self.fetched_at
+            out["openapi/SOURCE.json"] = dump_like(source_text, source).encode("utf-8")
+        overlay = dump_like(self.overlay_text, self.overlay_file)
+        if overlay != self.overlay_text:
+            out["openapi/overlay.json"] = overlay.encode("utf-8")
+        if self.entries:
+            text = dump_like(self.dep_text or self.overlay_text, self.dep_file)
+            if text != self.dep_text:
+                out[f"openapi/{DEPRECATED_FILE}"] = text.encode("utf-8")
+        elif self.dep_text is not None:
+            out[f"openapi/{DEPRECATED_FILE}"] = None
+        return out
+
+
+def _compact(raw: Any) -> str:
+    return json.dumps(normalize_naming(raw), separators=(",", ":"))
+
+
+def sync(root: Path, fetched: dict[str, bytes], date: str, fetched_at: str) -> Result:
+    """Plans the update of ``root/openapi`` for the downloaded ``fetched`` documents."""
+    return _Sync(root, fetched, date, fetched_at).run()
+
+
+# Summary ----------------------------------------------------------------------------
+
+
+def render(r: Report) -> str:
+    lines = [r.title, ""]
+    lines.append("Automated sync of the upstream OpenAPI documents (docs/DESIGN.md section 3.1).")
+    lines.append("")
+    if r.files:
+        lines += ["| File | Upstream | SHA-256 |", "|---|---|---|"]
+        for name, old, new in r.files:
+            lines.append(f"| `openapi/{name}` | {UPSTREAM[name][0]} | `{old[:12]}` -> `{new[:12]}` |")
+    else:
+        lines.append("The upstream documents did not change.")
+    lines += ["", "## Breaking changes", ""]
+    lines += _items(r.breaking) if r.breaking else ["None detected."]
+    if r.added or r.removed or r.changed:
+        lines += ["", "## Operations"]
+        for title, items in (("Added", r.added), ("Removed", r.removed), ("Changed", r.changed)):
+            if items:
+                lines += ["", f"**{title} ({len(items)})**", ""] + _items(items)
+    for title, items in (("Schemas", r.schemas), ("SDK naming", r.naming), ("Deprecations", r.deprecations)):
+        if items:
+            lines += ["", f"## {title}", ""] + _items(items)
+    text = "\n".join(lines) + "\n"
+    if len(text) > MAX_SUMMARY:
+        text = text[:MAX_SUMMARY].rsplit("\n", 1)[0] + "\n\n(Summary truncated; run `python3 codegen/spec_sync.py` locally for the full list.)\n"
+    return text
+
+
+def _items(items: list[str]) -> list[str]:
+    out = [f"- {i}" for i in items[:MAX_ITEMS]]
+    if len(items) > MAX_ITEMS:
+        out.append(f"- ... and {len(items) - MAX_ITEMS} more")
+    return out
