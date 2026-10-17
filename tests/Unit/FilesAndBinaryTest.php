@@ -122,9 +122,9 @@ final class FilesAndBinaryTest extends TestCase
     public function testUploadFromAPhpStreamResource(): void
     {
         $path = $this->tempFile('portrait.webp', 'resource-bytes');
-        $handle = fopen($path, 'rb');
+        $handle = fopen($path, 'r');
         self::assertIsResource($handle);
-        $memory = fopen('php://memory', 'w+b');
+        $memory = fopen('php://memory', 'w+');
         self::assertIsResource($memory);
         fwrite($memory, 'memory-bytes');
         $this->support->http->queueJson(200, self::OK);
@@ -146,7 +146,7 @@ final class FilesAndBinaryTest extends TestCase
 
     public function testFileFromStreamRejectsAClosedResource(): void
     {
-        $handle = fopen('php://memory', 'rb');
+        $handle = fopen('php://memory', 'r');
         self::assertIsResource($handle);
         fclose($handle);
 
@@ -267,7 +267,7 @@ final class FilesAndBinaryTest extends TestCase
 
     public function testJsonOrMultipartOperationSwitchesToMultipartWithAFile(): void
     {
-        $memory = fopen('php://memory', 'w+b');
+        $memory = fopen('php://memory', 'w+');
         self::assertIsResource($memory);
         fwrite($memory, 'favicon-bytes');
         $this->support->http->queueJson(200, []);
