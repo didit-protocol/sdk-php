@@ -346,6 +346,7 @@ final class Authentication
      *
      * @throws ApiStatusException an unknown step-up is `NotFoundException`
      * @throws ApiConnectionException
+     * @throws \InvalidArgumentException when the step-up ID is empty, "." or ".."
      */
     public function retrieveStepUp(string $accessToken, string $stepUpId): StepUp
     {
