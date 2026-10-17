@@ -215,17 +215,11 @@ final class PaginationTest extends TestCase
         $this->support->http->queueJson(200, self::page(['s1', 's2'], $next));
         $this->support->http->queueJson(200, self::page(['stolen'], null));
 
-        $page = $this->support->client()->sessions->list();
-        $seen = new \ArrayObject();
-        $error = self::thrown(static function () use ($page, $seen): void {
-            foreach ($page as $session) {
-                $seen[] = $session->sessionId;
-            }
-        });
+        [$seen, $error] = self::drain($this->support->client()->sessions->list());
 
         self::assertInstanceOf(DiditException::class, $error, 'the link was refused');
         self::assertStringContainsString('another origin', $error->getMessage());
-        self::assertSame(['s1', 's2'], $seen->getArrayCopy(), 'the first page is still delivered');
+        self::assertSame(['s1', 's2'], $seen, 'the first page is still delivered');
         self::assertCount(1, $this->support->http->requests, 'no request after the first page');
         self::assertSame(1, $this->support->http->remaining());
     }
@@ -409,17 +403,24 @@ final class PaginationTest extends TestCase
     }
 
     /**
-     * @param \Closure(): void $call
+     * Iterates a page until the end or the first error.
+     *
+     * @param iterable<SessionsListResponseResults> $page
+     *
+     * @return array{list<string|null>, \Throwable|null} the session ids seen and the error
      */
-    private static function thrown(\Closure $call): ?\Throwable
+    private static function drain(iterable $page): array
     {
+        $seen = [];
         try {
-            $call();
+            foreach ($page as $session) {
+                $seen[] = $session->sessionId;
+            }
         } catch (\Throwable $e) {
-            return $e;
+            return [$seen, $e];
         }
 
-        return null;
+        return [$seen, null];
     }
 
     private static function requester(): Requester

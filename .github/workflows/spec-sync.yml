@@ -56,6 +56,14 @@ jobs:
             echo "No upstream change." >> "$GITHUB_STEP_SUMMARY"
           fi
 
+      - name: Report a failed sync
+        if: failure() && steps.sync.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          if [ -f "$RUNNER_TEMP/summary.md" ]; then
+            cat "$RUNNER_TEMP/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
         if: steps.sync.outputs.changed == 'true'
         with:

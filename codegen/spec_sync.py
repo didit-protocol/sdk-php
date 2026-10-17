@@ -9,9 +9,10 @@ when upstream changed, maintains openapi/overlay.json and
 openapi/deprecated-operations.json (including deleting deprecated methods
 once they have shipped for one minor version), and writes the pull request
 summary (Markdown, first line is the title). Prints "No upstream change" and
-writes nothing when there is nothing to do. Exit codes: 0 done, 1 download or input
-error, 2 the new documents cannot be generated (for example an operation
-without SDK naming).
+writes nothing when there is nothing to do. Exit codes: 0 done, 1 download or
+input error, 2 the new documents cannot be generated (for example an operation
+without SDK naming); openapi/ is left untouched and the summary file, when
+given, also says what to fix.
 """
 
 from __future__ import annotations
@@ -136,7 +137,9 @@ def main(argv: list[str] | None = None) -> int:
     try:
         validate(root, result.files)
     except SpecError as exc:
-        print(f"spec-sync: the synced documents cannot be generated, nothing was written.\n{exc}", file=sys.stderr)
+        print(f"spec-sync: the synced documents cannot be generated, nothing was written to openapi/.\n{exc}", file=sys.stderr)
+        if args.summary_file is not None:
+            args.summary_file.write_text(f"{result.summary}\n## Action needed\n\n```text\n{exc}\n```\n", "utf-8")
         return 2
 
     write(root, result.files)

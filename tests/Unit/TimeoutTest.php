@@ -249,7 +249,8 @@ final class TimeoutTest extends TestCase
     private function guzzle(array $config = []): Client
     {
         $stack = HandlerStack::create($this->guzzleMock);
-        $stack->push(Middleware::history($this->history));
+        $history = $this->history; // the same ArrayObject, so entries land in $this->history
+        $stack->push(Middleware::history($history));
 
         return new Client(['handler' => $stack] + $config);
     }

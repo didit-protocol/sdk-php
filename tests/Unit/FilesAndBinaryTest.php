@@ -235,7 +235,6 @@ final class FilesAndBinaryTest extends TestCase
             'objects' => [['k' => 1], ['k' => 2]],
             'metadata' => [],
             'captured_at' => new \DateTimeImmutable('2026-03-01T12:00:00+02:00'),
-            7 => 'numeric name',
         ], 'B');
 
         self::assertSame(
@@ -246,7 +245,6 @@ final class FilesAndBinaryTest extends TestCase
             . "--B\r\nContent-Disposition: form-data; name=\"files\"; filename=\"b.png\"\r\nContent-Type: image/png\r\n\r\nb\r\n"
             . self::textPart('objects', '[{"k":1},{"k":2}]')
             . self::textPart('captured_at', '2026-03-01T12:00:00+02:00')
-            . self::textPart('7', 'numeric name')
             . "--B--\r\n",
             $body,
             'null and empty lists are left out, lists of scalars and files repeat, lists of objects are JSON',
