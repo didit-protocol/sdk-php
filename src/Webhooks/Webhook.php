@@ -74,22 +74,20 @@ final class Webhook
     /**
      * Verifies a delivery from its raw body and returns the typed event.
      *
-     * @param string                                             $rawBody     the request body exactly as received
-     * @param array<string, string|list<string>>|MessageInterface $headers     the request headers, names in any case:
-     *                                                                        `getallheaders()`, Laravel or Symfony
-     *                                                                        `$request->headers->all()`, or any PSR-7
-     *                                                                        request
-     * @param string|array<string>                               $secret      the destination's secret, or several during
-     *                                                                        a rotation
-     * @param int                                                $tolerance   maximum distance in seconds between the
-     *                                                                        delivery's timestamp and now
-     * @param bool                                               $allowSimple also accept the deprecated
-     *                                                                        `X-Signature-Simple`, which does not cover
-     *                                                                        the body
-     * @param int|null                                           $now         current unix time, for tests
+     * `$headers` takes the request headers with names in any case: the
+     * `getallheaders()` array, Laravel or Symfony `$request->headers->all()`,
+     * or any PSR-7 request. `$secret` is the destination's secret, or a list
+     * of secrets during a rotation. `$tolerance` is the largest accepted
+     * distance in seconds between the delivery's timestamp and `$now` (the
+     * current unix time unless given). `$allowSimple` also accepts the
+     * deprecated `X-Signature-Simple`, which does not cover the body.
+     *
+     * @param string $rawBody the request body exactly as received
+     * @param array<string, string|list<string>>|MessageInterface $headers
+     * @param string|array<string> $secret
      *
      * @throws WebhookVerificationException when the delivery fails verification; `reason` says why
-     * @throws ConfigurationException       when the secret is empty or the tolerance negative
+     * @throws ConfigurationException when the secret is empty or the tolerance negative
      */
     public static function verify(
         string $rawBody,
@@ -145,18 +143,13 @@ final class Webhook
      * one no longer matches its signature. `X-Signature` and
      * `X-Signature-Simple` are never checked here.
      *
-     * @param array<mixed>|object                                $payload   the decoded JSON object: an array from
-     *                                                                      `json_decode($body, true)` or a
-     *                                                                      `stdClass` from `json_decode($body)`
-     * @param array<string, string|list<string>>|MessageInterface $headers   the request headers, names in any case
-     * @param string|array<string>                               $secret    the destination's secret, or several
-     *                                                                      during a rotation
-     * @param int                                                $tolerance maximum distance in seconds between the
-     *                                                                      delivery's timestamp and now
-     * @param int|null                                           $now       current unix time, for tests
+     * @param array<mixed>|object $payload the decoded JSON object: an array from `json_decode($body, true)`
+     *                                     or a `stdClass` from `json_decode($body)`
+     * @param array<string, string|list<string>>|MessageInterface $headers
+     * @param string|array<string> $secret
      *
      * @throws WebhookVerificationException when the delivery fails verification; `reason` says why
-     * @throws ConfigurationException       when the secret is empty or the tolerance negative
+     * @throws ConfigurationException when the secret is empty or the tolerance negative
      */
     public static function verifyParsed(
         array|object $payload,
