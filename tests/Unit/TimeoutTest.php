@@ -12,6 +12,7 @@ use Didit\Exception\ConfigurationException;
 use Didit\Exception\InternalServerException;
 use Didit\Exception\NotFoundException;
 use Didit\RequestOptions;
+use Didit\Tests\Support\PhpProcess;
 use Didit\Tests\Support\TestClient;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
@@ -194,6 +195,41 @@ final class TimeoutTest extends TestCase
 
         self::assertInstanceOf(Client::class, $default);
         self::assertInstanceOf(Client::class, (new HttpTransport())->client());
+    }
+
+    /**
+     * Psr18Client::withOptions() only exists since Symfony 6.2. Older
+     * clients are used as they are, like any other PSR-18 client.
+     */
+    public function testSymfonyPsr18ClientBefore62IsUsedWithoutWithOptions(): void
+    {
+        $output = PhpProcess::run(<<<'PHP'
+            eval(<<<'STUB'
+                namespace Symfony\Component\HttpClient;
+
+                final class Psr18Client implements \Psr\Http\Client\ClientInterface
+                {
+                    public function sendRequest(\Psr\Http\Message\RequestInterface $request): \Psr\Http\Message\ResponseInterface
+                    {
+                        echo $request->getMethod(), ' ', $request->getUri()->getPath(), "\n";
+
+                        return new \GuzzleHttp\Psr7\Response(200, ['Content-Type' => 'application/json'], '{"session_id":"abc"}');
+                    }
+                }
+                STUB);
+            echo method_exists(Symfony\Component\HttpClient\Psr18Client::class, 'withOptions') ? 'withOptions' : 'no withOptions', "\n";
+            $factory = new GuzzleHttp\Psr7\HttpFactory();
+            $client = new Didit\DiditClient(
+                apiKey: 'test_api_key_123',
+                httpClient: new Symfony\Component\HttpClient\Psr18Client(),
+                requestFactory: $factory,
+                streamFactory: $factory,
+            );
+            echo $client->sessions->retrieveDecision('abc')->sessionId;
+            PHP);
+
+        self::assertSame("no withOptions\nGET /v3/session/abc/decision/\nabc", $output['stdout']);
+        self::assertSame('', $output['stderr']);
     }
 
     /**
