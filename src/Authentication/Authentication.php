@@ -352,6 +352,10 @@ final class Authentication
         if ('' === $stepUpId) {
             throw new \InvalidArgumentException('The step-up ID must not be empty.');
         }
+        // HTTP clients collapse "." and ".." segments, which would read another endpoint.
+        if ('.' === $stepUpId || '..' === $stepUpId) {
+            throw new \InvalidArgumentException('The step-up ID must not be "." or "..".');
+        }
         $response = $this->send('GET', $this->issuer . '/step-up/' . rawurlencode($stepUpId) . '/', accessToken: $accessToken);
         $this->jsonObject($response);
 
