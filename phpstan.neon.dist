@@ -13,7 +13,6 @@ parameters:
         - tests
         - examples
     tmpDir: .phpstan.cache
-    # BaseClient::initialize() and the generated initResources() run once, from the constructor or fromRequester().
+    # The generated DiditClient::initResources() runs once, from the constructor or BaseClient::fromRequester().
     additionalConstructors:
-        - Didit\Core\BaseClient::initialize
         - Didit\Core\BaseClient::initResources

@@ -17,7 +17,8 @@ use Psr\Log\LoggerInterface;
  */
 abstract class BaseClient
 {
-    protected readonly Requester $requester;
+    /** Set once, by the constructor or {@see fromRequester()}. */
+    protected Requester $requester;
 
     /**
      * @param string|null $apiKey your application's API key; falls back to `DIDIT_API_KEY`
@@ -60,13 +61,14 @@ abstract class BaseClient
             accountBaseUrl: $accountBaseUrl,
             accountToken: $accountToken,
         );
-        $this->initialize(new Requester(
+        $this->requester = new Requester(
             $options,
             new HttpTransport($httpClient),
             $requestFactory ?? Psr17FactoryDiscovery::findRequestFactory(),
             $streamFactory ?? Psr17FactoryDiscovery::findStreamFactory(),
             $logger ?? self::loggerFromEnvironment(),
-        ));
+        );
+        $this->initResources();
     }
 
     /**
@@ -75,7 +77,8 @@ abstract class BaseClient
     public static function fromRequester(Requester $requester): static
     {
         $client = (new \ReflectionClass(static::class))->newInstanceWithoutConstructor();
-        $client->initialize($requester);
+        $client->requester = $requester;
+        $client->initResources();
 
         return $client;
     }
@@ -124,12 +127,6 @@ abstract class BaseClient
     }
 
     abstract protected function initResources(): void;
-
-    private function initialize(Requester $requester): void
-    {
-        $this->requester = $requester;
-        $this->initResources();
-    }
 
     private static function loggerFromEnvironment(): ?LoggerInterface
     {
