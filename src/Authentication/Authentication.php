@@ -86,7 +86,7 @@ final class Authentication
      */
     public function __construct(
         string $issuer,
-        private ?ClientInterface $httpClient = null,
+        private readonly ?ClientInterface $httpClient = null,
         private ?RequestFactoryInterface $requestFactory = null,
         private ?StreamFactoryInterface $streamFactory = null,
         private readonly ?CacheInterface $cache = null,

@@ -40,6 +40,7 @@ final class AgeEstimation extends BaseResource
             method: 'POST',
             path: '/v3/age-estimation/',
             bodyTypes: ['multipart'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\AgeEstimationEstimateResponse::fromResponse($response);

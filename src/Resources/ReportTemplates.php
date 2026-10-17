@@ -70,6 +70,7 @@ final class ReportTemplates extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/report-templates/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['field_config' => ['o']],
         ), [], $params, $options);
 
         return Types\ReportTemplateDetail::fromResponse($response);
@@ -119,6 +120,7 @@ final class ReportTemplates extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/report-templates/{template_uuid}/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['field_config' => ['o']],
         ), ['template_uuid' => $templateUuid], $params, $options);
 
         return Types\ReportTemplateDetail::fromResponse($response);

@@ -45,8 +45,9 @@ final class Multipart
 
     /**
      * @param array<string, mixed> $fields
+     * @param array<string, mixed> $hints see {@see Operation::$jsonHints}
      */
-    public static function encode(array $fields, string $boundary): string
+    public static function encode(array $fields, string $boundary, array $hints = []): string
     {
         $body = '';
         foreach ($fields as $name => $value) {
@@ -61,13 +62,13 @@ final class Multipart
                 }
                 continue;
             }
-            $body .= self::part($boundary, $name, $value);
+            $body .= self::part($boundary, $name, $value, $hints[$name] ?? null);
         }
 
         return $body . '--' . $boundary . "--\r\n";
     }
 
-    private static function part(string $boundary, string $name, mixed $value): string
+    private static function part(string $boundary, string $name, mixed $value, mixed $hint = null): string
     {
         $disposition = 'form-data; name="' . self::escape($name) . '"';
         if ($value instanceof File || $value instanceof StreamInterface || \is_resource($value)) {
@@ -88,7 +89,7 @@ final class Multipart
             \is_string($value) => $value,
             \is_int($value) => (string) $value,
             $value instanceof \DateTimeInterface => $value->format(\DateTimeInterface::ATOM),
-            default => Json::encode($value),
+            default => Json::encode($value, $hint),
         };
 
         return '--' . $boundary . "\r\n"

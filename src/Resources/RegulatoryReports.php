@@ -68,6 +68,7 @@ final class RegulatoryReports extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/regulatory-reports/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['reporting_person' => ['o'], 'location' => ['o'], 'narrative' => ['o']],
         ), [], $params, $options);
 
         return Types\RegulatoryReportDetail::fromResponse($response);
@@ -117,6 +118,7 @@ final class RegulatoryReports extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['reporting_person' => ['o'], 'location' => ['o'], 'narrative' => ['o']],
         ), ['report_uuid' => $reportUuid], $params, $options);
 
         return Types\RegulatoryReportDetail::fromResponse($response);

@@ -110,6 +110,7 @@ final class Cases extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['subject' => ['o'], 'links' => ['l', ['o']], 'source_context' => ['o']],
         ), [], $params, $options);
 
         return Types\CaseDetail::fromResponse($response);
@@ -640,6 +641,7 @@ final class Cases extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/duplicates/',
             applicationScope: true,
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['subject' => ['o'], 'links' => ['l', ['o']]],
         ), [], $params, $options);
 
         return Types\CaseDuplicateCaseDuplicatePage::fromResponse($response);

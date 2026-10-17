@@ -42,6 +42,7 @@ final class Kyb extends BaseResource
             method: 'POST',
             path: '/v3/kyb/search/',
             bodyTypes: ['json'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\KybSearchResponse::fromResponse($response);
@@ -67,6 +68,7 @@ final class Kyb extends BaseResource
             method: 'POST',
             path: '/v3/kyb/select/',
             bodyTypes: ['json'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\KybSelectResponse::fromResponse($response);
@@ -92,6 +94,7 @@ final class Kyb extends BaseResource
             method: 'POST',
             path: '/v3/kyb/shareholders/',
             bodyTypes: ['json'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return match ($response->status) {
@@ -121,6 +124,7 @@ final class Kyb extends BaseResource
             method: 'POST',
             path: '/v3/kyb/ubo/',
             bodyTypes: ['json'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return match ($response->status) {

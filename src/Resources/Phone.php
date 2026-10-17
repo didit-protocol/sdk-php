@@ -41,6 +41,7 @@ final class Phone extends BaseResource
             method: 'POST',
             path: '/v3/phone/risk/',
             bodyTypes: ['json'],
+            jsonHints: ['signals' => ['o'], 'metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\PhoneRiskResponse::fromResponse($response);
@@ -64,6 +65,7 @@ final class Phone extends BaseResource
             method: 'POST',
             path: '/v3/phone/send/',
             bodyTypes: ['json'],
+            jsonHints: ['options' => ['o'], 'signals' => ['o'], 'metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\PhoneVerificationSendResponse::fromResponse($response);

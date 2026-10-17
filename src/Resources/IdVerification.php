@@ -39,6 +39,7 @@ final class IdVerification extends BaseResource
             method: 'POST',
             path: '/v3/id-verification/',
             bodyTypes: ['multipart'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\IdVerificationVerifyResponse::fromResponse($response);

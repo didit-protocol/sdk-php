@@ -102,6 +102,7 @@ final class Users extends BaseResource
             method: 'PATCH',
             path: '/v3/users/{vendor_data}/',
             bodyTypes: ['json'],
+            jsonHints: ['metadata' => ['o']],
         ), ['vendor_data' => $vendorData], $params, $options);
 
         return Types\UserDetailItem::fromResponse($response);
@@ -237,6 +238,7 @@ final class Users extends BaseResource
             method: 'POST',
             path: '/v3/users/create/',
             bodyTypes: ['json'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\UserDetailItem::fromResponse($response);

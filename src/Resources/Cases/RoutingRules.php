@@ -92,6 +92,7 @@ final class RoutingRules extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['conditions' => ['l', ['o']]],
         ), ['record_uuid' => $recordUuid], $params, $options);
 
         return Types\CaseRoutingRule::fromResponse($response);
@@ -139,6 +140,7 @@ final class RoutingRules extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['conditions' => ['l', ['o']]],
         ), [], $params, $options);
 
         return Types\CaseRoutingRule::fromResponse($response);
@@ -210,6 +212,7 @@ final class RoutingRules extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/{record_uuid}/draft/',
             applicationScope: true,
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['changes' => ['o']],
         ), ['record_uuid' => $recordUuid], $params, $options);
 
         return Types\RoutingPublicationPolicyDraft::fromResponse($response);
@@ -257,6 +260,7 @@ final class RoutingRules extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/routing-rules/preview/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['draft' => ['o', ['conditions' => ['l', ['o']]]]],
         ), [], $params, $options);
 
         return Types\CaseRoutingPreview::fromResponse($response);

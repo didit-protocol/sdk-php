@@ -70,6 +70,7 @@ final class Workflows extends BaseResource
             method: 'POST',
             path: '/v3/workflows/',
             bodyTypes: ['json'],
+            jsonHints: ['features' => ['l', ['o', ['config' => ['o']]]]],
         ), [], $params, $options);
 
         return JsonResponse::fromResponse($response);
@@ -121,6 +122,7 @@ final class Workflows extends BaseResource
             method: 'PATCH',
             path: '/v3/workflows/{settings_uuid}/',
             bodyTypes: ['json'],
+            jsonHints: ['features' => ['l', ['o', ['config' => ['o']]]]],
         ), ['settings_uuid' => $settingsUuid], $params, $options);
 
         return JsonResponse::fromResponse($response);

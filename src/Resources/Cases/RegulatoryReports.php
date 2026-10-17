@@ -71,6 +71,7 @@ final class RegulatoryReports extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/regulatory-reports/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['reporting_person' => ['o'], 'location' => ['o'], 'narrative' => ['o']],
         ), ['case_uuid' => $caseUuid], $params, $options);
 
         return Types\RegulatoryReportDetail::fromResponse($response);

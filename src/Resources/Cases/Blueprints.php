@@ -73,6 +73,7 @@ final class Blueprints extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/blueprints/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['content_config' => ['o', ['checklist' => ['o', ['items' => ['l', ['o']]]], 'aml_control' => ['o'], 'identity' => ['o'], 'verifications' => ['o'], 'reporting' => ['o'], 'financial' => ['o']]]],
         ), [], $params, $options);
 
         return Types\CaseBlueprintDetail::fromResponse($response);
@@ -123,6 +124,7 @@ final class Blueprints extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['content_config' => ['o', ['checklist' => ['o', ['items' => ['l', ['o']]]], 'aml_control' => ['o'], 'identity' => ['o'], 'verifications' => ['o'], 'reporting' => ['o'], 'financial' => ['o']]]],
         ), ['blueprint_uuid' => $blueprintUuid], $params, $options);
 
         return Types\CaseBlueprintDetail::fromResponse($response);
@@ -267,6 +269,7 @@ final class Blueprints extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/draft/',
             applicationScope: true,
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['changes' => ['o']],
         ), ['blueprint_uuid' => $blueprintUuid], $params, $options);
 
         return Types\CasePublicationPolicyDraft::fromResponse($response);

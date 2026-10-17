@@ -67,6 +67,7 @@ final class Questionnaires extends BaseResource
             method: 'POST',
             path: '/v3/questionnaires/',
             bodyTypes: ['json'],
+            jsonHints: ['form_elements' => ['l', ['o', ['label' => ['o'], 'description' => ['o'], 'placeholder' => ['o'], 'options' => ['l', ['o', ['label' => ['o']]]], 'validation' => ['o', ['error_message' => ['o']]]]]]],
         ), [], $params, $options);
 
         return Types\QuestionnaireDetail::fromResponse($response);
@@ -121,6 +122,7 @@ final class Questionnaires extends BaseResource
             method: 'PATCH',
             path: '/v3/questionnaires/{questionnaire_uuid}/',
             bodyTypes: ['json'],
+            jsonHints: ['form_elements' => ['l', ['o', ['label' => ['o'], 'description' => ['o'], 'placeholder' => ['o'], 'options' => ['l', ['o', ['label' => ['o']]]], 'validation' => ['o', ['error_message' => ['o']]]]]]],
         ), ['questionnaire_uuid' => $questionnaireUuid], $params, $options);
 
         return Types\QuestionnaireDetail::fromResponse($response);

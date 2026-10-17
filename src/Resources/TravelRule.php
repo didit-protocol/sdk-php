@@ -121,6 +121,7 @@ final class TravelRule extends BaseResource
             method: 'POST',
             path: '/v3/travel-rule/inbound/',
             bodyTypes: ['json'],
+            jsonHints: ['originator_data' => ['o'], 'beneficiary_data' => ['o'], 'originating_vasp' => ['o']],
         ), [], $params, $options);
 
         return Types\TravelRuleInboundResponse::fromResponse($response);

@@ -39,6 +39,7 @@ final class Aml extends BaseResource
             path: '/v3/aml/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\AmlScreenResponse::fromResponse($response);

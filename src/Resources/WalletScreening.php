@@ -70,6 +70,7 @@ final class WalletScreening extends BaseResource
             method: 'POST',
             path: '/v3/wallet-screening/pdf/',
             bodyTypes: ['json'],
+            jsonHints: ['sender_rows' => ['l', ['o']], 'receiver_rows' => ['l', ['o']], 'transaction_flows' => ['l', ['o']], 'source_of_funds' => ['l', ['o']], 'destination_of_funds' => ['l', ['o']], 'counterparty_connections' => ['l', ['o']], 'network_nodes' => ['l', ['o']], 'network_edges' => ['l', ['o']], 'risk_factors' => ['l', ['o']], 'raw_response' => ['o']],
             accept: 'application/pdf, application/json',
         ), [], $params, $options);
 

@@ -70,6 +70,7 @@ final class Sessions extends BaseResource
             method: 'POST',
             path: '/v3/session/',
             bodyTypes: ['json'],
+            jsonHints: ['contact_details' => ['o'], 'expected_details' => ['o']],
         ), [], $params, $options);
 
         return Types\SessionsCreateResponse::fromResponse($response);
@@ -181,6 +182,7 @@ final class Sessions extends BaseResource
             method: 'PATCH',
             path: '/v3/session/{sessionId}/update-status/',
             bodyTypes: ['json'],
+            jsonHints: ['nodes_to_resubmit' => ['l', ['o']]],
         ), ['sessionId' => $sessionId], $params, $options);
 
         return Types\SessionsUpdateStatusResponse::fromResponse($response);
@@ -338,6 +340,7 @@ final class Sessions extends BaseResource
             path: '/v3/session/{sessionId}/update-data/',
             query: ['node_id' => 'node_id'],
             bodyTypes: ['json'],
+            jsonHints: ['extra_fields' => ['o'], 'parsed_address' => ['o']],
         ), ['sessionId' => $sessionId], $params, $options);
 
         return Types\SessionsUpdateDataResponse::fromResponse($response);
@@ -424,6 +427,7 @@ final class Sessions extends BaseResource
             path: '/v3/session/{sessionId}/bulk-update-aml-hit-status/',
             query: ['node_id_query' => 'node_id'],
             bodyTypes: ['json'],
+            jsonHints: ['hit_updates' => ['l', ['o']]],
         ), ['sessionId' => $sessionId], $params, $options);
 
         return JsonResponse::fromResponse($response);
@@ -454,6 +458,7 @@ final class Sessions extends BaseResource
             path: '/v3/session/{sessionId}/update-poa-data/',
             query: ['node_id' => 'node_id'],
             bodyTypes: ['json'],
+            jsonHints: ['extra_fields' => ['o'], 'poa_parsed_address' => ['o']],
         ), ['sessionId' => $sessionId], $params, $options);
 
         return Types\SessionsUpdatePoaDataResponse::fromResponse($response);
@@ -571,6 +576,7 @@ final class Sessions extends BaseResource
             method: 'POST',
             path: '/v3/session/{sessionId}/resubmission-preview/',
             bodyTypes: ['json'],
+            jsonHints: ['nodes_to_resubmit' => ['l', ['o']]],
         ), ['sessionId' => $sessionId], $params, $options);
 
         return Types\SessionsPreviewResubmissionResponse::fromResponse($response);

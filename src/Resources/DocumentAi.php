@@ -42,6 +42,7 @@ final class DocumentAi extends BaseResource
             method: 'POST',
             path: '/v3/document-ai/',
             bodyTypes: ['multipart'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DocumentAiAnalyzeResponse::fromResponse($response);

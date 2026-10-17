@@ -38,6 +38,7 @@ final class PassiveLiveness extends BaseResource
             method: 'POST',
             path: '/v3/passive-liveness/',
             bodyTypes: ['multipart'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\PassiveLivenessCheckResponse::fromResponse($response);

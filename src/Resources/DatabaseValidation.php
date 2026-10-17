@@ -39,6 +39,7 @@ final class DatabaseValidation extends BaseResource
             method: 'POST',
             path: '/v3/database-validation/',
             bodyTypes: ['json', 'multipart'],
+            jsonHints: ['address' => ['o'], 'metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DatabaseValidationValidateResponse::fromResponse($response);

@@ -41,6 +41,7 @@ final class Email extends BaseResource
             method: 'POST',
             path: '/v3/email/risk/',
             bodyTypes: ['json'],
+            jsonHints: ['signals' => ['o'], 'metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\EmailRiskResponse::fromResponse($response);
@@ -64,6 +65,7 @@ final class Email extends BaseResource
             method: 'POST',
             path: '/v3/email/send/',
             bodyTypes: ['json'],
+            jsonHints: ['options' => ['o'], 'signals' => ['o'], 'metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\EmailVerificationSendResponse::fromResponse($response);

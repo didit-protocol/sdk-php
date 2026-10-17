@@ -81,6 +81,7 @@ final class Transactions extends BaseResource
             method: 'POST',
             path: '/v3/transactions/',
             bodyTypes: ['json'],
+            jsonHints: ['transaction_details' => ['o', ['crypto_params' => ['o']]], 'subject' => ['o', ['address' => ['o'], 'institution_details' => ['o', ['address' => ['o']]], 'device_context' => ['o', ['network_context' => ['o']]], 'payment_method' => ['o']]], 'counterparty' => ['o', ['address' => ['o'], 'institution_details' => ['o'], 'device_context' => ['o', ['network_context' => ['o']]], 'payment_method' => ['o']]], 'custom_properties' => ['o'], 'travel_rule_details' => ['o', ['originator_data' => ['o'], 'beneficiary_data' => ['o'], 'metadata' => ['o']]], 'network_snapshot' => ['o', ['nodes' => ['l', ['o']], 'edges' => ['l', ['o']], 'metrics' => ['o']]]],
         ), [], $params, $options);
 
         return Types\TransactionDetail::fromResponse($response);

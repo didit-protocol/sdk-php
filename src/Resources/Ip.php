@@ -39,6 +39,7 @@ final class Ip extends BaseResource
             method: 'POST',
             path: '/v3/ip/risk/',
             bodyTypes: ['json'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\IPRiskResponse::fromResponse($response);

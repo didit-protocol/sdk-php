@@ -382,15 +382,16 @@ final class Requester
         $useMultipart = \in_array('multipart', $types, true)
             && (!\in_array('json', $types, true) || Multipart::containsFile($body));
 
+        $hints = $operation->jsonHints;
         if ($useMultipart) {
-            return static function () use ($body): array {
+            return static function () use ($body, $hints): array {
                 $boundary = 'didit-' . bin2hex(random_bytes(16));
 
-                return ['multipart/form-data; boundary=' . $boundary, Multipart::encode($body, $boundary)];
+                return ['multipart/form-data; boundary=' . $boundary, Multipart::encode($body, $boundary, $hints)];
             };
         }
 
-        return static fn (): array => ['application/json', Json::encode([] === $body ? new \stdClass() : $body)];
+        return static fn (): array => ['application/json', Json::encode($body, ['o', $hints])];
     }
 
     /**

@@ -141,7 +141,8 @@ final class Webhook
      * `stdClass` objects to keep the difference), and `json_decode` turns
      * integers above PHP_INT_MAX into floats or strings, so a payload holding
      * one no longer matches its signature. `X-Signature` and
-     * `X-Signature-Simple` are never checked here.
+     * `X-Signature-Simple` are never checked here. `$headers`, `$secret`,
+     * `$tolerance` and `$now` work as in {@see self::verify()}.
      *
      * @param array<mixed>|object $payload the decoded JSON object: an array from `json_decode($body, true)`
      *                                     or a `stdClass` from `json_decode($body)`

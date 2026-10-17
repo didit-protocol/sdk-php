@@ -65,6 +65,7 @@ final class Teams extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/teams/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['members' => ['l', ['o']]],
         ), [], $params, $options);
 
         return Types\CaseReviewTeam::fromResponse($response);
@@ -111,6 +112,7 @@ final class Teams extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/teams/{record_uuid}/',
             applicationScope: true,
             bodyTypes: ['json'],
+            jsonHints: ['members' => ['l', ['o']]],
         ), ['record_uuid' => $recordUuid], $params, $options);
 
         return Types\CaseReviewTeam::fromResponse($response);

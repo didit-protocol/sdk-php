@@ -24,6 +24,8 @@ final class Operation
      * @param array<string, string> $headers parameter key => header name
      * @param list<string> $bodyTypes accepted request encodings: `json`, `multipart`, `form`; empty when the operation has no body
      * @param string $accept the `Accept` header
+     * @param array<string, mixed> $jsonHints body fields that are JSON objects, so an empty PHP array is sent as `{}`:
+     *                                        `['o', [field => hint]]` object, `['m', hint]` map, `['l', hint]` list
      */
     public function __construct(
         public readonly string $method,
@@ -35,6 +37,7 @@ final class Operation
         public readonly array $headers = [],
         public readonly array $bodyTypes = [],
         public readonly string $accept = 'application/json',
+        public readonly array $jsonHints = [],
     ) {
     }
 }

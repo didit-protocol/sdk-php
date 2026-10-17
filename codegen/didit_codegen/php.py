@@ -172,6 +172,39 @@ def array_shape(fields: list[tuple[str, str, bool]], indent: str) -> list[str]:
     return lines
 
 
+def json_hint(t: T) -> list | None:
+    """Where a request value is a JSON object, so an empty PHP array is sent as ``{}``.
+
+    ``['o', {key: hint}]`` object (children optional), ``['m', hint]`` map,
+    ``['l', hint]`` list whose items need hints. None: nothing to do.
+    """
+    if isinstance(t, ShapeT):
+        children = {p.wire: h for p in t.shape.props if (h := json_hint(p.type)) is not None}
+        return ["o", children] if children else ["o"]
+    if isinstance(t, MapT):
+        value = json_hint(t.value)
+        return ["m", value] if value is not None else ["o"]
+    if isinstance(t, FreeObjT):
+        return ["o"]
+    if isinstance(t, ArrayT):
+        item = json_hint(t.item)
+        return ["l", item] if item is not None else None
+    if isinstance(t, UnionT):
+        for v in t.variants:
+            h = json_hint(v)
+            if h is not None:
+                return h
+    return None
+
+
+def php_hint(value) -> str:
+    if isinstance(value, list):
+        return "[" + ", ".join(php_hint(v) for v in value) + "]"
+    if isinstance(value, dict):
+        return "[" + ", ".join(f"{php_string(k)} => {php_hint(v)}" for k, v in value.items()) + "]"
+    return php_string(str(value))
+
+
 # Files ------------------------------------------------------------------------------
 
 
@@ -513,6 +546,10 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
         op_args.append("headers: [" + ", ".join(f"{php_string(p.key)} => {php_string(p.wire)}" for p in headers) + "]")
     if om.body_types:
         op_args.append("bodyTypes: [" + ", ".join(php_string(b) for b in om.body_types) + "]")
+    if om.body is not None:
+        hints = {p.wire: h for p in om.body.props if (h := json_hint(p.type)) is not None}
+        if hints:
+            op_args.append(f"jsonHints: {php_hint(hints)}")
     if om.accept != "application/json":
         op_args.append(f"accept: {php_string(om.accept)}")
     operation = "new Operation(\n" + "".join(f"            {a},\n" for a in op_args) + "        )"

@@ -167,6 +167,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/mitid/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -197,6 +198,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/bankid-se/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -227,6 +229,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/bankid-no/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -257,6 +260,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/vipps/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -287,6 +291,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/buypass/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -317,6 +322,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/itsme/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -347,6 +353,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/idin/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -378,6 +385,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/ftn/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -408,6 +416,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/personalausweis/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -438,6 +447,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/frejaid/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -468,6 +478,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/uae-pass/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -498,6 +509,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/govbr/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -528,6 +540,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/oneid/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -558,6 +571,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/govuk-wallet/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -588,6 +602,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/smart-id/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -619,6 +634,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/mobile-id/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -650,6 +666,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/idcard-ee/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -681,6 +698,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/eparaksts-mobile/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -711,6 +729,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/bankid-cz/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -741,6 +760,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/mojeid/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -771,6 +791,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/diia/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -801,6 +822,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/franceconnect/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -831,6 +853,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/audkenni/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -861,6 +884,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/connectid/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
@@ -891,6 +915,7 @@ final class IdWallets extends BaseResource
             path: '/v3/id-verification/wallets/eudi/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);

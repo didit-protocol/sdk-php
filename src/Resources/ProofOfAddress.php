@@ -40,6 +40,7 @@ final class ProofOfAddress extends BaseResource
             method: 'POST',
             path: '/v3/poa/',
             bodyTypes: ['multipart'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\ProofOfAddressVerifyResponse::fromResponse($response);

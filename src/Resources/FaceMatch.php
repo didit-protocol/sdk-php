@@ -38,6 +38,7 @@ final class FaceMatch extends BaseResource
             method: 'POST',
             path: '/v3/face-match/',
             bodyTypes: ['multipart'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\FaceMatchCompareResponse::fromResponse($response);

@@ -99,6 +99,7 @@ final class Businesses extends BaseResource
             method: 'PATCH',
             path: '/v3/businesses/{vendor_data}/',
             bodyTypes: ['json'],
+            jsonHints: ['metadata' => ['o']],
         ), ['vendor_data' => $vendorData], $params, $options);
 
         return Types\BusinessDetailItem::fromResponse($response);
@@ -209,6 +210,7 @@ final class Businesses extends BaseResource
             method: 'POST',
             path: '/v3/businesses/create/',
             bodyTypes: ['json'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\BusinessDetailItem::fromResponse($response);

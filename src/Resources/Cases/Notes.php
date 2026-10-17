@@ -71,6 +71,7 @@ final class Notes extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/notes/',
             applicationScope: true,
             bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['attachments' => ['l', ['o']]],
         ), ['case_uuid' => $caseUuid], $params, $options);
 
         return Types\CaseCollaborationCaseNote::fromResponse($response);

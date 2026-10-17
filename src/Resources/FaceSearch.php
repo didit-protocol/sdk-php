@@ -39,6 +39,7 @@ final class FaceSearch extends BaseResource
             method: 'POST',
             path: '/v3/face-search/',
             bodyTypes: ['multipart'],
+            jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
         return Types\FaceSearchSearchResponse::fromResponse($response);
