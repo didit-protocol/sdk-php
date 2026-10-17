@@ -344,7 +344,10 @@ final class RetryTest extends TestCase
         }
         self::assertCount(1, $this->support->http->requests, 'the client default of 2 retries is overridden by 0');
         self::assertSame([], $this->support->sleeps);
+    }
 
+    public function testPerRequestMaxRetriesCanRaiseTheClientValue(): void
+    {
         for ($i = 0; $i < 5; ++$i) {
             $this->support->http->queueJson(503, []);
         }
@@ -352,7 +355,7 @@ final class RetryTest extends TestCase
 
         $this->support->client(TestClient::options(maxRetries: 0))->sessions->retrieveDecision('abc', [], new RequestOptions(maxRetries: 5));
 
-        self::assertCount(7, $this->support->http->requests, '1 + 6 attempts');
+        self::assertCount(6, $this->support->http->requests, 'maxRetries 5 means 6 attempts');
         self::assertSame(0, $this->support->http->remaining());
         self::assertSame([0.25, 0.5, 1.0, 2.0, 4.0], $this->support->sleeps);
     }

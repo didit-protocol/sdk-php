@@ -12,7 +12,6 @@ use Didit\Exception\AuthenticationException;
 use Didit\Exception\BadRequestException;
 use Didit\Exception\ConfigurationException;
 use Didit\Exception\ConflictException;
-use Didit\Exception\DiditException;
 use Didit\Exception\InternalServerException;
 use Didit\Exception\NotFoundException;
 use Didit\Exception\PermissionDeniedException;
@@ -77,7 +76,6 @@ final class ErrorsTest extends TestCase
         $e = self::statusError(fn () => $this->client()->sessions->retrieveDecision('abc'));
 
         self::assertSame($class, $e::class);
-        self::assertInstanceOf(DiditException::class, $e);
         self::assertSame($status, $e->status);
         self::assertSame($status, $e->getCode());
         self::assertSame(['detail' => 'Something failed.'], $e->body);
@@ -302,7 +300,6 @@ final class ErrorsTest extends TestCase
             self::fail('no exception');
         } catch (ApiConnectionException $e) {
             self::assertSame($class, $e::class);
-            self::assertInstanceOf(DiditException::class, $e);
             self::assertSame($mayHaveReachedServer, $e->mayHaveReachedServer);
             self::assertSame($failure, $e->getPrevious());
             self::assertStringStartsWith(ApiTimeoutException::class === $class ? 'Request timed out: ' : 'Connection error: ', $e->getMessage());

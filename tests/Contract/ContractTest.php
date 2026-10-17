@@ -67,8 +67,7 @@ final class ContractTest extends TestCase
 
         self::assertSame(248, $verification, 'DESIGN section 4: 248 server operations in verification.json');
         self::assertSame(9, $account, 'every account.json operation is a server operation');
-        self::assertCount($verification + $account + self::deprecatedCount(), self::sdkMethods());
-        self::assertSame(257, $verification + $account);
+        self::assertCount($verification + $account + self::deprecatedCount(), self::sdkMethods(), '248 + 9 = 257 methods, plus deprecated ones');
     }
 
     public function testEveryResourceSegmentIsAProperty(): void
@@ -90,7 +89,7 @@ final class ContractTest extends TestCase
                     $problems[$path] = "{$path}: {$class->getName()}::\${$property} is not a public readonly resource";
                     continue 2;
                 }
-                $class = new \ReflectionClass($type->getName());
+                $class = self::reflect($type->getName());
             }
         }
 
@@ -264,7 +263,7 @@ final class ContractTest extends TestCase
                 continue;
             }
             self::assertTrue($property->isReadOnly(), "{$class->getName()}::\${$property->getName()} is readonly");
-            $child = new \ReflectionClass($type->getName());
+            $child = self::reflect($type->getName());
             self::assertTrue($child->isSubclassOf(BaseResource::class), "{$child->getName()} is a resource");
             self::collect($child, $prefix . $property->getName() . '.', $methods, $visiting);
         }
@@ -286,6 +285,18 @@ final class ContractTest extends TestCase
             }
             $methods[$prefix . $method->getName()] = $method;
         }
+    }
+
+    /**
+     * @return \ReflectionClass<object>
+     */
+    private static function reflect(string $class): \ReflectionClass
+    {
+        if (!class_exists($class)) {
+            self::fail("class {$class} does not exist");
+        }
+
+        return new \ReflectionClass($class);
     }
 
     private static function sdkName(string $resource, string $method): string

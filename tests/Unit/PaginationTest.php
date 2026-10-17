@@ -6,7 +6,6 @@ namespace Didit\Tests\Unit;
 
 use Didit\Core\ClientOptions;
 use Didit\Core\HttpTransport;
-use Didit\Core\ListResponse;
 use Didit\Core\Page;
 use Didit\Core\Requester;
 use Didit\Exception\DiditException;
@@ -15,7 +14,6 @@ use Didit\Tests\Support\Http;
 use Didit\Tests\Support\MockHttpClient;
 use Didit\Tests\Support\TestClient;
 use Didit\Types\SessionsListResponseResults;
-use Didit\Types\WebhooksDestinationsListResponse;
 use GuzzleHttp\Psr7\HttpFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -217,17 +215,17 @@ final class PaginationTest extends TestCase
         $this->support->http->queueJson(200, self::page(['s1', 's2'], $next));
         $this->support->http->queueJson(200, self::page(['stolen'], null));
 
-        $seen = [];
-        try {
-            foreach ($this->support->client()->sessions->list() as $session) {
+        $page = $this->support->client()->sessions->list();
+        $seen = new \ArrayObject();
+        $error = self::thrown(static function () use ($page, $seen): void {
+            foreach ($page as $session) {
                 $seen[] = $session->sessionId;
             }
-            self::fail('the link was followed');
-        } catch (DiditException $e) {
-            self::assertStringContainsString('another origin', $e->getMessage());
-        }
+        });
 
-        self::assertSame(['s1', 's2'], $seen, 'the first page is still delivered');
+        self::assertInstanceOf(DiditException::class, $error, 'the link was refused');
+        self::assertStringContainsString('another origin', $error->getMessage());
+        self::assertSame(['s1', 's2'], $seen->getArrayCopy(), 'the first page is still delivered');
         self::assertCount(1, $this->support->http->requests, 'no request after the first page');
         self::assertSame(1, $this->support->http->remaining());
     }
@@ -333,18 +331,20 @@ final class PaginationTest extends TestCase
 
         $list = $this->support->client()->webhooks->destinations->list();
 
-        self::assertInstanceOf(ListResponse::class, $list);
         self::assertCount(2, $list);
-        self::assertSame(2, \count($list->items));
+        self::assertCount(2, $list->items);
         $uuids = [];
         foreach ($list as $index => $destination) {
-            self::assertInstanceOf(WebhooksDestinationsListResponse::class, $destination);
             $uuids[$index] = $destination->uuid;
         }
         self::assertSame(['d1', 'd2'], $uuids);
-        self::assertSame('https://example.com/hook-1', $list[0]?->url);
-        self::assertFalse($list[1]?->enabled);
-        self::assertSame(1, $list[1]?->get('brand_new'));
+        $first = $list[0];
+        $second = $list[1];
+        self::assertNotNull($first);
+        self::assertNotNull($second);
+        self::assertSame('https://example.com/hook-1', $first->url);
+        self::assertFalse($second->enabled);
+        self::assertSame(1, $second->get('brand_new'));
         self::assertTrue(isset($list[1]));
         self::assertFalse(isset($list[2]));
         self::assertNull($list[2]);
@@ -406,6 +406,20 @@ final class PaginationTest extends TestCase
     private function uris(): array
     {
         return array_map(static fn ($request): string => (string) $request->getUri(), $this->support->http->requests);
+    }
+
+    /**
+     * @param \Closure(): void $call
+     */
+    private static function thrown(\Closure $call): ?\Throwable
+    {
+        try {
+            $call();
+        } catch (\Throwable $e) {
+            return $e;
+        }
+
+        return null;
     }
 
     private static function requester(): Requester

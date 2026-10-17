@@ -33,7 +33,7 @@ final class LoggingTest extends TestCase
     /** @var array<string, string|false> */
     private array $savedEnv = [];
 
-    /** @var array{env: array<string, mixed>, server: array<string, mixed>} */
+    /** @var array{env: array<mixed>, server: array<mixed>} */
     private array $savedGlobals = ['env' => [], 'server' => []];
 
     private TestClient $support;
@@ -244,6 +244,9 @@ final class LoggingTest extends TestCase
         return array_values(array_map(static fn (array $record): string => $record['message'], $this->records->getArrayCopy()));
     }
 
+    /**
+     * @phpstan-impure reads the environment
+     */
     private static function constructedClient(?LoggerInterface $logger = null): DiditClient
     {
         return new DiditClient(
@@ -255,6 +258,9 @@ final class LoggingTest extends TestCase
         );
     }
 
+    /**
+     * @phpstan-impure
+     */
     private static function clientLogger(DiditClient $client): mixed
     {
         $requester = (new \ReflectionProperty(BaseClient::class, 'requester'))->getValue($client);

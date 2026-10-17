@@ -37,7 +37,7 @@ final class TimeoutTest extends TestCase
 {
     private TestClient $support;
 
-    /** @var \ArrayObject<int, mixed> Guzzle history entries */
+    /** @var \ArrayObject<int, array<mixed>> Guzzle history entries */
     private \ArrayObject $history;
 
     private MockHandler $guzzleMock;
@@ -105,7 +105,7 @@ final class TimeoutTest extends TestCase
             self::assertSame(302, $e->status);
         }
         self::assertCount(1, $this->history);
-        self::assertSame(1, $this->guzzleMock->count(), 'the redirect target was never requested');
+        self::assertCount(1, $this->guzzleMock, 'the redirect target was never requested');
     }
 
     public function testGuzzleErrorStatusesAreMappedByTheSdkNotByGuzzle(): void
@@ -262,7 +262,7 @@ final class TimeoutTest extends TestCase
     private function guzzleOptions(int $index): array
     {
         $entry = $this->history[$index] ?? null;
-        self::assertIsArray($entry, "request {$index} was sent");
+        self::assertNotNull($entry, "request {$index} was sent");
         $options = $entry['options'] ?? null;
         self::assertIsArray($options);
 
