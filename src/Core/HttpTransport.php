@@ -53,7 +53,8 @@ final class HttpTransport
                     'allow_redirects' => false,
                 ]);
             }
-            // Psr18Client::withOptions() exists since Symfony 6.2.
+            // Psr18Client::withOptions() exists since Symfony 6.2; older clients are used as they are.
+            // @phpstan-ignore function.alreadyNarrowedType (always true for the Symfony version installed for development)
             if ($client instanceof \Symfony\Component\HttpClient\Psr18Client && method_exists($client, 'withOptions')) {
                 $client = $client->withOptions(['timeout' => $timeout, 'max_duration' => $timeout, 'max_redirects' => 0]);
             }
