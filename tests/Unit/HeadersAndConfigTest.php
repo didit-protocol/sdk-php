@@ -31,10 +31,14 @@ final class HeadersAndConfigTest extends TestCase
     /** @var array<string, string|false> */
     private array $savedEnv = [];
 
+    /** @var array{env: array<mixed>, server: array<mixed>} */
+    private array $savedGlobals = ['env' => [], 'server' => []];
+
     private TestClient $support;
 
     protected function setUp(): void
     {
+        $this->savedGlobals = ['env' => $_ENV, 'server' => $_SERVER];
         foreach (self::ENV as $name) {
             $this->savedEnv[$name] = getenv($name);
             putenv($name);
@@ -47,8 +51,9 @@ final class HeadersAndConfigTest extends TestCase
     {
         foreach ($this->savedEnv as $name => $value) {
             false === $value ? putenv($name) : putenv("{$name}={$value}");
-            unset($_ENV[$name], $_SERVER[$name]);
         }
+        $_ENV = $this->savedGlobals['env'];
+        $_SERVER = $this->savedGlobals['server'];
     }
 
     public function testUserAgentAndClientHeaderFormat(): void
