@@ -148,7 +148,7 @@ final class RequestTest extends TestCase
     {
         $this->support->http->queueJson(200, ['count' => 0, 'next' => null, 'previous' => null, 'results' => []]);
         $this->support->client()->sessions->list(
-            ['limit' => 5, 'vendor_data' => 'a b&c', 'offset' => null],
+            ['limit' => 5, 'vendor_data' => 'a b&c'],
             new RequestOptions(extraQuery: ['flag' => true, 'new_filter' => 'x']),
         );
 
@@ -181,7 +181,7 @@ final class RequestTest extends TestCase
             'transaction_at' => new \DateTimeImmutable('2026-03-01T12:00:00+02:00'),
             'transaction_category' => 'finance',
             'transaction_details' => ['direction' => 'inbound', 'amount' => 10.0, 'currency' => 'EUR'],
-            'subject' => ['entity_type' => 'individual', 'vendor_data' => 'u1'],
+            'subject' => ['entity_type' => 'individual', 'vendor_data' => 'u1', 'full_name' => 'Ada Lovelace'],
         ]);
 
         $body = json_decode((string) $this->support->http->lastRequest()->getBody(), true, 512, \JSON_THROW_ON_ERROR);
