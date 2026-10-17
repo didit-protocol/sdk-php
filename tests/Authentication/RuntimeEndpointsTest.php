@@ -56,7 +56,7 @@ final class RuntimeEndpointsTest extends TestCase
 
         self::assertSame('access.jwt', $tokens->accessToken);
         self::assertSame('id.jwt', $tokens->idToken);
-        self::assertSame('N4yZTl6y24YKYq77X_SOrBn1q2Lit81WBQMOay7dq_IVfTnxyY8ZGcJk-6-fcmWW', $tokens->refreshToken);
+        self::assertSame('test-refresh-token-2', $tokens->refreshToken);
         self::assertSame('Bearer', $tokens->tokenType);
         self::assertSame(299, $tokens->expiresIn);
         self::assertSame('c9abf6cc-2d64-4bf2-b31e-a4d09a070ab1', $tokens->sessionId);
@@ -73,7 +73,7 @@ final class RuntimeEndpointsTest extends TestCase
         $request = $this->issuer->http->last();
         self::assertSame('application/x-www-form-urlencoded', $request->getHeaderLine('Content-Type'));
         self::assertSame(['grant_type' => 'refresh_token', 'refresh_token' => 'old+refresh/token='], self::form($request));
-        self::assertSame('N4yZTl6y24YKYq77X_SOrBn1q2Lit81WBQMOay7dq_IVfTnxyY8ZGcJk-6-fcmWW', $tokens->refreshToken);
+        self::assertSame('test-refresh-token-2', $tokens->refreshToken);
         self::assertSame(1, $this->issuer->http->count('POST', TestIssuer::TOKEN_URL));
     }
 
