@@ -243,7 +243,9 @@ final class Authentication
             'redirect_uri' => $redirectUri,
         ]);
 
-        return TokenSet::fromArray($this->jsonObject($response)) === null ? throw new \LogicException() : TokenSet::fromResponse($response);
+        $this->jsonObject($response);
+
+        return TokenSet::fromResponse($response);
     }
 
     /**

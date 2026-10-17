@@ -65,7 +65,8 @@ final class Es256
             return null;
         }
         $details = openssl_pkey_get_details($key);
-        if (!\is_array($details) || \OPENSSL_KEYTYPE_EC !== ($details['type'] ?? null) || 'prime256v1' !== ($details['ec']['curve_name'] ?? null)) {
+        $ec = \is_array($details) ? $details['ec'] ?? null : null;
+        if (!\is_array($ec) || \OPENSSL_KEYTYPE_EC !== $details['type'] || 'prime256v1' !== ($ec['curve_name'] ?? null)) {
             return null;
         }
 

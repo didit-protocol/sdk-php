@@ -33,8 +33,8 @@ class TokenVerificationException extends DiditException
     /** `aud` does not contain the expected audience. */
     public const INVALID_AUDIENCE = 'invalid_audience';
 
-    /** A claim the verification needs (`exp`, `iat`) is absent or not a number. */
-    public const MISSING_CLAIM = 'missing_claim';
+    /** `exp` or `iat` is absent, or `exp`, `iat` or `nbf` is not a number. */
+    public const INVALID_CLAIM = 'invalid_claim';
 
     /** `exp` is in the past, beyond the leeway. */
     public const EXPIRED = 'expired';
