@@ -164,6 +164,7 @@ final class ContractTest extends TestCase
                     $entry = self::entry($key, $naming, false);
                     if (null !== $entry) {
                         $operations[] = $entry;
+                        $present[$key] = $entry['resource'] . '.' . $entry['method'];
                     }
                 }
             }
@@ -174,12 +175,20 @@ final class ContractTest extends TestCase
             $naming = $deprecated['x-didit-sdk'] ?? null;
             self::assertIsString($key);
             self::assertIsArray($naming, "{$key} has no x-didit-sdk naming");
-            if (isset($present[$key])) {
-                continue; // the operation came back upstream
-            }
             $entry = self::entry($key, $naming, true);
-            if (null !== $entry) {
-                $operations[] = $entry;
+            if (null === $entry) {
+                continue;
+            }
+            if (true === ($deprecated['alias'] ?? false)) {
+                // The previous name of a renamed operation, while the operation still exists under its new name.
+                $current = $present[$key] ?? null;
+                if (\is_string($current) && $current !== $entry['resource'] . '.' . $entry['method']) {
+                    $operations[] = $entry;
+                }
+                continue;
+            }
+            if (!isset($present[$key])) {
+                $operations[] = $entry; // removed upstream, still exposed as deprecated
             }
         }
 
