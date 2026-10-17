@@ -2,13 +2,15 @@
 """Downloads the upstream API documents into openapi/ (docs/DESIGN.md section 3.1).
 
 Usage:
-    python3 codegen/spec_sync.py [--offline-dir DIR] [--summary-file PATH] [--date YYYY-MM-DD]
+    python3 codegen/spec_sync.py [--offline-dir DIR] [--summary-file PATH] [--commit-message-file PATH] [--date YYYY-MM-DD]
 
 Updates openapi/verification.json, openapi/account.json and openapi/SOURCE.json
 when upstream changed, maintains openapi/overlay.json and
 openapi/deprecated-operations.json (including deleting deprecated methods
 once they have shipped for one minor version), and writes the pull request
-summary (Markdown, first line is the title). Prints "No upstream change" and
+summary (Markdown, first line is the title) and the commit message, which
+carries a BREAKING CHANGE footer when the sync breaks the SDK surface, so
+release-please never ships it as a patch. Prints "No upstream change" and
 writes nothing when there is nothing to do. Exit codes: 0 done, 1 download or
 input error, 2 the new documents cannot be generated (for example an operation
 without SDK naming); openapi/ is left untouched and the summary file, when
@@ -108,6 +110,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--offline-dir", type=Path, help="read openapi-25.json and openapi-auth.json from DIR instead of downloading")
     parser.add_argument("--summary-file", type=Path, help="write the pull request summary here (default: stdout)")
+    parser.add_argument("--commit-message-file", type=Path, help="write the commit message here")
     parser.add_argument("--date", help="sync date YYYY-MM-DD (default: today, UTC)")
     parser.add_argument("--root", type=Path, default=ROOT, help=argparse.SUPPRESS)
     args = parser.parse_args(argv)
@@ -148,6 +151,8 @@ def main(argv: list[str] | None = None) -> int:
         args.summary_file.write_text(summary, "utf-8")
     else:
         sys.stdout.write(summary)
+    if args.commit_message_file is not None:
+        args.commit_message_file.write_text(result.report.commit_message, "utf-8")
     changed = ", ".join(result.upstream_changed) or "no upstream file"
     written = ", ".join(sorted(result.files))
     print(f"spec-sync: {changed} changed; updated {written}", file=sys.stderr if args.summary_file is None else sys.stdout)
