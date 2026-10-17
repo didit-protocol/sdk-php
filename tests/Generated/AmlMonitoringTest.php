@@ -7,7 +7,6 @@ declare(strict_types=1);
 namespace Didit\Tests\Generated;
 
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `aml_monitoring` resource.
@@ -29,7 +28,6 @@ final class AmlMonitoringTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\AmlMonitoringRetrieveJobResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"job_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","is_enabled":true,"target_type":"user","total":1,"processed":1,"outcomes":{"enabled":1,"screened_and_enabled":1,"already_enabled":1,"disabled":1,"skipped_no_identity_data":1,"skipped_blocked":1,"skipped_sandbox":1,"failed_provider":1,"failed_insufficient_balance":1},"results":[{"didit_internal_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","vendor_data":"vendor_data-value","outcome":"enabled"}],"error":"error-value","created_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->jobId);

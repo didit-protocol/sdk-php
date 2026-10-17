@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated;
 
-use Didit\Core\BinaryContent;
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -37,7 +35,6 @@ final class UsersTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(2, $result->results);
         self::assertContainsOnlyInstancesOf(Types\UserListItem::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -57,7 +54,6 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\UserDetailItem::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"didit_internal_id":"f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418","vendor_data":"user-abc-123","display_name":null,"full_name":"John Michael Doe","date_of_birth":"1990-05-15","effective_name":"John Michael Doe","status":"ACTIVE","metadata":{"tier":"premium","source":"website"},"portrait_image_url":"https://<media-host>/...","session_count":3,"approved_count":2,"declined_count":0,"in_review_count":1,"issuing_states":["USA"],"approved_emails":["john@example.com"],"approved_phones":["+14155551234"],"features":{"ID_VERIFICATION":"Approved","LIVENESS":"Approved","FACE_MATCH":"Approved","AML":"Approved"},"features_list":[{"feature":"ID_VERIFICATION","status":"Approved"},{"feature":"LIVENESS","status":"Approved"},{"feature":"FACE_MATCH","status":"Approved"},{"feature":"AML","status":"Approved"}],"last_session_at":"2025-06-15T10:30:00Z","last_activity_at":"2025-06-15T10:30:00Z","first_session_at":"2025-06-01T08:00:00Z","tags":[{"uuid":"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d","tag":{"uuid":"e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b","name":"VIP","color":"#2567FF","description":null,"source":"custom","created_at":"2025-05-01T09:00:00Z","updated_at":"2025-05-01T09:00:00Z"},"added_by_email":"analyst@acme.com","added_by_name":"Jane Analyst","created_at":"2025-06-02T11:00:00Z"}],"comments":[{"uuid":"c1111111-2222-4333-8444-555555555555","comment_type":"STATUS_CHANGED","comment":null,"actor_email":"analyst@acme.com","actor_name":"Jane Analyst","previous_status":"FLAGGED","new_status":"ACTIVE","previous_value":null,"new_value":null,"changed_fields":[],"metadata":null,"mentioned_emails":[],"created_at":"2025-06-01T10:30:00Z"}],"created_at":"2025-06-01T08:00:00Z","updated_at":"2025-06-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418', $result->diditInternalId);
@@ -94,7 +90,6 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"full_name":"full_name-value","display_name":"display_name-value","date_of_birth":"2026-01-15","status":"ACTIVE","metadata":{"key":"value"},"approved_emails":["approved_emails-value"],"approved_phones":["approved_phones-value"],"issuing_states":["issuing_states-value"]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\UserDetailItem::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"didit_internal_id":"f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418","vendor_data":"user-abc-123","display_name":"Jane S.","full_name":"Jane Elizabeth Smith","date_of_birth":"1985-11-22","effective_name":"Jane S.","status":"FLAGGED","metadata":{"tier":"premium"},"portrait_image_url":"https://<media-host>/...","session_count":3,"approved_count":2,"declined_count":0,"in_review_count":1,"issuing_states":["USA"],"approved_emails":["john@example.com"],"approved_phones":["+14155551234"],"features":{"ID_VERIFICATION":"Approved","LIVENESS":"Approved","FACE_MATCH":"Approved","AML":"Approved"},"features_list":[{"feature":"ID_VERIFICATION","status":"Approved"},{"feature":"LIVENESS","status":"Approved"},{"feature":"FACE_MATCH","status":"Approved"},{"feature":"AML","status":"Approved"}],"last_session_at":"2025-06-15T10:30:00Z","last_activity_at":"2025-06-15T10:30:00Z","first_session_at":"2025-06-01T08:00:00Z","tags":[{"uuid":"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d","tag":{"uuid":"e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b","name":"VIP","color":"#2567FF","description":null,"source":"custom","created_at":"2025-05-01T09:00:00Z","updated_at":"2025-05-01T09:00:00Z"},"added_by_email":"analyst@acme.com","added_by_name":"Jane Analyst","created_at":"2025-06-02T11:00:00Z"}],"comments":[],"created_at":"2025-06-01T08:00:00Z","updated_at":"2025-06-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418', $result->diditInternalId);
@@ -114,7 +109,6 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/pdf, application/json', $request->getHeaderLine('Accept'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(BinaryContent::class, $result);
         self::assertSame('binary-content', $result->contents());
         self::assertSame('application/pdf', $result->contentType());
     }
@@ -141,7 +135,6 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data_list":["vendor_data_list-value"],"didit_internal_id_list":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"delete_all":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\UsersBatchDeleteResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"deleted":2}'), $result->toArray());
         self::assertSame(2, $result->deleted);
@@ -192,7 +185,6 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"status":"ACTIVE"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\UserDetailItem::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"didit_internal_id":"f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418","vendor_data":"user-abc-123","display_name":null,"full_name":"John Michael Doe","date_of_birth":"1990-05-15","effective_name":"John Michael Doe","status":"BLOCKED","metadata":{"tier":"premium","source":"website"},"portrait_image_url":"https://<media-host>/...","session_count":3,"approved_count":2,"declined_count":0,"in_review_count":1,"issuing_states":["USA"],"approved_emails":["john@example.com"],"approved_phones":["+14155551234"],"features":{"ID_VERIFICATION":"Approved","LIVENESS":"Approved","FACE_MATCH":"Approved","AML":"Approved"},"features_list":[{"feature":"ID_VERIFICATION","status":"Approved"},{"feature":"LIVENESS","status":"Approved"},{"feature":"FACE_MATCH","status":"Approved"},{"feature":"AML","status":"Approved"}],"last_session_at":"2025-06-15T10:30:00Z","last_activity_at":"2025-06-15T10:30:00Z","first_session_at":"2025-06-01T08:00:00Z","tags":[{"uuid":"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d","tag":{"uuid":"e1f2a3b4-c5d6-4e7f-8a9b-0c1d2e3f4a5b","name":"VIP","color":"#2567FF","description":null,"source":"custom","created_at":"2025-05-01T09:00:00Z","updated_at":"2025-05-01T09:00:00Z"},"added_by_email":"analyst@acme.com","added_by_name":"Jane Analyst","created_at":"2025-06-02T11:00:00Z"}],"comments":[{"uuid":"c1111111-2222-4333-8444-555555555555","comment_type":"STATUS_CHANGED","comment":null,"actor_email":null,"actor_name":null,"previous_status":"ACTIVE","new_status":"BLOCKED","previous_value":null,"new_value":null,"changed_fields":[],"metadata":null,"mentioned_emails":[],"created_at":"2025-06-15T10:30:00Z"}],"created_at":"2025-06-01T08:00:00Z","updated_at":"2025-06-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418', $result->diditInternalId);
@@ -230,7 +222,6 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","full_name":"full_name-value","display_name":"display_name-value","date_of_birth":"2026-01-15","status":"ACTIVE","metadata":{"key":"value"},"approved_emails":["approved_emails-value"],"approved_phones":["approved_phones-value"],"issuing_states":["issuing_states-value"]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\UserDetailItem::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"didit_internal_id":"f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418","vendor_data":"user-abc-123","display_name":null,"full_name":"John Doe","date_of_birth":null,"effective_name":"John Doe","status":"ACTIVE","metadata":{},"portrait_image_url":null,"session_count":0,"approved_count":0,"declined_count":0,"in_review_count":0,"issuing_states":[],"approved_emails":[],"approved_phones":[],"features":{},"features_list":[],"last_session_at":null,"last_activity_at":"2025-06-15T10:30:00Z","first_session_at":null,"tags":[],"comments":[],"created_at":"2025-06-15T10:30:00Z","updated_at":"2025-06-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418', $result->diditInternalId);
@@ -253,7 +244,6 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"image":"ZmFrZQ==","comment":"comment-value"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\UsersUploadFaceResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee","image_url":"https://signed-url.example/face.jpg","comment":"Imported from previous KYC provider","uploaded_by":"api","created_at":"2026-05-18T12:00:00Z"}'), $result->toArray());
         self::assertSame('aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee', $result->uuid);
@@ -306,7 +296,6 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\UsersRetrieveOngoingMonitoringJobResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"job_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","is_enabled":true,"total":1,"processed":1,"outcomes":{"enabled":1,"screened_and_enabled":1,"already_enabled":1,"disabled":1,"skipped_no_identity_data":1,"skipped_blocked":1,"skipped_sandbox":1,"failed_provider":1,"failed_insufficient_balance":1},"error":"error-value","estimate":{"users_total":1,"already_enabled":1,"with_existing_aml":1,"needing_screening":1,"skipped_no_identity_data":1,"skipped_blocked":1,"estimated_screening_cost_usd":1.5,"estimated_annual_monitoring_cost_usd":1.5,"balance_sufficient":true}}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->jobId);
@@ -325,7 +314,6 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\UsersListNetworksResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z"},"subject":{"key":"value"},"signal_types":["ip_address"],"signal_count":1,"joined_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}]}'), $result->toArray());
     }

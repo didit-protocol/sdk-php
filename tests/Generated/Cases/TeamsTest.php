@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Cases;
 
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -36,7 +35,6 @@ final class TeamsTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\CaseReviewTeam::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -66,7 +64,6 @@ final class TeamsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"name":"name-value","description":"description-value","members":[{"user_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}],"is_active":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CaseReviewTeam::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"name":"name-value","description":"description-value","members":[{"user_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","availability":"available","capacity":1,"skills":["skills-value"],"available_from":"2026-01-15T10:30:00Z","available_until":"2026-01-15T10:30:00Z"}],"is_active":true,"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('name-value', $result->name);
@@ -85,7 +82,6 @@ final class TeamsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\CaseReviewTeam::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"name":"name-value","description":"description-value","members":[{"user_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","availability":"available","capacity":1,"skills":["skills-value"],"available_from":"2026-01-15T10:30:00Z","available_until":"2026-01-15T10:30:00Z"}],"is_active":true,"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('name-value', $result->name);
@@ -114,7 +110,6 @@ final class TeamsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"name":"name-value","description":"description-value","members":[{"user_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}],"is_active":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CaseReviewTeam::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"name":"name-value","description":"description-value","members":[{"user_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","availability":"available","capacity":1,"skills":["skills-value"],"available_from":"2026-01-15T10:30:00Z","available_until":"2026-01-15T10:30:00Z"}],"is_active":true,"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('name-value', $result->name);

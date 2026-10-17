@@ -7,7 +7,6 @@ declare(strict_types=1);
 namespace Didit\Tests\Generated;
 
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `business_sessions` resource.
@@ -29,7 +28,6 @@ final class BusinessSessionsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\BusinessSessionsListNetworksResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z"},"subject":{"key":"value"},"signal_types":["ip_address"],"signal_count":1,"joined_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}]}'), $result->toArray());
     }

@@ -8,7 +8,6 @@ namespace Didit\Tests\Generated;
 
 use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `customization` resource.
@@ -30,7 +29,6 @@ final class CustomizationTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\BrandingCustomization::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"color_primary":"#000000","color_secondary":"#9DA1A1","color_background":"#FFFFFF","color_panel":"#2567FF","color_panel_10":"#1A1A1A","color_on_panel_1":"#9DA1A1","color_on_panel_2":"#F4F4F6","color_on_background":"#000000","color_button_1":"#2567FF","color_button_2":"#F8F8F8","color_button_text_1":"#FFFFFF","color_button_text_2":"#000000","color_pill_text":"#111827","border_radius_panel":10,"border_radius_buttons":12,"font_family":"Inter","font_weight":"regular","font_url":"https://fonts.googleapis.com/css2?family=Inter","logo_square":null,"logo_rectangular":null,"favicon":null,"app_public_name":"Acme Verify","privacy_policy_url":"https://acme.com/privacy","skip_welcome_screen":false,"disable_login_with_didit":false,"hide_progress_bar":false,"callback_seconds":3}'), $result->toArray());
         self::assertSame('#000000', $result->colorPrimary);
@@ -168,7 +166,6 @@ final class CustomizationTest extends GeneratedTestCase
                 'file:image_favicon.jpg:image/jpeg:fake-image_favicon-bytes',
             ],
         ], $this->multipartFields($request));
-        self::assertInstanceOf(Types\BrandingCustomization::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"color_primary":"#123456","color_secondary":"#9DA1A1","color_background":"#FFFFFF","color_panel":"#2567FF","color_panel_10":"#1A1A1A","color_on_panel_1":"#9DA1A1","color_on_panel_2":"#F4F4F6","color_on_background":"#000000","color_button_1":"#2567FF","color_button_2":"#F8F8F8","color_button_text_1":"#FFFFFF","color_button_text_2":"#000000","color_pill_text":"#111827","border_radius_panel":10,"border_radius_buttons":16,"font_family":"AR One Sans","font_weight":"400","font_url":"https://fonts.googleapis.com/css2?family=AR+One+Sans","logo_square":null,"logo_rectangular":"https://cdn.didit.me/white_label/logo_rectangular/...","favicon":null,"app_public_name":"Acme Verify","privacy_policy_url":"https://acme.com/privacy","skip_welcome_screen":true,"disable_login_with_didit":false,"hide_progress_bar":false,"callback_seconds":3}'), $result->toArray());
         self::assertSame('#123456', $result->colorPrimary);

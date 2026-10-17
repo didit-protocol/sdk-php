@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Cases;
 
-use Didit\Core\BinaryContent;
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -39,7 +37,6 @@ final class RequestsTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\CustomerMessagingCaseRequest::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -67,7 +64,6 @@ final class RequestsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"contact_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","purpose":"identity_document","language":"en","request_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","expires_at":"2026-01-15T10:30:00+00:00","preview_token":"preview_token-value"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CustomerMessagingCaseRequest::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","purpose":"purpose-value","language":"language-value","recipient":"user@example.com","expires_at":"2026-01-15T10:30:00Z","actor_email":"user@example.com","delivery_status":"delivery_status-value","delivered_at":"2026-01-15T10:30:00Z","cancelled_at":"2026-01-15T10:30:00Z","responded_at":"2026-01-15T10:30:00Z","response":"response-value","has_attachment":true,"created_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -86,7 +82,6 @@ final class RequestsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\CustomerMessagingCaseRequest::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","purpose":"purpose-value","language":"language-value","recipient":"user@example.com","expires_at":"2026-01-15T10:30:00Z","actor_email":"user@example.com","delivery_status":"delivery_status-value","delivered_at":"2026-01-15T10:30:00Z","cancelled_at":"2026-01-15T10:30:00Z","responded_at":"2026-01-15T10:30:00Z","response":"response-value","has_attachment":true,"created_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -105,7 +100,6 @@ final class RequestsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\CustomerMessagingCaseRequestOptions::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"contacts":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","email":"user@example.com","verified_at":"2026-01-15T10:30:00Z"}],"purposes":["identity_document"],"languages":["en"]}'), $result->toArray());
     }
@@ -124,7 +118,6 @@ final class RequestsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('image/jpeg, application/json', $request->getHeaderLine('Accept'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(BinaryContent::class, $result);
         self::assertSame('binary-content', $result->contents());
         self::assertSame('image/jpeg', $result->contentType());
     }
@@ -147,7 +140,6 @@ final class RequestsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"contact_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","purpose":"identity_document","language":"en"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CustomerMessagingCaseRequestPreviewResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","expires_at":"2026-01-15T10:30:00Z","recipient":"user@example.com","sender":"sender-value","subject":"subject-value","html":"html-value","requires_user_action":true,"preview_token":"preview_token-value"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->requestId);

@@ -8,7 +8,6 @@ namespace Didit\Tests\Generated;
 
 use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `passive_liveness` resource.
@@ -59,7 +58,6 @@ final class PassiveLivenessTest extends GeneratedTestCase
                 '{"key":"value"}',
             ],
         ], $this->multipartFields($request));
-        self::assertInstanceOf(Types\PassiveLivenessCheckResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"a1b2c3d4-e5f6-7890-1234-567890abcdef","liveness":{"status":"Approved","method":"PASSIVE","score":95.0,"user_image":{"entities":[{"bbox":[661,728,1688,2188],"confidence":0.732973,"age":26.91,"gender":"male","race":null}],"best_angle":0},"warnings":[],"face_quality":84.21,"face_luminance":50.33},"vendor_data":"user-123","metadata":null,"created_at":"2026-06-12T01:04:42.763237+00:00"}'), $result->toArray());
         self::assertSame('a1b2c3d4-e5f6-7890-1234-567890abcdef', $result->requestId);

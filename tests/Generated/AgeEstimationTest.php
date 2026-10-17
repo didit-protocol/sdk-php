@@ -8,7 +8,6 @@ namespace Didit\Tests\Generated;
 
 use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `age_estimation` resource.
@@ -63,7 +62,6 @@ final class AgeEstimationTest extends GeneratedTestCase
                 '{"key":"value"}',
             ],
         ], $this->multipartFields($request));
-        self::assertInstanceOf(Types\AgeEstimationEstimateResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"0c40ba43-64ab-4e2e-b4b8-7d1f12f81bc1","age_estimation":{"status":"Approved","method":"PASSIVE","score":97.5,"user_image":{"entities":[{"age":27.33,"bbox":[40,40,100,100],"confidence":0.7177750468254089,"gender":"male"}],"best_angle":0},"age_estimation":27.33,"warnings":[]},"vendor_data":"user-123","metadata":{"flow":"age-gate"},"created_at":"2026-06-12T02:24:11.512941+00:00"}'), $result->toArray());
         self::assertSame('0c40ba43-64ab-4e2e-b4b8-7d1f12f81bc1', $result->requestId);

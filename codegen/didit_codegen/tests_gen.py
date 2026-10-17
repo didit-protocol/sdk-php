@@ -219,28 +219,27 @@ def _response(om: OpModel) -> tuple[str, list[str], set[str]]:
     r = om.response
     uses: set[str] = set()
     out: list[str] = []
-    if r.kind == "union":
+    union = r.kind == "union"
+    if union:
         r = r.variants[0]
+        first = r.type.model.name if isinstance(r.type, ModelT) else None
+        if first:
+            out.append(f"        self::assertInstanceOf(Types\\{first}::class, $result);")
+            uses.add("Didit\\Types")
     status = int(r.status or 200)
     if r.kind == "none":
-        out.append("        self::assertInstanceOf(NoContent::class, $result);")
         out.append(f"        self::assertSame({status}, $result->rawResponse()?->status);")
-        uses.add("Didit\\Core\\NoContent")
         return f"$this->queueEmpty({status});", out, uses
     if r.kind == "binary":
         ct = r.content_type or "application/octet-stream"
-        out.append("        self::assertInstanceOf(BinaryContent::class, $result);")
         out.append("        self::assertSame('binary-content', $result->contents());")
         out.append(f"        self::assertSame({php_str(ct)}, $result->contentType());")
-        uses.add("Didit\\Core\\BinaryContent")
         return f"$this->queueBinary({status}, 'binary-content', {php_str(ct)});", out, uses
 
     example = _response_example(om, r)
     if r.kind == "json":
         data = example if example is not None else {"key": "value"}
-        out.append("        self::assertInstanceOf(JsonResponse::class, $result);")
         out.append(f"        self::assertSame($this->decoded({php_str(json_text(data))}), $result->data);")
-        uses.add("Didit\\Core\\JsonResponse")
         return f"$this->queueJson({status}, {php_str(json_text(data))});", out, uses
     if r.kind == "page":
         item = r.type
@@ -250,37 +249,31 @@ def _response(om: OpModel) -> tuple[str, list[str], set[str]]:
         }
         data = dict(data)
         data["next"] = None
-        out.append("        self::assertInstanceOf(Page::class, $result);")
         out.append(f"        self::assertCount({len(data['results'])}, $result->results);")
         if isinstance(item, ModelT):
             out.append(f"        self::assertContainsOnlyInstancesOf(Types\\{item.model.name}::class, $result->results);")
             uses.add("Didit\\Types")
         out.append("        self::assertFalse($result->hasNextPage());")
         out.append(f"        self::assertSame($this->decoded({php_str(json_text(data))}), $result->toArray());")
-        uses.add("Didit\\Core\\Page")
         return f"$this->queueJson({status}, {php_str(json_text(data))});", out, uses
     if r.kind == "list":
         item = r.type
         data = example if isinstance(example, list) and example else [response_sample(item, "item")]
-        out.append("        self::assertInstanceOf(ListResponse::class, $result);")
         if isinstance(item, ModelT):
             out.append(f"        self::assertCount({len(data)}, $result);")
             out.append(f"        self::assertContainsOnlyInstancesOf(Types\\{item.model.name}::class, $result->items);")
             uses.add("Didit\\Types")
         out.append(f"        self::assertSame($this->decoded({php_str(json_text(data))}), $result->toArray());")
-        uses.add("Didit\\Core\\ListResponse")
         return f"$this->queueJson({status}, {php_str(json_text(data))});", out, uses
     if r.kind == "model":
         assert isinstance(r.type, ModelT)
         model = r.type.model
         data = example if isinstance(example, dict) else model_sample(model)
-        out.append(f"        self::assertInstanceOf(Types\\{model.name}::class, $result);")
         out.append(f"        self::assertSame({status}, $result->rawResponse()?->status);")
         out.append(f"        self::assertSame($this->decoded({php_str(json_text(data))}), $result->toArray());")
         check = _scalar_check(model, data)
         if check:
             out.append(check)
-        uses.add("Didit\\Types")
         return f"$this->queueJson({status}, {php_str(json_text(data))});", out, uses
     raise ValueError(r.kind)
 
@@ -315,7 +308,7 @@ def _scalar_check(model, data: dict[str, Any]) -> str | None:
             if base == "int" and isinstance(value, int) and not isinstance(value, bool):
                 return f"        self::assertSame({value}, $result->{p.name});"
             if base == "bool" and isinstance(value, bool):
-                return f"        self::assertSame({'true' if value else 'false'}, $result->{p.name});"
+                return f"        self::assert{'True' if value else 'False'}($result->{p.name});"
         if isinstance(t, DateTimeT) and isinstance(value, str) and re.match(r"^\d{4}-\d{2}-\d{2}T", value):
             return f"        self::assertInstanceOf(\\DateTimeImmutable::class, $result->{p.name});"
     return None

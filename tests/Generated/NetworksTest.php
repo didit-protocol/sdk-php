@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated;
 
-use Didit\Core\BinaryContent;
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -57,7 +55,6 @@ final class NetworksTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\NetworkListItem::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -77,7 +74,6 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\NetworkDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z","stats":{"key":"value"},"fraud_tags":[{"key":"value"}],"risk_signals":{"key":"value"},"reviewed_at":"2026-01-15T10:30:00Z","reviewed_by":"reviewed_by-value","review_reason":"review_reason-value"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -104,7 +100,6 @@ final class NetworksTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\NetworkGraph::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z","stats":{"key":"value"},"fraud_tags":[{"key":"value"}],"risk_signals":{"key":"value"},"reviewed_at":"2026-01-15T10:30:00Z","reviewed_by":"reviewed_by-value","review_reason":"review_reason-value"},"depth":1,"truncated":true,"nodes":[{"id":"id-value","kind":"vendor_user"}],"edges":[{"id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","source":"source-value","target":"target-value","subject_kind":"vendor_user","signal_type":"ip_address","confidence":1.5,"observation_count":1,"first_seen_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}],"metrics":{"node_count":1,"edge_count":1,"hub_signal_count":1}}'), $result->toArray());
         self::assertSame(1, $result->depth);
@@ -123,7 +118,6 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\NetworksListMembersResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"subject":{"key":"value"},"outcome_status":"outcome_status-value","node_status":"approved","tags":[{"id":"id-value","name":"name-value","color":"color-value","source":"subject_tag","category":"customer"}],"risk":{"score":1,"band":"low","bar":1.5},"signal_coverage":{"key":"value"},"shared_infrastructure":{"key":"value"},"joined_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z","provenance":{"session_ids":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"business_session_ids":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"transaction_ids":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"]}}]}'), $result->toArray());
     }
@@ -141,7 +135,6 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\NetworksListSignalsResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","signal_type":"ip_address","subject_count":1,"coverage":1.5,"is_hub":true,"is_datacenter_ip":true,"is_high_collision_device":true,"node_status":"signal_active","tags":[{"id":"id-value","name":"name-value","color":"color-value","source":"subject_tag","category":"customer"}],"risk_evidence":{"key":"value"},"first_seen_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}]}'), $result->toArray());
     }
@@ -159,7 +152,6 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\NetworksRetrieveTimelineResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"event_type":"event_type-value","occurred_at":"2026-01-15T10:30:00Z","label":"label-value","metadata":{"key":"value"}}]}'), $result->toArray());
     }
@@ -177,7 +169,6 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\NetworkMap::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z","stats":{"key":"value"},"fraud_tags":[{"key":"value"}],"risk_signals":{"key":"value"},"reviewed_at":"2026-01-15T10:30:00Z","reviewed_by":"reviewed_by-value","review_reason":"review_reason-value"},"convergence_count":1,"countries":["countries-value"],"points":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","country":"country-value","country_code":"country_code-value","city":"city-value","latitude":1.5,"longitude":1.5,"observed_at":"2026-01-15T10:30:00Z"}]}'), $result->toArray());
         self::assertSame(1, $result->convergenceCount);
@@ -200,7 +191,6 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame('authorization-value', $request->getHeaderLine('Authorization'));
         self::assertSame('application/pdf, application/json', $request->getHeaderLine('Accept'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(BinaryContent::class, $result);
         self::assertSame('binary-content', $result->contents());
         self::assertSame('application/pdf', $result->contentType());
     }

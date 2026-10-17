@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated;
 
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -50,7 +49,6 @@ final class BiometricTemplatesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\BiometricTemplatesListResponseResults::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -84,7 +82,6 @@ final class BiometricTemplatesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\BiometricTemplatesCountResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"count":128}'), $result->toArray());
         self::assertSame(128, $result->count);
@@ -103,7 +100,6 @@ final class BiometricTemplatesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\BiometricTemplatesRetrieveResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"9d2f4b6e-1c3a-4e8f-b7d5-0a1c2e3f4a5b","vendor_user_uuid":"2f7c1a9e-8b4d-4c6a-9e1f-3d5b7a9c1e2f","vendor_data":"user-42","source_type":"session_delete","provenance_reference":"6b1e8d2f-4a3c-4f9e-8c7d-1a2b3c4d5e6f","retention_policy":"retain_until_user_deleted","retention_override":null,"retained_at":"2026-08-28T10:15:42.318402Z","expires_at":"2027-08-28T10:15:42.318402Z","retained_by":"3c9e2b1f-7d4a-4e8b-9c1d-5f6a7b8c9d0e","retained_by_type":"API_KEY","instruction_class":"operational_session_delete","instruction_source":"api","instruction_id":"post-approval-cleanup-2026-08","held_out_of_use":false,"status":"active","purged_at":null}'), $result->toArray());
         self::assertSame('9d2f4b6e-1c3a-4e8f-b7d5-0a1c2e3f4a5b', $result->uuid);
@@ -122,7 +118,6 @@ final class BiometricTemplatesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\BiometricTemplatesDeleteResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"9d2f4b6e-1c3a-4e8f-b7d5-0a1c2e3f4a5b","outcome":"purged"}'), $result->toArray());
         self::assertSame('9d2f4b6e-1c3a-4e8f-b7d5-0a1c2e3f4a5b', $result->uuid);
@@ -153,7 +148,6 @@ final class BiometricTemplatesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"template_uuids":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"delete_all":true,"vendor_data":"vendor_data-value","vendor_user_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"pending","source_type":"session_delete","retained_from":"2026-01-15T10:30:00+00:00","retained_to":"2026-01-15T10:30:00+00:00"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\BiometricTemplatesBatchDeleteResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"uuid":"9d2f4b6e-1c3a-4e8f-b7d5-0a1c2e3f4a5b","outcome":"purged"},{"uuid":"1a2b3c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d","outcome":"already_purged"}]}'), $result->toArray());
     }

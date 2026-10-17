@@ -7,7 +7,6 @@ declare(strict_types=1);
 namespace Didit\Tests\Generated;
 
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `id_wallets` resource.
@@ -29,7 +28,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletCatalogResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"wallets":[{"id":"id-value","name":"name-value","path":"path-value","countries":["countries-value"],"issuing_authority":"issuing_authority-value","level_of_assurance":"level_of_assurance-value","interaction":"redirect","required_fields":["required_fields-value"],"available":true}]}'), $result->toArray());
     }
@@ -47,7 +45,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"ftn","name":"Finnish Trust Network","issuing_authority":"Finnish banks and mobile operators (FTN)"},"country":"FIN","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -66,7 +63,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"smart_id","name":"Smart-ID","issuing_authority":"SK ID Solutions"},"country":"EST","status":"Not Finished","outcome":"pending","error":null,"interaction":"in_app","simulated":true,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"confirm_in_app","verification_code":"1234","poll_interval_seconds":2},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -85,7 +81,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"ftn","name":"Finnish Trust Network","issuing_authority":"Finnish banks and mobile operators (FTN)"},"country":"FIN","status":"Declined","outcome":"cancelled","error":"cancelled_by_customer","interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":null,"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -116,7 +111,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"DNK","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"mitid","name":"MitID","issuing_authority":"Danish Agency for Digital Government"},"country":"DNK","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -147,7 +141,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"SWE","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"bankid_se","name":"BankID","issuing_authority":"Finansiell ID-Teknik / bank consortium"},"country":"SWE","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -178,7 +171,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"NOR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"bankid_no","name":"BankID","issuing_authority":"BankID BankAxept AS"},"country":"NOR","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -209,7 +201,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"NOR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"vipps","name":"Vipps","issuing_authority":"Vipps MobilePay / BankID NO"},"country":"NOR","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -240,7 +231,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"NOR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"buypass","name":"Buypass ID","issuing_authority":"Buypass AS"},"country":"NOR","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -271,7 +261,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"BEL","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"itsme","name":"itsme","issuing_authority":"Belgian Mobile ID"},"country":"BEL","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -302,7 +291,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"NLD","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"idin","name":"iDIN","issuing_authority":"Dutch banks (Currence iDIN)"},"country":"NLD","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -333,7 +321,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"FIN","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"ftn","name":"Finnish Trust Network","issuing_authority":"Finnish banks and mobile operators (FTN)"},"country":"FIN","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -364,7 +351,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"DEU","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"personalausweis","name":"Personalausweis","issuing_authority":"Bundesministerium des Innern (eID)"},"country":"DEU","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -395,7 +381,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"SWE","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"frejaid","name":"Freja eID","issuing_authority":"Freja eID Group"},"country":"SWE","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -426,7 +411,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"ARE","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"uae_pass","name":"UAE PASS","issuing_authority":"UAE Digital Government Authority"},"country":"ARE","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -457,7 +441,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"BRA","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"govbr","name":"gov.br","issuing_authority":"Governo Federal do Brasil"},"country":"BRA","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -488,7 +471,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"GBR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"oneid","name":"OneID","issuing_authority":"OneID (UK bank-verified identity)"},"country":"GBR","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -519,7 +501,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"GBR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"govuk_wallet","name":"GOV.UK Wallet","issuing_authority":"UK Government Digital Service"},"country":"GBR","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -549,7 +530,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"EST","personal_code":"personal_code-value"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"smart_id","name":"Smart-ID","issuing_authority":"SK ID Solutions"},"country":"EST","status":"Not Finished","outcome":"pending","error":null,"interaction":"in_app","simulated":true,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"confirm_in_app","verification_code":"1234","poll_interval_seconds":2},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -580,7 +560,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"EST","personal_code":"personal_code-value","phone_number":"phone_number-value"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"mobile_id","name":"Mobile-ID","issuing_authority":"SK ID Solutions with the national mobile operators"},"country":"EST","status":"Not Finished","outcome":"pending","error":null,"interaction":"in_app","simulated":true,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"confirm_in_app","verification_code":"1234","poll_interval_seconds":2},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -611,7 +590,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"EST","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"idcard_ee","name":"Estonian ID-card","issuing_authority":"Police and Border Guard Board (Estonia)"},"country":"EST","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -642,7 +620,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"LVA","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"eparaksts_mobile","name":"eParaksts mobile","issuing_authority":"LVRTC (Latvian State Radio and Television Centre)"},"country":"LVA","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -673,7 +650,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"CZE","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"bankid_cz","name":"Bank iD","issuing_authority":"Bankovní identita, a.s."},"country":"CZE","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -704,7 +680,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"CZE","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"mojeid","name":"MojeID","issuing_authority":"CZ.NIC"},"country":"CZE","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -735,7 +710,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"UKR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"diia","name":"Diia","issuing_authority":"Ministry of Digital Transformation of Ukraine"},"country":"UKR","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -766,7 +740,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"FRA","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"franceconnect","name":"FranceConnect","issuing_authority":"DINUM (French state)"},"country":"FRA","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -797,7 +770,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"ISL","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"audkenni","name":"Auðkenni","issuing_authority":"Auðkenni (Icelandic electronic ID)"},"country":"ISL","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -829,7 +801,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"AUS","authorisation_server_id":"authorisation_server_id-value","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"connectid","name":"ConnectID","issuing_authority":"Australian Payments Plus"},"country":"AUS","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
@@ -860,7 +831,6 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"AUT","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\DigitalIdWalletApiWalletVerificationResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"eudi","name":"EUDI Wallet","issuing_authority":"The user\'s own member state; the issuer differs per country"},"country":"AUT","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);

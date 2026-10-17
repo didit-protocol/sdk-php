@@ -8,7 +8,6 @@ namespace Didit\Tests\Generated;
 
 use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `database_validation` resource.
@@ -308,7 +307,6 @@ final class DatabaseValidationTest extends GeneratedTestCase
                 'file:selfie.jpg:image/jpeg:fake-selfie-bytes',
             ],
         ], $this->multipartFields($request));
-        self::assertInstanceOf(Types\DatabaseValidationValidateResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"7f9a1c0e-1f2b-4f6e-9d3a-2b1c0e7f9a1c","database_validation":{"status":"Approved","issuing_state":"BRA","validation_type":"one_by_one","screened_data":{"tax_number":"12345678900","first_name":"John","last_name":"Doe","date_of_birth":"1980-01-01"},"match_type":"full_match","validations":[{"validation":{"full_name":"full_match","date_of_birth":"full_match","identification_number":"full_match"},"outcome_code":"MATCH","outcome_detail":"200","service_id":"bra_cpf","service_name":"Brazil - CPF status check","source_data":{"identification_number":"12345678900","first_name":"JOHN","last_name":"DOE","date_of_birth":"1980-01-01","lgpd_minor":false,"minor_under_16":false,"minor_under_18":false}}],"warnings":[]},"vendor_data":"user-1234","metadata":null,"created_at":"2026-06-11T10:30:00.000000+00:00"}'), $result->toArray());
         self::assertSame('7f9a1c0e-1f2b-4f6e-9d3a-2b1c0e7f9a1c', $result->requestId);

@@ -8,7 +8,6 @@ namespace Didit\Tests\Generated;
 
 use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `proof_of_address` resource.
@@ -103,7 +102,6 @@ final class ProofOfAddressTest extends GeneratedTestCase
                 '{"key":"value"}',
             ],
         ], $this->multipartFields($request));
-        self::assertInstanceOf(Types\ProofOfAddressVerifyResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"4b523a8d-ed32-45e4-8aa8-a89eda459d88","poa":{"issuing_state":"ARG","document_type":"UTILITY_BILL","document_subtype":"WATER_BILL","document_language":"es","issuer":"Aguas del Norte","issue_date":"2026-04-10","expiration_date":null,"poa_address":"AVDA. MONSEÑOR TAVELLA N° 1291, B° VILLA LAVALLE CP: 4400, CAPITAL - SALTA","poa_formatted_address":"Av. Monseñor Tavella 1291 b, A4400 Salta, Argentina","poa_parsed_address":{"street_1":"Avenida Monseñor Tavella 1291","street_2":"b","city":"Salta","region":"Salta","country":"AR","postal_code":"A4400","document_location":{"latitude":-24.8208682,"longitude":-65.4130954}},"expected_details_address":null,"expected_details_formatted_address":null,"expected_details_parsed_address":null,"name_on_document":"OESTE EMBOTELLADORA S.A.","extra_fields":{"bank_account_number":null,"bank_iban":null,"bank_sort_code":null,"bank_routing_number":null,"bank_swift_bic":null,"bank_branch_name":null,"bank_branch_address":null,"document_phone_number":null,"additional_names":["LA EMBOTELLADORA DEL NORTE SA"]},"detected_codes":[{"type":"QR_CODE","page_number":1,"position":[[820,1120],[1002,1120],[1002,1302],[820,1302]],"x":820,"y":1120,"width":182,"height":182,"page_width":1190,"page_height":1684,"raw_payload":"aHR0cHM6Ly9hZ3Vhc2RlbG5vcnRlLmNvbS9mYWN0dXJhLzk5ODgxMQ==","parsed_payload":"https://aguasdelnorte.com/factura/998811"},{"type":"CODE_128","page_number":1,"position":[[112,1480],[560,1480],[560,1540],[112,1540]],"x":112,"y":1480,"width":448,"height":60,"page_width":1190,"page_height":1684,"raw_payload":"MDA5OTg4MTEwMDA0Mg==","parsed_payload":"0099881100042"}],"status":"Approved","warnings":[]},"vendor_data":"user-123","metadata":null,"created_at":"2026-06-12T02:29:02.439655+00:00"}'), $result->toArray());
         self::assertSame('4b523a8d-ed32-45e4-8aa8-a89eda459d88', $result->requestId);

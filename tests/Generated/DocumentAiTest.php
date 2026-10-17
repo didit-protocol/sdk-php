@@ -8,7 +8,6 @@ namespace Didit\Tests\Generated;
 
 use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `document_ai` resource.
@@ -95,7 +94,6 @@ final class DocumentAiTest extends GeneratedTestCase
                 '{"key":"value"}',
             ],
         ], $this->multipartFields($request));
-        self::assertInstanceOf(Types\DocumentAiAnalyzeResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"9d6a3b1e-2f0c-4a8e-9b7d-1c2e3f4a5b6c","document_ai":{"status":"Approved","extracted_data":{"employer_name":"Acme Payments Ltd","employee_name":"Sophia Martinez","net_pay":3120.5,"pay_date":"2026-07-31"},"detected_codes":[{"type":"CODE_128","page_number":1,"position":[[96,456],[96,616],[1012,611],[1015,456]],"x":96,"y":456,"width":919,"height":160,"page_width":1200,"page_height":1700,"raw_payload":"SU5WLTIwMjYtMDA0Mg==","parsed_payload":"INV-2026-0042"}],"fields":[{"key":"employer_name","name":"Employer name","instruction":"The employer or company issuing the payslip.","type":"text","required":true,"is_full_name":false},{"key":"employee_name","name":"Employee name","instruction":"The full name of the employee as printed on the payslip.","type":"text","required":true,"is_full_name":true},{"key":"net_pay","name":"Net pay","instruction":"The net amount paid to the employee for the period.","type":"number","required":true,"is_full_name":false},{"key":"pay_date","name":"Pay date","instruction":"The payment date shown on the payslip.","type":"date","required":false,"is_full_name":false}],"name_match_score":100.0,"name_on_document":"Sophia Martinez","warnings":[]},"vendor_data":"user-123","metadata":{"flow":"onboarding"},"created_at":"2026-08-19T16:40:12.318Z"}'), $result->toArray());
         self::assertSame('9d6a3b1e-2f0c-4a8e-9b7d-1c2e3f4a5b6c', $result->requestId);

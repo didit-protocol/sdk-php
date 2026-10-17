@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated;
 
-use Didit\Core\NoContent;
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -37,7 +35,6 @@ final class QuestionnairesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\QuestionnaireListItem::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -75,7 +72,6 @@ final class QuestionnairesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"title":"title-value","description":"description-value","languages":["languages-value"],"default_language":"default_language-value","is_active":true,"status":"draft","form_elements":[{"element_type":"short_text","label":{"key":"label-value"}}]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\QuestionnaireDetail::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"questionnaire_id":"11111111-2222-3333-4444-555555555555","title":"Customer Onboarding","description":"Additional information needed for verification","languages":["en"],"default_language":"en","is_active":true,"is_simple_questionnaire":true,"graph":{"start_node":"occupation","nodes":{"occupation":{"element_type":"SHORT_TEXT","is_required":true,"title":{"en":"What is your occupation?"},"next":"source_of_funds"},"source_of_funds":{"element_type":"MULTIPLE_CHOICE","is_required":true,"title":{"en":"Source of funds"},"choices":[{"value":"employment","label":{"en":"Employment"}},{"value":"business","label":{"en":"Business"}}],"next":null}}},"sections":[],"questionnaire_group_id":"11111111-2222-3333-4444-555555555555","version":1,"status":"published","published_at":"2026-04-23T10:00:00Z","is_editable":false}'), $result->toArray());
         self::assertSame('11111111-2222-3333-4444-555555555555', $result->questionnaireId);
@@ -94,7 +90,6 @@ final class QuestionnairesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\QuestionnaireDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"questionnaire_id":"11111111-2222-3333-4444-555555555555","title":"Customer Onboarding","description":"Additional information needed for verification","languages":["en"],"default_language":"en","is_active":true,"is_simple_questionnaire":true,"graph":{"start_node":"occupation","nodes":{"occupation":{"element_type":"SHORT_TEXT","is_required":true,"title":{"en":"What is your occupation?"},"next":"source_of_funds"},"source_of_funds":{"element_type":"MULTIPLE_CHOICE","is_required":true,"title":{"en":"Source of funds"},"choices":[{"value":"employment","label":{"en":"Employment"}},{"value":"business","label":{"en":"Business"}}],"next":null}}},"sections":[{"title":{},"description":{},"items":[{"uuid":"11111111-2222-3333-4444-666666666666","value":"occupation","element_type":"SHORT_TEXT","is_required":true,"title":{"en":"What is your occupation?"}}]}],"questionnaire_group_id":"11111111-2222-3333-4444-555555555555","version":1,"status":"published","published_at":"2026-04-23T10:00:00Z","is_editable":false}'), $result->toArray());
         self::assertSame('11111111-2222-3333-4444-555555555555', $result->questionnaireId);
@@ -131,7 +126,6 @@ final class QuestionnairesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"title":"title-value","description":"description-value","languages":["languages-value"],"default_language":"default_language-value","is_active":true,"status":"draft","form_elements":[{"element_type":"short_text","label":{"key":"label-value"}}]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\QuestionnaireDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"questionnaire_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","title":"title-value","description":"description-value","languages":["languages-value"],"default_language":"default_language-value","is_active":true,"is_simple_questionnaire":true,"graph":{"key":"value"},"sections":[{"key":"value"}],"questionnaire_group_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","version":1,"status":"draft","published_at":"2026-01-15T10:30:00Z","is_editable":true}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->questionnaireId);
@@ -150,7 +144,6 @@ final class QuestionnairesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(NoContent::class, $result);
         self::assertSame(204, $result->rawResponse()?->status);
     }
 }

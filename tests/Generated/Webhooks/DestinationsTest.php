@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Webhooks;
 
-use Didit\Core\ListResponse;
-use Didit\Core\NoContent;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -31,7 +29,6 @@ final class DestinationsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(ListResponse::class, $result);
         self::assertCount(2, $result);
         self::assertContainsOnlyInstancesOf(Types\WebhooksDestinationsListResponse::class, $result->items);
         self::assertSame($this->decoded('[{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","subscribed_events":["status.updated","data.updated"],"subscribed_events_count":2,"deliveries_count":12453,"failed_deliveries_count":14,"average_response_time_ms":187,"error_rate_percentage":0,"last_delivery_at":"2026-05-17T09:21:18Z","created_at":"2026-01-04T08:00:00Z","updated_at":"2026-04-22T14:09:11Z"},{"uuid":"22222222-3333-4444-5555-666666666666","label":"Staging mirror","url":"https://staging.yourapp.com/webhooks/didit","enabled":false,"webhook_version":"v3","subscribed_events":["status.updated"],"subscribed_events_count":1,"deliveries_count":0,"failed_deliveries_count":0,"average_response_time_ms":null,"error_rate_percentage":0,"last_delivery_at":null,"created_at":"2026-03-12T10:15:02Z","updated_at":"2026-03-12T10:15:02Z"}]'), $result->toArray());
@@ -59,7 +56,6 @@ final class DestinationsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"label":"label-value","url":"https://example.com/callback","enabled":true,"webhook_version":"v1","subscribed_events":["status.updated"]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\WebhooksDestinationsCreateResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","secret_shared_key":"tno2NTeRC1ZK3sBOYlBJDyEzBVENl3pQ1AcZyAW0xnQ","subscribed_events":["status.updated","data.updated"],"created_at":"2026-05-17T10:00:00Z","updated_at":"2026-05-17T10:00:00Z","summary":{"total_deliveries":0,"failed_deliveries":0,"error_rate_percentage":0,"min_response_time_ms":null,"avg_response_time_ms":null,"max_response_time_ms":null,"last_delivery_at":null}}'), $result->toArray());
         self::assertSame('11111111-2222-3333-4444-555555555555', $result->uuid);
@@ -78,7 +74,6 @@ final class DestinationsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\WebhooksDestinationsRetrieveResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":true,"webhook_version":"v3","secret_shared_key":"tno2NTeRC1ZK3sBOYlBJDyEzBVENl3pQ1AcZyAW0xnQ","subscribed_events":["status.updated","data.updated"],"created_at":"2026-01-04T08:00:00Z","updated_at":"2026-04-22T14:09:11Z","summary":{"total_deliveries":12453,"failed_deliveries":14,"error_rate_percentage":0,"min_response_time_ms":41,"avg_response_time_ms":187,"max_response_time_ms":2103,"last_delivery_at":"2026-05-17T09:21:18Z"}}'), $result->toArray());
         self::assertSame('11111111-2222-3333-4444-555555555555', $result->uuid);
@@ -106,7 +101,6 @@ final class DestinationsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"label":"label-value","url":"https://example.com/callback","enabled":true,"webhook_version":"v1","subscribed_events":["status.updated"]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\WebhooksDestinationsUpdateResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"11111111-2222-3333-4444-555555555555","label":"Production session webhooks","url":"https://yourapp.com/webhooks/didit","enabled":false,"webhook_version":"v3","secret_shared_key":"tno2NTeRC1ZK3sBOYlBJDyEzBVENl3pQ1AcZyAW0xnQ","subscribed_events":["status.updated","data.updated"],"created_at":"2026-01-04T08:00:00Z","updated_at":"2026-05-17T11:02:55Z","summary":{"total_deliveries":12453,"failed_deliveries":14,"error_rate_percentage":0,"min_response_time_ms":41,"avg_response_time_ms":187,"max_response_time_ms":2103,"last_delivery_at":"2026-05-17T09:21:18Z"}}'), $result->toArray());
         self::assertSame('11111111-2222-3333-4444-555555555555', $result->uuid);
@@ -125,7 +119,6 @@ final class DestinationsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(NoContent::class, $result);
         self::assertSame(204, $result->rawResponse()?->status);
     }
 }

@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated;
 
-use Didit\Core\NoContent;
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -43,7 +41,6 @@ final class RegulatoryReportsTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\RegulatoryReportDetail::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -102,7 +99,6 @@ final class RegulatoryReportsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"case":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","template":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","report_type":"SAR","jurisdiction":"jurisdiction-value","transactions":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"rentity_id":"rentity_id-value","rentity_branch":"rentity_branch-value","submission_code":"E","entity_reference":"entity_reference-value","fiu_ref_number":"fiu_ref_number-value","currency_code_local":"currency_code_local-value","submission_date":"2026-01-15T10:30:00+00:00","reporting_person":{"key":"value"},"location":{"key":"value"},"reason":"reason-value","action":"action-value","activity":"activity-value","narrative":{"who":"who-value","what":"what-value","when":"when-value","where":"where-value","why":"why-value","how":"how-value"},"report_indicators":["report_indicators-value"],"included_fields":["included_fields-value"]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\RegulatoryReportDetail::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","case_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","case_number":"case_number-value","report_type":"SAR","report_type_display":"report_type_display-value","report_code":"report_code-value","report_number":"report_number-value","status":"DRAFT","status_display":"status_display-value","jurisdiction":"jurisdiction-value","rentity_id":"rentity_id-value","rentity_branch":"rentity_branch-value","submission_code":"E","entity_reference":"entity_reference-value","fiu_ref_number":"fiu_ref_number-value","currency_code_local":"currency_code_local-value","submission_date":"2026-01-15T10:30:00Z","reporting_person":{"key":"value"},"location":{"key":"value"},"reason":"reason-value","action":"action-value","activity":"activity-value","narrative":{"who":"who-value","what":"what-value","when":"when-value","where":"where-value","why":"why-value","how":"how-value"},"report_indicators":["report_indicators-value"],"included_fields":["included_fields-value"],"transactions":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"validation_errors":[{"field":"field-value","message":"message-value"}],"validated_at":"2026-01-15T10:30:00Z","finalized_at":"2026-01-15T10:30:00Z","created_by_email":"created_by_email-value","created_by_name":"created_by_name-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -121,7 +117,6 @@ final class RegulatoryReportsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\RegulatoryReportDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","case_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","case_number":"case_number-value","report_type":"SAR","report_type_display":"report_type_display-value","report_code":"report_code-value","report_number":"report_number-value","status":"DRAFT","status_display":"status_display-value","jurisdiction":"jurisdiction-value","rentity_id":"rentity_id-value","rentity_branch":"rentity_branch-value","submission_code":"E","entity_reference":"entity_reference-value","fiu_ref_number":"fiu_ref_number-value","currency_code_local":"currency_code_local-value","submission_date":"2026-01-15T10:30:00Z","reporting_person":{"key":"value"},"location":{"key":"value"},"reason":"reason-value","action":"action-value","activity":"activity-value","narrative":{"who":"who-value","what":"what-value","when":"when-value","where":"where-value","why":"why-value","how":"how-value"},"report_indicators":["report_indicators-value"],"included_fields":["included_fields-value"],"transactions":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"validation_errors":[{"field":"field-value","message":"message-value"}],"validated_at":"2026-01-15T10:30:00Z","finalized_at":"2026-01-15T10:30:00Z","created_by_email":"created_by_email-value","created_by_name":"created_by_name-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -173,7 +168,6 @@ final class RegulatoryReportsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"jurisdiction":"jurisdiction-value","rentity_id":"rentity_id-value","rentity_branch":"rentity_branch-value","submission_code":"E","entity_reference":"entity_reference-value","fiu_ref_number":"fiu_ref_number-value","currency_code_local":"currency_code_local-value","submission_date":"2026-01-15T10:30:00+00:00","reporting_person":{"key":"value"},"location":{"key":"value"},"reason":"reason-value","action":"action-value","activity":"activity-value","narrative":{"who":"who-value","what":"what-value","when":"when-value","where":"where-value","why":"why-value","how":"how-value"},"report_indicators":["report_indicators-value"],"included_fields":["included_fields-value"]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\RegulatoryReportDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","case_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","case_number":"case_number-value","report_type":"SAR","report_type_display":"report_type_display-value","report_code":"report_code-value","report_number":"report_number-value","status":"DRAFT","status_display":"status_display-value","jurisdiction":"jurisdiction-value","rentity_id":"rentity_id-value","rentity_branch":"rentity_branch-value","submission_code":"E","entity_reference":"entity_reference-value","fiu_ref_number":"fiu_ref_number-value","currency_code_local":"currency_code_local-value","submission_date":"2026-01-15T10:30:00Z","reporting_person":{"key":"value"},"location":{"key":"value"},"reason":"reason-value","action":"action-value","activity":"activity-value","narrative":{"who":"who-value","what":"what-value","when":"when-value","where":"where-value","why":"why-value","how":"how-value"},"report_indicators":["report_indicators-value"],"included_fields":["included_fields-value"],"transactions":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"validation_errors":[{"field":"field-value","message":"message-value"}],"validated_at":"2026-01-15T10:30:00Z","finalized_at":"2026-01-15T10:30:00Z","created_by_email":"created_by_email-value","created_by_name":"created_by_name-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -192,7 +186,6 @@ final class RegulatoryReportsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(NoContent::class, $result);
         self::assertSame(204, $result->rawResponse()?->status);
     }
 
@@ -209,7 +202,6 @@ final class RegulatoryReportsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\RegulatoryReportsValidateResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"status":"DRAFT","is_valid":true,"errors":[{"field":"field-value","message":"message-value"}]}'), $result->toArray());
         self::assertSame('DRAFT', $result->status);
@@ -228,7 +220,6 @@ final class RegulatoryReportsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\RegulatoryReportDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","case_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","case_number":"case_number-value","report_type":"SAR","report_type_display":"report_type_display-value","report_code":"report_code-value","report_number":"report_number-value","status":"DRAFT","status_display":"status_display-value","jurisdiction":"jurisdiction-value","rentity_id":"rentity_id-value","rentity_branch":"rentity_branch-value","submission_code":"E","entity_reference":"entity_reference-value","fiu_ref_number":"fiu_ref_number-value","currency_code_local":"currency_code_local-value","submission_date":"2026-01-15T10:30:00Z","reporting_person":{"key":"value"},"location":{"key":"value"},"reason":"reason-value","action":"action-value","activity":"activity-value","narrative":{"who":"who-value","what":"what-value","when":"when-value","where":"where-value","why":"why-value","how":"how-value"},"report_indicators":["report_indicators-value"],"included_fields":["included_fields-value"],"transactions":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"validation_errors":[{"field":"field-value","message":"message-value"}],"validated_at":"2026-01-15T10:30:00Z","finalized_at":"2026-01-15T10:30:00Z","created_by_email":"created_by_email-value","created_by_name":"created_by_name-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -251,7 +242,6 @@ final class RegulatoryReportsTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\RegulatoryReportsRetrieveDownloadUrlResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"download_url":"https://example.com/callback","file":"pdf"}'), $result->toArray());
         self::assertSame('https://example.com/callback', $result->downloadUrl);

@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Cases;
 
-use Didit\Core\NoContent;
-use Didit\Core\Page;
 use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
@@ -40,7 +38,6 @@ final class NotesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\CaseCollaborationCaseNote::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -77,7 +74,6 @@ final class NotesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"comment":"comment-value","reply_to":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","client_reference":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","mentioned_emails":["user@example.com"],"is_internal":true,"attachments":[{"key":"value"}],"tags":["tags-value"]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CaseCollaborationCaseNote::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","comment":"comment-value","actor_email":"user@example.com","actor_name":"actor_name-value","mentioned_emails":"mentioned_emails-value","is_internal":true,"attachments":"attachments-value","tags":"tags-value","created_at":"2026-01-15T10:30:00Z","reply_to":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","actor_name":"actor_name-value","actor_email":"user@example.com","comment":"comment-value"},"is_pinned":true,"client_reference":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -99,7 +95,6 @@ final class NotesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"is_pinned":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CaseCollaborationCaseNote::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","comment":"comment-value","actor_email":"user@example.com","actor_name":"actor_name-value","mentioned_emails":"mentioned_emails-value","is_internal":true,"attachments":"attachments-value","tags":"tags-value","created_at":"2026-01-15T10:30:00Z","reply_to":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","actor_name":"actor_name-value","actor_email":"user@example.com","comment":"comment-value"},"is_pinned":true,"client_reference":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -118,7 +113,6 @@ final class NotesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(NoContent::class, $result);
         self::assertSame(204, $result->rawResponse()?->status);
     }
 
@@ -139,7 +133,6 @@ final class NotesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\CasesNotesRetrieveAttachmentUrlResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"s3_key":"s3_key-value","url":"https://example.com/callback","filename":"filename-value"}'), $result->toArray());
         self::assertSame('s3_key-value', $result->s3Key);
@@ -165,7 +158,6 @@ final class NotesTest extends GeneratedTestCase
                 'file:file.jpg:image/jpeg:fake-file-bytes',
             ],
         ], $this->multipartFields($request));
-        self::assertInstanceOf(Types\CasesNotesCreateAttachmentUploadResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"s3_key":"s3_key-value","url":"https://example.com/callback","filename":"filename-value","file_size":1}'), $result->toArray());
         self::assertSame('s3_key-value', $result->s3Key);

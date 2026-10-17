@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Sessions;
 
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -38,7 +37,6 @@ final class ReviewsTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(3, $result->results);
         self::assertContainsOnlyInstancesOf(Types\ReviewItem::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -62,7 +60,6 @@ final class ReviewsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"new_status":"Not Started","comment":"comment-value"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\SessionsReviewsCreateResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"user":"Unknown","new_status":"In Review","comment":"Flagging for manual document re-check.","created_at":"2026-06-12T00:18:44.466537Z"}'), $result->toArray());
         self::assertSame('Unknown', $result->user);

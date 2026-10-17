@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Networks;
 
-use Didit\Core\NoContent;
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -34,7 +32,6 @@ final class NotesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('authorization-value', $request->getHeaderLine('Authorization'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(NoContent::class, $result);
         self::assertSame(204, $result->rawResponse()?->status);
     }
 
@@ -59,7 +56,6 @@ final class NotesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('authorization-value', $request->getHeaderLine('Authorization'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\NetworkNote::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -85,7 +81,6 @@ final class NotesTest extends GeneratedTestCase
         self::assertSame('authorization-value', $request->getHeaderLine('Authorization'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"comment":"comment-value","client_reference":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\NetworkNote::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","actor_email":"user@example.com","comment":"comment-value","client_reference":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","created_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);

@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Cases;
 
-use Didit\Core\NoContent;
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -37,7 +35,6 @@ final class BlueprintsTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\CaseBlueprintListItem::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -82,7 +79,6 @@ final class BlueprintsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"name":"name-value","description":"description-value","assignee_pool":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"assignment_method":"MANUAL","max_active_cases":1,"escalation_enabled":true,"escalation_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","transfer_enabled":true,"four_eyes_checker_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","require_resolution_note":true,"content_config":{"checklist":{},"aml_control":{},"identity":{},"verifications":{},"reporting":{},"financial":{}},"is_active":true,"default_deadline_hours":1,"publish":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CaseBlueprintDetail::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","name":"name-value","description":"description-value","assignment_method":"MANUAL","assignee_pool":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"max_active_cases":1,"escalation_enabled":true,"transfer_enabled":true,"require_resolution_note":true,"is_active":true,"preset_key":"preset_key-value","created_at":"2026-01-15T10:30:00Z","escalation_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","escalation_blueprint_name":"escalation_blueprint_name-value","four_eyes_checker_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","four_eyes_checker_blueprint_name":"four_eyes_checker_blueprint_name-value","content_config":{"checklist":{"enabled":true,"optional":true,"items":[{"label":"label-value","order":1}]},"aml_control":{"enabled":true,"financial":true,"identity":true},"identity":{"enabled":true,"personal_information":true,"applicant_tags":true,"contact_information":true,"risk_overview":true,"poi_documents":true,"poa_documents":true},"verifications":{"enabled":true,"summary":true},"reporting":{"enabled":true,"fiu_reports":true},"financial":{"enabled":true,"payment_methods":true,"transactions":true}},"creation_sources":[{"kind":"aml","id":"id-value","name":"name-value"}],"receives_escalation_from":[{"id":"id-value","name":"name-value"}],"updated_at":"2026-01-15T10:30:00Z","version":1,"default_deadline_hours":1}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -101,7 +97,6 @@ final class BlueprintsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\CaseBlueprintDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","name":"name-value","description":"description-value","assignment_method":"MANUAL","assignee_pool":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"max_active_cases":1,"escalation_enabled":true,"transfer_enabled":true,"require_resolution_note":true,"is_active":true,"preset_key":"preset_key-value","created_at":"2026-01-15T10:30:00Z","escalation_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","escalation_blueprint_name":"escalation_blueprint_name-value","four_eyes_checker_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","four_eyes_checker_blueprint_name":"four_eyes_checker_blueprint_name-value","content_config":{"checklist":{"enabled":true,"optional":true,"items":[{"label":"label-value","order":1}]},"aml_control":{"enabled":true,"financial":true,"identity":true},"identity":{"enabled":true,"personal_information":true,"applicant_tags":true,"contact_information":true,"risk_overview":true,"poi_documents":true,"poa_documents":true},"verifications":{"enabled":true,"summary":true},"reporting":{"enabled":true,"fiu_reports":true},"financial":{"enabled":true,"payment_methods":true,"transactions":true}},"creation_sources":[{"kind":"aml","id":"id-value","name":"name-value"}],"receives_escalation_from":[{"id":"id-value","name":"name-value"}],"updated_at":"2026-01-15T10:30:00Z","version":1,"default_deadline_hours":1}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -145,7 +140,6 @@ final class BlueprintsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"name":"name-value","description":"description-value","assignee_pool":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"assignment_method":"MANUAL","max_active_cases":1,"escalation_enabled":true,"escalation_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","transfer_enabled":true,"four_eyes_checker_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","require_resolution_note":true,"content_config":{"checklist":{},"aml_control":{},"identity":{},"verifications":{},"reporting":{},"financial":{}},"is_active":true,"default_deadline_hours":1,"expected_version":1}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CaseBlueprintDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","name":"name-value","description":"description-value","assignment_method":"MANUAL","assignee_pool":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"max_active_cases":1,"escalation_enabled":true,"transfer_enabled":true,"require_resolution_note":true,"is_active":true,"preset_key":"preset_key-value","created_at":"2026-01-15T10:30:00Z","escalation_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","escalation_blueprint_name":"escalation_blueprint_name-value","four_eyes_checker_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","four_eyes_checker_blueprint_name":"four_eyes_checker_blueprint_name-value","content_config":{"checklist":{"enabled":true,"optional":true,"items":[{"label":"label-value","order":1}]},"aml_control":{"enabled":true,"financial":true,"identity":true},"identity":{"enabled":true,"personal_information":true,"applicant_tags":true,"contact_information":true,"risk_overview":true,"poi_documents":true,"poa_documents":true},"verifications":{"enabled":true,"summary":true},"reporting":{"enabled":true,"fiu_reports":true},"financial":{"enabled":true,"payment_methods":true,"transactions":true}},"creation_sources":[{"kind":"aml","id":"id-value","name":"name-value"}],"receives_escalation_from":[{"id":"id-value","name":"name-value"}],"updated_at":"2026-01-15T10:30:00Z","version":1,"default_deadline_hours":1}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -164,7 +158,6 @@ final class BlueprintsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(NoContent::class, $result);
         self::assertSame(204, $result->rawResponse()?->status);
     }
 
@@ -181,7 +174,6 @@ final class BlueprintsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\CasesBlueprintsListPresetsResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"preset_key":"screening_hit","name":"name-value","description":"description-value","content_config":{"checklist":{"enabled":true,"optional":true,"items":[]},"aml_control":{"enabled":true,"financial":true,"identity":true},"identity":{"enabled":true,"personal_information":true,"applicant_tags":true,"contact_information":true,"risk_overview":true,"poi_documents":true,"poa_documents":true},"verifications":{"enabled":true,"summary":true},"reporting":{"enabled":true,"fiu_reports":true},"financial":{"enabled":true,"payment_methods":true,"transactions":true}},"installed":true}]}'), $result->toArray());
     }
@@ -204,7 +196,6 @@ final class BlueprintsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"preset_keys":["preset_keys-value"]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CasesBlueprintsInstallPresetsResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"created":["created-value"]}'), $result->toArray());
     }
@@ -226,7 +217,6 @@ final class BlueprintsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"expected_version":1,"expected_revision":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CasePublicationCaseBlueprint::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","name":"name-value","description":"description-value","assignment_method":"MANUAL","assignee_pool":"assignee_pool-value","max_active_cases":1,"escalation_enabled":true,"escalation_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","escalation_blueprint_name":"escalation_blueprint_name-value","transfer_enabled":true,"four_eyes_checker_blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","four_eyes_checker_blueprint_name":"four_eyes_checker_blueprint_name-value","require_resolution_note":true,"content_config":"content_config-value","version":1,"default_deadline_hours":1,"is_active":true,"preset_key":"preset_key-value","creation_sources":[{"key":"value"}],"receives_escalation_from":[{"key":"value"}],"created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -245,7 +235,6 @@ final class BlueprintsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\CasePublicationPolicyDraftResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"draft":{"revision":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","base_version":1,"changes":"changes-value","actor_email":"user@example.com","updated_at":"2026-01-15T10:30:00Z"}}'), $result->toArray());
     }
@@ -270,7 +259,6 @@ final class BlueprintsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"expected_version":1,"expected_revision":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","changes":{"key":"value"}}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CasePublicationPolicyDraft::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"revision":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","base_version":1,"changes":"changes-value","actor_email":"user@example.com","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->revision);
@@ -293,7 +281,6 @@ final class BlueprintsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"expected_version":1,"expected_revision":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}', $this->canonicalBody($request));
-        self::assertInstanceOf(NoContent::class, $result);
         self::assertSame(204, $result->rawResponse()?->status);
     }
 
@@ -318,7 +305,6 @@ final class BlueprintsTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\CasePublicationPolicyRevision::class, $result->results);
         self::assertFalse($result->hasNextPage());

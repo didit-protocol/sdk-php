@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Cases;
 
-use Didit\Core\ListResponse;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -30,7 +29,6 @@ final class ChecklistTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(ListResponse::class, $result);
         self::assertCount(1, $result);
         self::assertContainsOnlyInstancesOf(Types\CaseChecklistItem::class, $result->items);
         self::assertSame($this->decoded('[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","label":"label-value","is_completed":true,"completed_by":"user@example.com","completed_at":"2026-01-15T10:30:00Z","order":1}]'), $result->toArray());
@@ -52,7 +50,6 @@ final class ChecklistTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"is_completed":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CaseChecklistItem::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","label":"label-value","is_completed":true,"completed_by":"user@example.com","completed_at":"2026-01-15T10:30:00Z","order":1}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);

@@ -7,7 +7,6 @@ declare(strict_types=1);
 namespace Didit\Tests\Generated\Transactions;
 
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `transactions.travel_rule` resource.
@@ -33,7 +32,6 @@ final class TravelRuleTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"payment_txn_id":"payment_txn_id-value","action":"cancel"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TravelRuleTransferDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"AWAITING_COUNTERPARTY","direction":"INBOUND","rail":"INTERNAL","protocol":"protocol-value","ivms_version":"ivms_version-value","required":true,"ownership_confirmed":true,"deadline_at":"2026-01-15T10:30:00Z","timeline":[{"status":"status-value","at":"2026-01-15T10:30:00Z","detail":"detail-value"}],"counterparty_vasp":{"name":"name-value","lei":"lei-value","dd_score":1},"originator_data":{"key":"value"},"beneficiary_data":{"key":"value"},"created_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -55,7 +53,6 @@ final class TravelRuleTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"confirmed":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TravelRuleTransferDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"AWAITING_COUNTERPARTY","direction":"INBOUND","rail":"INTERNAL","protocol":"protocol-value","ivms_version":"ivms_version-value","required":true,"ownership_confirmed":true,"deadline_at":"2026-01-15T10:30:00Z","timeline":[{"status":"status-value","at":"2026-01-15T10:30:00Z","detail":"detail-value"}],"counterparty_vasp":{"name":"name-value","lei":"lei-value","dd_score":1},"originator_data":{"key":"value"},"beneficiary_data":{"key":"value"},"created_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);

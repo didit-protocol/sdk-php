@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\TravelRule;
 
-use Didit\Core\NoContent;
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -37,7 +35,6 @@ final class WalletAddressesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\WalletAddressEntry::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -66,7 +63,6 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","self_declared":true,"travel_address":"travel_address-value"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\WalletAddressEntry::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","self_declared":true,"travel_address":"travel_address-value"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -91,7 +87,6 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"holder_name":"holder_name-value","holder_vendor_data":"holder_vendor_data-value","entity_type":"entity_type-value","travel_address":"travel_address-value"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\WalletAddressEntryUpdate::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"holder_name":"holder_name-value","holder_vendor_data":"holder_vendor_data-value","entity_type":"entity_type-value","travel_address":"travel_address-value"}'), $result->toArray());
         self::assertSame('holder_name-value', $result->holderName);
@@ -110,7 +105,6 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(NoContent::class, $result);
         self::assertSame(204, $result->rawResponse()?->status);
     }
 }

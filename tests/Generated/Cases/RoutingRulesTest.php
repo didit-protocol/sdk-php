@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Cases;
 
-use Didit\Core\NoContent;
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -39,7 +37,6 @@ final class RoutingRulesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\RoutingPublicationPolicyRevision::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -59,7 +56,6 @@ final class RoutingRulesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\CaseRoutingRule::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"name":"name-value","description":"description-value","priority":1,"conditions":[{"field":"source","operator":"equals","value":"value-value"}],"required_skills":["required_skills-value"],"blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","team":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","is_active":true,"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","version":1,"blueprint_name":"blueprint_name-value","team_name":"team_name-value"}'), $result->toArray());
         self::assertSame('name-value', $result->name);
@@ -97,7 +93,6 @@ final class RoutingRulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"name":"name-value","description":"description-value","priority":1,"conditions":[{"field":"source","operator":"equals","value":"value-value"}],"required_skills":["required_skills-value"],"blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","team":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","is_active":true,"expected_version":1}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CaseRoutingRule::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"name":"name-value","description":"description-value","priority":1,"conditions":[{"field":"source","operator":"equals","value":"value-value"}],"required_skills":["required_skills-value"],"blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","team":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","is_active":true,"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","version":1,"blueprint_name":"blueprint_name-value","team_name":"team_name-value"}'), $result->toArray());
         self::assertSame('name-value', $result->name);
@@ -122,7 +117,6 @@ final class RoutingRulesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\CaseRoutingRule::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -161,7 +155,6 @@ final class RoutingRulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"name":"name-value","description":"description-value","priority":1,"conditions":[{"field":"source","operator":"equals","value":"value-value"}],"required_skills":["required_skills-value"],"blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","team":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","is_active":true,"publish":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CaseRoutingRule::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"name":"name-value","description":"description-value","priority":1,"conditions":[{"field":"source","operator":"equals","value":"value-value"}],"required_skills":["required_skills-value"],"blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","team":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","is_active":true,"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","version":1,"blueprint_name":"blueprint_name-value","team_name":"team_name-value"}'), $result->toArray());
         self::assertSame('name-value', $result->name);
@@ -184,7 +177,6 @@ final class RoutingRulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"expected_version":1,"expected_revision":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\RoutingPublicationCaseRoutingRule::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","name":"name-value","description":"description-value","priority":1,"conditions":[{"field":"source","operator":"equals","value":"value-value"}],"required_skills":["required_skills-value"],"blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","blueprint_name":"blueprint_name-value","team":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","team_name":"team_name-value","is_active":true,"version":1,"created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -203,7 +195,6 @@ final class RoutingRulesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\RoutingPublicationPolicyDraftResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"draft":{"revision":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","base_version":1,"changes":"changes-value","actor_email":"user@example.com","updated_at":"2026-01-15T10:30:00Z"}}'), $result->toArray());
     }
@@ -228,7 +219,6 @@ final class RoutingRulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"expected_version":1,"expected_revision":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","changes":{"key":"value"}}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\RoutingPublicationPolicyDraft::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"revision":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","base_version":1,"changes":"changes-value","actor_email":"user@example.com","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->revision);
@@ -251,7 +241,6 @@ final class RoutingRulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"expected_version":1,"expected_revision":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}', $this->canonicalBody($request));
-        self::assertInstanceOf(NoContent::class, $result);
         self::assertSame(204, $result->rawResponse()?->status);
     }
 
@@ -295,7 +284,6 @@ final class RoutingRulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"source":"MANUAL","priority":"LOW","tags":["tags-value"],"rule_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","draft":{"name":"name-value","description":"description-value","priority":1,"conditions":[{"field":"source","operator":"equals","value":"value-value"}],"required_skills":["required_skills-value"],"blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","team":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","is_active":true,"publish":true}}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\CaseRoutingPreview::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"rule_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","rule_name":"rule_name-value","rule_version":1,"blueprint_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","team_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","assignee_user_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","reason":"reason-value","candidates":[{"user_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","eligible":true,"active_cases":1,"reason":"reason-value"}],"matched_rules":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","name":"name-value","priority":1}]}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->ruleUuid);

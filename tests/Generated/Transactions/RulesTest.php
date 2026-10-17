@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Transactions;
 
-use Didit\Core\NoContent;
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -49,7 +47,6 @@ final class RulesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\TransactionRuleDetail::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -106,7 +103,6 @@ final class RulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"title":"title-value","description":"description-value","category":"category-value","mode":"ACTIVE","evaluation_mode":"ALL","scope":{"transaction_types":["transaction_types-value"],"directions":["INBOUND"],"action_types":["action_types-value"]},"conditions":[{"field":"field-value","operator":"eq"}],"aggregation":[{"value":1.5}],"actions":[{"type":"add_score"}],"metadata":{"key":"value"}}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TransactionRuleDetail::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","title":"title-value","description":"description-value","category":"category-value","mode":"ACTIVE","evaluation_mode":"ALL","scope":{"transaction_types":["transaction_types-value"],"directions":["INBOUND"],"action_types":["action_types-value"]},"conditions":[{"field":"field-value","operator":"eq","value":"value-value","value_type":"list","score":1.5,"group_index":1,"group_logic":"AND","groups_logic":"AND"}],"aggregation":[{"metric":"count","field":"field-value","operator":"eq","value":1.5,"window":"window-value","filters":{"key":"value"}}],"actions":[{"type":"add_score","value":1,"workflow_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","tag_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","tag_name":"tag_name-value","tag_color":"tag_color-value","note":"note-value","list_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","grouping":"by_applicant","attach_matched_transaction":true}],"metadata":{"key":"value"},"severity":"UNKNOWN","source":"PRESET","library_key":"library_key-value","latest_triggered_at":"2026-01-15T10:30:00Z","run_count":1,"approved_count":1,"reviewed_count":1,"declined_count":1,"awaiting_user_count":1,"approved_pct":1.5,"reviewed_pct":1.5,"declined_pct":1.5,"created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -125,7 +121,6 @@ final class RulesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\TransactionRuleDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","title":"title-value","description":"description-value","category":"category-value","mode":"ACTIVE","evaluation_mode":"ALL","scope":{"transaction_types":["transaction_types-value"],"directions":["INBOUND"],"action_types":["action_types-value"]},"conditions":[{"field":"field-value","operator":"eq","value":"value-value","value_type":"list","score":1.5,"group_index":1,"group_logic":"AND","groups_logic":"AND"}],"aggregation":[{"metric":"count","field":"field-value","operator":"eq","value":1.5,"window":"window-value","filters":{"key":"value"}}],"actions":[{"type":"add_score","value":1,"workflow_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","tag_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","tag_name":"tag_name-value","tag_color":"tag_color-value","note":"note-value","list_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","grouping":"by_applicant","attach_matched_transaction":true}],"metadata":{"key":"value"},"severity":"UNKNOWN","source":"PRESET","library_key":"library_key-value","latest_triggered_at":"2026-01-15T10:30:00Z","run_count":1,"approved_count":1,"reviewed_count":1,"declined_count":1,"awaiting_user_count":1,"approved_pct":1.5,"reviewed_pct":1.5,"declined_pct":1.5,"created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -181,7 +176,6 @@ final class RulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"title":"title-value","description":"description-value","category":"category-value","mode":"ACTIVE","evaluation_mode":"ALL","scope":{"transaction_types":["transaction_types-value"],"directions":["INBOUND"],"action_types":["action_types-value"]},"conditions":[{"field":"field-value","operator":"eq"}],"aggregation":[{"value":1.5}],"actions":[{"type":"add_score"}],"metadata":{"key":"value"}}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TransactionRuleDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","title":"title-value","description":"description-value","category":"category-value","mode":"ACTIVE","evaluation_mode":"ALL","scope":{"transaction_types":["transaction_types-value"],"directions":["INBOUND"],"action_types":["action_types-value"]},"conditions":[{"field":"field-value","operator":"eq","value":"value-value","value_type":"list","score":1.5,"group_index":1,"group_logic":"AND","groups_logic":"AND"}],"aggregation":[{"metric":"count","field":"field-value","operator":"eq","value":1.5,"window":"window-value","filters":{"key":"value"}}],"actions":[{"type":"add_score","value":1,"workflow_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","tag_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","tag_name":"tag_name-value","tag_color":"tag_color-value","note":"note-value","list_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","blueprint":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","grouping":"by_applicant","attach_matched_transaction":true}],"metadata":{"key":"value"},"severity":"UNKNOWN","source":"PRESET","library_key":"library_key-value","latest_triggered_at":"2026-01-15T10:30:00Z","run_count":1,"approved_count":1,"reviewed_count":1,"declined_count":1,"awaiting_user_count":1,"approved_pct":1.5,"reviewed_pct":1.5,"declined_pct":1.5,"created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -200,7 +194,6 @@ final class RulesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(NoContent::class, $result);
         self::assertSame(204, $result->rawResponse()?->status);
     }
 
@@ -243,7 +236,6 @@ final class RulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"conditions":[{"field":"field-value","operator":"eq"}],"aggregation":[{"value":1.5}],"evaluation_mode":"ALL","scope":{"transaction_types":["transaction_types-value"],"directions":["INBOUND"],"action_types":["action_types-value"]},"period_days":1}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TransactionRuleBacktestResult::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"evaluated":4820,"matched":12,"affected_entities":4,"period_days":90}'), $result->toArray());
         self::assertSame(4820, $result->evaluated);
@@ -274,7 +266,6 @@ final class RulesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\TransactionRuleLibraryEntry::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -300,7 +291,6 @@ final class RulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"library_keys":["library_keys-value"],"bundle":"bundle-value"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TransactionRuleInstallResult::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"installed_library_keys":["structuring-inbound","structuring-outbound"],"installed_count":2}'), $result->toArray());
         self::assertSame(2, $result->installedCount);
@@ -325,7 +315,6 @@ final class RulesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"library_keys":["library_keys-value"],"bundle":"bundle-value"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TransactionRuleInstallResult::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uninstalled_count":5}'), $result->toArray());
         self::assertSame(5, $result->uninstalledCount);

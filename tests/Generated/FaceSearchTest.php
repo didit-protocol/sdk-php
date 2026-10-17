@@ -8,7 +8,6 @@ namespace Didit\Tests\Generated;
 
 use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `face_search` resource.
@@ -59,7 +58,6 @@ final class FaceSearchTest extends GeneratedTestCase
                 '{"key":"value"}',
             ],
         ], $this->multipartFields($request));
-        self::assertInstanceOf(Types\FaceSearchSearchResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"a1b2c3d4-e5f6-7890-1234-567890abcdef","face_search":{"status":"Declined","total_matches":1,"matches":[{"session_id":"882c42d5-8a4d-4d20-8080-a22f57822c86","session_number":323442,"similarity_percentage":99.99,"source":"session","vendor_data":"user-1","verification_date":"2025-01-01T00:00:00Z","user_details":{"full_name":"Jane Marie Doe","document_type":"ID","document_number":"X1234567"},"match_image_url":"https://<media-host>/face/3f6a1c2e/reference.jpg","status":"Approved","is_blocklisted":true,"is_allowlisted":false,"api_service":null,"vendor_user_id":"2f7c1a9e-8b4d-4c6a-9e1f-3d5b7a9c1e2f","biometric_template_id":null}],"user_image":{"entities":[{"bbox":[40,40,120,120],"confidence":0.732973}],"best_angle":0},"warnings":[{"risk":"FACE_IN_BLOCKLIST","feature":"LIVENESS","additional_data":{"blocklisted_session_id":"882c42d5-8a4d-4d20-8080-a22f57822c86","blocklisted_session_number":323442,"api_service":null},"log_type":"error","short_description":"Face in blocklist","long_description":"The system identified a face in the blocklist, which means the face is not allowed to be verified."}]},"vendor_data":"user-123","metadata":null,"created_at":"2026-06-12T01:04:42.763237+00:00"}'), $result->toArray());
         self::assertSame('a1b2c3d4-e5f6-7890-1234-567890abcdef', $result->requestId);

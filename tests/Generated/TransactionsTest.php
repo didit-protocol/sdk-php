@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated;
 
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -36,7 +35,6 @@ final class TransactionsTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\TransactionsListResponseResults::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -136,7 +134,6 @@ final class TransactionsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"transaction_id":"transaction_id-value","transaction_at":"2026-01-15T10:30:00+00:00","time_zone":"time_zone-value","transaction_category":"finance","transaction_details":{"direction":"inbound","amount":1.5,"currency":"currency-value","currency_kind":"currency_kind-value","amount_in_default_currency":1.5,"default_currency":"default_currency-value","payment_details":"payment_details-value","payment_reference_id":"payment_reference_id-value","action_type":"action_type-value","crypto_params":{}},"subject":{"entity_type":"entity_type-value","vendor_data":"vendor_data-value","full_name":"full_name-value","first_name":"first_name-value","last_name":"last_name-value","date_of_birth":"2026-01-15","address":{},"institution_details":{},"device_context":{},"payment_method":{}},"counterparty":{"entity_type":"entity_type-value","vendor_data":"vendor_data-value","full_name":"full_name-value","first_name":"first_name-value","last_name":"last_name-value","date_of_birth":"2026-01-15","address":{"key":"value"},"institution_details":{"key":"value"},"device_context":{},"payment_method":{}},"custom_properties":{"key":"value"},"travel_rule_details":{"status":"status-value","protocol":"protocol-value","required":true,"obligations_count":1,"originator_data":{"key":"value"},"beneficiary_data":{"key":"value"},"metadata":{"key":"value"}},"network_snapshot":{"nodes":[{"key":"value"}],"edges":[{"key":"value"}],"metrics":{"key":"value"}},"include_crypto_screening":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TransactionDetail::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"abcdef12-3456-4890-abcd-ef1234567890","environment":"live","transaction_number":4123,"txn_id":"your-txn-2026-05-17-001","txn_date":"2026-05-17T08:42:00Z","zone_id":"Europe/Madrid","transaction_type":"finance","action_type":"withdrawal","direction":"OUTBOUND","status":"APPROVED","source":"LIVE","amount":"1500","currency":"EUR","currency_type":"fiat","amount_in_default_currency":"1620.45","default_currency_code":"USD","preferred_currency_amount":"1620.45","preferred_currency_code":"USD","payment_details":"Withdrawal to crypto wallet","payment_txn_id":null,"score":0,"severity":null,"decision_reason_code":null,"decision_reason_label":null,"vendor_data":"user-12345","metadata":{"subject":{"entity_type":"individual","vendor_data":"user-12345","full_name":"Maria Garcia","address":{},"institution_details":{},"device_context":{}},"counterparty":{}},"props":{},"tags":[],"parties":[{"uuid":"b1111111-2222-4333-8444-555555555555","role":"APPLICANT","entity_type":"individual","kind":"USER","vendor_data":"user-12345","full_name":"Maria Garcia","first_name":null,"last_name":null,"country_code":null,"dob":null,"address":{},"institution_info":{},"device":{},"external_party_snapshot":null}],"payment_methods":[],"documents":[],"activities":[{"uuid":"d4e5f6a7-8901-4bcd-9ef0-123456789abc","activity_type":"TRANSACTION_CREATED","source":"TRANSACTION","status":"APPROVED","title":"withdrawal","description":"Transaction recorded.","metadata":{},"occurred_at":"2026-05-17T08:42:11Z"}],"alerts":[],"rule_runs":[],"provider_results":[],"travel_rule":null,"network_snapshot":null,"remediation":null,"cost_breakdown":null}'), $result->toArray());
         self::assertSame('abcdef12-3456-4890-abcd-ef1234567890', $result->uuid);
@@ -155,7 +152,6 @@ final class TransactionsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\TransactionDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"abcdef12-3456-4890-abcd-ef1234567890","environment":"live","transaction_number":4123,"txn_id":"your-txn-2026-05-17-001","txn_date":"2026-05-17T08:42:00Z","zone_id":"Europe/Madrid","transaction_type":"finance","action_type":"withdrawal","direction":"OUTBOUND","status":"IN_REVIEW","source":"LIVE","amount":"1500","currency":"EUR","currency_type":"fiat","amount_in_default_currency":"1620.45","default_currency_code":"USD","preferred_currency_amount":"1620.45","preferred_currency_code":"USD","payment_details":"Withdrawal to crypto wallet","payment_txn_id":null,"score":78,"severity":"HIGH","decision_reason_code":"WALLET_HIGH_RISK","decision_reason_label":"Destination wallet flagged as high risk","vendor_data":"user-12345","metadata":{"subject":{"entity_type":"individual","vendor_data":"user-12345","full_name":"Maria Garcia","address":{},"institution_details":{},"device_context":{}},"counterparty":{}},"props":{"order_id":"ord-9988"},"tags":[],"parties":[{"uuid":"b1111111-2222-4333-8444-555555555555","role":"APPLICANT","entity_type":"individual","kind":"USER","vendor_data":"user-12345","full_name":"Maria Garcia","first_name":null,"last_name":null,"country_code":null,"dob":null,"address":{},"institution_info":{},"device":{},"external_party_snapshot":null}],"payment_methods":[],"documents":[],"activities":[],"alerts":[{"uuid":"a7b8c9d0-1234-4abc-9def-567890abcdef","title":"Destination wallet flagged as high risk","description":"Provider risk score exceeded the configured threshold.","severity":"HIGH","status":"OPEN","source":"RULE","metadata":{},"created_at":"2026-05-17T08:42:12Z","due_at":null}],"rule_runs":[],"provider_results":[],"travel_rule":null,"network_snapshot":null,"remediation":null,"cost_breakdown":null}'), $result->toArray());
         self::assertSame('abcdef12-3456-4890-abcd-ef1234567890', $result->uuid);
@@ -179,7 +175,6 @@ final class TransactionsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","ttl_seconds":1,"max_uses":1}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TransactionsCreateSdkTokenResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"sdk_token":"q7Zt...urlsafe","expires_at":"2026-07-07T12:15:00Z"}'), $result->toArray());
         self::assertSame('q7Zt...urlsafe', $result->sdkToken);
@@ -198,7 +193,6 @@ final class TransactionsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\TransactionsListNetworksResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z"},"subject":{"key":"value"},"signal_types":["ip_address"],"signal_count":1,"joined_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}]}'), $result->toArray());
     }
@@ -216,7 +210,6 @@ final class TransactionsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\TransactionsListPartyNetworksResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z"},"subject":{"key":"value"},"signal_types":["ip_address"],"signal_count":1,"joined_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}]}'), $result->toArray());
     }

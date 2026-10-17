@@ -196,7 +196,7 @@ final class Requester
         $body = null === $bodyFactory ? null : $bodyFactory();
         $method = $operation->method;
 
-        for ($attempt = 0; ; ++$attempt) {
+        for ($attempt = 0;; ++$attempt) {
             $request = $this->buildRequest($method, $url, $headers, $body);
             $started = ($this->now)();
             try {

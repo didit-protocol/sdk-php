@@ -7,7 +7,6 @@ declare(strict_types=1);
 namespace Didit\Tests\Generated;
 
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `ip` resource.
@@ -38,7 +37,6 @@ final class IpTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"ip_address":"203.0.113.10","claimed_country":"claimed_country-value","user_agent":"user_agent-value","vendor_data":"vendor_data-value","metadata":{"key":"value"}}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\IPRiskResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"9a96ed2a-721e-4b86-8cbf-d61eda529279","status":"Approved","ip":{"status":"Approved","ip_address":"192.0.2.10","ip_country":"Spain","ip_country_code":"ES","ip_state":"Madrid","ip_city":"Madrid","latitude":40.4168,"longitude":-3.7038,"isp":"Example Telecom","organization":"Example Telecom SA","is_vpn_or_tor":false,"is_data_center":false,"time_zone":"Europe/Madrid","time_zone_offset":"+0200","asn_number":3352,"asn_organization":"EXAMPLE-TELECOM","connection_type":"broadband","carrier":"Example Telecom","proxy_type":null,"claimed_country":"ESP","country_mismatch":false,"threat":{}},"vendor_data":"lead-123","metadata":null,"created_at":"2026-09-01T10:30:00.123456+00:00"}'), $result->toArray());
         self::assertSame('9a96ed2a-721e-4b86-8cbf-d61eda529279', $result->requestId);

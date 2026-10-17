@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated;
 
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -30,10 +29,9 @@ final class TravelRuleTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\TravelRuleSettingsDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"is_enabled":false,"jurisdiction":"EU","name_matching_strictness":"DEFAULT","confirmation_timeout_hours":48,"timeout_outcome":"HOLD","threshold_amount":"0.00","legal_name":"","lei":"","compliance_email":"","is_discoverable":true,"disabled_networks":[],"networks":{"gtr":{"rail":"GTR","mode":"unavailable","platform_available":false,"connected":false},"trust":{"rail":"TRUST","mode":"unavailable","platform_available":false,"connected":false},"verifyvasp":{"rail":"VERIFYVASP","mode":"unavailable","platform_available":false,"connected":false},"sygna":{"rail":"SYGNA","mode":"unavailable","platform_available":false,"connected":false}}}'), $result->toArray());
-        self::assertSame(false, $result->isEnabled);
+        self::assertFalse($result->isEnabled);
     }
 
     public function testUpdateSettings(): void
@@ -69,10 +67,9 @@ final class TravelRuleTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"is_enabled":true,"legal_name":"legal_name-value","lei":"lei-value","jurisdiction":"jurisdiction-value","name_matching_strictness":"NONE","confirmation_timeout_hours":1,"timeout_outcome":"HOLD","compliance_email":"user@example.com","is_discoverable":true,"threshold_amount":"threshold_amount-value","inbound_auto_accept":true,"allow_self_declaration":true,"allow_screenshot_proof":true,"auto_wallet_verification":true,"vasp_attribution_enabled":true,"disabled_networks":["GTR"]}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TravelRuleSettingsDetail::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"is_enabled":true,"jurisdiction":"jurisdiction-value","name_matching_strictness":"NONE","confirmation_timeout_hours":1,"timeout_outcome":"HOLD","threshold_amount":"threshold_amount-value","legal_name":"legal_name-value","lei":"lei-value","compliance_email":"user@example.com","is_discoverable":true,"inbound_auto_accept":true,"allow_self_declaration":true,"allow_screenshot_proof":true,"auto_wallet_verification":true,"vasp_attribution_enabled":true,"travel_address":"travel_address-value","disabled_networks":["GTR"],"networks":{"gtr":{"rail":"GTR","mode":"own","platform_available":true,"connected":true},"trust":{"rail":"TRUST","mode":"own","platform_available":true,"connected":true},"verifyvasp":{"rail":"VERIFYVASP","mode":"own","platform_available":true,"connected":true},"sygna":{"rail":"SYGNA","mode":"own","platform_available":true,"connected":true}}}'), $result->toArray());
-        self::assertSame(true, $result->isEnabled);
+        self::assertTrue($result->isEnabled);
     }
 
     public function testListVasps(): void
@@ -96,7 +93,6 @@ final class TravelRuleTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\VaspDirectoryEntry::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -134,7 +130,6 @@ final class TravelRuleTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"chain":"chain-value","txid":"txid-value","wallet_address":"wallet_address-value","amount":"amount-value","currency":"currency-value","originator_data":{"key":"value"},"beneficiary_data":{"key":"value"},"originating_vasp":{"name":"name-value","lei":"lei-value","travel_address":"travel_address-value"}}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TravelRuleInboundResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"transaction_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","txn_id":"txn_id-value","created":true,"travel_rule":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"AWAITING_COUNTERPARTY","direction":"INBOUND","rail":"INTERNAL","protocol":"protocol-value","ivms_version":"ivms_version-value","required":true,"ownership_confirmed":true,"deadline_at":"2026-01-15T10:30:00Z","timeline":[{"status":"status-value","at":"2026-01-15T10:30:00Z","detail":"detail-value"}],"counterparty_vasp":{"name":"name-value","lei":"lei-value","dd_score":1},"originator_data":{"key":"value"},"beneficiary_data":{"key":"value"},"created_at":"2026-01-15T10:30:00Z"}}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->transactionId);
@@ -163,7 +158,6 @@ final class TravelRuleTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"wallet_address":"wallet_address-value","chain":"chain-value","holder_name":"holder_name-value","vendor_data":"vendor_data-value","transaction_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","satoshi_deposit_address":"satoshi_deposit_address-value","callback_url":"callback_url-value","expires_in_minutes":1}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\TravelRuleWidgetSessionResponse::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"widget_session_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","token":"token-value","url":"url-value","expires_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->widgetSessionId);

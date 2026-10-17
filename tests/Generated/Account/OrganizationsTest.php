@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Account;
 
-use Didit\Core\ListResponse;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -31,7 +30,6 @@ final class OrganizationsTest extends GeneratedTestCase
         self::assertSame('Bearer ' . self::ACCOUNT_TOKEN, $request->getHeaderLine('Authorization'));
         self::assertSame('', $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(ListResponse::class, $result);
         self::assertCount(1, $result);
         self::assertContainsOnlyInstancesOf(Types\Organization::class, $result->items);
         self::assertSame($this->decoded('[{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer","contact_email":"developer@gmail.com","created_at":"2025-06-01T10:00:00Z"}]'), $result->toArray());

@@ -6,7 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated;
 
-use Didit\Core\Page;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -36,7 +35,6 @@ final class BusinessesTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\BusinessListItem::class, $result->results);
         self::assertFalse($result->hasNextPage());
@@ -56,7 +54,6 @@ final class BusinessesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\BusinessDetailItem::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"didit_internal_id":"a1b2c3d4-e5f6-4890-abcd-ef1234567890","vendor_data":"company-123","display_name":null,"legal_name":"Acme Trading Ltd","registration_number":"12345678","country_code":"GB","effective_name":"Acme Trading Ltd","status":"ACTIVE","session_count":2,"approved_count":1,"declined_count":0,"in_review_count":1,"features":{"KYB":"Approved"},"features_list":[{"feature":"KYB","status":"Approved"}],"last_session_at":"2026-03-15T10:30:00Z","last_activity_at":"2026-03-15T10:30:00Z","first_session_at":"2026-01-10T08:00:00Z","tags":[{"uuid":"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d","name":"VIP","color":"#2567FF"}],"created_at":"2026-01-10T08:00:00Z","metadata":{"industry":"fintech"},"updated_at":"2026-03-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('a1b2c3d4-e5f6-4890-abcd-ef1234567890', $result->diditInternalId);
@@ -85,7 +82,6 @@ final class BusinessesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"display_name":"display_name-value","legal_name":"legal_name-value","registration_number":"registration_number-value","country_code":"country_code-value","status":"ACTIVE","metadata":{"key":"value"}}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\BusinessDetailItem::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"didit_internal_id":"a1b2c3d4-e5f6-4890-abcd-ef1234567890","vendor_data":"company-123","display_name":"Acme Corp","legal_name":"Acme Trading Ltd","registration_number":"12345678","country_code":"GB","effective_name":"Acme Corp","status":"FLAGGED","session_count":2,"approved_count":1,"declined_count":0,"in_review_count":1,"features":{"KYB":"Approved"},"features_list":[{"feature":"KYB","status":"Approved"}],"last_session_at":"2026-03-15T10:30:00Z","last_activity_at":"2026-03-15T10:30:00Z","first_session_at":"2026-01-10T08:00:00Z","tags":[{"uuid":"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d","name":"VIP","color":"#2567FF"}],"created_at":"2026-01-10T08:00:00Z","metadata":{"industry":"fintech","risk_level":"low"},"updated_at":"2026-03-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('a1b2c3d4-e5f6-4890-abcd-ef1234567890', $result->diditInternalId);
@@ -107,7 +103,6 @@ final class BusinessesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"status":"ACTIVE"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\BusinessDetailItem::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"didit_internal_id":"a1b2c3d4-e5f6-4890-abcd-ef1234567890","vendor_data":"company-123","display_name":null,"legal_name":"Acme Trading Ltd","registration_number":"12345678","country_code":"GB","effective_name":"Acme Trading Ltd","status":"BLOCKED","session_count":2,"approved_count":1,"declined_count":0,"in_review_count":1,"features":{"KYB":"Approved"},"features_list":[{"feature":"KYB","status":"Approved"}],"last_session_at":"2026-03-15T10:30:00Z","last_activity_at":"2026-03-15T10:30:00Z","first_session_at":"2026-01-10T08:00:00Z","tags":[{"uuid":"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d","name":"VIP","color":"#2567FF"}],"created_at":"2026-01-10T08:00:00Z","metadata":{"industry":"fintech"},"updated_at":"2026-03-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('a1b2c3d4-e5f6-4890-abcd-ef1234567890', $result->diditInternalId);
@@ -135,7 +130,6 @@ final class BusinessesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data_list":["vendor_data_list-value"],"didit_internal_id_list":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"delete_all":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\BusinessesBatchDeleteResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"deleted":2}'), $result->toArray());
         self::assertSame(2, $result->deleted);
@@ -194,7 +188,6 @@ final class BusinessesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","display_name":"display_name-value","legal_name":"legal_name-value","registration_number":"registration_number-value","country_code":"country_code-value","status":"ACTIVE","metadata":{"key":"value"}}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\BusinessDetailItem::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"didit_internal_id":"a1b2c3d4-e5f6-4890-abcd-ef1234567890","vendor_data":"company-456","display_name":null,"legal_name":"New Corp Ltd","registration_number":null,"country_code":"US","effective_name":"New Corp Ltd","status":"ACTIVE","session_count":0,"approved_count":0,"declined_count":0,"in_review_count":0,"features":{},"features_list":[],"last_session_at":null,"last_activity_at":"2026-03-15T10:30:00Z","first_session_at":null,"tags":[],"created_at":"2026-03-15T10:30:00Z","metadata":{},"updated_at":"2026-03-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('a1b2c3d4-e5f6-4890-abcd-ef1234567890', $result->diditInternalId);
@@ -247,7 +240,6 @@ final class BusinessesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\BusinessesRetrieveOngoingMonitoringJobResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"job_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","is_enabled":true,"total":1,"processed":1,"outcomes":{"enabled":1,"screened_and_enabled":1,"already_enabled":1,"disabled":1,"skipped_no_identity_data":1,"skipped_blocked":1,"skipped_sandbox":1,"failed_provider":1,"failed_insufficient_balance":1},"error":"error-value","estimate":{"users_total":1,"already_enabled":1,"with_existing_aml":1,"needing_screening":1,"skipped_no_identity_data":1,"skipped_blocked":1,"estimated_screening_cost_usd":1.5,"estimated_annual_monitoring_cost_usd":1.5,"balance_sufficient":true}}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->jobId);
@@ -302,7 +294,6 @@ final class BusinessesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\BusinessesRetrieveSessionOngoingMonitoringJobResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"job_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","is_enabled":true,"total":1,"processed":1,"outcomes":{"enabled":1,"screened_and_enabled":1,"already_enabled":1,"disabled":1,"skipped_no_identity_data":1,"skipped_blocked":1,"skipped_sandbox":1,"failed_provider":1,"failed_insufficient_balance":1},"error":"error-value","estimate":{"users_total":1,"already_enabled":1,"with_existing_aml":1,"needing_screening":1,"skipped_no_identity_data":1,"skipped_blocked":1,"estimated_screening_cost_usd":1.5,"estimated_annual_monitoring_cost_usd":1.5,"balance_sufficient":true}}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->jobId);
@@ -321,7 +312,6 @@ final class BusinessesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\BusinessesListNetworksResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z"},"subject":{"key":"value"},"signal_types":["ip_address"],"signal_count":1,"joined_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}]}'), $result->toArray());
     }

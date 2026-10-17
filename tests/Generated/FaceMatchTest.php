@@ -8,7 +8,6 @@ namespace Didit\Tests\Generated;
 
 use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `face_match` resource.
@@ -63,7 +62,6 @@ final class FaceMatchTest extends GeneratedTestCase
                 '{"key":"value"}',
             ],
         ], $this->multipartFields($request));
-        self::assertInstanceOf(Types\FaceMatchCompareResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"f9f5a777-8002-44c6-baaf-128bcfd6e226","face_match":{"status":"Approved","score":99.41,"user_image":{"entities":[{"bbox":[661,728,1688,2188],"confidence":0.732973,"age":26.91,"gender":"male","race":null}],"best_angle":0},"ref_image":{"entities":[{"bbox":[653,745,1691,2185],"confidence":0.722082,"age":27.0,"gender":"male","race":null}],"best_angle":0},"warnings":[]},"vendor_data":"user-123","metadata":{"flow":"login"},"created_at":"2026-06-12T01:04:42.763237+00:00"}'), $result->toArray());
         self::assertSame('f9f5a777-8002-44c6-baaf-128bcfd6e226', $result->requestId);

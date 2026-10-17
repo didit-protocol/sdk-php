@@ -6,8 +6,6 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\Sessions;
 
-use Didit\Core\BinaryContent;
-use Didit\Core\Page;
 use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
@@ -55,7 +53,6 @@ final class ImportsTest extends GeneratedTestCase
                 'file:file.jpg:image/jpeg:fake-file-bytes',
             ],
         ], $this->multipartFields($request));
-        self::assertInstanceOf(Types\SessionImportJob::class, $result);
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f9c1a2b-4d5e-4f60-8a7b-9c0d1e2f3a4b","status":"PENDING","import_type":"user_verification","source_format":"ndjson","source_filename":"sessions.ndjson","total_rows":0,"processed_rows":0,"checkpoint_row":0,"created_count":0,"updated_count":0,"skipped_count":0,"failed_count":0,"total_media_bytes":0,"last_error":null,"created_at":"2026-05-17T08:42:11Z","updated_at":"2026-05-17T08:42:11Z","started_at":null,"completed_at":null}'), $result->toArray());
         self::assertSame('3f9c1a2b-4d5e-4f60-8a7b-9c0d1e2f3a4b', $result->uuid);
@@ -79,7 +76,6 @@ final class ImportsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('text/csv, application/json', $request->getHeaderLine('Accept'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(BinaryContent::class, $result);
         self::assertSame('binary-content', $result->contents());
         self::assertSame('text/csv', $result->contentType());
     }
@@ -97,7 +93,6 @@ final class ImportsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Types\SessionImportJob::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
@@ -122,7 +117,6 @@ final class ImportsTest extends GeneratedTestCase
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertInstanceOf(Page::class, $result);
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\SessionImportError::class, $result->results);
         self::assertFalse($result->hasNextPage());

@@ -7,7 +7,6 @@ declare(strict_types=1);
 namespace Didit\Tests\Generated;
 
 use Didit\Tests\Support\GeneratedTestCase;
-use Didit\Types;
 
 /**
  * Generated tests for the `phone` resource.
@@ -47,7 +46,6 @@ final class PhoneTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"phone_number":"phone_number-value","country_code":"country_code-value","signals":{"ip":"203.0.113.10","device_id":"device_id-value","device_platform":"android","device_model":"device_model-value","os_version":"os_version-value","app_version":"app_version-value","user_agent":"user_agent-value"},"vendor_data":"vendor_data-value","metadata":{"key":"value"},"enable_social":true}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\PhoneRiskResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"4fd09d2e-9bc9-4c4e-9c46-7f625ac0ab62","status":"Approved","phone":{"status":"Approved","phone_number_prefix":"+1","phone_number":"4155552671","full_number":"+14155552671","country_code":"US","country_name":"United States","carrier":{"name":"Example Mobile","type":"mobile"},"is_disposable":false,"is_virtual":false,"verification_method":null,"verification_attempts":0,"verified_at":null,"warnings":[],"lifecycle":[],"matches":[],"phone_intelligence":{"score":3.0,"phone_type_risk":"Low","phone_trust_index":97,"network_stability_index":95,"is_disposable":false,"is_ported":false,"is_recently_ported":false,"carrier_type":"mobile","reason_codes":[]},"enrichment":{"score":3.0,"phone_type_risk":"Low","phone_trust_index":97,"network_stability_index":95,"is_disposable":false,"is_ported":false,"is_recently_ported":false,"carrier_type":"mobile","reason_codes":[]}},"vendor_data":"lead-123","metadata":{"source":"signup_prescreen"},"created_at":"2026-09-01T10:30:00.123456+00:00"}'), $result->toArray());
         self::assertSame('4fd09d2e-9bc9-4c4e-9c46-7f625ac0ab62', $result->requestId);
@@ -89,7 +87,6 @@ final class PhoneTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"phone_number":"phone_number-value","options":{"code_size":1,"locale":"locale-value","preferred_channel":"whatsapp","use_white_label_customization":true,"sms_sender_name":"sms_sender_name-value"},"signals":{"ip":"ip-value","device_id":"device_id-value","device_platform":"android","device_model":"device_model-value","os_version":"os_version-value","app_version":"app_version-value","user_agent":"user_agent-value"},"vendor_data":"vendor_data-value","metadata":{"key":"value"}}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\PhoneVerificationSendResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Success","reason":null,"vendor_data":"user-1234","metadata":null}'), $result->toArray());
         self::assertSame('e39cb057-92fc-4b59-b84e-02fec29a0f24', $result->requestId);
@@ -117,7 +114,6 @@ final class PhoneTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"phone_number":"phone_number-value","code":"code-value","duplicated_phone_number_action":"NO_ACTION","disposable_number_action":"NO_ACTION","voip_number_action":"NO_ACTION","enable_social":true,"phone_no_social_presence_action":"NO_ACTION"}', $this->canonicalBody($request));
-        self::assertInstanceOf(Types\PhoneVerificationCheckResponse::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Approved","message":"The verification code is correct.","phone":{"status":"Approved","phone_number_prefix":"+1","phone_number":"4155552671","full_number":"+14155552671","country_code":"US","country_name":"United States","carrier":{"name":"AT&T","type":"mobile"},"is_disposable":false,"is_virtual":false,"verification_method":"whatsapp","verification_attempts":1,"verified_at":"2026-06-12T01:24:47.311323Z","warnings":[],"lifecycle":[{"type":"PHONE_VERIFICATION_MESSAGE_SENT","timestamp":"2026-06-12T01:23:39.580554+00:00","details":{"status":"Success","reason":null,"channel":"whatsapp","actual_channel":"whatsapp"},"fee":0.0709},{"type":"PHONE_DELIVERY_DELIVERED","timestamp":"2026-06-12T01:23:43.118220+00:00","details":{"channel":"whatsapp","status":"delivered"},"fee":0},{"type":"VALID_CODE_ENTERED","timestamp":"2026-06-12T01:24:47.311201+00:00","details":{"code_tried":"123456","status":"Approved"},"fee":0},{"type":"PHONE_VERIFICATION_APPROVED","timestamp":"2026-06-12T01:24:47.384292+00:00","details":null,"fee":0}],"matches":[]},"vendor_data":"user-1234","metadata":null,"created_at":"2026-06-12T01:24:47.401719+00:00"}'), $result->toArray());
         self::assertSame('e39cb057-92fc-4b59-b84e-02fec29a0f24', $result->requestId);

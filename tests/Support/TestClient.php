@@ -32,9 +32,6 @@ final class TestClient
     ) {
     }
 
-    /**
-     * @param array<string, string> $defaultHeaders
-     */
     public function client(
         ?ClientOptions $options = null,
         ?LoggerInterface $logger = null,
