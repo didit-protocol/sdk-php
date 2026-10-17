@@ -187,7 +187,7 @@ final class TestIssuer
             'email' => 'person@example.com',
             'name' => 'Alex Example',
             'phone_number' => '+34600000000',
-            'nonce' => 'n-0S6_WzA2Mj',
+            'nonce' => 'test-nonce-7f3a',
         ]);
         unset($claims['client_id']);
 

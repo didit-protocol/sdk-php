@@ -25,7 +25,7 @@ final class RuntimeEndpointsTest extends TestCase
     private const SESSION_URL = TestIssuer::ISSUER . '/session/';
     private const STEP_UP_URL = TestIssuer::ISSUER . '/step-up/';
     private const STEP_UP_ID = '94efc2c3-ca84-42fe-900b-6fb61669a7a1';
-    private const ACCESS_TOKEN = 'eyJhbGciOiJFUzI1NiJ9.e30.c2ln';
+    private const ACCESS_TOKEN = 'test-access-token';
 
     private TestIssuer $issuer;
 
@@ -393,7 +393,7 @@ final class RuntimeEndpointsTest extends TestCase
         return [
             'access_token' => 'access.jwt',
             'id_token' => 'id.jwt',
-            'refresh_token' => 'N4yZTl6y24YKYq77X_SOrBn1q2Lit81WBQMOay7dq_IVfTnxyY8ZGcJk-6-fcmWW',
+            'refresh_token' => 'test-refresh-token-2',
             'token_type' => 'Bearer',
             'expires_in' => 299,
             'session_id' => 'c9abf6cc-2d64-4bf2-b31e-a4d09a070ab1',

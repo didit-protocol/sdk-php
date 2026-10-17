@@ -91,10 +91,10 @@ final class TokenVerificationTest extends TestCase
     {
         $token = $this->issuer->sign($this->issuer->idClaims(), ['typ' => 'JWT']);
 
-        $claims = $this->issuer->auth()->verifyIdToken($token, 'n-0S6_WzA2Mj', TestIssuer::AUDIENCE);
+        $claims = $this->issuer->auth()->verifyIdToken($token, 'test-nonce-7f3a', TestIssuer::AUDIENCE);
 
         self::assertSame(TestIssuer::AUDIENCE, $claims->aud);
-        self::assertSame('n-0S6_WzA2Mj', $claims->nonce);
+        self::assertSame('test-nonce-7f3a', $claims->nonce);
         self::assertSame(1792233664, $claims->authTime);
         self::assertSame('person@example.com', $claims->email);
         self::assertTrue($claims->emailVerified);
@@ -133,14 +133,14 @@ final class TokenVerificationTest extends TestCase
         unset($claims['nonce']);
         $token = $this->issuer->sign($claims, ['typ' => 'JWT']);
 
-        $this->assertRejected(TokenVerificationException::INVALID_NONCE, fn () => $this->issuer->auth()->verifyIdToken($token, 'n-0S6_WzA2Mj', TestIssuer::AUDIENCE));
+        $this->assertRejected(TokenVerificationException::INVALID_NONCE, fn () => $this->issuer->auth()->verifyIdToken($token, 'test-nonce-7f3a', TestIssuer::AUDIENCE));
     }
 
     public function testIdTokenAudienceIsRequiredToMatch(): void
     {
         $token = $this->issuer->sign($this->issuer->idClaims(), ['typ' => 'JWT']);
 
-        $this->assertRejected(TokenVerificationException::INVALID_AUDIENCE, fn () => $this->issuer->auth()->verifyIdToken($token, 'n-0S6_WzA2Mj', 'another-app'));
+        $this->assertRejected(TokenVerificationException::INVALID_AUDIENCE, fn () => $this->issuer->auth()->verifyIdToken($token, 'test-nonce-7f3a', 'another-app'));
     }
 
     public function testAnIdTokenIsNotAnAccessToken(): void
