@@ -84,6 +84,9 @@ final class ConfigurationAndPkceTest extends TestCase
 
         $custom = Authentication::fromPublishableKey(' pk_live_' . Base64Url::encode('https://login.example.com') . "\n");
         self::assertSame('https://login.example.com', $custom->issuer);
+
+        $urlSafe = Authentication::fromPublishableKey('pk_live_aHR0cHM6Ly9sb2dpbi5leGFtcGxlLmNvbS9-');
+        self::assertSame('https://login.example.com/~', $urlSafe->issuer);
     }
 
     public function testPublishableKeyClientUsesTheDecodedIssuer(): void
@@ -107,8 +110,8 @@ final class ConfigurationAndPkceTest extends TestCase
         yield 'upper-case prefix' => ['PK_LIVE_' . Base64Url::encode('https://acme.auth.didit.me')];
         yield 'unknown environment' => ['pk_prod_' . Base64Url::encode('https://acme.auth.didit.me')];
         yield 'prefix only' => ['pk_live_'];
-        yield 'padded' => ['pk_live_' . base64_encode('https://acme.auth.didit.me/')];
-        yield 'standard alphabet' => ['pk_live_' . str_replace(['-', '_'], ['+', '/'], Base64Url::encode('https://a.auth.didit.me/?>?'))];
+        yield 'padded' => ['pk_live_' . base64_encode('https://acme.auth.didit.me')];
+        yield 'standard alphabet' => ['pk_live_' . base64_encode('https://login.example.com/~')];
         yield 'not base64' => ['pk_live_not*base64'];
         yield 'not a URL' => ['pk_live_' . Base64Url::encode('acme.auth.didit.me')];
         yield 'http issuer' => ['pk_live_' . Base64Url::encode('http://acme.auth.didit.me')];
