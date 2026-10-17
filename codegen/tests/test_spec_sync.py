@@ -46,6 +46,7 @@ class SpecSyncTest(unittest.TestCase):
         shutil.copy(REPO / "openapi" / "verification.json", self.offline / "openapi-25.json")
         shutil.copy(REPO / "openapi" / "account.json", self.offline / "openapi-auth.json")
         self.summary = self.root / "summary.md"
+        self.commit = self.root / "commit.txt"
 
     # helpers ----------------------------------------------------------------
 
@@ -56,7 +57,11 @@ class SpecSyncTest(unittest.TestCase):
 
     def sync(self, *extra: str) -> tuple[int, str, str]:
         out, err = io.StringIO(), io.StringIO()
-        args = ["--root", str(self.root), "--offline-dir", str(self.offline), "--summary-file", str(self.summary), "--date", DATE, *extra]
+        self.commit.unlink(missing_ok=True)
+        args = [
+            "--root", str(self.root), "--offline-dir", str(self.offline), "--summary-file", str(self.summary),
+            "--commit-message-file", str(self.commit), "--date", DATE, *extra,
+        ]
         with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
             code = spec_sync.main(args)
         return code, out.getvalue(), err.getvalue()
@@ -124,6 +129,14 @@ class SpecSyncTest(unittest.TestCase):
         breaking = summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0]
         self.assertIn(f"`{REMOVED}` was removed upstream: `sessions.imports.retrieve()` is deprecated", breaking)
         self.assertIn("**Removed (1)**", summary)
+        # The commit and the pull request body carry a BREAKING CHANGE footer, so release-please
+        # never ships the sync in a patch release.
+        commit = self.commit.read_text("utf-8")
+        self.assertEqual(commit.splitlines()[0], f"chore(spec): sync API spec {DATE}")
+        footer = commit.split("\n\n")[-1]
+        self.assertTrue(footer.startswith("BREAKING CHANGE: the API spec sync changes the SDK surface.\n- "), commit)
+        self.assertIn(f"`{REMOVED}` was removed upstream", footer)
+        self.assertTrue(summary.rstrip("\n").endswith(footer.rstrip("\n")))
 
         # The generator still builds the method, with its component type, from the entry alone.
         files, _ = build(self.root)
@@ -134,6 +147,69 @@ class SpecSyncTest(unittest.TestCase):
         # A second run with the same upstream has nothing to do.
         code, out, _ = self.sync()
         self.assertEqual((code, out.strip()), (0, "No upstream change"))
+
+    def test_operation_that_stops_being_a_server_operation_is_deprecated(self) -> None:
+        def withdraw(doc: dict[str, Any]) -> None:
+            doc["paths"]["/v3/session/imports/{importId}/errors/"]["get"]["x-didit-sdk"] = dict(self.overlay[ERRORS], server=False)
+        self.upstream(withdraw)
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+
+        [entry] = self.read("deprecated-operations.json")["operations"]
+        self.assertEqual(entry["key"], ERRORS)
+        self.assertEqual(entry["x-didit-sdk"], self.overlay[ERRORS])
+        self.assertEqual((entry["removed_on"], entry["deprecated_since"]), (DATE, "0.1.0"))
+        self.assertIn("responses", entry["operation"])
+        self.assertNotIn(ERRORS, self.read("overlay.json")["operations"])
+        summary = self.summary.read_text("utf-8")
+        self.assertIn(f"`{ERRORS}` is no longer a server operation: `sessions.imports.list_errors()` is deprecated", summary)
+        self.assertIn("BREAKING CHANGE: ", self.commit.read_text("utf-8"))
+
+        # The method stays, deprecated, until the next minor version.
+        files, _ = build(self.root)
+        imports = files["src/Resources/Sessions/Imports.php"]
+        self.assertIn("public function listErrors(", imports)
+        self.assertIn(f"@deprecated this operation stopped being a server operation on {DATE}", imports)
+        code, out, _ = self.sync()
+        self.assertEqual((code, out.strip()), (0, "No upstream change"))
+
+        version = self.root / "src" / "Version.php"
+        version.write_text(version.read_text("utf-8").replace("'0.1.0'", "'0.2.0'"), "utf-8")
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        self.assertFalse((self.root / "openapi" / "deprecated-operations.json").exists())
+        self.assertIn("`sessions.imports.list_errors()` deleted (deprecated since 0.1.0)", self.commit.read_text("utf-8"))
+        self.assertNotIn("public function listErrors(", build(self.root)[0]["src/Resources/Sessions/Imports.php"])
+
+    def test_operation_that_becomes_a_server_operation_again_is_not_deprecated(self) -> None:
+        def withdraw(doc: dict[str, Any]) -> None:
+            doc["paths"]["/v3/session/imports/{importId}/errors/"]["get"]["x-didit-sdk"] = dict(self.overlay[ERRORS], server=False)
+        self.upstream(withdraw)
+        self.assertEqual(self.sync()[0], 0)
+        def restore(doc: dict[str, Any]) -> None:
+            doc["paths"]["/v3/session/imports/{importId}/errors/"]["get"]["x-didit-sdk"] = dict(self.overlay[ERRORS])
+        self.upstream(restore)
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        self.assertFalse((self.root / "openapi" / "deprecated-operations.json").exists())
+        self.assertIn(f"`{ERRORS}` came back upstream: `sessions.imports.list_errors` is no longer deprecated", self.summary.read_text("utf-8"))
+        self.assertIn("public function listErrors(", build(self.root)[0]["src/Resources/Sessions/Imports.php"])
+
+    def test_breaking_change_to_an_operation_is_summarised_and_flagged(self) -> None:
+        def retype(doc: dict[str, Any]) -> None:
+            schema = doc["paths"]["/v3/session/imports/{importId}/errors/"]["get"]["responses"]["200"]["content"]["application/json"]["schema"]
+            schema["properties"]["count"]["type"] = "string"
+        self.upstream(retype)
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        summary = self.summary.read_text("utf-8")
+        changed = summary.split("**Changed (1)**", 1)[1]
+        self.assertIn(f"- `{ERRORS}` (`sessions.imports.list_errors`): ", changed)
+        self.assertIn("breaking: response 200 `count`: type changed from integer to string", changed)
+        breaking = summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0]
+        self.assertIn(f"`sessions.imports.list_errors()` (`{ERRORS}`): response 200 `count`: type changed from integer to string", breaking)
+        self.assertIn("BREAKING CHANGE: ", self.commit.read_text("utf-8"))
+        self.assertFalse((self.root / "openapi" / "deprecated-operations.json").exists())
 
     def test_deprecation_ends_after_one_minor_version(self) -> None:
         self.upstream(self.remove)
@@ -211,6 +287,11 @@ class SpecSyncTest(unittest.TestCase):
         self.assertEqual((self.root / "openapi" / "SOURCE.json").read_text("utf-8"), json.dumps(source, indent=1))
         summary = self.summary.read_text("utf-8")
         self.assertIn("None detected.", summary)
+        self.assertNotIn("BREAKING CHANGE", summary)
+        self.assertEqual(
+            self.commit.read_text("utf-8"),
+            f"chore(spec): sync API spec {DATE}\n\nGenerated by .github/workflows/spec-sync.yml from the upstream OpenAPI documents.\n",
+        )
         self.assertTrue(re.search(r"\| `openapi/verification.json` \| https://docs.didit.me/openapi-25.json \| `[0-9a-f]{12}` -> `[0-9a-f]{12}` \|", summary))
 
 
