@@ -1,0 +1,184 @@
+name: Spec sync
+
+# docs/DESIGN.md section 3.1: download the upstream OpenAPI documents daily and,
+# when they changed, regenerate the SDK, run every check and open (or update)
+# the pull request "chore(spec): sync API spec YYYY-MM-DD" from chore/spec-sync.
+#
+# A pull request opened or pushed with the default GITHUB_TOKEN does not trigger
+# other workflows, so CI would not run on it. When the SPEC_SYNC_TOKEN secret is
+# set (a fine-grained token or GitHub App token with contents and pull-requests
+# write access to this repository), it is used instead and CI runs as usual.
+#
+# The sync never removes commits that people added to the open pull request
+# (DESIGN 15: hand-written core changes go there). When the branch holds any
+# commit not made by this workflow, the sync builds on top of it and pushes a
+# fast-forward; otherwise it starts again from main and replaces the branch
+# only if nobody pushed to it while the checks ran.
+
+on:
+  schedule:
+    - cron: '17 6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: spec-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Sync API spec
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: bash
+    env:
+      BRANCH: chore/spec-sync
+      BOT_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          token: ${{ secrets.SPEC_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Choose where the sync starts
+        id: base
+        env:
+          GH_TOKEN: ${{ secrets.SPEC_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+          BASE: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          mode=rebuild
+          remote_sha=""
+          if git fetch --quiet origin "refs/heads/$BRANCH" 2>/dev/null; then
+            remote_sha="$(git rev-parse FETCH_HEAD)"
+            open="$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq 'length')"
+            # Authors and committers of the branch commits that main lacks.
+            people="$(git log --format='%ae%n%ce' "HEAD..$remote_sha")"
+            others="$(printf '%s\n' "$people" | grep -vxF -e "$BOT_EMAIL" -e '' | sort -u || true)"
+            if [ "$open" -gt 0 ] && [ -n "$others" ]; then
+              mode='continue'
+              git switch --quiet --force-create "$BRANCH" "$remote_sha"
+              echo "The open pull request has commits from others; syncing on top of $BRANCH." >> "$GITHUB_STEP_SUMMARY"
+            fi
+          fi
+          echo "mode=$mode" >> "$GITHUB_OUTPUT"
+          echo "remote_sha=$remote_sha" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+
+      # Exits non-zero, leaving openapi/ untouched, when a new operation has no
+      # SDK naming: add it to openapi/overlay.json (or x-didit-sdk upstream).
+      - name: Download the upstream documents
+        id: sync
+        run: |
+          set -euo pipefail
+          python3 codegen/spec_sync.py --summary-file "$RUNNER_TEMP/summary.md" --commit-message-file "$RUNNER_TEMP/commit.txt"
+          if [ -n "$(git status --porcelain -- openapi)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            cat "$RUNNER_TEMP/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No upstream change." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Report a failed sync
+        if: failure() && steps.sync.outcome == 'failure'
+        run: |
+          set -euo pipefail
+          if [ -f "$RUNNER_TEMP/summary.md" ]; then
+            cat "$RUNNER_TEMP/summary.md" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: shivammathur/setup-php@eb7c497e18156a6bbabfef1d3a82760b9eda3962 # 2.40.0
+        if: steps.sync.outputs.changed == 'true'
+        with:
+          php-version: '8.4'
+          extensions: json, openssl
+          coverage: none
+          tools: composer:v2
+
+      # composer.lock is not committed for this library.
+      - name: Install dependencies
+        if: steps.sync.outputs.changed == 'true'
+        run: composer update --no-interaction --no-progress --prefer-dist
+
+      - name: Regenerate the SDK
+        if: steps.sync.outputs.changed == 'true'
+        run: python3 codegen/generate.py
+
+      - name: Generator tests
+        if: steps.sync.outputs.changed == 'true'
+        run: python3 -m unittest discover -s codegen/tests
+
+      - name: PHPUnit
+        if: steps.sync.outputs.changed == 'true'
+        run: composer test
+
+      - name: PHPStan (level max)
+        if: steps.sync.outputs.changed == 'true'
+        run: composer analyse -- --no-progress
+
+      - name: PHP-CS-Fixer
+        if: steps.sync.outputs.changed == 'true'
+        run: composer lint
+
+      - name: Open or update the pull request
+        if: steps.sync.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SPEC_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+          BASE: ${{ github.event.repository.default_branch }}
+          MODE: ${{ steps.base.outputs.mode }}
+          REMOTE_SHA: ${{ steps.base.outputs.remote_sha }}
+        run: |
+          set -euo pipefail
+          title="$(head -n 1 "$RUNNER_TEMP/summary.md")"
+          tail -n +3 "$RUNNER_TEMP/summary.md" > "$RUNNER_TEMP/body.md"
+
+          git config user.name 'github-actions[bot]'
+          git config user.email "$BOT_EMAIL"
+          if [ "$MODE" = rebuild ]; then
+            git switch --force-create "$BRANCH"
+          fi
+          git add --all -- openapi src tests/Generated
+          # The message ends with a BREAKING CHANGE footer when the sync breaks
+          # the SDK surface (the pull request body carries it too).
+          git commit --quiet --file "$RUNNER_TEMP/commit.txt"
+
+          # Push only when the content differs from the open branch (ignoring the
+          # fetch time in SOURCE.json), so an unchanged sync does not re-run CI
+          # every day.
+          pushed=false
+          if [ -n "$REMOTE_SHA" ] \
+            && git diff --quiet "$REMOTE_SHA" HEAD -- . ':(exclude)openapi/SOURCE.json'; then
+            echo "chore/spec-sync already has this content."
+          elif [ "$MODE" = continue ]; then
+            # A plain push: it fails, losing nothing, if someone pushed meanwhile.
+            git push origin "HEAD:refs/heads/$BRANCH"
+            pushed=true
+          else
+            # Replaces the branch only while it still points where it did when
+            # this run started (an empty value means it must not exist yet).
+            git push --force-with-lease="refs/heads/$BRANCH:$REMOTE_SHA" origin "HEAD:refs/heads/$BRANCH"
+            pushed=true
+          fi
+
+          number="$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number // empty')"
+          if [ -n "$number" ] && [ "$MODE" = continue ]; then
+            # The description still lists the changes since main; this sync's
+            # own changes go in a comment.
+            gh pr edit "$number" --title "$title"
+            if [ "$pushed" = true ]; then
+              gh pr comment "$number" --body-file "$RUNNER_TEMP/body.md"
+            fi
+          elif [ -n "$number" ]; then
+            gh pr edit "$number" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          else
+            gh pr create --head "$BRANCH" --base "$BASE" --title "$title" --body-file "$RUNNER_TEMP/body.md"
+          fi
