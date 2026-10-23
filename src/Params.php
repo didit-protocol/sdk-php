@@ -80,6 +80,30 @@ namespace Didit;
  *     privacy_url?: string,
  *     description?: string,
  * }
+ * @phpstan-type BankAccountCheckHolder array{
+ *     full_name?: string,
+ *     business_name?: string,
+ * }
+ * @phpstan-type BankAccountCheckRequest array{
+ *     country: string,
+ *     account: BankAccountCheckRequestAccount,
+ *     holder: BankAccountCheckHolder,
+ *     vendor_data?: string|null,
+ * }
+ * @phpstan-type BankAccountCheckRequestAccount array{
+ *     iban?: string,
+ *     account_number?: string,
+ *     sort_code?: string,
+ *     routing_number?: string,
+ *     transit_institution?: string,
+ *     bsb?: string,
+ *     ifsc?: string,
+ *     bank_code?: string,
+ *     bic?: string,
+ *     clabe?: string,
+ *     cbu_cvu?: string,
+ *     registration_id?: string,
+ * }
  * @phpstan-type BillingTopUpParams array{
  *     amount_in_dollars: float|int,
  *     success_url?: string,

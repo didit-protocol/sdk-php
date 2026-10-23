@@ -206,6 +206,17 @@ final class SessionDecision extends BaseModel
     public readonly ?array $questionnaireResponses;
 
     /**
+     * Bank Verification results, one item per Bank Verification step, for User and Business Verification.
+     * `null` until a step produces one. Each item's `method` says how the account was verified:
+     * `open_banking` (bank sign-in) or `account_lookup` (account check), or a `microdeposits` or
+     * `statement` fallback. See [Bank verification
+     * methods](/core-technology/bank-verification/verification-methods).
+     *
+     * @var list<BankVerificationResult>|null
+     */
+    public readonly ?array $bankVerifications;
+
+    /**
      * Electronic Signature results, one item per signer and signature step, for User and Business
      * Verification. Present only when the workflow has an Electronic Signature step; an empty array until
      * a signer reaches it. See the [Electronic Signature
@@ -337,6 +348,7 @@ final class SessionDecision extends BaseModel
         $this->poaVerifications = Hydrate::list($data['poa_verifications'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionPoaVerifications::class));
         $this->documentAiDocuments = Hydrate::list($data['document_ai_documents'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionDocumentAiDocuments::class));
         $this->questionnaireResponses = Hydrate::list($data['questionnaire_responses'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionQuestionnaireResponses::class));
+        $this->bankVerifications = Hydrate::list($data['bank_verifications'] ?? null, static fn (mixed $v) => Hydrate::model($v, BankVerificationResult::class));
         $this->signatures = Hydrate::list($data['signatures'] ?? null, static fn (mixed $v) => Hydrate::model($v, SignatureResult::class));
         $this->amlScreenings = Hydrate::list($data['aml_screenings'] ?? null, static fn (mixed $v) => Hydrate::model($v, AMLScreening::class));
         $this->ipAnalyses = Hydrate::list($data['ip_analyses'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionIpAnalyses::class));
