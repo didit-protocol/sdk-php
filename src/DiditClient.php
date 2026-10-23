@@ -48,6 +48,8 @@ final class DiditClient extends BaseClient
 
     public readonly Resources\DatabaseValidation $databaseValidation;
 
+    public readonly Resources\Bank $bank;
+
     public readonly Resources\Workflows $workflows;
 
     public readonly Resources\Questionnaires $questionnaires;
@@ -114,6 +116,7 @@ final class DiditClient extends BaseClient
         $this->kyb = new Resources\Kyb($this->requester);
         $this->passiveLiveness = new Resources\PassiveLiveness($this->requester);
         $this->databaseValidation = new Resources\DatabaseValidation($this->requester);
+        $this->bank = new Resources\Bank($this->requester);
         $this->workflows = new Resources\Workflows($this->requester);
         $this->questionnaires = new Resources\Questionnaires($this->requester);
         $this->users = new Resources\Users($this->requester);
