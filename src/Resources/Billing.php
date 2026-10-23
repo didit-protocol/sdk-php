@@ -43,8 +43,8 @@ final class Billing extends BaseResource
     /**
      * Top up credits.
      *
-     * Add credits via a hosted Stripe Checkout session (**$50 minimum**); not available on annual plans.
-     * Redirect the customer to the returned `checkout_session_url`.
+     * Add credits via a hosted checkout session (**$50 minimum**); not available on annual plans. Redirect
+     * the customer to the returned `checkout_session_url`.
      *
      * `POST /v3/billing/top-up/`
      *

@@ -11,7 +11,7 @@ use Didit\Core\Hydrate;
 
 /**
  * PATCH is a partial update; the response echoes only holder_name, holder_vendor_data, entity_type,
- * and travel_address.
+ * travel_address, receiving_travel_address, label, and owner_type.
  */
 final class WalletAddressEntryUpdate extends BaseModel
 {

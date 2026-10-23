@@ -86,6 +86,16 @@ final class DiditClient extends BaseClient
 
     public readonly Resources\FraudChecks $fraudChecks;
 
+    public readonly Resources\Lists $lists;
+
+    public readonly Resources\Blocklist $blocklist;
+
+    public readonly Resources\MonitoringEvents $monitoringEvents;
+
+    public readonly Resources\Analytics $analytics;
+
+    public readonly Resources\Investigator $investigator;
+
     public readonly Resources\Account $account;
 
     protected function initResources(): void
@@ -123,6 +133,11 @@ final class DiditClient extends BaseClient
         $this->biometricTemplates = new Resources\BiometricTemplates($this->requester);
         $this->idWallets = new Resources\IdWallets($this->requester);
         $this->fraudChecks = new Resources\FraudChecks($this->requester);
+        $this->lists = new Resources\Lists($this->requester);
+        $this->blocklist = new Resources\Blocklist($this->requester);
+        $this->monitoringEvents = new Resources\MonitoringEvents($this->requester);
+        $this->analytics = new Resources\Analytics($this->requester);
+        $this->investigator = new Resources\Investigator($this->requester);
         $this->account = new Resources\Account($this->requester);
     }
 }

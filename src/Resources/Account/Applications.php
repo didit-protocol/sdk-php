@@ -7,8 +7,9 @@ declare(strict_types=1);
 namespace Didit\Resources\Account;
 
 use Didit\Core\BaseResource;
-use Didit\Core\JsonResponse;
+use Didit\Core\Hydrate;
 use Didit\Core\Operation;
+use Didit\Core\Page;
 use Didit\Exception\DiditException;
 use Didit\Params;
 use Didit\RequestOptions;
@@ -17,6 +18,7 @@ use Didit\Types;
 /**
  * The `account.applications` resource.
  *
+ * @phpstan-import-type AccountApplicationsListParams from Params
  * @phpstan-import-type ApplicationCreateRequest from Params
  * @phpstan-import-type ApplicationUpdateRequest from Params
  */
@@ -25,27 +27,30 @@ final class Applications extends BaseResource
     /**
      * List the organization's applications.
      *
-     * List every application in the organization. Use this to discover `app_id` values when recovering
-     * credentials from a new machine, follow with `GET /organizations/me/{org_id}/applications/{app_id}/`
-     * for the API key. Requires an owner or admin Bearer token.
+     * List the organization's applications, 50 per page by default. Use this to discover `app_id` values
+     * when recovering credentials from a new machine, then call `GET
+     * /organizations/me/{org_id}/applications/{app_id}/` for the API key. Requires an owner or admin
+     * Bearer token.
      *
      * `GET /organizations/me/{org_id}/applications/`
      *
      * @param string $orgId UUID of the organization
+     * @param AccountApplicationsListParams $params
+     *
+     * @return Page<Types\Application>
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function list(string $orgId, ?RequestOptions $options = null): JsonResponse
+    public function list(string $orgId, array $params = [], ?RequestOptions $options = null): Page
     {
-        $response = $this->requester->request(new Operation(
+        return $this->requester->requestPage(new Operation(
             method: 'GET',
             path: '/organizations/me/{org_id}/applications/',
             auth: 'account_token',
             base: 'account',
-        ), ['org_id' => $orgId], [], $options);
-
-        return JsonResponse::fromResponse($response);
+            query: ['limit' => 'limit', 'offset' => 'offset'],
+        ), ['org_id' => $orgId], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\Application::class));
     }
 
     /**
@@ -105,7 +110,7 @@ final class Applications extends BaseResource
      * Update Application.
      *
      * Update application metadata (name, URLs, redirect URIs). `api_key` and `client_id` are never
-     * rotated. Requires owner/admin JWT.
+     * rotated. `products` is read-only: a `products` key in the body is ignored. Requires owner/admin JWT.
      *
      * `PATCH /organizations/me/{org_id}/applications/{app_id}/`
      *

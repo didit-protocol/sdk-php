@@ -9,7 +9,6 @@ namespace Didit\Resources;
 use Didit\Core\BaseResource;
 use Didit\Core\BinaryContent;
 use Didit\Core\Hydrate;
-use Didit\Core\JsonResponse;
 use Didit\Core\Operation;
 use Didit\Core\Page;
 use Didit\Core\Requester;
@@ -21,17 +20,25 @@ use Didit\Types;
 /**
  * The `sessions` resource.
  *
+ * @phpstan-import-type SandboxSimulateRequest from Params
+ * @phpstan-import-type SessionsAddImagesParams from Params
  * @phpstan-import-type SessionsBatchDeleteParams from Params
  * @phpstan-import-type SessionsBulkUpdateAmlHitStatusParams from Params
  * @phpstan-import-type SessionsCreateParams from Params
  * @phpstan-import-type SessionsDeleteParams from Params
+ * @phpstan-import-type SessionsExportAmlScreeningHistoryParams from Params
  * @phpstan-import-type SessionsImportSharedParams from Params
+ * @phpstan-import-type SessionsListAmlScreeningHistoryParams from Params
+ * @phpstan-import-type SessionsListEventsParams from Params
  * @phpstan-import-type SessionsListParams from Params
+ * @phpstan-import-type SessionsPreviewDecisionEmailParams from Params
  * @phpstan-import-type SessionsPreviewResubmissionParams from Params
  * @phpstan-import-type SessionsRetrieveDecisionParams from Params
  * @phpstan-import-type SessionsShareParams from Params
  * @phpstan-import-type SessionsUpdateAmlHitStatusParams from Params
+ * @phpstan-import-type SessionsUpdateAmlStatusParams from Params
  * @phpstan-import-type SessionsUpdateDataParams from Params
+ * @phpstan-import-type SessionsUpdateDocumentAiDataParams from Params
  * @phpstan-import-type SessionsUpdateFeatureStatusParams from Params
  * @phpstan-import-type SessionsUpdateKybCompanyDataParams from Params
  * @phpstan-import-type SessionsUpdateKybPartyParams from Params
@@ -44,11 +51,17 @@ final class Sessions extends BaseResource
 
     public readonly Sessions\Reviews $reviews;
 
+    public readonly Sessions\Signatures $signatures;
+
+    public readonly Sessions\Webhooks $webhooks;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
         $this->imports = new Sessions\Imports($requester);
         $this->reviews = new Sessions\Reviews($requester);
+        $this->signatures = new Sessions\Signatures($requester);
+        $this->webhooks = new Sessions\Webhooks($requester);
     }
 
     /**
@@ -71,7 +84,7 @@ final class Sessions extends BaseResource
             method: 'POST',
             path: '/v3/session/',
             bodyTypes: ['json'],
-            jsonHints: ['metadata' => ['o'], 'contact_details' => ['o'], 'expected_details' => ['o']],
+            jsonHints: ['metadata' => ['o'], 'contact_details' => ['o'], 'expected_details' => ['o'], 'sign' => ['o', ['documents' => ['l', ['o', ['fields' => ['l', ['o', ['anchor' => ['o'], 'validation' => ['o']]]]]]], 'field_values' => ['o']]]],
         ), [], $params, $options);
 
         return Types\SessionsCreateResponse::fromResponse($response);
@@ -98,14 +111,14 @@ final class Sessions extends BaseResource
         string $sessionId,
         array $params = [],
         ?RequestOptions $options = null,
-    ): Types\SessionsRetrieveDecisionResponse {
+    ): Types\SessionDecision {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/session/{sessionId}/decision/',
             query: ['include' => 'include'],
         ), ['sessionId' => $sessionId], $params, $options);
 
-        return Types\SessionsRetrieveDecisionResponse::fromResponse($response);
+        return Types\SessionDecision::fromResponse($response);
     }
 
     /**
@@ -258,7 +271,7 @@ final class Sessions extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function importShared(array $params, ?RequestOptions $options = null): JsonResponse
+    public function importShared(array $params, ?RequestOptions $options = null): Types\SessionDecision
     {
         $response = $this->requester->request(new Operation(
             method: 'POST',
@@ -266,7 +279,7 @@ final class Sessions extends BaseResource
             bodyTypes: ['json'],
         ), [], $params, $options);
 
-        return JsonResponse::fromResponse($response);
+        return Types\SessionDecision::fromResponse($response);
     }
 
     /**
@@ -285,7 +298,7 @@ final class Sessions extends BaseResource
     public function batchDelete(
         array $params = [],
         ?RequestOptions $options = null,
-    ): Types\SessionsBatchDeleteResponse200|Types\SessionsBatchDeleteResponse202 {
+    ): Types\SessionsBatchDeleteResponse200|Types\SessionDeletionJob {
         $response = $this->requester->request(new Operation(
             method: 'POST',
             path: '/v3/sessions/delete/',
@@ -293,7 +306,7 @@ final class Sessions extends BaseResource
         ), [], $params, $options);
 
         return match ($response->status) {
-            202 => Types\SessionsBatchDeleteResponse202::fromResponse($response),
+            202 => Types\SessionDeletionJob::fromResponse($response),
             default => Types\SessionsBatchDeleteResponse200::fromResponse($response),
         };
     }
@@ -312,16 +325,14 @@ final class Sessions extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function retrieveDeletionJob(
-        string $jobId,
-        ?RequestOptions $options = null,
-    ): Types\SessionsRetrieveDeletionJobResponse {
+    public function retrieveDeletionJob(string $jobId, ?RequestOptions $options = null): Types\SessionDeletionJob
+    {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/sessions/delete/{job_id}/',
         ), ['job_id' => $jobId], [], $options);
 
-        return Types\SessionsRetrieveDeletionJobResponse::fromResponse($response);
+        return Types\SessionDeletionJob::fromResponse($response);
     }
 
     /**
@@ -360,9 +371,9 @@ final class Sessions extends BaseResource
     /**
      * Update an individual feature (step) status.
      *
-     * Set the status of a single verification feature (step) within a session **without changing the
-     * overall session decision**. Target the feature by its workflow graph `nodeId` (use `default` for
-     * non-graph workflows where the step has no node).
+     * Set the status of a single verification feature (step) within a session. Target the feature by its
+     * workflow graph `nodeId`. On non-graph workflows, whose steps have no node, use `default` and also
+     * pass `feature_type` to say which step you mean.
      *
      * `PATCH /v3/session/{sessionId}/features/{nodeId}/update-status/`
      *
@@ -404,8 +415,11 @@ final class Sessions extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function updateAmlHitStatus(string $sessionId, array $params, ?RequestOptions $options = null): JsonResponse
-    {
+    public function updateAmlHitStatus(
+        string $sessionId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\SessionsUpdateAmlHitStatusResponse {
         $response = $this->requester->request(new Operation(
             method: 'PATCH',
             path: '/v3/session/{sessionId}/update-aml-hit-status/',
@@ -413,7 +427,7 @@ final class Sessions extends BaseResource
             bodyTypes: ['json'],
         ), ['sessionId' => $sessionId], $params, $options);
 
-        return JsonResponse::fromResponse($response);
+        return Types\SessionsUpdateAmlHitStatusResponse::fromResponse($response);
     }
 
     /**
@@ -435,7 +449,7 @@ final class Sessions extends BaseResource
         string $sessionId,
         array $params,
         ?RequestOptions $options = null,
-    ): JsonResponse {
+    ): Types\SessionsBulkUpdateAmlHitStatusResponse {
         $response = $this->requester->request(new Operation(
             method: 'PATCH',
             path: '/v3/session/{sessionId}/bulk-update-aml-hit-status/',
@@ -444,7 +458,7 @@ final class Sessions extends BaseResource
             jsonHints: ['hit_updates' => ['l', ['o']]],
         ), ['sessionId' => $sessionId], $params, $options);
 
-        return JsonResponse::fromResponse($response);
+        return Types\SessionsBulkUpdateAmlHitStatusResponse::fromResponse($response);
     }
 
     /**
@@ -557,7 +571,7 @@ final class Sessions extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function listNetworks(string $sessionId, ?RequestOptions $options = null): Types\SessionsListNetworksResponse
+    public function listNetworks(string $sessionId, ?RequestOptions $options = null): Types\EntityNetworkMembershipList
     {
         $response = $this->requester->request(new Operation(
             method: 'GET',
@@ -565,18 +579,18 @@ final class Sessions extends BaseResource
             applicationScope: true,
         ), ['session_id' => $sessionId], [], $options);
 
-        return Types\SessionsListNetworksResponse::fromResponse($response);
+        return Types\EntityNetworkMembershipList::fromResponse($response);
     }
 
     /**
      * Preview a resubmission email.
      *
      * Render the email that would accompany a KYC or KYB resubmission without changing the session,
-     * resetting checks, extending its expiry, running checks or sending mail. Requires write:sessions and
-     * an application-scoped session in Approved, Declined, In Review, Kyc Expired or Abandoned status. The
-     * server validates the selected workflow steps and renders its fixed translated template with the
-     * applicable verified white-label sender and branding. The request cannot set a subject, message body
-     * or action URL.
+     * resetting checks, extending its expiry, running checks or sending mail. Requires the
+     * `write:sessions` privilege (a scoped API key needs write access to decisions) and a session in
+     * `Approved`, `Declined`, `In Review`, `Kyc Expired` or `Abandoned` status. The server validates the
+     * selected workflow steps and renders its fixed translated template with the applicable verified
+     * white-label sender and branding. The request cannot set a subject, message body or action URL.
      *
      * `POST /v3/session/{sessionId}/resubmission-preview/`
      *
@@ -588,7 +602,7 @@ final class Sessions extends BaseResource
      */
     public function previewResubmission(
         string $sessionId,
-        array $params,
+        array $params = [],
         ?RequestOptions $options = null,
     ): Types\SessionsPreviewResubmissionResponse {
         $response = $this->requester->request(new Operation(
@@ -599,5 +613,340 @@ final class Sessions extends BaseResource
         ), ['sessionId' => $sessionId], $params, $options);
 
         return Types\SessionsPreviewResubmissionResponse::fromResponse($response);
+    }
+
+    /**
+     * Update a Document AI document.
+     *
+     * Correct the fields Document AI extracted from one uploaded document, set its review status, or both,
+     * on a KYC or KYB session. `extracted_data` must be a JSON object and is merged key by key: a key you
+     * send replaces the stored value (a key sent as `null` is stored as `null`) and keys you leave out
+     * keep their values. The document status feeds the Document AI result of its workflow node in the
+     * session decision; the session status itself is not recomputed.
+     *
+     * `PATCH /v3/document-ai/{sessionId}/documents/{documentUuid}/`
+     *
+     * @param string $sessionId UUID of the verification session (the `session_id` returned by `POST /v3/session/`)
+     * @param string $documentUuid UUID of the Document AI document (`document_ai_documents[].items[].uuid` in `GET /v3/session/{sessionId}/decision/`).
+     * @param SessionsUpdateDocumentAiDataParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function updateDocumentAiData(
+        string $sessionId,
+        string $documentUuid,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\SessionsUpdateDocumentAiDataResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'PATCH',
+            path: '/v3/document-ai/{sessionId}/documents/{documentUuid}/',
+            bodyTypes: ['json'],
+            jsonHints: ['extracted_data' => ['o']],
+        ), ['sessionId' => $sessionId, 'documentUuid' => $documentUuid], $params, $options);
+
+        return Types\SessionsUpdateDocumentAiDataResponse::fromResponse($response);
+    }
+
+    /**
+     * Regenerate a Key People party's KYC session.
+     *
+     * Give a Key People party of a Business Verification (KYB) session a new individual KYC session after
+     * its previous one was deleted, so the Key People check can finish again; send no request body. It
+     * works only when the party's KYC session was deleted (`kyc_session_deleted: true`): a party whose KYC
+     * session still exists (in any status), a party that never had one, or a company party returns `409`.
+     *
+     * `POST /v3/session/{sessionId}/kyb/parties/{partyUuid}/regenerate/`
+     *
+     * @param string $sessionId UUID of the parent Business Verification (KYB) session
+     * @param string $partyUuid UUID of the Key People party (`key_people_checks[].submitted.parties[].uuid` on the business session decision).
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function regenerateKybParty(
+        string $sessionId,
+        string $partyUuid,
+        ?RequestOptions $options = null,
+    ): Types\KYBKeyPeopleParty {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/{sessionId}/kyb/parties/{partyUuid}/regenerate/',
+        ), ['sessionId' => $sessionId, 'partyUuid' => $partyUuid], [], $options);
+
+        return Types\KYBKeyPeopleParty::fromResponse($response);
+    }
+
+    /**
+     * List session events.
+     *
+     * Read the event timeline of one verification session, newest first by `sent_at`: the screens the user
+     * saw, buttons and uploads, failed attempts, status and feature-step changes, and the workflow routing
+     * trace. Works for User Verification (KYC) and Business Verification (KYB) session IDs. Events are
+     * stored asynchronously, so a new event can take a few seconds to appear. Results are paginated with
+     * `limit` and `offset`; follow `next` until it is `null`. A scoped API key needs `sessions: read` and
+     * `decisions: read`, and without `media: read` it receives `file_url` as `null`.
+     *
+     * `GET /v3/session/{sessionId}/events/`
+     *
+     * @param string $sessionId UUID of the verification session (the `session_id` returned by `POST /v3/session/`)
+     * @param SessionsListEventsParams $params
+     *
+     * @return Page<Types\SessionEvent>
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listEvents(string $sessionId, array $params = [], ?RequestOptions $options = null): Page
+    {
+        return $this->requester->requestPage(new Operation(
+            method: 'GET',
+            path: '/v3/session/{sessionId}/events/',
+            query: ['limit' => 'limit', 'offset' => 'offset', 'ordering' => 'ordering'],
+        ), ['sessionId' => $sessionId], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\SessionEvent::class));
+    }
+
+    /**
+     * List AML screening history.
+     *
+     * List every completed ongoing-monitoring re-screen of a session's AML check, newest first by
+     * `completed_at`, including the runs where nothing changed: alerts, activity entries and webhooks fire
+     * only when a result moves, so this history is the evidence that a clean subject was still being
+     * screened. Works for KYC and KYB session IDs; pass `node_id` when the session ran more than one AML
+     * step.
+     *
+     * `GET /v3/session/{sessionId}/aml-screening-history/`
+     *
+     * @param string $sessionId UUID of the verification session (the `session_id` returned by `POST /v3/session/`)
+     * @param SessionsListAmlScreeningHistoryParams $params
+     *
+     * @return Page<Types\AMLScreeningRun>
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listAmlScreeningHistory(
+        string $sessionId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Page {
+        return $this->requester->requestPage(new Operation(
+            method: 'GET',
+            path: '/v3/session/{sessionId}/aml-screening-history/',
+            query: ['node_id' => 'node_id', 'limit' => 'limit', 'offset' => 'offset', 'ordering' => 'ordering'],
+        ), ['sessionId' => $sessionId], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\AMLScreeningRun::class));
+    }
+
+    /**
+     * Export AML screening history as CSV.
+     *
+     * Download the same ongoing-monitoring history as `GET /v3/session/{sessionId}/aml-screening-history/`
+     * as a CSV file, one line per completed re-screen, newest first, ready to hand to an auditor. The file
+     * is streamed whole (no pagination) and starts with a header line; an empty cell means unknown,
+     * dataset dates are never estimated, and a value that would start a spreadsheet formula is prefixed
+     * with an apostrophe. Works for KYC and KYB session IDs; pass `node_id` when the session ran more than
+     * one AML step. Errors are returned as JSON, not CSV.
+     *
+     * `GET /v3/session/{sessionId}/aml-screening-history/export/`
+     *
+     * @param string $sessionId UUID of the verification session (the `session_id` returned by `POST /v3/session/`)
+     * @param SessionsExportAmlScreeningHistoryParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function exportAmlScreeningHistory(
+        string $sessionId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): BinaryContent {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/session/{sessionId}/aml-screening-history/export/',
+            query: ['node_id' => 'node_id'],
+            accept: 'text/csv, application/json',
+        ), ['sessionId' => $sessionId], $params, $options);
+
+        return BinaryContent::fromResponse($response);
+    }
+
+    /**
+     * Add an image to a session.
+     *
+     * Attach one extra image or PDF to the ID verification (`model_type=kyc`) or Proof of Address
+     * (`model_type=poa`) result of a finished User Verification (KYC) session, for example evidence
+     * collected outside the flow. The session must be `Approved`, `Declined`, `In Review` or `Kyc Expired`
+     * and carry the result named by `model_type`; Business Verification (KYB) sessions are not supported.
+     *
+     * `PATCH /v3/session/{sessionId}/add-images/`
+     *
+     * @param string $sessionId UUID of the User Verification (KYC) session to add the file to (the `session_id` returned by `POST /v3/session/`)
+     * @param SessionsAddImagesParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function addImages(
+        string $sessionId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\SessionsAddImagesResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'PATCH',
+            path: '/v3/session/{sessionId}/add-images/',
+            bodyTypes: ['multipart'],
+        ), ['sessionId' => $sessionId], $params, $options);
+
+        return Types\SessionsAddImagesResponse::fromResponse($response);
+    }
+
+    /**
+     * Update an AML check status.
+     *
+     * Set the status of a session's AML screening check as a whole (the `status` of an `aml_screenings[]`
+     * entry in the session decision), for example `Approved` after your team cleared every hit. Works for
+     * KYC and KYB session IDs; pass `node_id` (query parameter or body field) when the session ran more
+     * than one AML step, otherwise the most recent AML check is updated. When the status actually changes,
+     * an `AML_STATUS_UPDATED` activity entry is recorded and a `data.updated`
+     * [webhook](https://docs.didit.me/integration/webhooks) is sent; sending the current status returns
+     * `200` and changes nothing.
+     *
+     * `PATCH /v3/session/{sessionId}/update-aml-status/`
+     *
+     * @param string $sessionId UUID of the verification session (the `session_id` returned by `POST /v3/session/`)
+     * @param SessionsUpdateAmlStatusParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function updateAmlStatus(
+        string $sessionId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\SessionsUpdateAmlStatusResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'PATCH',
+            path: '/v3/session/{sessionId}/update-aml-status/',
+            query: ['node_id_query' => 'node_id'],
+            bodyTypes: ['json'],
+        ), ['sessionId' => $sessionId], $params, $options);
+
+        return Types\SessionsUpdateAmlStatusResponse::fromResponse($response);
+    }
+
+    /**
+     * Simulate a sandbox session's status.
+     *
+     * Force a terminal status on a sandbox session after the fact, from your backend, without running the
+     * flow. Sandbox applications only: a live session returns `404`. Works for User Verification (KYC) and
+     * Business Verification (KYB) sessions.
+     *
+     * `POST /v3/session/{sessionId}/simulate/`
+     *
+     * @param string $sessionId UUID of the sandbox verification session
+     * @param SandboxSimulateRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function simulate(
+        string $sessionId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\SandboxSimulateResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/{sessionId}/simulate/',
+            bodyTypes: ['json'],
+        ), ['sessionId' => $sessionId], $params, $options);
+
+        return Types\SandboxSimulateResponse::fromResponse($response);
+    }
+
+    /**
+     * List a session's check overrides.
+     *
+     * Every override of an individual feature (step) status on a User Verification (KYC) or Business
+     * Verification (KYB) session, newest first and not paginated: applied ones, ones waiting for the
+     * person to finish the flow (`pending_until_flow_finishes`) and cancelled ones, each with who asked,
+     * their reason, and whether it applied while the person was still in the flow (`forced`).
+     *
+     * `GET /v3/session/{sessionId}/features/overrides/`
+     *
+     * @param string $sessionId UUID of the verification session
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listFeatureOverrides(
+        string $sessionId,
+        ?RequestOptions $options = null,
+    ): Types\SessionsListFeatureOverridesResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/session/{sessionId}/features/overrides/',
+        ), ['sessionId' => $sessionId], [], $options);
+
+        return Types\SessionsListFeatureOverridesResponse::fromResponse($response);
+    }
+
+    /**
+     * Cancel a check override that waits for the flow to finish.
+     *
+     * Cancel an override of a feature (step) status that is still `pending_until_flow_finishes`, so it
+     * never applies. The check keeps its status, the cancellation is recorded in the session's activity as
+     * `FEATURE_OVERRIDE_CANCELLED`, and no webhook is sent. The response is the override with `state:
+     * cancelled` and `cancel_reason: cancelled_by_reviewer`.
+     *
+     * `POST /v3/session/{sessionId}/features/overrides/{overrideId}/cancel/`
+     *
+     * @param string $sessionId UUID of the verification session
+     * @param string $overrideId the `id` of the override to cancel
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function cancelFeatureOverride(
+        string $sessionId,
+        string $overrideId,
+        ?RequestOptions $options = null,
+    ): Types\FeatureStatusOverride {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/{sessionId}/features/overrides/{overrideId}/cancel/',
+        ), ['sessionId' => $sessionId, 'overrideId' => $overrideId], [], $options);
+
+        return Types\FeatureStatusOverride::fromResponse($response);
+    }
+
+    /**
+     * Preview a session's decision email.
+     *
+     * Render the email the person receives when you set a session to `Approved` or `Declined` with
+     * `send_email: true`, without changing the session or sending anything. The response shows the subject
+     * and HTML exactly as they are sent, the recipient, the sender, the language, and whether confirming
+     * the change sends the email at all (`will_be_sent`, `not_sent_reason`).
+     *
+     * `POST /v3/session/{sessionId}/decision-email-preview/`
+     *
+     * @param string $sessionId UUID of the verification session
+     * @param SessionsPreviewDecisionEmailParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function previewDecisionEmail(
+        string $sessionId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\SessionsPreviewDecisionEmailResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/{sessionId}/decision-email-preview/',
+            bodyTypes: ['json'],
+        ), ['sessionId' => $sessionId], $params, $options);
+
+        return Types\SessionsPreviewDecisionEmailResponse::fromResponse($response);
     }
 }

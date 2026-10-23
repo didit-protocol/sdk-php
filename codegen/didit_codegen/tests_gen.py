@@ -95,7 +95,7 @@ def _emit_test(om: OpModel, node: ResourceNode) -> tuple[str, set[str]]:
 
     # Params
     params: dict[str, Any] = {}
-    expected_query: dict[str, str] = {}
+    expected_query: dict[str, str | list[str]] = {}
     expected_headers: dict[str, str] = {}
     body_values: dict[str, Any] = {}
     if om.body is not None:
@@ -105,7 +105,7 @@ def _emit_test(om: OpModel, node: ResourceNode) -> tuple[str, set[str]]:
         value = request_sample(p.type, p.key)
         params[p.key] = value
         if p.location == "query":
-            expected_query[p.wire] = _query_text(value)
+            expected_query[p.wire] = _query_expectation(value)
         else:
             expected_headers[p.wire] = str(value)
 
@@ -170,6 +170,14 @@ def _body_sample(om: OpModel) -> dict[str, Any]:
     for p in om.body.props:
         sample[p.wire] = request_sample(p.type, p.wire, 1)
     return sample
+
+
+def _query_expectation(value: Any) -> str | list[str]:
+    """A list is sent as the repeated parameter: one value reads back as a string, several as a list."""
+    if isinstance(value, list):
+        items = [_query_text(v) for v in value]
+        return items[0] if len(items) == 1 else items
+    return _query_text(value)
 
 
 def _query_text(value: Any) -> str:

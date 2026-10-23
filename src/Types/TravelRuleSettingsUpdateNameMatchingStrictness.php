@@ -7,6 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
+ * `CONTAINS` accepts one name whose words all appear in the other.
+ *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
 final class TravelRuleSettingsUpdateNameMatchingStrictness
@@ -14,6 +16,8 @@ final class TravelRuleSettingsUpdateNameMatchingStrictness
     public const NONE = 'NONE';
 
     public const STRICT = 'STRICT';
+
+    public const CONTAINS = 'CONTAINS';
 
     public const DEFAULT = 'DEFAULT';
 

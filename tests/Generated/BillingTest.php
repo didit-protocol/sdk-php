@@ -35,7 +35,7 @@ final class BillingTest extends GeneratedTestCase
 
     public function testTopUp(): void
     {
-        $this->queueJson(200, '{"checkout_session_id":"cs_test_a1B2c3D4e5F6g7H8i9J0","checkout_session_url":"https://checkout.stripe.com/c/pay/cs_test_a1B2c3D4e5F6g7H8i9J0"}');
+        $this->queueJson(200, '{"checkout_session_id":"cs_test_a1B2c3D4e5F6g7H8i9J0","checkout_session_url":"https://checkout.example.com/c/pay/cs_test_a1B2c3D4e5F6g7H8i9J0"}');
 
         $result = $this->client->billing->topUp([
             'amount_in_dollars' => 1.5,
@@ -52,7 +52,7 @@ final class BillingTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"amount_in_dollars":1.5,"success_url":"https://example.com/callback","cancel_url":"https://example.com/callback"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"checkout_session_id":"cs_test_a1B2c3D4e5F6g7H8i9J0","checkout_session_url":"https://checkout.stripe.com/c/pay/cs_test_a1B2c3D4e5F6g7H8i9J0"}'), $result->toArray());
+        self::assertSame($this->decoded('{"checkout_session_id":"cs_test_a1B2c3D4e5F6g7H8i9J0","checkout_session_url":"https://checkout.example.com/c/pay/cs_test_a1B2c3D4e5F6g7H8i9J0"}'), $result->toArray());
         self::assertSame('cs_test_a1B2c3D4e5F6g7H8i9J0', $result->checkoutSessionId);
     }
 }

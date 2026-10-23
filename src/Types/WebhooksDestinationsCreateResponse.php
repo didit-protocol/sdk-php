@@ -37,6 +37,21 @@ final class WebhooksDestinationsCreateResponse extends BaseModel
     public readonly ?string $secretSharedKey;
 
     /**
+     * Last four characters of the destination's current signing secret, so you can tell secrets apart. Not
+     * enough to verify a signature.
+     */
+    public readonly ?string $secretLast4;
+
+    /**
+     * Set for 24 hours after the destination's signing secret is rotated in the Business Console. Until
+     * this time, every delivery to the destination also carries `X-Signature-Previous`,
+     * `X-Signature-V2-Previous` and `X-Signature-Simple-Previous`, made with the replaced secret (see
+     * [Signature verification](/integration/webhooks#signature-verification)). `null` when no rotation
+     * happened in the last 24 hours.
+     */
+    public readonly ?\DateTimeImmutable $previousSecretExpiresAt;
+
+    /**
      * Event filter for this webhook destination. Didit delivers only webhooks whose event type exactly
      * matches one of these values, there is no wildcard subscription. When sent, the list must contain at
      * least one valid event (an explicit `[]` is rejected with 400); a destination whose list is empty
@@ -46,13 +61,65 @@ final class WebhooksDestinationsCreateResponse extends BaseModel
      */
     public readonly ?array $subscribedEvents;
 
+    /**
+     * Email of the Business Console member who created the destination. `null` for a destination created
+     * with an API key.
+     */
+    public readonly ?string $createdByEmail;
+
+    /**
+     * Name of the Business Console member who created the destination. `null` for a destination created
+     * with an API key.
+     */
+    public readonly ?string $createdByName;
+
     /** The `created_at` field. */
     public readonly ?\DateTimeImmutable $createdAt;
 
     /** The `updated_at` field. */
     public readonly ?\DateTimeImmutable $updatedAt;
 
-    /** Delivery health summary (all zero/null on a brand-new destination). */
+    /**
+     * Delivery health. `failing`: 3 or more consecutive events failed their first delivery attempt since
+     * the destination last answered successfully (see `failing_streak`). `degraded`: not failing, but a
+     * delivery attempt failed in the last 24 hours and no later attempt has delivered that event; a retry
+     * or resend that delivers it clears this. `healthy`: neither. Independent of `enabled`. A failed
+     * attempt is one answered with HTTP 400 or above, or not answered at all.
+     *
+     * Known values: {@see WebhooksDestinationsCreateResponseHealthStatus}.
+     */
+    public readonly ?string $healthStatus;
+
+    /**
+     * How many consecutive events failed their first delivery attempt since the destination last answered
+     * successfully, within the last 30 days. Retries are not counted, and any successful attempt,
+     * including a retry or a resend, ends the streak. `0` when no event has failed since the last success.
+     */
+    public readonly ?int $failingStreak;
+
+    /**
+     * When the first failed attempt of the current `failing_streak` was made. `null` when `failing_streak`
+     * is `0`.
+     */
+    public readonly ?\DateTimeImmutable $failingSince;
+
+    /**
+     * When the destination last answered a delivery with an HTTP status under 400, within the last 30
+     * days. `null` if it has not in that window.
+     */
+    public readonly ?\DateTimeImmutable $lastSuccessAt;
+
+    /**
+     * Environment of the application that owns the destination.
+     *
+     * Known values: {@see WebhooksDestinationsCreateResponseEnvironment}.
+     */
+    public readonly ?string $environment;
+
+    /**
+     * Delivery metrics for the last `metrics_window_days` (30) days. `last_delivery_at` is the most recent
+     * attempt, whenever it was made.
+     */
     public readonly ?WebhooksDestinationsCreateResponseSummary $summary;
 
     /**
@@ -67,9 +134,18 @@ final class WebhooksDestinationsCreateResponse extends BaseModel
         $this->enabled = Hydrate::bool($data['enabled'] ?? null);
         $this->webhookVersion = Hydrate::string($data['webhook_version'] ?? null);
         $this->secretSharedKey = Hydrate::string($data['secret_shared_key'] ?? null);
+        $this->secretLast4 = Hydrate::string($data['secret_last4'] ?? null);
+        $this->previousSecretExpiresAt = Hydrate::dateTime($data['previous_secret_expires_at'] ?? null);
         $this->subscribedEvents = Hydrate::list($data['subscribed_events'] ?? null, Hydrate::string(...));
+        $this->createdByEmail = Hydrate::string($data['created_by_email'] ?? null);
+        $this->createdByName = Hydrate::string($data['created_by_name'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
         $this->updatedAt = Hydrate::dateTime($data['updated_at'] ?? null);
+        $this->healthStatus = Hydrate::string($data['health_status'] ?? null);
+        $this->failingStreak = Hydrate::int($data['failing_streak'] ?? null);
+        $this->failingSince = Hydrate::dateTime($data['failing_since'] ?? null);
+        $this->lastSuccessAt = Hydrate::dateTime($data['last_success_at'] ?? null);
+        $this->environment = Hydrate::string($data['environment'] ?? null);
         $this->summary = Hydrate::model($data['summary'] ?? null, WebhooksDestinationsCreateResponseSummary::class);
     }
 }

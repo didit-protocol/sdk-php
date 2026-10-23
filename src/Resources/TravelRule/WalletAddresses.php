@@ -19,6 +19,7 @@ use Didit\Types;
 /**
  * The `travel_rule.wallet_addresses` resource.
  *
+ * @phpstan-import-type TravelRuleWalletAddressesBulkImportParams from Params
  * @phpstan-import-type TravelRuleWalletAddressesListParams from Params
  * @phpstan-import-type WalletAddressEntryCreate from Params
  * @phpstan-import-type WalletAddressEntryUpdate from Params
@@ -103,8 +104,9 @@ final class WalletAddresses extends BaseResource
     /**
      * Delete a wallet address.
      *
-     * Deletes the entry. It stops matching new transfers immediately and the address is freed up for
-     * re-registration.
+     * Deletes the entry together with its ownership proofs and the screenshots they stored. It stops
+     * matching new transfers immediately and the address is freed up for re-registration. Transfers that
+     * already used the wallet keep their own record of it and read the same. Deletion is irreversible.
      *
      * `DELETE /v3/travel-rule/wallet-addresses/{entry_uuid}/`
      *
@@ -119,5 +121,33 @@ final class WalletAddresses extends BaseResource
         ), ['entry_uuid' => $entryUuid], [], $options);
 
         return NoContent::fromResponse($response);
+    }
+
+    /**
+     * Import wallet addresses in bulk.
+     *
+     * Add up to 10,000 wallets to your Travel Rule address book in one call, as JSON or as a CSV file. A
+     * wallet can be sent by its address, by the SHA-256 of its lowercased address (`address_hash`) to keep
+     * the address private, or both. The import is idempotent: a wallet already in the book is reported as
+     * `existing` and left untouched, so the same file can be sent again. Each row is validated on its own,
+     * so one bad row never fails the others. A wallet imported by its hash only matches transfers to that
+     * address and can be proven with the wallet-ownership widget like any other entry.
+     *
+     * `POST /v3/travel-rule/wallet-addresses/import/`
+     *
+     * @param TravelRuleWalletAddressesBulkImportParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function bulkImport(array $params = [], ?RequestOptions $options = null): Types\WalletAddressImportReport
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/travel-rule/wallet-addresses/import/',
+            bodyTypes: ['json', 'multipart'],
+        ), [], $params, $options);
+
+        return Types\WalletAddressImportReport::fromResponse($response);
     }
 }

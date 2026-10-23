@@ -207,9 +207,10 @@ final class TransactionDetail extends BaseModel
      * Travel Rule transfer or check. Populated when `travel_rule_details` was submitted, and also when
      * Travel Rule is enabled and the transaction was created with `transaction_category: travelRule`
      * (Didit initiates the exchange itself, even without `travel_rule_details`). `null` when no transfer
-     * or check exists.
+     * or check exists. On an inbound transfer, the counterparty's `originator_data` and `beneficiary_data`
+     * stay masked (`data_masked: true`) until wallet ownership is confirmed.
      */
-    public readonly ?TransactionDetailTravelRule $travelRule;
+    public readonly ?TransactionTravelRule $travelRule;
 
     /**
      * Graph snapshot of related transactions/parties used by the rules engine. Either the
@@ -283,7 +284,7 @@ final class TransactionDetail extends BaseModel
         $this->alerts = Hydrate::list($data['alerts'] ?? null, static fn (mixed $v) => Hydrate::model($v, TransactionDetailAlerts::class));
         $this->ruleRuns = Hydrate::list($data['rule_runs'] ?? null, static fn (mixed $v) => Hydrate::model($v, TransactionDetailRuleRuns::class));
         $this->providerResults = Hydrate::list($data['provider_results'] ?? null, static fn (mixed $v) => Hydrate::model($v, TransactionDetailProviderResults::class));
-        $this->travelRule = Hydrate::model($data['travel_rule'] ?? null, TransactionDetailTravelRule::class);
+        $this->travelRule = Hydrate::model($data['travel_rule'] ?? null, TransactionTravelRule::class);
         $this->networkSnapshot = Hydrate::model($data['network_snapshot'] ?? null, TransactionDetailNetworkSnapshot::class);
         $this->remediation = Hydrate::model($data['remediation'] ?? null, TransactionDetailRemediation::class);
         $this->actionRequired = Hydrate::model($data['action_required'] ?? null, TransactionDetailActionRequired::class);

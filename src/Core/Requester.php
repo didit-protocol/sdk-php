@@ -413,7 +413,13 @@ final class Requester
             }
             // Integer-like keys arrive as int.
             $key = "{$key}";
-            $pairs[] = rawurlencode($key) . '=' . rawurlencode(self::scalarString($value, $key));
+            // A list is sent as the repeated parameter (`?status=a&status=b`).
+            foreach (\is_array($value) ? $value : [$value] as $item) {
+                if (null === $item) {
+                    continue;
+                }
+                $pairs[] = rawurlencode($key) . '=' . rawurlencode(self::scalarString($item, $key));
+            }
         }
 
         return [] === $pairs ? '' : '?' . implode('&', $pairs);

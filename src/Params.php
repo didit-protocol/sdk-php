@@ -12,6 +12,14 @@ namespace Didit;
  * Import one in your own code with
  * `@phpstan-import-type SessionsCreateParams from \Didit\Params`.
  *
+ * @phpstan-type AccountApplicationsListParams array{
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type AccountOrganizationsListParams array{
+ *     limit?: int,
+ *     offset?: int,
+ * }
  * @phpstan-type AccountResendOtpParams array{
  *     email: string,
  *     password: string,
@@ -43,6 +51,18 @@ namespace Didit;
  *     vendor_data?: string,
  *     metadata?: array<string, mixed>|null,
  *     sandbox_scenario?: string,
+ * }
+ * @phpstan-type AnalyticsRetrieveParams array{
+ *     start_date?: string,
+ *     end_date?: string,
+ *     scope?: string,
+ *     widget_keys?: string,
+ *     workflow_ids?: string,
+ *     versions?: string,
+ *     branch_path_ids?: string,
+ *     tag?: string,
+ *     transaction_type?: string,
+ *     action_type?: string,
  * }
  * @phpstan-type ApplicationCreateRequest array{
  *     name?: string,
@@ -94,6 +114,25 @@ namespace Didit;
  *     limit?: int,
  *     offset?: int,
  * }
+ * @phpstan-type BlocklistAddParams array{
+ *     session_id: string,
+ *     blocklist_face?: bool,
+ *     blocklist_document?: bool,
+ *     blocklist_phone?: bool,
+ *     blocklist_email?: bool,
+ * }
+ * @phpstan-type BlocklistListParams array{
+ *     item_type?: string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type BlocklistRemoveParams array{
+ *     session_id: string,
+ *     unblock_face?: bool,
+ *     unblock_document?: bool,
+ *     unblock_phone?: bool,
+ *     unblock_email?: bool,
+ * }
  * @phpstan-type BusinessesBatchDeleteParams array{
  *     vendor_data_list?: list<string>,
  *     didit_internal_id_list?: list<string>,
@@ -118,17 +157,6 @@ namespace Didit;
  *     vendor_data_list?: list<string>,
  *     didit_internal_id_list?: list<string>,
  * }
- * @phpstan-type BusinessesSetOngoingMonitoringParams array{
- *     is_enabled: bool,
- *     estimate_only?: bool,
- *     update_all?: bool,
- *     filter_search?: string,
- *     filter_status?: list<string>,
- *     filter_country?: string,
- *     filter_date_from?: string,
- *     filter_date_to?: string,
- *     didit_internal_id_list?: list<string>,
- * }
  * @phpstan-type BusinessesSetSessionOngoingMonitoringParams array{
  *     is_enabled: bool,
  *     estimate_only?: bool,
@@ -149,9 +177,11 @@ namespace Didit;
  *     country_code?: string|null,
  *     status?: string,
  *     metadata?: array<string, mixed>|null,
+ *     reason?: string|null,
  * }
  * @phpstan-type BusinessesUpdateStatusParams array{
  *     status: string,
+ *     reason?: string|null,
  * }
  * @phpstan-type CaseActionCaseEntityActionRequest array{
  *     client_reference?: string,
@@ -462,6 +492,7 @@ namespace Didit;
  * @phpstan-type CasesResolveParams array{
  *     resolution: string,
  *     note?: string|null,
+ *     checker?: string|null,
  * }
  * @phpstan-type CasesRetrieveStatisticsParams array{
  *     date_from?: string,
@@ -493,6 +524,7 @@ namespace Didit;
  *     priority?: string,
  *     due_at?: \DateTimeInterface|string|null,
  *     tags?: list<string>,
+ *     team?: string|null,
  * }
  * @phpstan-type CustomerMessagingCaseRequestConfirmRequest array{
  *     contact_id: string,
@@ -533,9 +565,11 @@ namespace Didit;
  *     callback_seconds?: int,
  *     delete_logo_square?: bool,
  *     delete_logo_rectangular?: bool,
+ *     delete_logo_rectangular_dark?: bool,
  *     delete_favicon?: bool,
  *     image_square?: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
  *     image_rectangular?: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
+ *     image_rectangular_dark?: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
  *     image_favicon?: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
  * }
  * @phpstan-type DatabaseValidationValidateParams array{
@@ -1180,13 +1214,66 @@ namespace Didit;
  *     device?: string,
  *     idempotency_key?: string,
  * }
- * @phpstan-type KybListShareholdersParams array{
- *     kyb_response_id: string,
- *     vendor_data?: string,
- *     metadata?: array<string, mixed>|null,
- *     save_api_request?: bool,
+ * @phpstan-type InvestigatorAcceptRequest array{
+ *     narrative?: string,
+ *     send_email?: bool,
+ *     email_address?: string,
+ *     email_language?: string,
  * }
- * @phpstan-type KybListUbosParams array{
+ * @phpstan-type InvestigatorBatchAcceptRequest array{
+ *     run_ids: list<string>,
+ * }
+ * @phpstan-type InvestigatorExportActivityParams array{
+ *     scope?: string,
+ *     group?: string,
+ *     actor?: string,
+ *     since?: \DateTimeInterface|string,
+ *     until?: \DateTimeInterface|string,
+ * }
+ * @phpstan-type InvestigatorListActivityParams array{
+ *     scope?: string,
+ *     group?: string,
+ *     actor?: string,
+ *     since?: \DateTimeInterface|string,
+ *     until?: \DateTimeInterface|string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type InvestigatorListQueueParams array{
+ *     scope?: string,
+ *     kind?: string,
+ *     queue?: string,
+ *     recommendation?: string,
+ *     confidence?: string,
+ *     ready?: bool,
+ *     search?: string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type InvestigatorOverrideRequest array{
+ *     action: string,
+ *     category: string,
+ *     reason: string,
+ *     send_email?: bool,
+ *     email_address?: string,
+ *     email_language?: string,
+ * }
+ * @phpstan-type InvestigatorRetrieveDashboardParams array{
+ *     scope?: string,
+ * }
+ * @phpstan-type InvestigatorRetrievePerformanceParams array{
+ *     scope?: string,
+ *     period?: string,
+ * }
+ * @phpstan-type InvestigatorRetrieveSummaryParams array{
+ *     scope?: string,
+ *     timezone?: string,
+ * }
+ * @phpstan-type InvestigatorSettings array{
+ *     stage?: string,
+ *     monthly_spend_limit?: string|null,
+ * }
+ * @phpstan-type KYBRegistryCandidateRequest array{
  *     kyb_response_id: string,
  *     vendor_data?: string,
  *     metadata?: array<string, mixed>|null,
@@ -1196,37 +1283,187 @@ namespace Didit;
  *     country_code: string,
  *     name?: string,
  *     registration_number?: string,
+ *     tier?: string,
  *     search_type?: string,
  *     vendor_data?: string,
  *     metadata?: array<string, mixed>|null,
  *     webhook_url?: string,
  * }
- * @phpstan-type KybSelectParams array{
- *     kyb_response_id: string,
- *     vendor_data?: string,
- *     metadata?: array<string, mixed>|null,
- *     save_api_request?: bool,
+ * @phpstan-type ListsCreateParams array{
+ *     name: string,
+ *     description?: string,
+ *     list_type: string,
+ *     entry_type: string,
+ * }
+ * @phpstan-type ListsEntriesCreateParams array{
+ *     value?: string,
+ *     reference_session_id?: string,
+ *     reference_object_uuid?: string,
+ *     face_image_source?: string,
+ *     reference_node_id?: string|null,
+ *     display_label?: string,
+ *     comment?: string,
+ *     metadata?: ListsEntriesCreateParamsMetadata,
+ * }
+ * @phpstan-type ListsEntriesCreateParamsMetadata array{
+ *     reference_type?: string,
+ *     reference_id?: string,
+ * }
+ * @phpstan-type ListsEntriesListParams array{
+ *     search?: string,
+ *     reference_session_id?: string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type ListsEntriesUploadFaceParams array{
+ *     image: string,
+ *     comment?: string,
+ * }
+ * @phpstan-type ListsListParams array{
+ *     list_type?: string,
+ *     entry_type?: string,
+ *     ordering?: string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type ListsUpdateParams array{
+ *     name?: string,
+ *     description?: string,
  * }
  * @phpstan-type LoginRequest array{
  *     email: string,
  *     password: string,
+ * }
+ * @phpstan-type MonitoringEventCreateRequest array{
+ *     event_id: string,
+ *     event_category: string,
+ *     action_type: string,
+ *     occurred_at: \DateTimeInterface|string,
+ *     time_zone?: string|null,
+ *     subject: MonitoringEventCreateRequestSubject,
+ *     business?: MonitoringEventCreateRequestBusiness,
+ *     session?: MonitoringEventCreateRequestSession,
+ *     device_context?: MonitoringEventCreateRequestDeviceContext,
+ *     transaction_context?: MonitoringEventCreateRequestTransactionContext,
+ *     payload?: array<string, mixed>,
+ *     custom_values?: array<string, string|float|int|bool|null>,
+ * }
+ * @phpstan-type MonitoringEventCreateRequestBusiness array{
+ *     vendor_data?: string,
+ * }
+ * @phpstan-type MonitoringEventCreateRequestDeviceContext array{
+ *     fingerprint?: string,
+ *     persistent_device_id?: string,
+ *     bot_score?: int,
+ *     network_context?: MonitoringEventCreateRequestDeviceContextNetworkContext,
+ * }
+ * @phpstan-type MonitoringEventCreateRequestDeviceContextNetworkContext array{
+ *     ip_address?: string,
+ * }
+ * @phpstan-type MonitoringEventCreateRequestSession array{
+ *     session_id?: string|null,
+ *     sequence?: int|null,
+ *     page_url?: string|null,
+ *     referrer?: string|null,
+ * }
+ * @phpstan-type MonitoringEventCreateRequestSubject array{
+ *     vendor_data: string,
+ *     entity_type?: string,
+ *     full_name?: string|null,
+ *     email?: string|null,
+ *     phone?: string|null,
+ *     country?: string|null,
+ * }
+ * @phpstan-type MonitoringEventCreateRequestTransactionContext array{
+ *     amount?: string|null,
+ *     currency?: string|null,
+ *     direction?: string|null,
+ *     payment_reference_id?: string|null,
+ * }
+ * @phpstan-type MonitoringEventsCreateBatchParams array{
+ *     events: list<MonitoringEventCreateRequest>,
+ * }
+ * @phpstan-type MonitoringEventsCreateSdkTokenParams array{
+ *     vendor_data: string,
+ *     entity_type?: string,
+ *     allowed_event_categories?: list<string>,
+ *     ttl_seconds?: int,
+ *     max_uses?: int|null,
+ *     bind_to_origin?: string|null,
+ * }
+ * @phpstan-type MonitoringEventsListParams array{
+ *     limit?: int,
+ *     offset?: int,
+ *     event_category?: list<string>,
+ *     action_type?: list<string>,
+ *     status?: list<string>,
+ *     retention_class?: list<string>,
+ *     subject_vendor_data?: string,
+ *     subject_entity_type?: string,
+ *     business_vendor_data?: string,
+ *     session_id?: string,
+ *     device_fingerprint?: string,
+ *     ip_address?: string,
+ *     game_id?: string,
+ *     round_id?: string,
+ *     affiliate_code?: string,
+ *     payment_reference_id?: string,
+ *     counterparty_vendor_data?: string,
+ *     matched_only?: bool,
+ *     occurred_from?: \DateTimeInterface|string,
+ *     occurred_to?: \DateTimeInterface|string,
+ *     search?: string,
+ * }
+ * @phpstan-type MonitoringEventsRetrieveEnrichmentMetricsParams array{
+ *     days?: int,
+ * }
+ * @phpstan-type MonitoringEventsRetrieveSubjectTimelineParams array{
+ *     entity_type?: string,
+ *     limit?: int,
+ *     offset?: int,
+ *     event_category?: list<string>,
+ *     action_type?: list<string>,
+ *     status?: list<string>,
+ *     retention_class?: list<string>,
+ *     business_vendor_data?: string,
+ *     session_id?: string,
+ *     device_fingerprint?: string,
+ *     ip_address?: string,
+ *     game_id?: string,
+ *     round_id?: string,
+ *     affiliate_code?: string,
+ *     payment_reference_id?: string,
+ *     counterparty_vendor_data?: string,
+ *     matched_only?: bool,
+ *     occurred_from?: \DateTimeInterface|string,
+ *     occurred_to?: \DateTimeInterface|string,
+ *     search?: string,
+ * }
+ * @phpstan-type NetworkTagRequest array{
+ *     tag_uuid: string,
  * }
  * @phpstan-type NetworksDownloadReportParams array{
  *     authorization?: string,
  * }
  * @phpstan-type NetworksListParams array{
  *     status?: string,
+ *     scope?: string,
  *     signal_type?: string,
  *     pattern_type?: string,
  *     risk_band?: string,
  *     min_size?: int,
  *     max_size?: int,
+ *     assignee?: string,
+ *     priority?: string,
+ *     risk_min?: int,
+ *     has_case?: bool,
  *     date_from?: string,
  *     date_to?: string,
  *     q?: string,
  *     ordering?: string,
  *     limit?: int,
  *     offset?: int,
+ *     summary?: bool,
  * }
  * @phpstan-type NetworksNotesCreateParams array{
  *     comment: string,
@@ -1244,6 +1481,23 @@ namespace Didit;
  *     depth?: string,
  *     focus_kind?: string,
  *     focus_id?: string,
+ * }
+ * @phpstan-type NetworksRetrieveTimelineParams array{
+ *     contract?: string,
+ *     limit?: int,
+ *     cursor?: string,
+ *     event_type?: list<string>,
+ * }
+ * @phpstan-type OngoingMonitoringToggleRequest array{
+ *     is_enabled: bool,
+ *     estimate_only?: bool,
+ *     update_all?: bool,
+ *     filter_search?: string,
+ *     filter_status?: list<string>,
+ *     filter_country?: string,
+ *     filter_date_from?: string,
+ *     filter_date_to?: string,
+ *     didit_internal_id_list?: list<string>,
  * }
  * @phpstan-type PassiveLivenessCheckParams array{
  *     user_image: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
@@ -1420,6 +1674,25 @@ namespace Didit;
  *     expected_revision: string|null,
  *     changes: array<string, mixed>,
  * }
+ * @phpstan-type SandboxSimulateRequest array{
+ *     new_status?: string,
+ *     comment?: string,
+ *     scenario?: string,
+ *     risk?: string,
+ *     node_id?: string,
+ *     send_webhooks?: bool,
+ * }
+ * @phpstan-type SessionSignDocument array{
+ *     title?: string,
+ *     file_name: string,
+ *     content_base64: string,
+ *     fields?: list<SignatureField>,
+ * }
+ * @phpstan-type SessionsAddImagesParams array{
+ *     file: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
+ *     model_type: string,
+ *     file_password?: string,
+ * }
  * @phpstan-type SessionsBatchDeleteParams array{
  *     session_numbers?: list<string>,
  *     delete_all?: bool,
@@ -1428,6 +1701,25 @@ namespace Didit;
  *     face_retention_deadline?: \DateTimeInterface|string,
  *     deletion_instruction?: string,
  *     instruction_id?: string,
+ *     filter_status?: string|list<string>,
+ *     filter_vendor_data?: string,
+ *     filter_search?: string,
+ *     filter_workflow_id?: string|list<string>,
+ *     filter_date_from?: string,
+ *     filter_date_to?: string,
+ *     filter_country?: string|list<string>,
+ *     filter_document_type?: string|list<string>,
+ *     filter_document_name?: string|list<string>,
+ *     filter_region?: string|list<string>,
+ *     filter_didit_internal_id?: string,
+ *     filter_session_type?: string|list<string>,
+ *     filter_api_service?: string,
+ *     filter_screened_full_name?: string,
+ *     filter_warning?: string|list<string>,
+ *     filter_status_initialized_as_in_review?: bool,
+ *     filter_is_kyc_to_be_reviewed?: bool,
+ *     filter_euuid?: string,
+ *     filter_organization_name?: string|list<string>,
  * }
  * @phpstan-type SessionsBulkUpdateAmlHitStatusParams array{
  *     hit_updates: list<SessionsBulkUpdateAmlHitStatusParamsHitUpdates>,
@@ -1448,6 +1740,7 @@ namespace Didit;
  *     expected_details?: SessionsCreateParamsExpectedDetails,
  *     portrait_image?: string,
  *     sandbox_scenario?: string,
+ *     sign?: SessionsCreateParamsSign,
  * }
  * @phpstan-type SessionsCreateParamsContactDetails array{
  *     email?: string,
@@ -1472,12 +1765,19 @@ namespace Didit;
  *     registry_country?: string,
  *     registration_number?: string,
  * }
+ * @phpstan-type SessionsCreateParamsSign array{
+ *     documents?: list<SessionSignDocument>,
+ *     field_values?: array<string, string|bool>,
+ * }
  * @phpstan-type SessionsDeleteParams array{
  *     retain_face_embeddings?: bool|null,
  *     face_retention_days?: int,
  *     face_retention_deadline?: \DateTimeInterface|string,
  *     deletion_instruction?: string,
  *     instruction_id?: string,
+ * }
+ * @phpstan-type SessionsExportAmlScreeningHistoryParams array{
+ *     node_id?: string,
  * }
  * @phpstan-type SessionsImportSharedParams array{
  *     share_token: string,
@@ -1498,6 +1798,17 @@ namespace Didit;
  * }
  * @phpstan-type SessionsImportsRetrieveTemplateParams array{
  *     import_type?: string,
+ * }
+ * @phpstan-type SessionsListAmlScreeningHistoryParams array{
+ *     node_id?: string,
+ *     limit?: int,
+ *     offset?: int,
+ *     ordering?: string,
+ * }
+ * @phpstan-type SessionsListEventsParams array{
+ *     limit?: int,
+ *     offset?: int,
+ *     ordering?: string,
  * }
  * @phpstan-type SessionsListParams array{
  *     session_kind?: string,
@@ -1523,9 +1834,13 @@ namespace Didit;
  *     euuid?: string,
  *     organization_name?: string,
  * }
+ * @phpstan-type SessionsPreviewDecisionEmailParams array{
+ *     new_status: string,
+ *     email_language?: string,
+ * }
  * @phpstan-type SessionsPreviewResubmissionParams array{
  *     nodes_to_resubmit?: list<SessionsPreviewResubmissionParamsNodesToResubmit>,
- *     email_address: string,
+ *     email_address?: string,
  *     email_language?: string,
  * }
  * @phpstan-type SessionsPreviewResubmissionParamsNodesToResubmit array{
@@ -1548,9 +1863,19 @@ namespace Didit;
  *     for_application_id: string,
  *     ttl_in_seconds?: int,
  * }
+ * @phpstan-type SessionsSignaturesDownloadEvidenceParams array{
+ *     signature_id?: string,
+ * }
+ * @phpstan-type SessionsSignaturesValidateParams array{
+ *     signature_id?: string,
+ * }
  * @phpstan-type SessionsUpdateAmlHitStatusParams array{
  *     hit_id: string,
  *     review_status: string,
+ *     node_id?: string,
+ * }
+ * @phpstan-type SessionsUpdateAmlStatusParams array{
+ *     status: string,
  *     node_id?: string,
  * }
  * @phpstan-type SessionsUpdateDataParams array{
@@ -1581,9 +1906,15 @@ namespace Didit;
  *     postal_code?: string|null,
  *     country?: string|null,
  * }
+ * @phpstan-type SessionsUpdateDocumentAiDataParams array{
+ *     extracted_data?: array<string, mixed>,
+ *     status?: string,
+ * }
  * @phpstan-type SessionsUpdateFeatureStatusParams array{
  *     new_status: string,
  *     comment?: string,
+ *     feature_type?: string,
+ *     defer_until_flow_finishes?: bool,
  * }
  * @phpstan-type SessionsUpdateKybCompanyDataParams array{
  *     company_name?: string,
@@ -1646,6 +1977,40 @@ namespace Didit;
  * @phpstan-type SessionsUpdateStatusParamsNodesToResubmit array{
  *     node_id: string,
  *     feature: string,
+ * }
+ * @phpstan-type SignatureField array{
+ *     key: string,
+ *     type: string,
+ *     role?: string,
+ *     page?: int,
+ *     x?: float|int,
+ *     y?: float|int,
+ *     width?: float|int,
+ *     height?: float|int,
+ *     anchor?: SignatureFieldAnchor,
+ *     required?: bool,
+ *     label?: string,
+ *     placeholder?: string|null,
+ *     validation?: SignatureFieldValidation|null,
+ *     prefill?: string|null,
+ *     editable_when_prefilled?: bool,
+ *     checked_by_default?: bool,
+ *     date_format?: string,
+ * }
+ * @phpstan-type SignatureFieldAnchor array{
+ *     text: string,
+ *     occurrence?: string,
+ *     offset_x?: float|int,
+ *     offset_y?: float|int,
+ *     width?: float|int,
+ *     height?: float|int,
+ * }
+ * @phpstan-type SignatureFieldValidation array{
+ *     kind?: string,
+ *     min_length?: int,
+ *     max_length?: int,
+ *     pattern?: string|null,
+ *     message?: string|null,
  * }
  * @phpstan-type SimpleQuestionnaireElement array{
  *     id?: string,
@@ -1838,6 +2203,7 @@ namespace Didit;
  * @phpstan-type TransactionsCreateParamsCounterpartyPaymentMethod array{
  *     method_type?: string,
  *     account_id?: string,
+ *     memo?: string,
  *     issuing_country?: string,
  * }
  * @phpstan-type TransactionsCreateParamsNetworkSnapshot array{
@@ -1892,6 +2258,7 @@ namespace Didit;
  * @phpstan-type TransactionsCreateParamsSubjectPaymentMethod array{
  *     method_type?: string,
  *     account_id?: string,
+ *     memo?: string,
  *     issuing_country?: string,
  * }
  * @phpstan-type TransactionsCreateParamsTransactionDetails array{
@@ -1917,6 +2284,10 @@ namespace Didit;
  *     originator_data?: array<string, mixed>,
  *     beneficiary_data?: array<string, mixed>,
  *     metadata?: array<string, mixed>,
+ *     utxo?: TravelRuleUtxo,
+ *     originator?: array<string, mixed>,
+ *     beneficiary?: array<string, mixed>,
+ *     ivms101?: array<string, mixed>,
  * }
  * @phpstan-type TransactionsCreateSdkTokenParams array{
  *     vendor_data: string,
@@ -1924,6 +2295,19 @@ namespace Didit;
  *     max_uses?: int|null,
  * }
  * @phpstan-type TransactionsListParams array{
+ *     limit?: int,
+ *     offset?: int,
+ *     travel_rule_status?: string,
+ * }
+ * @phpstan-type TransactionsListRelatedParams array{
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type TransactionsNotesCreateParams array{
+ *     note: string,
+ *     mentioned_emails?: list<string>,
+ * }
+ * @phpstan-type TransactionsNotesListParams array{
  *     limit?: int,
  *     offset?: int,
  * }
@@ -1944,6 +2328,30 @@ namespace Didit;
  *     limit?: int,
  *     offset?: int,
  * }
+ * @phpstan-type TravelRuleCounterpartyContactCreate array{
+ *     counterparty: string,
+ *     email: string,
+ *     name?: string,
+ * }
+ * @phpstan-type TravelRuleCounterpartyContactsListParams array{
+ *     counterparty?: string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type TravelRuleCounterpartyDecisionRequest array{
+ *     decision: string,
+ *     reason?: string,
+ * }
+ * @phpstan-type TravelRuleCounterpartyQuestionnaireRequest array{
+ *     sent_to?: string,
+ * }
+ * @phpstan-type TravelRuleCounterpartyScreeningRequest array{
+ *     refresh?: bool,
+ * }
+ * @phpstan-type TravelRuleDataSharingFields array{
+ *     individual?: list<string>,
+ *     company?: list<string>,
+ * }
  * @phpstan-type TravelRuleInboundRequest array{
  *     chain: string,
  *     txid: string,
@@ -1953,6 +2361,8 @@ namespace Didit;
  *     originator_data?: array<string, mixed>,
  *     beneficiary_data?: array<string, mixed>,
  *     originating_vasp?: TravelRuleInboundRequestOriginatingVasp,
+ *     memo?: string,
+ *     utxo?: TravelRuleUtxo,
  * }
  * @phpstan-type TravelRuleInboundRequestOriginatingVasp array{
  *     name?: string,
@@ -1961,11 +2371,40 @@ namespace Didit;
  * }
  * @phpstan-type TravelRuleListVaspsParams array{
  *     search?: string,
+ *     network?: string,
+ *     jurisdiction?: string,
+ *     reachable?: bool,
+ *     kind?: string,
+ *     risk?: string,
+ *     responsiveness?: string,
  *     limit?: int,
  *     offset?: int,
  * }
+ * @phpstan-type TravelRuleMatchingRules array{
+ *     individual?: TravelRuleMatchingRulesIndividual,
+ *     company?: TravelRuleMatchingRulesCompany,
+ * }
+ * @phpstan-type TravelRuleMatchingRulesCompany array{
+ *     name?: string,
+ *     address?: string,
+ *     account?: string,
+ * }
+ * @phpstan-type TravelRuleMatchingRulesIndividual array{
+ *     name?: string,
+ *     date_of_birth?: string,
+ *     address?: string,
+ *     account?: string,
+ * }
+ * @phpstan-type TravelRuleMessageCreateRequest array{
+ *     kind?: string,
+ *     body?: string,
+ *     requested_documents?: list<string>,
+ *     reply_to?: string|null,
+ *     files?: list<\Didit\File|\Psr\Http\Message\StreamInterface|resource>,
+ * }
  * @phpstan-type TravelRuleOwnershipConfirmRequest array{
  *     confirmed: bool,
+ *     wallet_address?: string,
  * }
  * @phpstan-type TravelRuleSettingsUpdate array{
  *     is_enabled?: bool,
@@ -1978,30 +2417,82 @@ namespace Didit;
  *     compliance_email?: string,
  *     is_discoverable?: bool,
  *     threshold_amount?: string,
+ *     ownership_validation_mode?: string,
+ *     simplified_validation_threshold?: string,
+ *     data_sharing_fields?: TravelRuleDataSharingFields,
+ *     matching_rules?: TravelRuleMatchingRules,
  *     inbound_auto_accept?: bool,
  *     allow_self_declaration?: bool,
  *     allow_screenshot_proof?: bool,
  *     auto_wallet_verification?: bool,
  *     vasp_attribution_enabled?: bool,
+ *     counterparty_screening_enabled?: bool,
+ *     sunrise_policy?: string,
+ *     non_responsive_policy?: string,
  *     disabled_networks?: list<string>,
+ * }
+ * @phpstan-type TravelRuleTestVaspInboundRequest array{
+ *     beneficiary_wallet_address: string,
+ *     scenario?: string,
+ *     chain?: string,
+ *     amount?: string,
+ *     currency?: string,
+ *     reference?: string,
  * }
  * @phpstan-type TravelRuleTransferPatchRequest array{
  *     payment_txn_id?: string,
  *     action?: string,
+ *     compliance_email?: string,
+ *     wallet_address?: string,
+ *     memo?: string,
+ * }
+ * @phpstan-type TravelRuleTransfersListParams array{
+ *     direction?: string,
+ *     status?: string,
+ *     rail?: string,
+ *     kind?: string,
+ *     currency?: string,
+ *     start_date?: string,
+ *     end_date?: string,
+ *     counterparty?: string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type TravelRuleUtxo array{
+ *     inputs?: list<TravelRuleUtxoEntry>,
+ *     outputs: list<TravelRuleUtxoEntry>,
+ * }
+ * @phpstan-type TravelRuleUtxoEntry array{
+ *     address: string,
+ *     amount?: string|null,
+ *     txid?: string,
+ *     vout?: int|null,
+ * }
+ * @phpstan-type TravelRuleWalletAddressesBulkImportParams array{
+ *     file?: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
  * }
  * @phpstan-type TravelRuleWalletAddressesListParams array{
  *     limit?: int,
  *     offset?: int,
  * }
  * @phpstan-type TravelRuleWidgetSessionCreate array{
- *     wallet_address: string,
- *     chain: string,
+ *     wallet_address?: string,
+ *     chain?: string,
  *     holder_name?: string,
  *     vendor_data?: string,
- *     transaction_id?: string,
+ *     transaction_id?: string|null,
  *     satoshi_deposit_address?: string,
  *     callback_url?: string,
  *     expires_in_minutes?: int,
+ * }
+ * @phpstan-type TravelRuleWorkspaceBillingRequest array{
+ *     enabled?: bool,
+ * }
+ * @phpstan-type TravelRuleWorkspaceClaimRequest array{
+ *     vasp_id: string,
+ * }
+ * @phpstan-type TravelRuleWorkspaceDomainConfirmRequest array{
+ *     code: string,
  * }
  * @phpstan-type UsersBatchDeleteParams array{
  *     vendor_data_list?: list<string>,
@@ -2018,6 +2509,14 @@ namespace Didit;
  *     approved_emails?: list<string>,
  *     approved_phones?: list<string>,
  *     issuing_states?: list<string>,
+ *     first_name?: string,
+ *     last_name?: string,
+ *     email?: string,
+ *     phone_number?: string,
+ *     country?: string,
+ *     send_verification_link?: bool,
+ *     workflow_id?: string,
+ *     language?: string,
  * }
  * @phpstan-type UsersListParams array{
  *     limit?: int,
@@ -2029,17 +2528,6 @@ namespace Didit;
  *     vendor_data_list?: list<string>,
  *     didit_internal_id_list?: list<string>,
  * }
- * @phpstan-type UsersSetOngoingMonitoringParams array{
- *     is_enabled: bool,
- *     estimate_only?: bool,
- *     update_all?: bool,
- *     filter_search?: string,
- *     filter_status?: list<string>,
- *     filter_country?: string,
- *     filter_date_from?: string,
- *     filter_date_to?: string,
- *     didit_internal_id_list?: list<string>,
- * }
  * @phpstan-type UsersUpdateParams array{
  *     full_name?: string|null,
  *     display_name?: string|null,
@@ -2049,9 +2537,11 @@ namespace Didit;
  *     approved_emails?: list<string>,
  *     approved_phones?: list<string>,
  *     issuing_states?: list<string>,
+ *     reason?: string|null,
  * }
  * @phpstan-type UsersUpdateStatusParams array{
  *     status: string,
+ *     reason?: string|null,
  * }
  * @phpstan-type UsersUploadFaceParams array{
  *     image: string,
@@ -2069,6 +2559,7 @@ namespace Didit;
  *     entity_type?: string,
  *     self_declared?: bool,
  *     travel_address?: string,
+ *     memo?: string,
  * }
  * @phpstan-type WalletAddressEntryUpdate array{
  *     holder_name?: string,
@@ -2183,12 +2674,32 @@ namespace Didit;
  *     webhook_version?: string,
  *     subscribed_events?: list<string>,
  * }
+ * @phpstan-type WebhooksDestinationsListDeliveriesParams array{
+ *     limit?: int,
+ *     offset?: int,
+ *     date_from?: string,
+ *     date_to?: string,
+ * }
+ * @phpstan-type WebhooksDestinationsRetrieveAnalyticsParams array{
+ *     date_from?: string,
+ *     date_to?: string,
+ * }
  * @phpstan-type WebhooksDestinationsUpdateParams array{
  *     label?: string,
  *     url?: string,
  *     enabled?: bool,
  *     webhook_version?: string,
  *     subscribed_events?: list<string>,
+ * }
+ * @phpstan-type WebhooksUpdateConfigParams array{
+ *     webhook_url?: string|null,
+ *     webhook_version?: string,
+ *     rotate_secret_key?: bool,
+ *     capture_method?: string,
+ *     data_retention_months?: int|null,
+ *     face_retention_policy?: string,
+ *     face_retention_days?: int|null,
+ *     allowed_return_hosts?: list<string>,
  * }
  * @phpstan-type WorkflowsListParams array{
  *     limit?: int,

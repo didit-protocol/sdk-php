@@ -27,6 +27,21 @@ final class CaseSubject extends BaseModel
     public readonly ?string $externalId;
 
     /**
+     * Three-letter country code of the subject (ISO 3166-1 alpha-3), or null when it is not known. For a
+     * business, its country of incorporation. For a person, the issuing country of an identity document
+     * from their verifications; a person with documents from several countries shows one of them, and ICAO
+     * document codes such as `XXA` can appear.
+     */
+    public readonly ?string $country;
+
+    /**
+     * Short-lived signed URL of the person's portrait image. Always null for a business, and null for a
+     * person without a portrait. The URL expires, so download the image when you read the case instead of
+     * storing the URL.
+     */
+    public readonly ?string $portrait;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -36,5 +51,7 @@ final class CaseSubject extends BaseModel
         $this->uuid = Hydrate::string($data['uuid'] ?? null);
         $this->name = Hydrate::string($data['name'] ?? null);
         $this->externalId = Hydrate::string($data['external_id'] ?? null);
+        $this->country = Hydrate::string($data['country'] ?? null);
+        $this->portrait = Hydrate::string($data['portrait'] ?? null);
     }
 }

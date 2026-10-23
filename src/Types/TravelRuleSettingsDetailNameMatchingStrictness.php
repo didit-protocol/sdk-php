@@ -7,7 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * How strictly beneficiary names must match before a transfer can reach COMPLETED.
+ * How strictly beneficiary names must match before a transfer can reach COMPLETED. `CONTAINS` accepts
+ * one name whose words all appear in the other.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -16,6 +17,8 @@ final class TravelRuleSettingsDetailNameMatchingStrictness
     public const NONE = 'NONE';
 
     public const STRICT = 'STRICT';
+
+    public const CONTAINS = 'CONTAINS';
 
     public const DEFAULT = 'DEFAULT';
 

@@ -19,11 +19,11 @@ use Didit\Types;
 /**
  * The `users` resource.
  *
+ * @phpstan-import-type OngoingMonitoringToggleRequest from Params
  * @phpstan-import-type UsersBatchDeleteParams from Params
  * @phpstan-import-type UsersCreateParams from Params
  * @phpstan-import-type UsersListParams from Params
  * @phpstan-import-type UsersSetAmlMonitoringParams from Params
- * @phpstan-import-type UsersSetOngoingMonitoringParams from Params
  * @phpstan-import-type UsersUpdateParams from Params
  * @phpstan-import-type UsersUpdateStatusParams from Params
  * @phpstan-import-type UsersUploadFaceParams from Params
@@ -83,10 +83,11 @@ final class Users extends BaseResource
      * Update user.
      *
      * Partial update of a user: `display_name`, `full_name`, `date_of_birth`, `status`, `metadata`,
-     * `approved_emails`/`approved_phones`/`issuing_states`. `metadata` fully replaces. **Note:** unlike
-     * [Update User Status](#patch-/v3/users/-vendor_data-/update-status/), changing `status` here does NOT
-     * record a status-change activity and does NOT sync the system blocklist, use the dedicated
-     * update-status endpoint for `BLOCKED`/unblock flows.
+     * `approved_emails`/`approved_phones`/`issuing_states`. `metadata` fully replaces. Changing `status`
+     * here works like [Update User Status](#patch-/v3/users/-vendor_data-/update-status/): it records a
+     * `STATUS_CHANGED` activity with the optional `reason`, and `BLOCKED` adds the `vendor_data` to the
+     * system blocklist (moving away from `BLOCKED` removes that entry). Changes to `display_name`,
+     * `full_name`, `date_of_birth` or `metadata` are recorded as a `PROFILE_UPDATED` activity.
      *
      * `PATCH /v3/users/{vendor_data}/`
      *
@@ -140,11 +141,11 @@ final class Users extends BaseResource
     /**
      * Batch delete users.
      *
-     * **Permanently delete** users, the user records are removed permanently. For everyday blocking prefer
+     * **Permanently delete** users: the user records are removed permanently. For everyday blocking prefer
      * [Update User Status](#patch-/v3/users/-vendor_data-/update-status/) with `BLOCKED`. Select users
      * with `vendor_data_list`, with `didit_internal_id_list`, or with both at once; or pass `delete_all:
-     * true`. The Console's `filter_*` batch params are rejected with a `400` rather than ignored, so a
-     * narrowed intent can never turn into a full wipe.
+     * true`. This endpoint never narrows `delete_all` with filters. The Console's People filters are
+     * refused with a `400` (see the `400` response), so a narrowed intent does not turn into a full wipe.
      *
      * `POST /v3/users/delete/`
      *
@@ -184,7 +185,7 @@ final class Users extends BaseResource
     public function setAmlMonitoring(
         array $params,
         ?RequestOptions $options = null,
-    ): Types\UsersSetAmlMonitoringResponse200|Types\UsersSetAmlMonitoringResponse202 {
+    ): Types\AMLMonitoringToggleResult|Types\AMLMonitoringJob {
         $response = $this->requester->request(new Operation(
             method: 'POST',
             path: '/v3/users/aml-monitoring/',
@@ -192,17 +193,19 @@ final class Users extends BaseResource
         ), [], $params, $options);
 
         return match ($response->status) {
-            202 => Types\UsersSetAmlMonitoringResponse202::fromResponse($response),
-            default => Types\UsersSetAmlMonitoringResponse200::fromResponse($response),
+            202 => Types\AMLMonitoringJob::fromResponse($response),
+            default => Types\AMLMonitoringToggleResult::fromResponse($response),
         };
     }
 
     /**
      * Update user status.
      *
-     * Flip only the lifecycle `status` of a user, `ACTIVE`/`FLAGGED`/`BLOCKED` (NOT session statuses).
+     * Flip only the lifecycle `status` of a user: `ACTIVE`, `FLAGGED` or `BLOCKED` (not session statuses).
      * `BLOCKED` adds the `vendor_data` to the system blocklist; moving away from `BLOCKED` removes that
-     * entry. Each change is recorded as a `STATUS_CHANGED` activity on the user.
+     * entry. Each change is recorded as a `STATUS_CHANGED` activity on the user, with the optional
+     * `reason` as its `comment`. Sending the current status changes nothing and records no `reason`. The
+     * `user.status.updated` webhook does not carry `reason`.
      *
      * `PATCH /v3/users/{vendor_data}/update-status/`
      *
@@ -229,9 +232,9 @@ final class Users extends BaseResource
     /**
      * Create user.
      *
-     * Pre-create a [user](/entities/users) by `vendor_data` *without* a verification session.
-     * `vendor_data` must be unique among non-deleted users for the application (exact match; conflicts
-     * return 400). Not idempotent.
+     * Create a [user](/entities/users) by `vendor_data`, before or without a verification session.
+     * `vendor_data` must be unique among the application's users (a duplicate returns `400`). Not
+     * idempotent.
      *
      * `POST /v3/users/create/`
      *
@@ -240,7 +243,7 @@ final class Users extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function create(array $params, ?RequestOptions $options = null): Types\UserDetailItem
+    public function create(array $params, ?RequestOptions $options = null): Types\UsersCreateResponse
     {
         $response = $this->requester->request(new Operation(
             method: 'POST',
@@ -249,7 +252,7 @@ final class Users extends BaseResource
             jsonHints: ['metadata' => ['o']],
         ), [], $params, $options);
 
-        return Types\UserDetailItem::fromResponse($response);
+        return Types\UsersCreateResponse::fromResponse($response);
     }
 
     /**
@@ -294,7 +297,7 @@ final class Users extends BaseResource
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/vendor-users/toggle-ongoing-monitoring/`
      *
-     * @param UsersSetOngoingMonitoringParams $params
+     * @param OngoingMonitoringToggleRequest $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
@@ -302,7 +305,7 @@ final class Users extends BaseResource
     public function setOngoingMonitoring(
         array $params,
         ?RequestOptions $options = null,
-    ): Types\UsersSetOngoingMonitoringResponse200|Types\UsersSetOngoingMonitoringResponse202 {
+    ): Types\OngoingMonitoringToggleResult|Types\OngoingMonitoringJob {
         $response = $this->requester->request(new Operation(
             method: 'PATCH',
             path: '/v3/organization/{organization_id}/application/{application_id}/vendor-users/toggle-ongoing-monitoring/',
@@ -311,8 +314,8 @@ final class Users extends BaseResource
         ), [], $params, $options);
 
         return match ($response->status) {
-            202 => Types\UsersSetOngoingMonitoringResponse202::fromResponse($response),
-            default => Types\UsersSetOngoingMonitoringResponse200::fromResponse($response),
+            202 => Types\OngoingMonitoringJob::fromResponse($response),
+            default => Types\OngoingMonitoringToggleResult::fromResponse($response),
         };
     }
 
@@ -332,14 +335,14 @@ final class Users extends BaseResource
     public function retrieveOngoingMonitoringJob(
         string $jobId,
         ?RequestOptions $options = null,
-    ): Types\UsersRetrieveOngoingMonitoringJobResponse {
+    ): Types\OngoingMonitoringJob {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/organization/{organization_id}/application/{application_id}/vendor-users/toggle-ongoing-monitoring/{job_id}/',
             applicationScope: true,
         ), ['job_id' => $jobId], [], $options);
 
-        return Types\UsersRetrieveOngoingMonitoringJobResponse::fromResponse($response);
+        return Types\OngoingMonitoringJob::fromResponse($response);
     }
 
     /**
@@ -357,13 +360,13 @@ final class Users extends BaseResource
     public function listNetworks(
         string $vendorUserUuid,
         ?RequestOptions $options = null,
-    ): Types\UsersListNetworksResponse {
+    ): Types\EntityNetworkMembershipList {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/organization/{organization_id}/application/{application_id}/users/{vendor_user_uuid}/networks/',
             applicationScope: true,
         ), ['vendor_user_uuid' => $vendorUserUuid], [], $options);
 
-        return Types\UsersListNetworksResponse::fromResponse($response);
+        return Types\EntityNetworkMembershipList::fromResponse($response);
     }
 }

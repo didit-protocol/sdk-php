@@ -193,6 +193,17 @@ final class RequestTest extends TestCase
         );
     }
 
+    public function testAListQueryValueIsSentAsTheRepeatedParameter(): void
+    {
+        $this->support->http->queueJson(200, ['count' => 0, 'next' => null, 'previous' => null, 'results' => []]);
+        $this->support->client()->monitoringEvents->list(['event_category' => ['auth', 'payment'], 'status' => ['ACCEPTED']]);
+
+        self::assertSame(
+            '/v3/events/?event_category=auth&event_category=payment&status=ACCEPTED',
+            $this->support->http->lastRequest()->getUri()->getPath() . '?' . $this->support->http->lastRequest()->getUri()->getQuery(),
+        );
+    }
+
     public function testUnencodableJsonBodyIsAnInvalidArgumentBeforeSending(): void
     {
         try {

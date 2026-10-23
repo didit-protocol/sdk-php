@@ -32,13 +32,13 @@ final class BusinessSessions extends BaseResource
     public function listNetworks(
         string $businessSessionId,
         ?RequestOptions $options = null,
-    ): Types\BusinessSessionsListNetworksResponse {
+    ): Types\EntityNetworkMembershipList {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/organization/{organization_id}/application/{application_id}/business-sessions/{business_session_id}/networks/',
             applicationScope: true,
         ), ['business_session_id' => $businessSessionId], [], $options);
 
-        return Types\BusinessSessionsListNetworksResponse::fromResponse($response);
+        return Types\EntityNetworkMembershipList::fromResponse($response);
     }
 }

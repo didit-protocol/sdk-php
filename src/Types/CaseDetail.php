@@ -50,6 +50,13 @@ final class CaseDetail extends BaseModel
     /** The `assigned_at` field. */
     public readonly ?\DateTimeImmutable $assignedAt;
 
+    /**
+     * The review team that owns the case, or null when no team owns it. Routing sets it when a routing
+     * rule places the case with one of its teams. Change or clear it with `PATCH .../cases/{case_uuid}/`
+     * (`team`).
+     */
+    public readonly ?CaseTeamSummary $team;
+
     /** The `due_at` field. */
     public readonly ?\DateTimeImmutable $dueAt;
 
@@ -64,6 +71,14 @@ final class CaseDetail extends BaseModel
      * reject-approval.
      */
     public readonly ?CaseDetailPendingResolution $pendingResolution;
+
+    /**
+     * The member named to approve or reject the pending resolution. Set only while a four-eyes resolution
+     * waits on a named checker. Null when nothing is pending, while the pending resolution waits on the
+     * checker queue, and once the resolution is approved, rejected, or returned for a new review because
+     * the evidence changed.
+     */
+    public readonly ?CaseChecker $checker;
 
     /** @var array<string, mixed>|null */
     public readonly ?array $metadata;
@@ -121,10 +136,12 @@ final class CaseDetail extends BaseModel
         $this->subject = Hydrate::model($data['subject'] ?? null, CaseSubject::class);
         $this->assignedTo = Hydrate::model($data['assigned_to'] ?? null, CaseAssignee::class);
         $this->assignedAt = Hydrate::dateTime($data['assigned_at'] ?? null);
+        $this->team = Hydrate::model($data['team'] ?? null, CaseTeamSummary::class);
         $this->dueAt = Hydrate::dateTime($data['due_at'] ?? null);
         $this->resolvedAt = Hydrate::dateTime($data['resolved_at'] ?? null);
         $this->resolvedByEmail = Hydrate::string($data['resolved_by_email'] ?? null);
         $this->pendingResolution = Hydrate::model($data['pending_resolution'] ?? null, CaseDetailPendingResolution::class);
+        $this->checker = Hydrate::model($data['checker'] ?? null, CaseChecker::class);
         $this->metadata = Hydrate::assoc($data['metadata'] ?? null);
         $this->blueprint = Hydrate::model($data['blueprint'] ?? null, CaseBlueprintDetail::class);
         $this->notes = Hydrate::list($data['notes'] ?? null, static fn (mixed $v) => Hydrate::model($v, CaseNote::class));

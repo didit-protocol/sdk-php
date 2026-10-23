@@ -20,9 +20,11 @@ use Didit\Types;
 /**
  * The `networks` resource.
  *
+ * @phpstan-import-type NetworkTagRequest from Params
  * @phpstan-import-type NetworksDownloadReportParams from Params
  * @phpstan-import-type NetworksListParams from Params
  * @phpstan-import-type NetworksRetrieveGraphParams from Params
+ * @phpstan-import-type NetworksRetrieveTimelineParams from Params
  */
 final class Networks extends BaseResource
 {
@@ -37,9 +39,11 @@ final class Networks extends BaseResource
     /**
      * List networks.
      *
-     * List fraud networks detected within this application's organization, newest activity first by
-     * default. By default dismissed networks are excluded; pass status to include them. Sandbox
-     * applications never have networks - clustering excludes sandbox data entirely.
+     * List fraud networks detected within this application's organization, highest risk first by default.
+     * By default dismissed networks are excluded; pass status to include them. Sandbox applications never
+     * have networks: clustering excludes sandbox data entirely. Every response carries the organization's
+     * `sharing_mode` and whether cross-organization signals apply to it (`cross_org_available`,
+     * `cross_org_unavailable_reason`).
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/`
      *
@@ -56,14 +60,17 @@ final class Networks extends BaseResource
             method: 'GET',
             path: '/v3/organization/{organization_id}/application/{application_id}/networks/',
             applicationScope: true,
-            query: ['status' => 'status', 'signal_type' => 'signal_type', 'pattern_type' => 'pattern_type', 'risk_band' => 'risk_band', 'min_size' => 'min_size', 'max_size' => 'max_size', 'date_from' => 'date_from', 'date_to' => 'date_to', 'q' => 'q', 'ordering' => 'ordering', 'limit' => 'limit', 'offset' => 'offset'],
+            query: ['status' => 'status', 'scope' => 'scope', 'signal_type' => 'signal_type', 'pattern_type' => 'pattern_type', 'risk_band' => 'risk_band', 'min_size' => 'min_size', 'max_size' => 'max_size', 'assignee' => 'assignee', 'priority' => 'priority', 'risk_min' => 'risk_min', 'has_case' => 'has_case', 'date_from' => 'date_from', 'date_to' => 'date_to', 'q' => 'q', 'ordering' => 'ordering', 'limit' => 'limit', 'offset' => 'offset', 'summary' => 'summary'],
         ), [], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\NetworkListItem::class));
     }
 
     /**
      * Get network.
      *
-     * Retrieve a single network's full detail, including stats, fraud tags, and risk signals.
+     * Retrieve a single network's full detail: stats, fraud tags and risk signals, plus the organization's
+     * `sharing_mode` and cross-organization availability, your application's `tags` on the network, member
+     * `outcomes` and pattern scores (`patterns`). Requires a full-access API key, or `read:networks` for a
+     * console member.
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/`
      *
@@ -72,7 +79,7 @@ final class Networks extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function retrieve(string $networkUuid, ?RequestOptions $options = null): Types\NetworkDetail
+    public function retrieve(string $networkUuid, ?RequestOptions $options = null): Types\NetworkDetailResponse
     {
         $response = $this->requester->request(new Operation(
             method: 'GET',
@@ -80,7 +87,7 @@ final class Networks extends BaseResource
             applicationScope: true,
         ), ['network_uuid' => $networkUuid], [], $options);
 
-        return Types\NetworkDetail::fromResponse($response);
+        return Types\NetworkDetailResponse::fromResponse($response);
     }
 
     /**
@@ -164,25 +171,33 @@ final class Networks extends BaseResource
     /**
      * Get network timeline.
      *
-     * Chronological events for this network: detection, each signal's observation, and lifecycle status
-     * changes.
+     * Without `contract`: the network's own events (detection, each signal's latest observation and its
+     * review), oldest first and not paginated. `limit`, `cursor` and `event_type` are ignored. With
+     * `contract=2`: the typed timeline, newest first and paginated by cursor. It adds what the member
+     * accounts did (verification attempts, transactions, sign-ins you post through the events API and the
+     * live rules they hit) and the cases opened for the network. `note_added` events are returned to
+     * console members only, never to an API key. Requires a full-access API key, or `read:networks` for a
+     * console member.
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/timeline/`
      *
      * @param string $networkUuid network UUID
+     * @param NetworksRetrieveTimelineParams $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function retrieveTimeline(
         string $networkUuid,
+        array $params = [],
         ?RequestOptions $options = null,
     ): Types\NetworksRetrieveTimelineResponse {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/timeline/',
             applicationScope: true,
-        ), ['network_uuid' => $networkUuid], [], $options);
+            query: ['contract' => 'contract', 'limit' => 'limit', 'cursor' => 'cursor', 'event_type' => 'event_type'],
+        ), ['network_uuid' => $networkUuid], $params, $options);
 
         return Types\NetworksRetrieveTimelineResponse::fromResponse($response);
     }
@@ -241,5 +256,66 @@ final class Networks extends BaseResource
         ), ['network_uuid' => $networkUuid], $params, $options);
 
         return BinaryContent::fromResponse($response);
+    }
+
+    /**
+     * Add a tag to a network.
+     *
+     * Put one of your application's tags on the network. Returns the network detail, whose `tags` lists
+     * your application's tags on the network, with `201` when the tag was added and `200` when it was
+     * already on the network. A tag that belongs to another application, or does not exist, returns 404
+     * `Tag not found.`. Requires a full-access API key, or `write:networks` for a console member.
+     *
+     * `POST /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/tags/add/`
+     *
+     * @param string $networkUuid network UUID
+     * @param NetworkTagRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function addTag(
+        string $networkUuid,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\NetworkDetailResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/tags/add/',
+            applicationScope: true,
+            bodyTypes: ['json'],
+        ), ['network_uuid' => $networkUuid], $params, $options);
+
+        return Types\NetworkDetailResponse::fromResponse($response);
+    }
+
+    /**
+     * Remove a tag from a network.
+     *
+     * Remove one of your application's tags from the network. Returns the network detail. 404 when the tag
+     * is not on the network, or does not belong to your application. Requires a full-access API key, or
+     * `write:networks` for a console member.
+     *
+     * `POST /v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/tags/remove/`
+     *
+     * @param string $networkUuid network UUID
+     * @param NetworkTagRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function removeTag(
+        string $networkUuid,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\NetworkDetailResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/organization/{organization_id}/application/{application_id}/networks/{network_uuid}/tags/remove/',
+            applicationScope: true,
+            bodyTypes: ['json'],
+        ), ['network_uuid' => $networkUuid], $params, $options);
+
+        return Types\NetworkDetailResponse::fromResponse($response);
     }
 }

@@ -45,4 +45,27 @@ final class Aml extends BaseResource
 
         return Types\AmlScreenResponse::fromResponse($response);
     }
+
+    /**
+     * Get AML dataset freshness.
+     *
+     * Report how current the datasets behind AML screening are, per source family (`sanctions`, `pep`,
+     * `warnings`, `adverse_media`), as audit evidence for [ongoing AML
+     * monitoring](https://docs.didit.me/core-technology/aml-screening/continuous-monitoring-aml-screening#proving-that-monitoring-ran).
+     * The answer is platform-wide: no session in the path, no customer data in the body, the same answer
+     * for every application.
+     *
+     * `GET /v3/aml/dataset-freshness/`
+     *
+     * @throws DiditException
+     */
+    public function retrieveDatasetFreshness(?RequestOptions $options = null): Types\AmlRetrieveDatasetFreshnessResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/aml/dataset-freshness/',
+        ), [], [], $options);
+
+        return Types\AmlRetrieveDatasetFreshnessResponse::fromResponse($response);
+    }
 }

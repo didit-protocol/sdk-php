@@ -144,8 +144,12 @@ final class Cases extends BaseResource
     /**
      * Update case.
      *
-     * Update the case's title, priority, due date, or tags. Logs
-     * PRIORITY_CHANGED/DUE_DATE_CHANGED/TAG_ADDED/TAG_REMOVED events as applicable.
+     * Update the case's title, priority, due date, tags, or owning review team. Send only the fields you
+     * want to change; fields you omit keep their value. `tags` replaces the whole tag list. `team` takes
+     * the uuid of an active review team of this application (list them with `GET .../cases/teams/`), or
+     * null to clear the team. Requires a full-access API key, or `write:cases` for a console member: a key
+     * with restricted access gets 403. Logs PRIORITY_CHANGED, DUE_DATE_CHANGED, TAG_ADDED, TAG_REMOVED and
+     * TEAM_CHANGED events as applicable; a title change is saved without a timeline event.
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/`
      *
@@ -219,11 +223,10 @@ final class Cases extends BaseResource
     /**
      * Resolve case.
      *
-     * Resolve the case as false_positive or valid_threat. Blocked with 400 if the blueprint's checklist is
-     * not optional and items remain incomplete, or if the blueprint requires a resolution note and none is
-     * given. When the case's blueprint has a four_eyes_checker_blueprint configured, the resolution is
-     * staged (case.pending_resolution) and the case moves to the checker blueprint instead of resolving
-     * immediately; a different user must call approve or reject-approval.
+     * Resolve the case with one of five resolutions: FALSE_POSITIVE (no concern found), VALID_THREAT
+     * (concern confirmed), INCONCLUSIVE, REQUIREMENTS_NOT_MET or REQUIREMENTS_SATISFIED. Blocked with 400
+     * if the blueprint's checklist is not optional and items remain incomplete, or if the blueprint
+     * requires a resolution note and none is given.
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/resolve/`
      *
@@ -346,8 +349,10 @@ final class Cases extends BaseResource
     /**
      * Approve staged resolution (4-eyes).
      *
-     * Apply a resolution staged by resolve on a maker blueprint. The caller must be a different user than
-     * the one who submitted it, otherwise 403.
+     * Apply a resolution staged by resolve on a four-eyes blueprint. The caller must be a different
+     * officer than the one who submitted it, otherwise 403. When the resolution names a checker (the
+     * case's `checker`), only that member can approve it: any other caller, including an API key, gets
+     * 403.
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/approve/`
      *
@@ -371,7 +376,9 @@ final class Cases extends BaseResource
      * Reject staged resolution (4-eyes).
      *
      * Reject a resolution staged by resolve and return the case to its maker blueprint. The caller must be
-     * a different user than the one who submitted it, otherwise 403.
+     * a different officer than the one who submitted it, otherwise 403. When the resolution names a
+     * checker (the case's `checker`), only that member can reject it: any other caller, including an API
+     * key, gets 403.
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/reject-approval/`
      *
@@ -487,7 +494,7 @@ final class Cases extends BaseResource
      *
      * @param string $caseUuid case UUID
      *
-     * @return ListResponse<array<string, mixed>>
+     * @return ListResponse<Types\AMLScreening>
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
@@ -500,7 +507,7 @@ final class Cases extends BaseResource
             applicationScope: true,
         ), ['case_uuid' => $caseUuid], [], $options);
 
-        return ListResponse::fromResponse($response, Hydrate::assoc(...));
+        return ListResponse::fromResponse($response, static fn (mixed $v) => Hydrate::model($v, Types\AMLScreening::class));
     }
 
     /**
@@ -547,10 +554,8 @@ final class Cases extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function bulkUpdateStatus(
-        array $params,
-        ?RequestOptions $options = null,
-    ): Types\CasesBulkUpdateStatusResponse {
+    public function bulkUpdateStatus(array $params, ?RequestOptions $options = null): Types\CaseBulkUpdateResult
+    {
         $response = $this->requester->request(new Operation(
             method: 'POST',
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/bulk/status/',
@@ -558,7 +563,7 @@ final class Cases extends BaseResource
             bodyTypes: ['json'],
         ), [], $params, $options);
 
-        return Types\CasesBulkUpdateStatusResponse::fromResponse($response);
+        return Types\CaseBulkUpdateResult::fromResponse($response);
     }
 
     /**
@@ -574,7 +579,7 @@ final class Cases extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function bulkAssign(array $params, ?RequestOptions $options = null): Types\CasesBulkAssignResponse
+    public function bulkAssign(array $params, ?RequestOptions $options = null): Types\CaseBulkUpdateResult
     {
         $response = $this->requester->request(new Operation(
             method: 'POST',
@@ -583,7 +588,7 @@ final class Cases extends BaseResource
             bodyTypes: ['json'],
         ), [], $params, $options);
 
-        return Types\CasesBulkAssignResponse::fromResponse($response);
+        return Types\CaseBulkUpdateResult::fromResponse($response);
     }
 
     /**

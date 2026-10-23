@@ -45,6 +45,8 @@ final class SimpleWorkflowFeatureFeature
 
     public const KYB_KEY_PEOPLE = 'KYB_KEY_PEOPLE';
 
+    public const SIGNATURE = 'SIGNATURE';
+
     private function __construct()
     {
     }

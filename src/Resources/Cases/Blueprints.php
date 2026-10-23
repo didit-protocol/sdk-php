@@ -198,7 +198,7 @@ final class Blueprints extends BaseResource
     public function installPresets(
         array $params = [],
         ?RequestOptions $options = null,
-    ): Types\CasesBlueprintsInstallPresetsResponse {
+    ): Types\CaseBlueprintPresetInstallResult {
         $response = $this->requester->request(new Operation(
             method: 'POST',
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/blueprints/presets/install/',
@@ -206,7 +206,7 @@ final class Blueprints extends BaseResource
             bodyTypes: ['json'],
         ), [], $params, $options);
 
-        return Types\CasesBlueprintsInstallPresetsResponse::fromResponse($response);
+        return Types\CaseBlueprintPresetInstallResult::fromResponse($response);
     }
 
     /**

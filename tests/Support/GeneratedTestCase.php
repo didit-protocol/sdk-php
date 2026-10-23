@@ -51,7 +51,7 @@ abstract class GeneratedTestCase extends TestCase
     }
 
     /**
-     * @return array<string, string>
+     * @return array<string, string|list<string>>
      */
     protected function queryParams(RequestInterface $request): array
     {

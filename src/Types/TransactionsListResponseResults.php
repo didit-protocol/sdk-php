@@ -129,6 +129,18 @@ final class TransactionsListResponseResults extends BaseModel
     public readonly ?string $assignedToName;
 
     /**
+     * Status of the transaction's Travel Rule transfer (for example `COMPLETED`), or `null` when it has
+     * none.
+     */
+    public readonly ?string $travelRuleStatus;
+
+    /**
+     * The transaction's Travel Rule transfer, the same block as `travel_rule` on `GET
+     * /v3/transactions/{transaction_id}/`, or `null` when the transaction has none.
+     */
+    public readonly ?TransactionTravelRule $travelRule;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -160,5 +172,7 @@ final class TransactionsListResponseResults extends BaseModel
         $this->decisionReasonCode = Hydrate::string($data['decision_reason_code'] ?? null);
         $this->decisionReasonLabel = Hydrate::string($data['decision_reason_label'] ?? null);
         $this->assignedToName = Hydrate::string($data['assigned_to_name'] ?? null);
+        $this->travelRuleStatus = Hydrate::string($data['travel_rule_status'] ?? null);
+        $this->travelRule = Hydrate::model($data['travel_rule'] ?? null, TransactionTravelRule::class);
     }
 }

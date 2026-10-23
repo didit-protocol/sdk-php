@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Webhooks;
 
-use Didit\Types\SessionsRetrieveDecisionResponse;
+use Didit\Types\SessionDecision;
 use Didit\Webhooks\Event;
 use Didit\Webhooks\Events\ActivityCreatedEvent;
 use Didit\Webhooks\Events\BusinessDataUpdatedEvent;
@@ -128,7 +128,7 @@ final class EventTest extends TestCase
         self::assertSame('user-42', $event->vendorData);
         self::assertSame(['plan' => 'pro'], $event->metadata);
         self::assertNull($event->resubmitInfo);
-        self::assertInstanceOf(SessionsRetrieveDecisionResponse::class, $event->decision);
+        self::assertInstanceOf(SessionDecision::class, $event->decision);
         self::assertSame('Approved', $event->decision->status);
         self::assertSame('11111111-2222-3333-4444-555555555555', $event->decision->sessionId);
         self::assertSame(1, $event->decision->get('future_block'));

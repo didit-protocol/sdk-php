@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Didit\Resources;
 
 use Didit\Core\BaseResource;
+use Didit\Core\BinaryContent;
 use Didit\Core\Hydrate;
 use Didit\Core\Operation;
 use Didit\Core\Page;
@@ -22,6 +23,7 @@ use Didit\Types;
  * @phpstan-import-type TransactionsCreateParams from Params
  * @phpstan-import-type TransactionsCreateSdkTokenParams from Params
  * @phpstan-import-type TransactionsListParams from Params
+ * @phpstan-import-type TransactionsListRelatedParams from Params
  */
 final class Transactions extends BaseResource
 {
@@ -29,11 +31,14 @@ final class Transactions extends BaseResource
 
     public readonly Transactions\Rules $rules;
 
+    public readonly Transactions\Notes $notes;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
         $this->travelRule = new Transactions\TravelRule($requester);
         $this->rules = new Transactions\Rules($requester);
+        $this->notes = new Transactions\Notes($requester);
     }
 
     /**
@@ -57,7 +62,7 @@ final class Transactions extends BaseResource
         return $this->requester->requestPage(new Operation(
             method: 'GET',
             path: '/v3/transactions/',
-            query: ['limit' => 'limit', 'offset' => 'offset'],
+            query: ['limit' => 'limit', 'offset' => 'offset', 'travel_rule_status' => 'travel_rule_status'],
         ), [], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\TransactionsListResponseResults::class));
     }
 
@@ -68,7 +73,8 @@ final class Transactions extends BaseResource
      * then your rules (and crypto screening, when applicable) run inline and may flip the returned
      * `status` to `IN_REVIEW` or `DECLINED`. **`transaction_id` is your idempotency key** (max 128 chars,
      * unique per app); reusing it returns 400. A `transaction.created` webhook is dispatched on success
-     * (sandbox applications are not billed and do not emit webhooks).
+     * for live applications. Sandbox applications are not billed and do not emit `transaction.created` or
+     * `transaction.status.updated` webhooks.
      *
      * `POST /v3/transactions/`
      *
@@ -83,7 +89,7 @@ final class Transactions extends BaseResource
             method: 'POST',
             path: '/v3/transactions/',
             bodyTypes: ['json'],
-            jsonHints: ['transaction_details' => ['o', ['crypto_params' => ['o']]], 'subject' => ['o', ['address' => ['o'], 'institution_details' => ['o', ['address' => ['o']]], 'device_context' => ['o', ['network_context' => ['o']]], 'payment_method' => ['o']]], 'counterparty' => ['o', ['address' => ['o'], 'institution_details' => ['o'], 'device_context' => ['o', ['network_context' => ['o']]], 'payment_method' => ['o']]], 'custom_properties' => ['o'], 'travel_rule_details' => ['o', ['originator_data' => ['o'], 'beneficiary_data' => ['o'], 'metadata' => ['o']]], 'network_snapshot' => ['o', ['nodes' => ['l', ['o']], 'edges' => ['l', ['o']], 'metrics' => ['o']]]],
+            jsonHints: ['transaction_details' => ['o', ['crypto_params' => ['o']]], 'subject' => ['o', ['address' => ['o'], 'institution_details' => ['o', ['address' => ['o']]], 'device_context' => ['o', ['network_context' => ['o']]], 'payment_method' => ['o']]], 'counterparty' => ['o', ['address' => ['o'], 'institution_details' => ['o'], 'device_context' => ['o', ['network_context' => ['o']]], 'payment_method' => ['o']]], 'custom_properties' => ['o'], 'travel_rule_details' => ['o', ['originator_data' => ['o'], 'beneficiary_data' => ['o'], 'metadata' => ['o'], 'utxo' => ['o', ['inputs' => ['l', ['o']], 'outputs' => ['l', ['o']]]], 'originator' => ['o'], 'beneficiary' => ['o'], 'ivms101' => ['o']]], 'network_snapshot' => ['o', ['nodes' => ['l', ['o']], 'edges' => ['l', ['o']], 'metrics' => ['o']]]],
         ), [], $params, $options);
 
         return Types\TransactionDetail::fromResponse($response);
@@ -158,14 +164,14 @@ final class Transactions extends BaseResource
     public function listNetworks(
         string $transactionUuid,
         ?RequestOptions $options = null,
-    ): Types\TransactionsListNetworksResponse {
+    ): Types\EntityNetworkMembershipList {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/organization/{organization_id}/application/{application_id}/transactions/{transaction_uuid}/networks/',
             applicationScope: true,
         ), ['transaction_uuid' => $transactionUuid], [], $options);
 
-        return Types\TransactionsListNetworksResponse::fromResponse($response);
+        return Types\EntityNetworkMembershipList::fromResponse($response);
     }
 
     /**
@@ -186,13 +192,68 @@ final class Transactions extends BaseResource
         string $transactionUuid,
         string $transactionPartyUuid,
         ?RequestOptions $options = null,
-    ): Types\TransactionsListPartyNetworksResponse {
+    ): Types\EntityNetworkMembershipList {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/organization/{organization_id}/application/{application_id}/transactions/{transaction_uuid}/parties/{transaction_party_uuid}/networks/',
             applicationScope: true,
         ), ['transaction_uuid' => $transactionUuid, 'transaction_party_uuid' => $transactionPartyUuid], [], $options);
 
-        return Types\TransactionsListPartyNetworksResponse::fromResponse($response);
+        return Types\EntityNetworkMembershipList::fromResponse($response);
+    }
+
+    /**
+     * List related transactions.
+     *
+     * List the other transactions in your application that involve the same people or companies as this
+     * one. A transaction is related when any of its parties, in any role, has the same `vendor_data` as
+     * one of this transaction's parties. The transaction itself is never returned, and parties without
+     * `vendor_data` are ignored: when none of this transaction's parties has one, the result is always
+     * empty.
+     *
+     * `GET /v3/transactions/{transaction_id}/related/`
+     *
+     * @param string $transactionId didit transaction UUID: the `uuid` returned by `POST /v3/transactions/` and `GET /v3/transactions/`
+     * @param TransactionsListRelatedParams $params
+     *
+     * @return Page<Types\TransactionSummary>
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listRelated(string $transactionId, array $params = [], ?RequestOptions $options = null): Page
+    {
+        return $this->requester->requestPage(new Operation(
+            method: 'GET',
+            path: '/v3/transactions/{transaction_id}/related/',
+            query: ['limit' => 'limit', 'offset' => 'offset'],
+        ), ['transaction_id' => $transactionId], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\TransactionSummary::class));
+    }
+
+    /**
+     * Download a transaction PDF report.
+     *
+     * Render one monitored transaction as a PDF report: overview and verdict, parties and payment methods,
+     * custom properties, alerts and rule runs, screening and Travel Rule results, the network summary, the
+     * cost breakdown, up to 50 related transactions and the 20 most recent activity entries. The body is
+     * the PDF itself (`application/pdf`), not JSON.
+     *
+     * `GET /v3/organization/{organization_id}/application/{application_id}/transactions/{transaction_uuid}/pdf/`
+     *
+     * @param string $transactionUuid didit transaction UUID: the `uuid` returned by `POST /v3/transactions/` and `GET /v3/transactions/`
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function generatePdf(string $transactionUuid, ?RequestOptions $options = null): BinaryContent
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/organization/{organization_id}/application/{application_id}/transactions/{transaction_uuid}/pdf/',
+            applicationScope: true,
+            accept: 'application/pdf, application/json',
+        ), ['transaction_uuid' => $transactionUuid], [], $options);
+
+        return BinaryContent::fromResponse($response);
     }
 }

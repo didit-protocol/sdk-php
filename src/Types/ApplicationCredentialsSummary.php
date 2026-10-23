@@ -24,7 +24,11 @@ final class ApplicationCredentialsSummary extends BaseModel
     /** The `client_id` field. */
     public readonly ?string $clientId;
 
-    /** Use this as `x-api-key` on every verification API call. */
+    /**
+     * Use this as `x-api-key` on every verification API call. New keys start with `sk_live_` (live
+     * application) or `sk_test_` (sandbox application), followed by 43 URL-safe characters (letters,
+     * digits, `-` and `_`). Keys created before this format have no prefix and keep working unchanged.
+     */
     public readonly ?string $apiKey;
 
     /**

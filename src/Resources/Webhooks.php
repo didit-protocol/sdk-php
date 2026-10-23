@@ -7,10 +7,17 @@ declare(strict_types=1);
 namespace Didit\Resources;
 
 use Didit\Core\BaseResource;
+use Didit\Core\Operation;
 use Didit\Core\Requester;
+use Didit\Exception\DiditException;
+use Didit\Params;
+use Didit\RequestOptions;
+use Didit\Types;
 
 /**
  * The `webhooks` resource.
+ *
+ * @phpstan-import-type WebhooksUpdateConfigParams from Params
  */
 final class Webhooks extends BaseResource
 {
@@ -22,5 +29,55 @@ final class Webhooks extends BaseResource
     {
         parent::__construct($requester);
         $this->destinations = new Webhooks\Destinations($requester);
+    }
+
+    /**
+     * Get webhook configuration.
+     *
+     * Return the application's webhook settings in one call: every [webhook
+     * destination](https://docs.didit.me/management-api/webhook/list-destinations) with its signing
+     * secret, the event types a destination can subscribe to, the application-level (legacy) webhook URL,
+     * version and secret, the data and biometric-template retention policy, and the Digital ID wallet
+     * return hosts.
+     *
+     * `GET /v3/webhook/`
+     *
+     * @throws DiditException
+     */
+    public function retrieveConfig(?RequestOptions $options = null): Types\WebhookConfig
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/webhook/',
+        ), [], [], $options);
+
+        return Types\WebhookConfig::fromResponse($response);
+    }
+
+    /**
+     * Update webhook configuration.
+     *
+     * Partially update application-level settings: the legacy webhook URL, version and secret, the data
+     * and biometric-template retention policy, and the Digital ID wallet return hosts. Send only the
+     * fields to change; the response is the full configuration, the same shape as `GET /v3/webhook/`.
+     * Destinations are not managed here: create, update and delete them with the
+     * `/v3/webhook/destinations/` endpoints, and do not send an `endpoints` field to this endpoint.
+     *
+     * `PATCH /v3/webhook/`
+     *
+     * @param WebhooksUpdateConfigParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function updateConfig(array $params = [], ?RequestOptions $options = null): Types\WebhookConfig
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'PATCH',
+            path: '/v3/webhook/',
+            bodyTypes: ['json'],
+        ), [], $params, $options);
+
+        return Types\WebhookConfig::fromResponse($response);
     }
 }

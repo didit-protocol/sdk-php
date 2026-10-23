@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Didit\Webhooks\Events;
 
 use Didit\Core\Hydrate;
-use Didit\Types\SessionsRetrieveDecisionResponse;
+use Didit\Types\SessionDecision;
 use Didit\Webhooks\Event;
 
 /**
@@ -43,7 +43,7 @@ abstract class SessionEvent extends Event
      * The decision, sent once the session is `Approved`, `Declined`,
      * `In Review` or `Abandoned`.
      */
-    public readonly ?SessionsRetrieveDecisionResponse $decision;
+    public readonly ?SessionDecision $decision;
 
     /**
      * @var array<string, mixed>|null for `Resubmitted` sessions:
@@ -65,7 +65,7 @@ abstract class SessionEvent extends Event
         $this->workflowVersion = Hydrate::int($data['workflow_version'] ?? null);
         $this->vendorData = Hydrate::string($data['vendor_data'] ?? null);
         $this->metadata = Hydrate::assoc($data['metadata'] ?? null);
-        $this->decision = Hydrate::model($data['decision'] ?? null, SessionsRetrieveDecisionResponse::class);
+        $this->decision = Hydrate::model($data['decision'] ?? null, SessionDecision::class);
         $this->resubmitInfo = Hydrate::assoc($data['resubmit_info'] ?? null);
     }
 }

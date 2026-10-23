@@ -10,12 +10,15 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * NetworksRetrieveTimelineResponse.
+ * Without `contract`: the network's own events, oldest first, not paginated.
  */
 final class NetworksRetrieveTimelineResponse extends BaseModel
 {
     /** @var list<NetworkTimelineEvent>|null */
     public readonly ?array $results;
+
+    /** Pass as `cursor` to read the next page. Null on the last page. */
+    public readonly ?string $nextCursor;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -24,5 +27,6 @@ final class NetworksRetrieveTimelineResponse extends BaseModel
     {
         parent::__construct($data);
         $this->results = Hydrate::list($data['results'] ?? null, static fn (mixed $v) => Hydrate::model($v, NetworkTimelineEvent::class));
+        $this->nextCursor = Hydrate::string($data['next_cursor'] ?? null);
     }
 }

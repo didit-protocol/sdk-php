@@ -175,4 +175,37 @@ final class Requests extends BaseResource
 
         return Types\CustomerMessagingCaseRequestPreviewResponse::fromResponse($response);
     }
+
+    /**
+     * Remind the customer of a request.
+     *
+     * Send a waiting customer request's email again, to the same verified recipient, with the same
+     * content. You can remind a request at most once every 24 hours. A reminder changes nothing else: the
+     * request keeps its deadline and the case keeps its status. Each reminder is logged on the case as a
+     * CUSTOMER_REQUEST event with action `reminded`. The response's `delivery_status` is how this
+     * reminder's delivery ended: SENT, SIMULATED (the email was not sent), or UNKNOWN (the email might
+     * have been accepted; it is not sent again automatically). `next_reminder_at` is when you can remind
+     * this request again.
+     *
+     * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/{request_uuid}/remind/`
+     *
+     * @param string $caseUuid case UUID
+     * @param string $requestUuid customer request UUID, from the case's request list
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function remind(
+        string $caseUuid,
+        string $requestUuid,
+        ?RequestOptions $options = null,
+    ): Types\CasesRequestsRemindResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/requests/{request_uuid}/remind/',
+            applicationScope: true,
+        ), ['case_uuid' => $caseUuid, 'request_uuid' => $requestUuid], [], $options);
+
+        return Types\CasesRequestsRemindResponse::fromResponse($response);
+    }
 }
