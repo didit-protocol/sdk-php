@@ -24,6 +24,7 @@ final class KybTest extends GeneratedTestCase
             'country_code' => 'country_code-value',
             'name' => 'name-value',
             'registration_number' => 'registration_number-value',
+            'tier' => 'basic',
             'search_type' => 'contains',
             'vendor_data' => 'vendor_data-value',
             'metadata' => [
@@ -39,7 +40,7 @@ final class KybTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"country_code":"country_code-value","name":"name-value","registration_number":"registration_number-value","search_type":"contains","vendor_data":"vendor_data-value","metadata":{"key":"value"},"webhook_url":"https://example.com/callback"}', $this->canonicalBody($request));
+        self::assertSame('{"country_code":"country_code-value","name":"name-value","registration_number":"registration_number-value","tier":"basic","search_type":"contains","vendor_data":"vendor_data-value","metadata":{"key":"value"},"webhook_url":"https://example.com/callback"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"0c7e9a40-3a13-4f7e-8a44-9d2e2f1c5b6a","kyb_registry":{"companies":[{"kyb_response_id":"69aeeb95febb0f1704042259","name":"Tesco PLC","registration_number":"00445790","status":"active","type":"Public Limited Company","risk_level":null,"fetch_status":"pending"},{"kyb_response_id":"69aeeb95febb0f170404225a","name":"E-TESCO LTD","registration_number":"15168476","status":"active","type":"Private Limited Company","risk_level":null,"fetch_status":"pending"}],"pagination":{"total":2,"page":1,"per_page":25},"search_status":"resolved","search_resolved":true},"vendor_data":"company-1234","metadata":null,"created_at":"2026-06-11T10:40:00.000000+00:00"}'), $result->toArray());
         self::assertSame('0c7e9a40-3a13-4f7e-8a44-9d2e2f1c5b6a', $result->requestId);

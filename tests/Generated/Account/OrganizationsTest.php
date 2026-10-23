@@ -18,20 +18,27 @@ final class OrganizationsTest extends GeneratedTestCase
 {
     public function testList(): void
     {
-        $this->queueJson(200, '[{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer","contact_email":"developer@gmail.com","created_at":"2025-06-01T10:00:00Z"}]');
+        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer","contact_email":"developer@gmail.com","created_at":"2025-06-01T10:00:00Z"}]}');
 
-        $result = $this->client->account->organizations->list();
+        $result = $this->client->account->organizations->list([
+            'limit' => 1,
+            'offset' => 1,
+        ]);
 
         $request = $this->lastRequest();
         self::assertSame('GET', $request->getMethod());
         self::assertSame('apx.didit.me', $request->getUri()->getHost());
         self::assertSame('/auth/v2/organizations/me/', $request->getUri()->getPath());
-        self::assertSame([], $this->queryParams($request));
+        self::assertSame([
+            'limit' => '1',
+            'offset' => '1',
+        ], $this->queryParams($request));
         self::assertSame('Bearer ' . self::ACCOUNT_TOKEN, $request->getHeaderLine('Authorization'));
         self::assertSame('', $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertCount(1, $result);
-        self::assertContainsOnlyInstancesOf(Types\Organization::class, $result->items);
-        self::assertSame($this->decoded('[{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer","contact_email":"developer@gmail.com","created_at":"2025-06-01T10:00:00Z"}]'), $result->toArray());
+        self::assertCount(1, $result->results);
+        self::assertContainsOnlyInstancesOf(Types\Organization::class, $result->results);
+        self::assertFalse($result->hasNextPage());
+        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer","contact_email":"developer@gmail.com","created_at":"2025-06-01T10:00:00Z"}]}'), $result->toArray());
     }
 }

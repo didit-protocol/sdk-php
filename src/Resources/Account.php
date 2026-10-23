@@ -7,7 +7,6 @@ declare(strict_types=1);
 namespace Didit\Resources;
 
 use Didit\Core\BaseResource;
-use Didit\Core\JsonResponse;
 use Didit\Core\Operation;
 use Didit\Core\Requester;
 use Didit\Exception\DiditException;
@@ -129,7 +128,7 @@ final class Account extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function resendOtp(array $params, ?RequestOptions $options = null): JsonResponse
+    public function resendOtp(array $params, ?RequestOptions $options = null): Types\AccountResendOtpResponse
     {
         $response = $this->requester->request(new Operation(
             method: 'POST',
@@ -139,6 +138,6 @@ final class Account extends BaseResource
             bodyTypes: ['json'],
         ), [], $params, $options);
 
-        return JsonResponse::fromResponse($response);
+        return Types\AccountResendOtpResponse::fromResponse($response);
     }
 }

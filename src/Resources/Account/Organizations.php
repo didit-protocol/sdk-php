@@ -8,14 +8,17 @@ namespace Didit\Resources\Account;
 
 use Didit\Core\BaseResource;
 use Didit\Core\Hydrate;
-use Didit\Core\ListResponse;
 use Didit\Core\Operation;
+use Didit\Core\Page;
 use Didit\Exception\DiditException;
+use Didit\Params;
 use Didit\RequestOptions;
 use Didit\Types;
 
 /**
  * The `account.organizations` resource.
+ *
+ * @phpstan-import-type AccountOrganizationsListParams from Params
  */
 final class Organizations extends BaseResource
 {
@@ -27,19 +30,21 @@ final class Organizations extends BaseResource
      *
      * `GET /organizations/me/`
      *
-     * @return ListResponse<Types\Organization>
+     * @param AccountOrganizationsListParams $params
+     *
+     * @return Page<Types\Organization>
      *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function list(?RequestOptions $options = null): ListResponse
+    public function list(array $params = [], ?RequestOptions $options = null): Page
     {
-        $response = $this->requester->request(new Operation(
+        return $this->requester->requestPage(new Operation(
             method: 'GET',
             path: '/organizations/me/',
             auth: 'account_token',
             base: 'account',
-        ), [], [], $options);
-
-        return ListResponse::fromResponse($response, static fn (mixed $v) => Hydrate::model($v, Types\Organization::class));
+            query: ['limit' => 'limit', 'offset' => 'offset'],
+        ), [], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\Organization::class));
     }
 }

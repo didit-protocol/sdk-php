@@ -34,6 +34,48 @@ final class WebhookEvent
 
     public const TRAVEL_RULE_STATUS_UPDATED = 'travel_rule.status.updated';
 
+    public const WORKFLOW_COMPLIANCE_CHANGED = 'workflow.compliance_changed';
+
+    public const AUTH_SIGNUP = 'auth.signup';
+
+    public const AUTH_LOGIN = 'auth.login';
+
+    public const AUTH_LOGIN_FAILED = 'auth.login_failed';
+
+    public const AUTH_PASSWORD_RESET_REQUESTED = 'auth.password_reset_requested';
+
+    public const AUTH_PASSWORD_RESET_COMPLETED = 'auth.password_reset_completed';
+
+    public const AUTH_MFA_CHANGED = 'auth.mfa_changed';
+
+    public const AUTH_NEW_DEVICE = 'auth.new_device';
+
+    public const AUTH_ACCOUNT_LOCKED = 'auth.account_locked';
+
+    public const INVESTIGATOR_REPORT_READY = 'investigator.report.ready';
+
+    public const INVESTIGATOR_DECISION_AUTOMATED = 'investigator.decision.automated';
+
+    public const INVESTIGATOR_DECISION_OVERRIDDEN = 'investigator.decision.overridden';
+
+    public const INVESTIGATOR_DECISION_CONTESTED = 'investigator.decision.contested';
+
+    public const INVESTIGATOR_QUESTION_RAISED = 'investigator.question.raised';
+
+    public const INVESTIGATOR_AUTOMATION_PAUSED = 'investigator.automation.paused';
+
+    public const INVESTIGATOR_RFI_ANSWERED = 'investigator.rfi.answered';
+
+    public const INVESTIGATOR_RFI_OVERDUE = 'investigator.rfi.overdue';
+
+    public const INVESTIGATOR_DRIFT_DETECTED = 'investigator.drift.detected';
+
+    public const INVESTIGATOR_SLA_BREACHED = 'investigator.sla.breached';
+
+    public const INVESTIGATOR_QA_FAILED = 'investigator.qa.failed';
+
+    public const INVESTIGATOR_EXTERNAL_REPORT_READY = 'investigator.external.report.ready';
+
     private function __construct()
     {
     }

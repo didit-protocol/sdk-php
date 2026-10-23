@@ -17,18 +17,23 @@ final class TravelRuleInboundResponse extends BaseModel
     /** Didit transaction UUID for the inbound deposit. */
     public readonly ?string $transactionId;
 
-    /** Didit-generated txn_id for the sunrise transaction. */
+    /**
+     * txn_id of the inbound transaction: Didit-generated when Didit created the transaction, or your own
+     * when an unclaimed deposit was reused.
+     */
     public readonly ?string $txnId;
 
     /**
-     * true when a new transaction was minted (HTTP 201); false when an existing unclaimed deposit was
-     * reused (HTTP 200).
+     * true when this call registered the transfer (HTTP 201); false when a transfer for the same txid and
+     * wallet_address already existed (HTTP 200).
      */
     public readonly ?bool $created;
 
     /**
-     * Full transfer object returned by the ownership-confirmation and finish/cancel endpoints.
-     * originator_data/beneficiary_data are omitted while PII is masked (see description).
+     * Full transfer object returned by the ownership-confirmation and finish/cancel endpoints. While an
+     * inbound transfer's wallet ownership is unconfirmed, the counterparty's `originator_data` and
+     * `beneficiary_data` come back masked (the first letter of each word is kept; the wallet, chain and
+     * VASP routing stay readable) and `data_masked` is true.
      */
     public readonly ?TravelRuleTransferDetail $travelRule;
 

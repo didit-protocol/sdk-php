@@ -10,8 +10,10 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Full transfer object returned by the ownership-confirmation and finish/cancel endpoints.
- * originator_data/beneficiary_data are omitted while PII is masked (see description).
+ * Full transfer object returned by the ownership-confirmation and finish/cancel endpoints. While an
+ * inbound transfer's wallet ownership is unconfirmed, the counterparty's `originator_data` and
+ * `beneficiary_data` come back masked (the first letter of each word is kept; the wallet, chain and
+ * VASP routing stay readable) and `data_masked` is true.
  */
 final class TravelRuleTransferDetail extends BaseModel
 {
@@ -24,7 +26,16 @@ final class TravelRuleTransferDetail extends BaseModel
     /** Known values: {@see TravelRuleTransferDetailDirection}. */
     public readonly ?string $direction;
 
-    /** Known values: {@see TravelRuleTransferDetailRail}. */
+    /**
+     * The rail the transfer was routed over, or null when no rail was selected (for example below the
+     * threshold, a self-hosted counterparty wallet, an after-deposit registration, or no reachable
+     * counterparty). INTERNAL means both sides are Didit applications; EMAIL means the counterparty was
+     * reached by an emailed pickup link. TEST_VASP means the Didit Test VASP answered a sandbox
+     * application's transfer. Over GTR, VERIFYVASP and SYGNA, Didit reads the counterparty's answer from
+     * the network's response or by polling it every 5 minutes.
+     *
+     * Known values: {@see TravelRuleTransferDetailRail}.
+     */
     public readonly ?string $rail;
 
     /** The `protocol` field. */
@@ -48,14 +59,97 @@ final class TravelRuleTransferDetail extends BaseModel
     /** The `counterparty_vasp` field. */
     public readonly ?TravelRuleTransferDetailCounterpartyVasp $counterpartyVasp;
 
-    /** @var array<string, mixed>|null */
+    /**
+     * Originator party. For an inbound transfer the counterparty's values are masked until ownership is
+     * confirmed.
+     *
+     * @var array<string, mixed>|null
+     */
     public readonly ?array $originatorData;
 
-    /** @var array<string, mixed>|null */
+    /**
+     * Beneficiary party. For an inbound transfer the counterparty's values are masked until ownership is
+     * confirmed.
+     *
+     * @var array<string, mixed>|null
+     */
     public readonly ?array $beneficiaryData;
+
+    /**
+     * The name comparison that decided the transfer, or null until one ran. While the parties are masked,
+     * and on the other customer's copy of an INTERNAL exchange, `transfer_name`, `compared_name`,
+     * `matched_names` and `mismatched_names` are hidden. `score` and `matched` can disagree: `matched`
+     * follows the strictness, `score` is the similarity of the two full names.
+     */
+    public readonly ?TravelRuleNameMatch $nameMatch;
+
+    /**
+     * Field-by-field comparison of the transfer's party data with what the other side knows about the
+     * wallet holder. It names fields and results, never values, so it stays readable while the
+     * counterparty's data is masked. Null until a comparison ran.
+     */
+    public readonly ?TravelRuleDataMatch $dataMatch;
+
+    /**
+     * Shortcut for `data_match.mismatched_fields`. Empty when nothing differs.
+     *
+     * @var list<string>|null
+     */
+    public readonly ?array $mismatchedFields;
+
+    /**
+     * Audit record of the moment the counterparty's data was unmasked. Null while the data is still
+     * masked, and for outbound transfers.
+     */
+    public readonly ?TravelRuleDataUnmasked $dataUnmasked;
+
+    /** True while the counterparty's personal data is masked in this response. */
+    public readonly ?bool $dataMasked;
 
     /** The `created_at` field. */
     public readonly ?\DateTimeImmutable $createdAt;
+
+    /**
+     * Where the latest message this transfer owes the other side stands. Null when the transfer never owed
+     * one (for example below `threshold_amount`, a declared self-hosted wallet, or a sunrise
+     * registration).
+     */
+    public readonly ?TravelRuleDelivery $delivery;
+
+    /**
+     * How Didit looked for the counterparty, one entry per step that ran. Empty when no discovery ran, for
+     * example on an inbound transfer.
+     *
+     * @var list<TravelRuleDiscoveryStep>|null
+     */
+    public readonly ?array $discovery;
+
+    /**
+     * Why a `COUNTERPARTY_VASP_NOT_FOUND` or `COUNTERPARTY_VASP_NOT_REACHABLE` transfer is stuck; `""` for
+     * any other status. A failed delivery decides it first, on `COUNTERPARTY_VASP_NOT_REACHABLE` only:
+     * `email_undeliverable` (the mail provider refused the compliance email and no address is left to try:
+     * when it was sent, on a reminder, or as a permanent bounce reported later) or `delivery_failed` (the
+     * rail that was delivering failed for good: a network rail refused the message or ran out of retries,
+     * a `TRP` identity host did not answer, or the counterparty's `TRP` host did not accept the inquiry).
+     */
+    public readonly ?string $reason;
+
+    /**
+     * What moves the transfer on; `[]` for any status but `COUNTERPARTY_VASP_NOT_FOUND` or
+     * `COUNTERPARTY_VASP_NOT_REACHABLE`. `email_undeliverable` offers `update_compliance_email`, then
+     * `resend`. `delivery_failed` offers `resend`. A discovery reason offers `select_counterparty_vasp`,
+     * `declare_self_hosted`, `add_vasp_hint` and `resend`.
+     *
+     * @var list<TravelRuleNextAction>|null
+     */
+    public readonly ?array $nextActions;
+
+    /**
+     * How the transfer's chain names its two wallets, when that is more than one address paying another.
+     * Empty (`{}`) for an account-chain transfer (EVM, Solana, Tron), where the two addresses are the
+     * wallets. Matching, routing and the address book read the wallets from here first.
+     */
+    public readonly ?TravelRuleChainDetails $chainDetails;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -76,6 +170,16 @@ final class TravelRuleTransferDetail extends BaseModel
         $this->counterpartyVasp = Hydrate::model($data['counterparty_vasp'] ?? null, TravelRuleTransferDetailCounterpartyVasp::class);
         $this->originatorData = Hydrate::assoc($data['originator_data'] ?? null);
         $this->beneficiaryData = Hydrate::assoc($data['beneficiary_data'] ?? null);
+        $this->nameMatch = Hydrate::model($data['name_match'] ?? null, TravelRuleNameMatch::class);
+        $this->dataMatch = Hydrate::model($data['data_match'] ?? null, TravelRuleDataMatch::class);
+        $this->mismatchedFields = Hydrate::list($data['mismatched_fields'] ?? null, Hydrate::string(...));
+        $this->dataUnmasked = Hydrate::model($data['data_unmasked'] ?? null, TravelRuleDataUnmasked::class);
+        $this->dataMasked = Hydrate::bool($data['data_masked'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
+        $this->delivery = Hydrate::model($data['delivery'] ?? null, TravelRuleDelivery::class);
+        $this->discovery = Hydrate::list($data['discovery'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleDiscoveryStep::class));
+        $this->reason = Hydrate::string($data['reason'] ?? null);
+        $this->nextActions = Hydrate::list($data['next_actions'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleNextAction::class));
+        $this->chainDetails = Hydrate::model($data['chain_details'] ?? null, TravelRuleChainDetails::class);
     }
 }

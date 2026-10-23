@@ -108,7 +108,9 @@ final class Rules extends BaseResource
      *
      * Partially update a rule. Custom rules accept every configuration field. Library (PRESET) rules
      * accept only `mode` - use it to activate, disable, or switch a preset to TEST; any other field
-     * returns 400.
+     * returns 400. An installed copy of a withheld library rule is switched off: setting its `mode` to
+     * anything but `DISABLED` answers 400 ("This library rule cannot run yet: its conditions read data the
+     * rules engine cannot evaluate.").
      *
      * `PATCH /v3/transactions/rules/{rule_uuid}/`
      *
@@ -188,7 +190,9 @@ final class Rules extends BaseResource
      * List rule library.
      *
      * Browse the full preset rule library (150+ rules) with each entry's complete configuration and an
-     * `is_installed` flag for this application. Filter by bundle, category, or free-text search.
+     * `is_installed` flag for this application. Filter by bundle, category, or free-text search. A library
+     * rule whose conditions read data the rules engine cannot evaluate yet is withheld until it can run.
+     * Withheld rules are not listed.
      *
      * `GET /v3/transactions/rules/library/`
      *
@@ -211,8 +215,12 @@ final class Rules extends BaseResource
     /**
      * Install library rules.
      *
-     * Install one or more presets onto the application, by `library_keys` or a whole `bundle`. Installed
-     * presets evaluate immediately in their default mode; already-installed keys are skipped.
+     * Install one or more presets onto the application, by `library_keys` or a whole `bundle`. An
+     * installed preset is active at once while transaction monitoring is on, and disabled otherwise;
+     * already-installed keys are skipped. A library rule whose conditions read data the rules engine
+     * cannot evaluate yet is withheld until it can run. A request that names one in `library_keys` answers
+     * 400 and installs nothing ("These library rules cannot run yet: their conditions read data the rules
+     * engine cannot evaluate." followed by the keys), and a `bundle` install skips it.
      *
      * `POST /v3/transactions/rules/install/`
      *

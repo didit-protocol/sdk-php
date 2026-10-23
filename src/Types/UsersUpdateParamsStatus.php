@@ -7,8 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * User lifecycle status. Changing it via this generic PATCH does NOT sync the system blocklist or
- * record a status-change activity; prefer the update-status endpoint.
+ * User lifecycle status. A change is recorded as a `STATUS_CHANGED` activity, and `BLOCKED` adds the
+ * `vendor_data` to the system blocklist (moving away from `BLOCKED` removes that entry).
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

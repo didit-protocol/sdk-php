@@ -8,7 +8,6 @@ namespace Didit\Resources;
 
 use Didit\Core\BaseResource;
 use Didit\Core\Hydrate;
-use Didit\Core\JsonResponse;
 use Didit\Core\NoContent;
 use Didit\Core\Operation;
 use Didit\Core\Page;
@@ -66,7 +65,7 @@ final class Workflows extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function create(array $params, ?RequestOptions $options = null): JsonResponse
+    public function create(array $params, ?RequestOptions $options = null): Types\WorkflowDetail
     {
         $response = $this->requester->request(new Operation(
             method: 'POST',
@@ -75,7 +74,7 @@ final class Workflows extends BaseResource
             jsonHints: ['features' => ['l', ['o', ['config' => ['o']]]]],
         ), [], $params, $options);
 
-        return JsonResponse::fromResponse($response);
+        return Types\WorkflowDetail::fromResponse($response);
     }
 
     /**
@@ -91,14 +90,14 @@ final class Workflows extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function retrieve(string $settingsUuid, ?RequestOptions $options = null): JsonResponse
+    public function retrieve(string $settingsUuid, ?RequestOptions $options = null): Types\WorkflowDetail
     {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/workflows/{settings_uuid}/',
         ), ['settings_uuid' => $settingsUuid], [], $options);
 
-        return JsonResponse::fromResponse($response);
+        return Types\WorkflowDetail::fromResponse($response);
     }
 
     /**
@@ -120,8 +119,11 @@ final class Workflows extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function update(string $settingsUuid, array $params = [], ?RequestOptions $options = null): JsonResponse
-    {
+    public function update(
+        string $settingsUuid,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\WorkflowDetail {
         $response = $this->requester->request(new Operation(
             method: 'PATCH',
             path: '/v3/workflows/{settings_uuid}/',
@@ -129,7 +131,7 @@ final class Workflows extends BaseResource
             jsonHints: ['features' => ['l', ['o', ['config' => ['o']]]]],
         ), ['settings_uuid' => $settingsUuid], $params, $options);
 
-        return JsonResponse::fromResponse($response);
+        return Types\WorkflowDetail::fromResponse($response);
     }
 
     /**

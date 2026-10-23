@@ -144,4 +144,22 @@ final class RequestsTest extends GeneratedTestCase
         self::assertSame($this->decoded('{"request_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","expires_at":"2026-01-15T10:30:00Z","recipient":"user@example.com","sender":"sender-value","subject":"subject-value","html":"html-value","requires_user_action":true,"preview_token":"preview_token-value"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->requestId);
     }
+
+    public function testRemind(): void
+    {
+        $this->queueJson(200, '{"request":{"uuid":"3fa85f64-5717-4562-b3fc-2c963f66afa6","purpose":"confirm_details","language":"en","recipient":"customer@example.com","expires_at":"2026-10-20T09:00:00Z","actor_email":"reviewer@example.com","delivery_status":"SENT","delivered_at":"2026-10-13T09:00:04Z","cancelled_at":null,"responded_at":null,"response":null,"has_attachment":false,"created_at":"2026-10-13T09:00:00Z"},"reminded_at":"2026-10-14T10:30:00Z","delivery_status":"SENT","next_reminder_at":"2026-10-15T10:30:00Z"}');
+
+        $result = $this->client->cases->requests->remind('caseUuid-1', 'requestUuid-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/organization/org-7f3a/application/app-91c2/cases/caseUuid-1/requests/requestUuid-1/remind/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"request":{"uuid":"3fa85f64-5717-4562-b3fc-2c963f66afa6","purpose":"confirm_details","language":"en","recipient":"customer@example.com","expires_at":"2026-10-20T09:00:00Z","actor_email":"reviewer@example.com","delivery_status":"SENT","delivered_at":"2026-10-13T09:00:04Z","cancelled_at":null,"responded_at":null,"response":null,"has_attachment":false,"created_at":"2026-10-13T09:00:00Z"},"reminded_at":"2026-10-14T10:30:00Z","delivery_status":"SENT","next_reminder_at":"2026-10-15T10:30:00Z"}'), $result->toArray());
+        self::assertInstanceOf(\DateTimeImmutable::class, $result->remindedAt);
+    }
 }

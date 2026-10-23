@@ -249,9 +249,9 @@ final class HeadersAndConfigTest extends TestCase
 
     public function testAccountBaseUrlOverrideNeverReceivesTheApiKey(): void
     {
-        $this->support->http->queueJson(200, []);
+        $this->support->http->queueJson(200, ['count' => 0, 'next' => null, 'previous' => null, 'results' => []]);
 
-        $this->support->client()->account->organizations->list(new RequestOptions(accountBaseUrl: 'https://auth.example.test/v2/'));
+        $this->support->client()->account->organizations->list([], new RequestOptions(accountBaseUrl: 'https://auth.example.test/v2/'));
 
         $request = $this->support->http->lastRequest();
         self::assertSame('https://auth.example.test/v2/organizations/me/', (string) $request->getUri());

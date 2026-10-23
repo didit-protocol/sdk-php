@@ -67,7 +67,9 @@ final class SessionsCreateResponse extends BaseModel
     /**
      * Final redirect URL the user is sent to after completing the flow. Didit appends
      * `?verificationSessionId={session_id}&status={status}` to this URL. Falls back to the workflow's
-     * configured callback URL when not provided in the request; `null` when neither is set.
+     * configured callback URL when not provided in the request; `null` when neither is set. When the
+     * application has allowed domains and this URL is a web URL outside them (for example a workflow
+     * default set before the list changed), the hosted flow does not redirect the user to it.
      */
     public readonly ?string $callback;
 

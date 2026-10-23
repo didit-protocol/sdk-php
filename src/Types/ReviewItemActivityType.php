@@ -44,6 +44,12 @@ final class ReviewItemActivityType
 
     public const TAG_REMOVED = 'TAG_REMOVED';
 
+    public const FEATURE_OVERRIDE_PENDING = 'FEATURE_OVERRIDE_PENDING';
+
+    public const FEATURE_OVERRIDE_APPLIED = 'FEATURE_OVERRIDE_APPLIED';
+
+    public const FEATURE_OVERRIDE_CANCELLED = 'FEATURE_OVERRIDE_CANCELLED';
+
     private function __construct()
     {
     }

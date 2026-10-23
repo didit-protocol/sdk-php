@@ -14,7 +14,7 @@ final class Http
     /**
      * Query parameters in order, without PHP's `parse_str` name mangling.
      *
-     * @return array<string, string>
+     * @return array<string, string|list<string>>
      */
     public static function queryParams(RequestInterface $request): array
     {
@@ -25,7 +25,14 @@ final class Http
         }
         foreach (explode('&', $query) as $pair) {
             [$name, $value] = array_pad(explode('=', $pair, 2), 2, '');
-            $out[rawurldecode($name)] = rawurldecode($value);
+            $name = rawurldecode($name);
+            $value = rawurldecode($value);
+            // A repeated parameter reads back as a list.
+            if (\array_key_exists($name, $out)) {
+                $out[$name] = [...(array) $out[$name], $value];
+            } else {
+                $out[$name] = $value;
+            }
         }
 
         return $out;

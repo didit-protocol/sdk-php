@@ -46,20 +46,98 @@ final class WebhooksDestinationsListResponse extends BaseModel
     /** Cached length of `subscribed_events`, useful for UI rendering. */
     public readonly ?int $subscribedEventsCount;
 
-    /** Total delivery attempts (successful + failed) recorded for this destination. */
+    /** Delivery attempts (retries included) made to this destination in the last 30 days. */
     public readonly ?int $deliveriesCount;
 
-    /** Delivery attempts whose target responded with HTTP ≥ 400 (or did not respond). */
+    /**
+     * Delivery attempts in the last 30 days that the destination answered with HTTP 400 or above, or did
+     * not answer (timeout, refused connection or blocked address).
+     */
     public readonly ?int $failedDeliveriesCount;
 
-    /** Average target response time in milliseconds, rounded to an integer. `null` if no deliveries yet. */
+    /**
+     * Average response time in milliseconds over the last 30 days, rounded to an integer. `null` when
+     * there were no deliveries in that window.
+     */
     public readonly ?int $averageResponseTimeMs;
 
-    /** `round(failed_deliveries_count / deliveries_count * 100)`; `0` when there are no deliveries. */
+    /**
+     * `round(failed_deliveries_count / deliveries_count * 100)` over the last 30 days; `0` when there are
+     * no deliveries.
+     */
     public readonly ?int $errorRatePercentage;
 
     /** Timestamp of the most recent delivery attempt (success or failure). `null` if never delivered. */
     public readonly ?\DateTimeImmutable $lastDeliveryAt;
+
+    /**
+     * Length in days of the window that `deliveries_count`, `failed_deliveries_count`,
+     * `average_response_time_ms`, `error_rate_percentage` and `daily_points` cover. Always `30`.
+     */
+    public readonly ?int $metricsWindowDays;
+
+    /**
+     * Delivery health. `failing`: 3 or more consecutive events failed their first delivery attempt since
+     * the destination last answered successfully (see `failing_streak`). `degraded`: not failing, but a
+     * delivery attempt failed in the last 24 hours and no later attempt has delivered that event; a retry
+     * or resend that delivers it clears this. `healthy`: neither. Independent of `enabled`. A failed
+     * attempt is one answered with HTTP 400 or above, or not answered at all.
+     *
+     * Known values: {@see WebhooksDestinationsListResponseHealthStatus}.
+     */
+    public readonly ?string $healthStatus;
+
+    /**
+     * How many consecutive events failed their first delivery attempt since the destination last answered
+     * successfully, within the last 30 days. Retries are not counted, and any successful attempt,
+     * including a retry or a resend, ends the streak. `0` when no event has failed since the last success.
+     */
+    public readonly ?int $failingStreak;
+
+    /**
+     * When the first failed attempt of the current `failing_streak` was made. `null` when `failing_streak`
+     * is `0`.
+     */
+    public readonly ?\DateTimeImmutable $failingSince;
+
+    /**
+     * When the destination last answered a delivery with an HTTP status under 400, within the last 30
+     * days. `null` if it has not in that window.
+     */
+    public readonly ?\DateTimeImmutable $lastSuccessAt;
+
+    /**
+     * Environment of the application that owns the destination.
+     *
+     * Known values: {@see WebhooksDestinationsListResponseEnvironment}.
+     */
+    public readonly ?string $environment;
+
+    /**
+     * One entry per UTC day of the last 30 days, oldest first, including days with no deliveries. Counts
+     * every attempt, retries included.
+     *
+     * @var list<WebhooksDestinationsListResponseDailyPoints>|null
+     */
+    public readonly ?array $dailyPoints;
+
+    /**
+     * Last four characters of the destination's current signing secret, so you can tell secrets apart. Not
+     * enough to verify a signature.
+     */
+    public readonly ?string $secretLast4;
+
+    /**
+     * Email of the Business Console member who created the destination. `null` for a destination created
+     * with an API key.
+     */
+    public readonly ?string $createdByEmail;
+
+    /**
+     * Name of the Business Console member who created the destination. `null` for a destination created
+     * with an API key.
+     */
+    public readonly ?string $createdByName;
 
     /** The `created_at` field. */
     public readonly ?\DateTimeImmutable $createdAt;
@@ -85,6 +163,16 @@ final class WebhooksDestinationsListResponse extends BaseModel
         $this->averageResponseTimeMs = Hydrate::int($data['average_response_time_ms'] ?? null);
         $this->errorRatePercentage = Hydrate::int($data['error_rate_percentage'] ?? null);
         $this->lastDeliveryAt = Hydrate::dateTime($data['last_delivery_at'] ?? null);
+        $this->metricsWindowDays = Hydrate::int($data['metrics_window_days'] ?? null);
+        $this->healthStatus = Hydrate::string($data['health_status'] ?? null);
+        $this->failingStreak = Hydrate::int($data['failing_streak'] ?? null);
+        $this->failingSince = Hydrate::dateTime($data['failing_since'] ?? null);
+        $this->lastSuccessAt = Hydrate::dateTime($data['last_success_at'] ?? null);
+        $this->environment = Hydrate::string($data['environment'] ?? null);
+        $this->dailyPoints = Hydrate::list($data['daily_points'] ?? null, static fn (mixed $v) => Hydrate::model($v, WebhooksDestinationsListResponseDailyPoints::class));
+        $this->secretLast4 = Hydrate::string($data['secret_last4'] ?? null);
+        $this->createdByEmail = Hydrate::string($data['created_by_email'] ?? null);
+        $this->createdByName = Hydrate::string($data['created_by_name'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
         $this->updatedAt = Hydrate::dateTime($data['updated_at'] ?? null);
     }

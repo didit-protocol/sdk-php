@@ -21,11 +21,20 @@ final class CaseDetailPendingResolution extends BaseModel
     /** The `resolution_notes` field. */
     public readonly ?string $resolutionNotes;
 
-    /** The `maker_email` field. */
+    /**
+     * Email of the officer who submitted the resolution. Null when an API key submitted it: that
+     * resolution has no recorded maker, so approve and reject-approval return 403 for every caller.
+     */
     public readonly ?string $makerEmail;
 
     /** The `maker_name` field. */
     public readonly ?string $makerName;
+
+    /**
+     * Member user uuid of the officer who submitted the resolution. Null when an API key submitted it.
+     * That member cannot be named as `checker`.
+     */
+    public readonly ?string $makerUserId;
 
     /** The `maker_blueprint_id` field. */
     public readonly ?string $makerBlueprintId;
@@ -43,6 +52,7 @@ final class CaseDetailPendingResolution extends BaseModel
         $this->resolutionNotes = Hydrate::string($data['resolution_notes'] ?? null);
         $this->makerEmail = Hydrate::string($data['maker_email'] ?? null);
         $this->makerName = Hydrate::string($data['maker_name'] ?? null);
+        $this->makerUserId = Hydrate::string($data['maker_user_id'] ?? null);
         $this->makerBlueprintId = Hydrate::string($data['maker_blueprint_id'] ?? null);
         $this->stagedAt = Hydrate::dateTime($data['staged_at'] ?? null);
     }

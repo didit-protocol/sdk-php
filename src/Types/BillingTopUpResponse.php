@@ -15,12 +15,12 @@ use Didit\Core\Hydrate;
 final class BillingTopUpResponse extends BaseModel
 {
     /**
-     * Stripe Checkout Session identifier (e.g. `cs_test_a1B2c3...`). Useful for server-side
+     * Hosted checkout session identifier (e.g. `cs_test_a1B2c3...`). Useful for server-side
      * reconciliation.
      */
     public readonly ?string $checkoutSessionId;
 
-    /** Single-use Stripe-hosted payment page URL. Redirect the customer here to complete payment. */
+    /** Single-use hosted payment page URL. Redirect the customer here to complete payment. */
     public readonly ?string $checkoutSessionUrl;
 
     /**

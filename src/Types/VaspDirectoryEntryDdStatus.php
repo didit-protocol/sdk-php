@@ -7,6 +7,9 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
+ * Didit's verification status of the entry, scored by the verification component of dd_score. Always
+ * COMPLETED for a Didit network member.
+ *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
 final class VaspDirectoryEntryDdStatus

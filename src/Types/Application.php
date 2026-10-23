@@ -26,7 +26,9 @@ final class Application extends BaseModel
     /**
      * Long-lived secret (also called `client_secret`). Use as the `x-api-key` header for every call to
      * `https://verification.didit.me/v3/...` (sessions, workflows, AML, etc.). Treat as a credential;
-     * never expose client-side.
+     * never expose client-side. New keys start with `sk_live_` (live application) or `sk_test_` (sandbox
+     * application), followed by 43 URL-safe characters (letters, digits, `-` and `_`). Keys created before
+     * this format have no prefix and keep working unchanged.
      */
     public readonly ?string $apiKey;
 
@@ -53,6 +55,15 @@ final class Application extends BaseModel
     public readonly ?\DateTimeImmutable $createdAt;
 
     /**
+     * The application's products. Always all three, in this order: `identity`, `transactions`,
+     * `authentication`. A new application has `identity` enabled with every module on, and `transactions`
+     * and `authentication` disabled. Read-only: a `products` key in a create or update body is ignored.
+     *
+     * @var list<ApplicationProduct>|null
+     */
+    public readonly ?array $products;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -68,5 +79,6 @@ final class Application extends BaseModel
         $this->privacyUrl = Hydrate::string($data['privacy_url'] ?? null);
         $this->description = Hydrate::string($data['description'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
+        $this->products = Hydrate::list($data['products'] ?? null, static fn (mixed $v) => Hydrate::model($v, ApplicationProduct::class));
     }
 }

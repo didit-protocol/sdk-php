@@ -18,7 +18,7 @@ final class CustomizationTest extends GeneratedTestCase
 {
     public function testRetrieve(): void
     {
-        $this->queueJson(200, '{"color_primary":"#000000","color_secondary":"#9DA1A1","color_background":"#FFFFFF","color_panel":"#2567FF","color_panel_10":"#1A1A1A","color_on_panel_1":"#9DA1A1","color_on_panel_2":"#F4F4F6","color_on_background":"#000000","color_button_1":"#2567FF","color_button_2":"#F8F8F8","color_button_text_1":"#FFFFFF","color_button_text_2":"#000000","color_pill_text":"#111827","border_radius_panel":10,"border_radius_buttons":12,"font_family":"Inter","font_weight":"regular","font_url":"https://fonts.googleapis.com/css2?family=Inter","logo_square":null,"logo_rectangular":null,"favicon":null,"app_public_name":"Acme Verify","privacy_policy_url":"https://acme.com/privacy","skip_welcome_screen":false,"disable_login_with_didit":false,"hide_progress_bar":false,"callback_seconds":3}');
+        $this->queueJson(200, '{"color_primary":"#000000","color_secondary":"#9DA1A1","color_background":"#FFFFFF","color_panel":"#2567FF","color_panel_10":"#1A1A1A","color_on_panel_1":"#9DA1A1","color_on_panel_2":"#F4F4F6","color_on_background":"#000000","color_button_1":"#2567FF","color_button_2":"#F8F8F8","color_button_text_1":"#FFFFFF","color_button_text_2":"#000000","color_pill_text":"#111827","border_radius_panel":10,"border_radius_buttons":12,"font_family":"Inter","font_weight":"regular","font_url":"https://fonts.googleapis.com/css2?family=Inter","logo_square":null,"logo_rectangular":null,"logo_rectangular_dark":null,"favicon":null,"app_public_name":"Acme Verify","privacy_policy_url":"https://acme.com/privacy","skip_welcome_screen":false,"disable_login_with_didit":false,"hide_progress_bar":false,"callback_seconds":3}');
 
         $result = $this->client->customization->retrieve();
 
@@ -30,13 +30,13 @@ final class CustomizationTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"color_primary":"#000000","color_secondary":"#9DA1A1","color_background":"#FFFFFF","color_panel":"#2567FF","color_panel_10":"#1A1A1A","color_on_panel_1":"#9DA1A1","color_on_panel_2":"#F4F4F6","color_on_background":"#000000","color_button_1":"#2567FF","color_button_2":"#F8F8F8","color_button_text_1":"#FFFFFF","color_button_text_2":"#000000","color_pill_text":"#111827","border_radius_panel":10,"border_radius_buttons":12,"font_family":"Inter","font_weight":"regular","font_url":"https://fonts.googleapis.com/css2?family=Inter","logo_square":null,"logo_rectangular":null,"favicon":null,"app_public_name":"Acme Verify","privacy_policy_url":"https://acme.com/privacy","skip_welcome_screen":false,"disable_login_with_didit":false,"hide_progress_bar":false,"callback_seconds":3}'), $result->toArray());
+        self::assertSame($this->decoded('{"color_primary":"#000000","color_secondary":"#9DA1A1","color_background":"#FFFFFF","color_panel":"#2567FF","color_panel_10":"#1A1A1A","color_on_panel_1":"#9DA1A1","color_on_panel_2":"#F4F4F6","color_on_background":"#000000","color_button_1":"#2567FF","color_button_2":"#F8F8F8","color_button_text_1":"#FFFFFF","color_button_text_2":"#000000","color_pill_text":"#111827","border_radius_panel":10,"border_radius_buttons":12,"font_family":"Inter","font_weight":"regular","font_url":"https://fonts.googleapis.com/css2?family=Inter","logo_square":null,"logo_rectangular":null,"logo_rectangular_dark":null,"favicon":null,"app_public_name":"Acme Verify","privacy_policy_url":"https://acme.com/privacy","skip_welcome_screen":false,"disable_login_with_didit":false,"hide_progress_bar":false,"callback_seconds":3}'), $result->toArray());
         self::assertSame('#000000', $result->colorPrimary);
     }
 
     public function testUpdate(): void
     {
-        $this->queueJson(200, '{"color_primary":"#123456","color_secondary":"#9DA1A1","color_background":"#FFFFFF","color_panel":"#2567FF","color_panel_10":"#1A1A1A","color_on_panel_1":"#9DA1A1","color_on_panel_2":"#F4F4F6","color_on_background":"#000000","color_button_1":"#2567FF","color_button_2":"#F8F8F8","color_button_text_1":"#FFFFFF","color_button_text_2":"#000000","color_pill_text":"#111827","border_radius_panel":10,"border_radius_buttons":16,"font_family":"AR One Sans","font_weight":"400","font_url":"https://fonts.googleapis.com/css2?family=AR+One+Sans","logo_square":null,"logo_rectangular":"https://cdn.didit.me/white_label/logo_rectangular/...","favicon":null,"app_public_name":"Acme Verify","privacy_policy_url":"https://acme.com/privacy","skip_welcome_screen":true,"disable_login_with_didit":false,"hide_progress_bar":false,"callback_seconds":3}');
+        $this->queueJson(200, '{"color_primary":"#123456","color_secondary":"#9DA1A1","color_background":"#FFFFFF","color_panel":"#2567FF","color_panel_10":"#1A1A1A","color_on_panel_1":"#9DA1A1","color_on_panel_2":"#F4F4F6","color_on_background":"#000000","color_button_1":"#2567FF","color_button_2":"#F8F8F8","color_button_text_1":"#FFFFFF","color_button_text_2":"#000000","color_pill_text":"#111827","border_radius_panel":10,"border_radius_buttons":16,"font_family":"AR One Sans","font_weight":"400","font_url":"https://fonts.googleapis.com/css2?family=AR+One+Sans","logo_square":null,"logo_rectangular":"https://cdn.didit.me/white_label/logo_rectangular/...","logo_rectangular_dark":null,"favicon":null,"app_public_name":"Acme Verify","privacy_policy_url":"https://acme.com/privacy","skip_welcome_screen":true,"disable_login_with_didit":false,"hide_progress_bar":false,"callback_seconds":3}');
 
         $result = $this->client->customization->update([
             'color_primary' => 'color_primary-value',
@@ -64,9 +64,11 @@ final class CustomizationTest extends GeneratedTestCase
             'callback_seconds' => 1,
             'delete_logo_square' => true,
             'delete_logo_rectangular' => true,
+            'delete_logo_rectangular_dark' => true,
             'delete_favicon' => true,
             'image_square' => File::fromBytes('fake-image_square-bytes', 'image_square.jpg', 'image/jpeg'),
             'image_rectangular' => File::fromBytes('fake-image_rectangular-bytes', 'image_rectangular.jpg', 'image/jpeg'),
+            'image_rectangular_dark' => File::fromBytes('fake-image_rectangular_dark-bytes', 'image_rectangular_dark.jpg', 'image/jpeg'),
             'image_favicon' => File::fromBytes('fake-image_favicon-bytes', 'image_favicon.jpg', 'image/jpeg'),
         ]);
 
@@ -153,6 +155,9 @@ final class CustomizationTest extends GeneratedTestCase
             'delete_logo_rectangular' => [
                 'true',
             ],
+            'delete_logo_rectangular_dark' => [
+                'true',
+            ],
             'delete_favicon' => [
                 'true',
             ],
@@ -162,12 +167,15 @@ final class CustomizationTest extends GeneratedTestCase
             'image_rectangular' => [
                 'file:image_rectangular.jpg:image/jpeg:fake-image_rectangular-bytes',
             ],
+            'image_rectangular_dark' => [
+                'file:image_rectangular_dark.jpg:image/jpeg:fake-image_rectangular_dark-bytes',
+            ],
             'image_favicon' => [
                 'file:image_favicon.jpg:image/jpeg:fake-image_favicon-bytes',
             ],
         ], $this->multipartFields($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"color_primary":"#123456","color_secondary":"#9DA1A1","color_background":"#FFFFFF","color_panel":"#2567FF","color_panel_10":"#1A1A1A","color_on_panel_1":"#9DA1A1","color_on_panel_2":"#F4F4F6","color_on_background":"#000000","color_button_1":"#2567FF","color_button_2":"#F8F8F8","color_button_text_1":"#FFFFFF","color_button_text_2":"#000000","color_pill_text":"#111827","border_radius_panel":10,"border_radius_buttons":16,"font_family":"AR One Sans","font_weight":"400","font_url":"https://fonts.googleapis.com/css2?family=AR+One+Sans","logo_square":null,"logo_rectangular":"https://cdn.didit.me/white_label/logo_rectangular/...","favicon":null,"app_public_name":"Acme Verify","privacy_policy_url":"https://acme.com/privacy","skip_welcome_screen":true,"disable_login_with_didit":false,"hide_progress_bar":false,"callback_seconds":3}'), $result->toArray());
+        self::assertSame($this->decoded('{"color_primary":"#123456","color_secondary":"#9DA1A1","color_background":"#FFFFFF","color_panel":"#2567FF","color_panel_10":"#1A1A1A","color_on_panel_1":"#9DA1A1","color_on_panel_2":"#F4F4F6","color_on_background":"#000000","color_button_1":"#2567FF","color_button_2":"#F8F8F8","color_button_text_1":"#FFFFFF","color_button_text_2":"#000000","color_pill_text":"#111827","border_radius_panel":10,"border_radius_buttons":16,"font_family":"AR One Sans","font_weight":"400","font_url":"https://fonts.googleapis.com/css2?family=AR+One+Sans","logo_square":null,"logo_rectangular":"https://cdn.didit.me/white_label/logo_rectangular/...","logo_rectangular_dark":null,"favicon":null,"app_public_name":"Acme Verify","privacy_policy_url":"https://acme.com/privacy","skip_welcome_screen":true,"disable_login_with_didit":false,"hide_progress_bar":false,"callback_seconds":3}'), $result->toArray());
         self::assertSame('#123456', $result->colorPrimary);
     }
 }

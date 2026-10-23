@@ -17,6 +17,12 @@ final class VaspDirectoryEntryReachableRails
 
     public const GTR = 'GTR';
 
+    public const TRUST = 'TRUST';
+
+    public const VERIFYVASP = 'VERIFYVASP';
+
+    public const SYGNA = 'SYGNA';
+
     public const EMAIL = 'EMAIL';
 
     private function __construct()

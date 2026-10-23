@@ -23,6 +23,15 @@ final class TravelRuleTransferDetailTimeline extends BaseModel
     /** The `detail` field. */
     public readonly ?string $detail;
 
+    /** The name comparison this entry decided, next to `detail`. Absent on entries that compared no name. */
+    public readonly ?TravelRuleNameMatch $nameMatch;
+
+    /**
+     * Present only on the entry of a transition a failed delivery caused: `email_undeliverable` or
+     * `delivery_failed`, the value the transfer's `reason` reports.
+     */
+    public readonly ?string $reason;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -32,5 +41,7 @@ final class TravelRuleTransferDetailTimeline extends BaseModel
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->at = Hydrate::dateTime($data['at'] ?? null);
         $this->detail = Hydrate::string($data['detail'] ?? null);
+        $this->nameMatch = Hydrate::model($data['name_match'] ?? null, TravelRuleNameMatch::class);
+        $this->reason = Hydrate::string($data['reason'] ?? null);
     }
 }

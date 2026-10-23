@@ -7,17 +7,15 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Name-matching strategy applied by the registry search.
+ * Name-matching strategy applied by the registry search. `contains` is the only accepted value: no
+ * registry source behind the search offers a prefix or fuzzy mode, so `start_with` and `fuzzy` are
+ * rejected with `400` (`not a valid choice`).
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
 final class KybSearchParamsSearchType
 {
     public const CONTAINS = 'contains';
-
-    public const START_WITH = 'start_with';
-
-    public const FUZZY = 'fuzzy';
 
     private function __construct()
     {

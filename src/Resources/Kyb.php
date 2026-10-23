@@ -16,10 +16,8 @@ use Didit\Types;
 /**
  * The `kyb` resource.
  *
- * @phpstan-import-type KybListShareholdersParams from Params
- * @phpstan-import-type KybListUbosParams from Params
+ * @phpstan-import-type KYBRegistryCandidateRequest from Params
  * @phpstan-import-type KybSearchParams from Params
- * @phpstan-import-type KybSelectParams from Params
  */
 final class Kyb extends BaseResource
 {
@@ -59,7 +57,7 @@ final class Kyb extends BaseResource
      *
      * `POST /v3/kyb/select/`
      *
-     * @param KybSelectParams $params
+     * @param KYBRegistryCandidateRequest $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
@@ -84,7 +82,7 @@ final class Kyb extends BaseResource
      *
      * `POST /v3/kyb/shareholders/`
      *
-     * @param KybListShareholdersParams $params
+     * @param KYBRegistryCandidateRequest $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
@@ -115,7 +113,7 @@ final class Kyb extends BaseResource
      *
      * `POST /v3/kyb/ubo/`
      *
-     * @param KybListUbosParams $params
+     * @param KYBRegistryCandidateRequest $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded

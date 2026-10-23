@@ -29,6 +29,20 @@ final class CaseListItem extends BaseModel
     /** Known values: {@see CaseListItemResolution}. */
     public readonly ?string $resolution;
 
+    /**
+     * Set only while a 4-eyes resolution is staged on the checker blueprint, awaiting approve or
+     * reject-approval.
+     */
+    public readonly ?CaseListItemPendingResolution $pendingResolution;
+
+    /**
+     * The member named to approve or reject the pending resolution. Set only while a four-eyes resolution
+     * waits on a named checker. Null when nothing is pending, while the pending resolution waits on the
+     * checker queue, and once the resolution is approved, rejected, or returned for a new review because
+     * the evidence changed.
+     */
+    public readonly ?CaseChecker $checker;
+
     /** Known values: {@see CaseListItemPriority}. */
     public readonly ?string $priority;
 
@@ -46,6 +60,13 @@ final class CaseListItem extends BaseModel
 
     /** The `assigned_at` field. */
     public readonly ?\DateTimeImmutable $assignedAt;
+
+    /**
+     * The review team that owns the case, or null when no team owns it. Routing sets it when a routing
+     * rule places the case with one of its teams. Change or clear it with `PATCH .../cases/{case_uuid}/`
+     * (`team`).
+     */
+    public readonly ?CaseTeamSummary $team;
 
     /** The `due_at` field. */
     public readonly ?\DateTimeImmutable $dueAt;
@@ -97,12 +118,15 @@ final class CaseListItem extends BaseModel
         $this->title = Hydrate::string($data['title'] ?? null);
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->resolution = Hydrate::string($data['resolution'] ?? null);
+        $this->pendingResolution = Hydrate::model($data['pending_resolution'] ?? null, CaseListItemPendingResolution::class);
+        $this->checker = Hydrate::model($data['checker'] ?? null, CaseChecker::class);
         $this->priority = Hydrate::string($data['priority'] ?? null);
         $this->source = Hydrate::string($data['source'] ?? null);
         $this->tags = Hydrate::list($data['tags'] ?? null, Hydrate::string(...));
         $this->subject = Hydrate::model($data['subject'] ?? null, CaseSubject::class);
         $this->assignedTo = Hydrate::model($data['assigned_to'] ?? null, CaseAssignee::class);
         $this->assignedAt = Hydrate::dateTime($data['assigned_at'] ?? null);
+        $this->team = Hydrate::model($data['team'] ?? null, CaseTeamSummary::class);
         $this->dueAt = Hydrate::dateTime($data['due_at'] ?? null);
         $this->resolvedAt = Hydrate::dateTime($data['resolved_at'] ?? null);
         $this->createdByEmail = Hydrate::string($data['created_by_email'] ?? null);

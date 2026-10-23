@@ -30,9 +30,20 @@ def _sha(path: Path) -> str:
 class SpecSyncTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.verification = json.loads((REPO / "openapi" / "verification.json").read_text("utf-8"))
-        cls.overlay_text = (REPO / "openapi" / "overlay.json").read_text("utf-8")
-        cls.overlay = json.loads(cls.overlay_text)["operations"]
+        # The baseline names these three operations through the overlay, whatever the live documents do:
+        # once upstream carries x-didit-sdk the sync deletes their overlay entries (docs/DESIGN.md section 3),
+        # and the tests below need them to start in the overlay.
+        spec = json.loads((REPO / "openapi" / "verification.json").read_text("utf-8"))
+        overlay_doc = json.loads((REPO / "openapi" / "overlay.json").read_text("utf-8"))
+        cls.overlay = {}
+        for key in (REMOVED, TEMPLATE, ERRORS):
+            verb, path = key.split(" ", 1)
+            op = spec["paths"][path][verb.lower()]
+            cls.overlay[key] = op.pop("x-didit-sdk", None) or overlay_doc["operations"][key]
+            overlay_doc["operations"][key] = cls.overlay[key]
+        cls.verification = spec
+        cls.verification_text = json.dumps(spec, indent=2) + "\n"
+        cls.overlay_text = json.dumps(overlay_doc, indent=1)
 
     def setUp(self) -> None:
         tmp = tempfile.TemporaryDirectory()
@@ -43,7 +54,9 @@ class SpecSyncTest(unittest.TestCase):
         shutil.copy(REPO / "src" / "Version.php", self.root / "src" / "Version.php")
         self.offline = self.root / "upstream"
         self.offline.mkdir()
-        shutil.copy(REPO / "openapi" / "verification.json", self.offline / "openapi-25.json")
+        (self.root / "openapi" / "verification.json").write_text(self.verification_text, "utf-8")
+        (self.root / "openapi" / "overlay.json").write_text(self.overlay_text, "utf-8")
+        (self.offline / "openapi-25.json").write_text(self.verification_text, "utf-8")
         shutil.copy(REPO / "openapi" / "account.json", self.offline / "openapi-auth.json")
         self.summary = self.root / "summary.md"
         self.commit = self.root / "commit.txt"
@@ -224,7 +237,7 @@ class SpecSyncTest(unittest.TestCase):
     def test_operation_that_comes_back_gets_its_naming_back(self) -> None:
         self.upstream(self.remove)
         self.assertEqual(self.sync()[0], 0)
-        shutil.copy(REPO / "openapi" / "verification.json", self.offline / "openapi-25.json")
+        (self.offline / "openapi-25.json").write_text(self.verification_text, "utf-8")
         code, _, err = self.sync()
         self.assertEqual(code, 0, err)
         self.assertFalse((self.root / "openapi" / "deprecated-operations.json").exists())

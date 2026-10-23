@@ -20,8 +20,20 @@ final class TravelRuleTransferDetailCounterpartyVasp extends BaseModel
     /** The `lei` field. */
     public readonly ?string $lei;
 
-    /** The `dd_score` field. */
+    /** Due-diligence score from 0 to 100, where higher is better. Same scale as in the VASP directory. */
     public readonly ?int $ddScore;
+
+    /**
+     * Per-component contributions to dd_score, one object per component as in the VASP directory
+     * (jurisdiction, verification, protocol, lei, history, essentials, responsiveness), each {points, max,
+     * reason, detail}. {} until the counterparty has been assessed.
+     *
+     * @var array<string, TravelRuleTransferDetailCounterpartyVaspDdScoreBreakdownValue>|null
+     */
+    public readonly ?array $ddScoreBreakdown;
+
+    /** When the due-diligence assessment last ran. Null until the counterparty has been assessed. */
+    public readonly ?\DateTimeImmutable $ddAssessedAt;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -32,5 +44,7 @@ final class TravelRuleTransferDetailCounterpartyVasp extends BaseModel
         $this->name = Hydrate::string($data['name'] ?? null);
         $this->lei = Hydrate::string($data['lei'] ?? null);
         $this->ddScore = Hydrate::int($data['dd_score'] ?? null);
+        $this->ddScoreBreakdown = Hydrate::map($data['dd_score_breakdown'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleTransferDetailCounterpartyVaspDdScoreBreakdownValue::class));
+        $this->ddAssessedAt = Hydrate::dateTime($data['dd_assessed_at'] ?? null);
     }
 }

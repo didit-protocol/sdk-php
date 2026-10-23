@@ -21,7 +21,7 @@ final class BillingRetrieveBalanceResponse extends BaseModel
     public readonly ?string $balance;
 
     /**
-     * When `true`, Didit will automatically charge the saved Stripe payment method to add credits once the
+     * When `true`, Didit will automatically charge the saved payment method to add credits once the
      * balance crosses `auto_refill_threshold`. Configured from Console → Billing.
      */
     public readonly ?bool $autoRefillEnabled;

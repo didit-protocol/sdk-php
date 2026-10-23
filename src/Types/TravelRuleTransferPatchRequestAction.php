@@ -9,6 +9,9 @@ namespace Didit\Types;
 /**
  * "cancel" cancels a non-terminal transfer. "resend" re-runs routing for an outbound transfer stuck in
  * COUNTERPARTY_VASP_NOT_FOUND, COUNTERPARTY_VASP_NOT_REACHABLE, or NOT_ENOUGH_COUNTERPARTY_DATA.
+ * "update_compliance_email" replaces the compliance email the request goes to, on an outbound transfer
+ * in one of those three statuses; send "resend" afterwards. "update_originator_wallet" records the
+ * wallet the funds actually left from (`wallet_address`, `memo`).
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -17,6 +20,10 @@ final class TravelRuleTransferPatchRequestAction
     public const CANCEL = 'cancel';
 
     public const RESEND = 'resend';
+
+    public const UPDATE_COMPLIANCE_EMAIL = 'update_compliance_email';
+
+    public const UPDATE_ORIGINATOR_WALLET = 'update_originator_wallet';
 
     private function __construct()
     {

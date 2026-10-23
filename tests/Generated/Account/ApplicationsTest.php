@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Didit\Tests\Generated\Account;
 
 use Didit\Tests\Support\GeneratedTestCase;
+use Didit\Types;
 
 /**
  * Generated tests for the `account.applications` resource.
@@ -17,24 +18,33 @@ final class ApplicationsTest extends GeneratedTestCase
 {
     public function testList(): void
     {
-        $this->queueJson(200, '{"key":"value"}');
+        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"My App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://example.com","redirect_uris":["https://example.com/callback"],"terms_url":"https://example.com/terms","privacy_url":"https://example.com/privacy","description":"Production application","created_at":"2025-06-01T10:00:00Z","products":[{"product":"identity","status":"enabled","modules":{"user_verification":true,"business_verification":true,"case_management":true}},{"product":"transactions","status":"disabled","modules":{"travel_rule":true,"case_management":true}},{"product":"authentication","status":"disabled","modules":{}}]}]}');
 
-        $result = $this->client->account->applications->list('orgId-1');
+        $result = $this->client->account->applications->list('orgId-1', [
+            'limit' => 1,
+            'offset' => 1,
+        ]);
 
         $request = $this->lastRequest();
         self::assertSame('GET', $request->getMethod());
         self::assertSame('apx.didit.me', $request->getUri()->getHost());
         self::assertSame('/auth/v2/organizations/me/orgId-1/applications/', $request->getUri()->getPath());
-        self::assertSame([], $this->queryParams($request));
+        self::assertSame([
+            'limit' => '1',
+            'offset' => '1',
+        ], $this->queryParams($request));
         self::assertSame('Bearer ' . self::ACCOUNT_TOKEN, $request->getHeaderLine('Authorization'));
         self::assertSame('', $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
-        self::assertSame($this->decoded('{"key":"value"}'), $result->data);
+        self::assertCount(1, $result->results);
+        self::assertContainsOnlyInstancesOf(Types\Application::class, $result->results);
+        self::assertFalse($result->hasNextPage());
+        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"My App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://example.com","redirect_uris":["https://example.com/callback"],"terms_url":"https://example.com/terms","privacy_url":"https://example.com/privacy","description":"Production application","created_at":"2025-06-01T10:00:00Z","products":[{"product":"identity","status":"enabled","modules":{"user_verification":true,"business_verification":true,"case_management":true}},{"product":"transactions","status":"disabled","modules":{"travel_rule":true,"case_management":true}},{"product":"authentication","status":"disabled","modules":{}}]}]}'), $result->toArray());
     }
 
     public function testCreate(): void
     {
-        $this->queueJson(201, '{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"Acme Customer App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://acme.example","redirect_uris":["https://acme.example/callback"],"terms_url":"https://acme.example/terms","privacy_url":"https://acme.example/privacy","description":null,"created_at":"2025-06-01T10:00:00Z"}');
+        $this->queueJson(201, '{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"Acme Customer App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://acme.example","redirect_uris":["https://acme.example/callback"],"terms_url":"https://acme.example/terms","privacy_url":"https://acme.example/privacy","description":null,"created_at":"2025-06-01T10:00:00Z","products":[{"product":"identity","status":"enabled","modules":{"user_verification":true,"business_verification":true,"case_management":true}},{"product":"transactions","status":"disabled","modules":{"travel_rule":true,"case_management":true}},{"product":"authentication","status":"disabled","modules":{}}]}');
 
         $result = $this->client->account->applications->create('orgId-1', [
             'name' => 'name-value',
@@ -57,13 +67,13 @@ final class ApplicationsTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"name":"name-value","website_url":"website_url-value","redirect_uris":["redirect_uris-value"],"terms_url":"terms_url-value","privacy_url":"privacy_url-value","description":"description-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"Acme Customer App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://acme.example","redirect_uris":["https://acme.example/callback"],"terms_url":"https://acme.example/terms","privacy_url":"https://acme.example/privacy","description":null,"created_at":"2025-06-01T10:00:00Z"}'), $result->toArray());
+        self::assertSame($this->decoded('{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"Acme Customer App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://acme.example","redirect_uris":["https://acme.example/callback"],"terms_url":"https://acme.example/terms","privacy_url":"https://acme.example/privacy","description":null,"created_at":"2025-06-01T10:00:00Z","products":[{"product":"identity","status":"enabled","modules":{"user_verification":true,"business_verification":true,"case_management":true}},{"product":"transactions","status":"disabled","modules":{"travel_rule":true,"case_management":true}},{"product":"authentication","status":"disabled","modules":{}}]}'), $result->toArray());
         self::assertSame('b2c3d4e5-6789-01bc-defg-222222222222', $result->uuid);
     }
 
     public function testRetrieve(): void
     {
-        $this->queueJson(200, '{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"My App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://example.com","redirect_uris":["https://example.com/callback"],"terms_url":"https://example.com/terms","privacy_url":"https://example.com/privacy","description":"Production application","created_at":"2025-06-01T10:00:00Z"}');
+        $this->queueJson(200, '{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"My App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://example.com","redirect_uris":["https://example.com/callback"],"terms_url":"https://example.com/terms","privacy_url":"https://example.com/privacy","description":"Production application","created_at":"2025-06-01T10:00:00Z","products":[{"product":"identity","status":"enabled","modules":{"user_verification":true,"business_verification":true,"case_management":true}},{"product":"transactions","status":"disabled","modules":{"travel_rule":true,"case_management":true}},{"product":"authentication","status":"disabled","modules":{}}]}');
 
         $result = $this->client->account->applications->retrieve('orgId-1', 'appId-1');
 
@@ -76,13 +86,13 @@ final class ApplicationsTest extends GeneratedTestCase
         self::assertSame('', $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"My App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://example.com","redirect_uris":["https://example.com/callback"],"terms_url":"https://example.com/terms","privacy_url":"https://example.com/privacy","description":"Production application","created_at":"2025-06-01T10:00:00Z"}'), $result->toArray());
+        self::assertSame($this->decoded('{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"My App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://example.com","redirect_uris":["https://example.com/callback"],"terms_url":"https://example.com/terms","privacy_url":"https://example.com/privacy","description":"Production application","created_at":"2025-06-01T10:00:00Z","products":[{"product":"identity","status":"enabled","modules":{"user_verification":true,"business_verification":true,"case_management":true}},{"product":"transactions","status":"disabled","modules":{"travel_rule":true,"case_management":true}},{"product":"authentication","status":"disabled","modules":{}}]}'), $result->toArray());
         self::assertSame('b2c3d4e5-6789-01bc-defg-222222222222', $result->uuid);
     }
 
     public function testUpdate(): void
     {
-        $this->queueJson(200, '{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"Acme Production App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://app.acme.example","redirect_uris":["https://acme.example/callback"],"terms_url":"https://acme.example/terms","privacy_url":"https://acme.example/privacy","description":null,"created_at":"2025-06-01T10:00:00Z"}');
+        $this->queueJson(200, '{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"Acme Production App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://app.acme.example","redirect_uris":["https://acme.example/callback"],"terms_url":"https://acme.example/terms","privacy_url":"https://acme.example/privacy","description":null,"created_at":"2025-06-01T10:00:00Z","products":[{"product":"identity","status":"enabled","modules":{"user_verification":true,"business_verification":true,"case_management":true}},{"product":"transactions","status":"disabled","modules":{"travel_rule":true,"case_management":true}},{"product":"authentication","status":"disabled","modules":{}}]}');
 
         $result = $this->client->account->applications->update('orgId-1', 'appId-1', [
             'name' => 'name-value',
@@ -105,7 +115,7 @@ final class ApplicationsTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"name":"name-value","website_url":"website_url-value","redirect_uris":["redirect_uris-value"],"terms_url":"terms_url-value","privacy_url":"privacy_url-value","description":"description-value"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"Acme Production App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://app.acme.example","redirect_uris":["https://acme.example/callback"],"terms_url":"https://acme.example/terms","privacy_url":"https://acme.example/privacy","description":null,"created_at":"2025-06-01T10:00:00Z"}'), $result->toArray());
+        self::assertSame($this->decoded('{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"Acme Production App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://app.acme.example","redirect_uris":["https://acme.example/callback"],"terms_url":"https://acme.example/terms","privacy_url":"https://acme.example/privacy","description":null,"created_at":"2025-06-01T10:00:00Z","products":[{"product":"identity","status":"enabled","modules":{"user_verification":true,"business_verification":true,"case_management":true}},{"product":"transactions","status":"disabled","modules":{"travel_rule":true,"case_management":true}},{"product":"authentication","status":"disabled","modules":{}}]}'), $result->toArray());
         self::assertSame('b2c3d4e5-6789-01bc-defg-222222222222', $result->uuid);
     }
 }

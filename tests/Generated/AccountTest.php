@@ -86,7 +86,7 @@ final class AccountTest extends GeneratedTestCase
 
     public function testResendOtp(): void
     {
-        $this->queueJson(200, '{"detail":"A new verification code has been sent to your email."}');
+        $this->queueJson(200, '{"message":"A new verification code has been sent to your email.","email":"you@yourdomain.com"}');
 
         $result = $this->client->account->resendOtp([
             'email' => 'user@example.com',
@@ -102,6 +102,8 @@ final class AccountTest extends GeneratedTestCase
         self::assertSame('', $request->getHeaderLine('Authorization'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"email":"user@example.com","password":"password-value"}', $this->canonicalBody($request));
-        self::assertSame($this->decoded('{"detail":"A new verification code has been sent to your email."}'), $result->data);
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"message":"A new verification code has been sent to your email.","email":"you@yourdomain.com"}'), $result->toArray());
+        self::assertSame('A new verification code has been sent to your email.', $result->message);
     }
 }

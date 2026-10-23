@@ -17,14 +17,27 @@ final class SessionsUpdateFeatureStatusResponse extends BaseModel
     /** The `session_id` field. */
     public readonly ?string $sessionId;
 
-    /** The `node_id` field. */
+    /**
+     * The updated step's workflow node, or `null` for a step without a node (the `default` path in a
+     * non-graph workflow).
+     */
     public readonly ?string $nodeId;
 
     /** Model name of the updated feature (e.g. `KYC`, `Face`, `FaceMatch`, `AML`, `POA`). */
     public readonly ?string $featureType;
 
-    /** The `new_status` field. */
+    /**
+     * The check's stored status: the requested one once the override applied, the unchanged one while the
+     * override waits for the flow to finish.
+     */
     public readonly ?string $newStatus;
+
+    /**
+     * One override of a check (feature) status made with `PATCH
+     * /v3/session/{sessionId}/features/{nodeId}/update-status/`: what it changes, whether it applied or
+     * still waits for the person to finish the flow, who asked and why.
+     */
+    public readonly ?FeatureStatusOverride $override;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -36,5 +49,6 @@ final class SessionsUpdateFeatureStatusResponse extends BaseModel
         $this->nodeId = Hydrate::string($data['node_id'] ?? null);
         $this->featureType = Hydrate::string($data['feature_type'] ?? null);
         $this->newStatus = Hydrate::string($data['new_status'] ?? null);
+        $this->override = Hydrate::model($data['override'] ?? null, FeatureStatusOverride::class);
     }
 }

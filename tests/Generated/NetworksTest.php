@@ -22,17 +22,23 @@ final class NetworksTest extends GeneratedTestCase
 
         $result = $this->client->networks->list([
             'status' => 'status-value',
+            'scope' => 'identity',
             'signal_type' => 'signal_type-value',
             'pattern_type' => 'pattern_type-value',
             'risk_band' => 'risk_band-value',
             'min_size' => 1,
             'max_size' => 1,
+            'assignee' => 'assignee-value',
+            'priority' => 'priority-value',
+            'risk_min' => 1,
+            'has_case' => true,
             'date_from' => '2026-01-15',
             'date_to' => '2026-01-15',
             'q' => 'q-value',
             'ordering' => 'ordering-value',
             'limit' => 1,
             'offset' => 1,
+            'summary' => true,
         ]);
 
         $request = $this->lastRequest();
@@ -41,17 +47,23 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame('/v3/organization/org-7f3a/application/app-91c2/networks/', $request->getUri()->getPath());
         self::assertSame([
             'status' => 'status-value',
+            'scope' => 'identity',
             'signal_type' => 'signal_type-value',
             'pattern_type' => 'pattern_type-value',
             'risk_band' => 'risk_band-value',
             'min_size' => '1',
             'max_size' => '1',
+            'assignee' => 'assignee-value',
+            'priority' => 'priority-value',
+            'risk_min' => '1',
+            'has_case' => 'true',
             'date_from' => '2026-01-15',
             'date_to' => '2026-01-15',
             'q' => 'q-value',
             'ordering' => 'ordering-value',
             'limit' => '1',
             'offset' => '1',
+            'summary' => 'true',
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
@@ -63,7 +75,7 @@ final class NetworksTest extends GeneratedTestCase
 
     public function testRetrieve(): void
     {
-        $this->queueJson(200, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z","stats":{"key":"value"},"fraud_tags":[{"key":"value"}],"risk_signals":{"key":"value"},"reviewed_at":"2026-01-15T10:30:00Z","reviewed_by":"reviewed_by-value","review_reason":"review_reason-value"}');
+        $this->queueJson(200, '{"uuid":"3fa85f64-5717-4562-b3fc-2c963f66afa6","network_id":"N-0042","name":null,"status":"in_review","risk":{"score":82,"band":"high","bar":0.82},"pattern_types":["exact_same_device","same_email"],"signal_types":["device","email"],"member_counts":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signal_coverage":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}},"first_activity_at":"2026-10-01T09:12:44Z","last_activity_at":"2026-10-12T16:03:10Z","stats":{"members":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signals":{"total":2,"by_type":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}}}},"fraud_tags":[],"risk_signals":{"residential_proxy_reuse":{"detected":false,"signal_count":0,"max_subject_count":0},"email_intelligence":{"enriched_signal_count":1,"high_risk_count":0,"social_profile_count":0},"phone_intelligence":{"enriched_signal_count":0,"high_risk_count":0}},"reviewed_at":"2026-10-12T16:30:00Z","reviewed_by":"reviewer@example.com","review_reason":"Shared device across three new accounts.","notes_count":0,"sharing_mode":"global","cross_org_available":true,"cross_org_unavailable_reason":null,"tags":[{"uuid":"7c9e6679-7425-40de-944b-e07fc1f90ae7","name":"SUSPICIOUS","color":"#6366F1","source":"custom","added_by":null,"added_at":"2026-10-13T08:15:00Z"}],"outcomes":{"approved":1,"declined":1,"in_review":0,"total":3},"patterns":[{"type":"background","score":0.8125,"members":3,"reason":null,"computed_at":"2026-10-13T08:00:00Z"}]}');
 
         $result = $this->client->networks->retrieve('networkUuid-1');
 
@@ -75,8 +87,8 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z","stats":{"key":"value"},"fraud_tags":[{"key":"value"}],"risk_signals":{"key":"value"},"reviewed_at":"2026-01-15T10:30:00Z","reviewed_by":"reviewed_by-value","review_reason":"review_reason-value"}'), $result->toArray());
-        self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
+        self::assertSame($this->decoded('{"uuid":"3fa85f64-5717-4562-b3fc-2c963f66afa6","network_id":"N-0042","name":null,"status":"in_review","risk":{"score":82,"band":"high","bar":0.82},"pattern_types":["exact_same_device","same_email"],"signal_types":["device","email"],"member_counts":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signal_coverage":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}},"first_activity_at":"2026-10-01T09:12:44Z","last_activity_at":"2026-10-12T16:03:10Z","stats":{"members":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signals":{"total":2,"by_type":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}}}},"fraud_tags":[],"risk_signals":{"residential_proxy_reuse":{"detected":false,"signal_count":0,"max_subject_count":0},"email_intelligence":{"enriched_signal_count":1,"high_risk_count":0,"social_profile_count":0},"phone_intelligence":{"enriched_signal_count":0,"high_risk_count":0}},"reviewed_at":"2026-10-12T16:30:00Z","reviewed_by":"reviewer@example.com","review_reason":"Shared device across three new accounts.","notes_count":0,"sharing_mode":"global","cross_org_available":true,"cross_org_unavailable_reason":null,"tags":[{"uuid":"7c9e6679-7425-40de-944b-e07fc1f90ae7","name":"SUSPICIOUS","color":"#6366F1","source":"custom","added_by":null,"added_at":"2026-10-13T08:15:00Z"}],"outcomes":{"approved":1,"declined":1,"in_review":0,"total":3},"patterns":[{"type":"background","score":0.8125,"members":3,"reason":null,"computed_at":"2026-10-13T08:00:00Z"}]}'), $result->toArray());
+        self::assertSame('3fa85f64-5717-4562-b3fc-2c963f66afa6', $result->uuid);
     }
 
     public function testRetrieveGraph(): void
@@ -141,19 +153,31 @@ final class NetworksTest extends GeneratedTestCase
 
     public function testRetrieveTimeline(): void
     {
-        $this->queueJson(200, '{"results":[{"event_type":"event_type-value","occurred_at":"2026-01-15T10:30:00Z","label":"label-value","metadata":{"key":"value"}}]}');
+        $this->queueJson(200, '{"results":[{"event_type":"network_detected","occurred_at":"2026-10-01T09:12:44Z","label":"Network detected","metadata":{"network_id":"N-0042"}},{"event_type":"signal_observed","occurred_at":"2026-10-12T16:03:10Z","label":"device observed","metadata":{"signal_type":"device","subject_count":3,"is_hub":false}},{"event_type":"network_in_review","occurred_at":"2026-10-12T16:30:00Z","label":"Network in_review","metadata":{"reason":"Shared device across three new accounts."}}]}');
 
-        $result = $this->client->networks->retrieveTimeline('networkUuid-1');
+        $result = $this->client->networks->retrieveTimeline('networkUuid-1', [
+            'contract' => '2',
+            'limit' => 1,
+            'cursor' => 'cursor-value',
+            'event_type' => [
+                'network_detected',
+            ],
+        ]);
 
         $request = $this->lastRequest();
         self::assertSame('GET', $request->getMethod());
         self::assertSame('verification.didit.me', $request->getUri()->getHost());
         self::assertSame('/v3/organization/org-7f3a/application/app-91c2/networks/networkUuid-1/timeline/', $request->getUri()->getPath());
-        self::assertSame([], $this->queryParams($request));
+        self::assertSame([
+            'contract' => '2',
+            'limit' => '1',
+            'cursor' => 'cursor-value',
+            'event_type' => 'network_detected',
+        ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"results":[{"event_type":"event_type-value","occurred_at":"2026-01-15T10:30:00Z","label":"label-value","metadata":{"key":"value"}}]}'), $result->toArray());
+        self::assertSame($this->decoded('{"results":[{"event_type":"network_detected","occurred_at":"2026-10-01T09:12:44Z","label":"Network detected","metadata":{"network_id":"N-0042"}},{"event_type":"signal_observed","occurred_at":"2026-10-12T16:03:10Z","label":"device observed","metadata":{"signal_type":"device","subject_count":3,"is_hub":false}},{"event_type":"network_in_review","occurred_at":"2026-10-12T16:30:00Z","label":"Network in_review","metadata":{"reason":"Shared device across three new accounts."}}]}'), $result->toArray());
     }
 
     public function testRetrieveMap(): void
@@ -193,5 +217,47 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame('', (string) $request->getBody());
         self::assertSame('binary-content', $result->contents());
         self::assertSame('application/pdf', $result->contentType());
+    }
+
+    public function testAddTag(): void
+    {
+        $this->queueJson(200, '{"uuid":"3fa85f64-5717-4562-b3fc-2c963f66afa6","network_id":"N-0042","name":null,"status":"in_review","risk":{"score":82,"band":"high","bar":0.82},"pattern_types":["exact_same_device","same_email"],"signal_types":["device","email"],"member_counts":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signal_coverage":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}},"first_activity_at":"2026-10-01T09:12:44Z","last_activity_at":"2026-10-12T16:03:10Z","stats":{"members":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signals":{"total":2,"by_type":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}}}},"fraud_tags":[],"risk_signals":{"residential_proxy_reuse":{"detected":false,"signal_count":0,"max_subject_count":0},"email_intelligence":{"enriched_signal_count":1,"high_risk_count":0,"social_profile_count":0},"phone_intelligence":{"enriched_signal_count":0,"high_risk_count":0}},"reviewed_at":"2026-10-12T16:30:00Z","reviewed_by":"reviewer@example.com","review_reason":"Shared device across three new accounts.","notes_count":0,"sharing_mode":"global","cross_org_available":true,"cross_org_unavailable_reason":null,"tags":[{"uuid":"7c9e6679-7425-40de-944b-e07fc1f90ae7","name":"SUSPICIOUS","color":"#6366F1","source":"custom","added_by":null,"added_at":"2026-10-13T08:15:00Z"}],"outcomes":{"approved":1,"declined":1,"in_review":0,"total":3},"patterns":[{"type":"background","score":0.8125,"members":3,"reason":null,"computed_at":"2026-10-13T08:00:00Z"}]}');
+
+        $result = $this->client->networks->addTag('networkUuid-1', [
+            'tag_uuid' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/organization/org-7f3a/application/app-91c2/networks/networkUuid-1/tags/add/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"tag_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}', $this->canonicalBody($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"uuid":"3fa85f64-5717-4562-b3fc-2c963f66afa6","network_id":"N-0042","name":null,"status":"in_review","risk":{"score":82,"band":"high","bar":0.82},"pattern_types":["exact_same_device","same_email"],"signal_types":["device","email"],"member_counts":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signal_coverage":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}},"first_activity_at":"2026-10-01T09:12:44Z","last_activity_at":"2026-10-12T16:03:10Z","stats":{"members":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signals":{"total":2,"by_type":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}}}},"fraud_tags":[],"risk_signals":{"residential_proxy_reuse":{"detected":false,"signal_count":0,"max_subject_count":0},"email_intelligence":{"enriched_signal_count":1,"high_risk_count":0,"social_profile_count":0},"phone_intelligence":{"enriched_signal_count":0,"high_risk_count":0}},"reviewed_at":"2026-10-12T16:30:00Z","reviewed_by":"reviewer@example.com","review_reason":"Shared device across three new accounts.","notes_count":0,"sharing_mode":"global","cross_org_available":true,"cross_org_unavailable_reason":null,"tags":[{"uuid":"7c9e6679-7425-40de-944b-e07fc1f90ae7","name":"SUSPICIOUS","color":"#6366F1","source":"custom","added_by":null,"added_at":"2026-10-13T08:15:00Z"}],"outcomes":{"approved":1,"declined":1,"in_review":0,"total":3},"patterns":[{"type":"background","score":0.8125,"members":3,"reason":null,"computed_at":"2026-10-13T08:00:00Z"}]}'), $result->toArray());
+        self::assertSame('3fa85f64-5717-4562-b3fc-2c963f66afa6', $result->uuid);
+    }
+
+    public function testRemoveTag(): void
+    {
+        $this->queueJson(200, '{"uuid":"3fa85f64-5717-4562-b3fc-2c963f66afa6","network_id":"N-0042","name":null,"status":"in_review","risk":{"score":82,"band":"high","bar":0.82},"pattern_types":["exact_same_device","same_email"],"signal_types":["device","email"],"member_counts":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signal_coverage":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}},"first_activity_at":"2026-10-01T09:12:44Z","last_activity_at":"2026-10-12T16:03:10Z","stats":{"members":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signals":{"total":2,"by_type":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}}}},"fraud_tags":[],"risk_signals":{"residential_proxy_reuse":{"detected":false,"signal_count":0,"max_subject_count":0},"email_intelligence":{"enriched_signal_count":1,"high_risk_count":0,"social_profile_count":0},"phone_intelligence":{"enriched_signal_count":0,"high_risk_count":0}},"reviewed_at":"2026-10-12T16:30:00Z","reviewed_by":"reviewer@example.com","review_reason":"Shared device across three new accounts.","notes_count":0,"sharing_mode":"global","cross_org_available":true,"cross_org_unavailable_reason":null,"tags":[],"outcomes":{"approved":1,"declined":1,"in_review":0,"total":3},"patterns":[{"type":"background","score":0.8125,"members":3,"reason":null,"computed_at":"2026-10-13T08:00:00Z"}]}');
+
+        $result = $this->client->networks->removeTag('networkUuid-1', [
+            'tag_uuid' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/organization/org-7f3a/application/app-91c2/networks/networkUuid-1/tags/remove/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"tag_uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}', $this->canonicalBody($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"uuid":"3fa85f64-5717-4562-b3fc-2c963f66afa6","network_id":"N-0042","name":null,"status":"in_review","risk":{"score":82,"band":"high","bar":0.82},"pattern_types":["exact_same_device","same_email"],"signal_types":["device","email"],"member_counts":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signal_coverage":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}},"first_activity_at":"2026-10-01T09:12:44Z","last_activity_at":"2026-10-12T16:03:10Z","stats":{"members":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signals":{"total":2,"by_type":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}}}},"fraud_tags":[],"risk_signals":{"residential_proxy_reuse":{"detected":false,"signal_count":0,"max_subject_count":0},"email_intelligence":{"enriched_signal_count":1,"high_risk_count":0,"social_profile_count":0},"phone_intelligence":{"enriched_signal_count":0,"high_risk_count":0}},"reviewed_at":"2026-10-12T16:30:00Z","reviewed_by":"reviewer@example.com","review_reason":"Shared device across three new accounts.","notes_count":0,"sharing_mode":"global","cross_org_available":true,"cross_org_unavailable_reason":null,"tags":[],"outcomes":{"approved":1,"declined":1,"in_review":0,"total":3},"patterns":[{"type":"background","score":0.8125,"members":3,"reason":null,"computed_at":"2026-10-13T08:00:00Z"}]}'), $result->toArray());
+        self::assertSame('3fa85f64-5717-4562-b3fc-2c963f66afa6', $result->uuid);
     }
 }

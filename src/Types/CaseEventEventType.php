@@ -29,6 +29,10 @@ final class CaseEventEventType
 
     public const NOTE_ADDED = 'NOTE_ADDED';
 
+    public const NOTE_PINNED = 'NOTE_PINNED';
+
+    public const NOTE_UNPINNED = 'NOTE_UNPINNED';
+
     public const PRIORITY_CHANGED = 'PRIORITY_CHANGED';
 
     public const DUE_DATE_CHANGED = 'DUE_DATE_CHANGED';
@@ -56,6 +60,16 @@ final class CaseEventEventType
     public const ENTITY_ACTION = 'ENTITY_ACTION';
 
     public const APPROVAL_INVALIDATED = 'APPROVAL_INVALIDATED';
+
+    public const CUSTOMER_REQUEST = 'CUSTOMER_REQUEST';
+
+    public const STAGE_CHANGED = 'STAGE_CHANGED';
+
+    public const TEAM_CHANGED = 'TEAM_CHANGED';
+
+    public const CHECKER_ASSIGNED = 'CHECKER_ASSIGNED';
+
+    public const CHECKER_UNASSIGNED = 'CHECKER_UNASSIGNED';
 
     private function __construct()
     {

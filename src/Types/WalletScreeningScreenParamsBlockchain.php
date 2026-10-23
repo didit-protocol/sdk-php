@@ -10,7 +10,8 @@ namespace Didit\Types;
  * Network identifier. Managed screening supports BTC, ETH, LTC, XRP, BCH, DOGE, TRX, SOL, MATIC, BNB,
  * BASE (Base), OP (Optimism), and ARB (Arbitrum One). USDT and USDC are legacy Ethereum aliases, not
  * multi-network searches. Connected-provider coverage varies. LIGHTNING requires a supported connected
- * provider. Celo, Mode and Plume are not currently supported. Alias: `currency`.
+ * provider. CELO (Celo), MODE (Mode) and PLUME (Plume) are screened through a connected TRM Labs
+ * account; managed screening answers 400 for them. Alias: `currency`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -47,6 +48,12 @@ final class WalletScreeningScreenParamsBlockchain
     public const OP = 'OP';
 
     public const ARB = 'ARB';
+
+    public const CELO = 'CELO';
+
+    public const MODE = 'MODE';
+
+    public const PLUME = 'PLUME';
 
     private function __construct()
     {

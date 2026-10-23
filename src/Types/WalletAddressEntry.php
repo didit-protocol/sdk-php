@@ -17,10 +17,21 @@ final class WalletAddressEntry extends BaseModel
     /** The `uuid` field. */
     public readonly ?string $uuid;
 
-    /** The wallet address. Unique per application and chain among non-deleted entries. */
+    /**
+     * The wallet address; `""` for an entry imported by its hash only. Unique per application, chain and
+     * memo, comparing the address without regard to case. After you delete an entry, you can register the
+     * same address again.
+     */
     public readonly ?string $address;
 
-    /** Free-text chain identifier, e.g. "ethereum", "bitcoin". */
+    /**
+     * Chain token for the address, for example `ETH` or `BTC`. When Didit routes or registers a transfer,
+     * it matches address book entries on the wallet address and, when the transfer carries a chain, on
+     * this value too, ignoring case. A transfer's chain is `beneficiary_data.chain`, filled from the
+     * transaction's crypto chain or currency symbol (for example `ETH`) when you do not send it, or the
+     * `chain` of an after-deposit registration, so use the same token everywhere. An entry with an empty
+     * chain matches any chain.
+     */
     public readonly ?string $chain;
 
     /** Your internal identifier for the holder. */
@@ -38,14 +49,32 @@ final class WalletAddressEntry extends BaseModel
     /** The `created_at` field. */
     public readonly ?\DateTimeImmutable $createdAt;
 
-    /** Whether the entry was created as a self-declared ownership proof. */
-    public readonly ?bool $selfDeclared;
-
     /**
      * The counterparty VASP's travel address for this wallet, if known. Lets Didit route this
-     * beneficiary's transfers over the TRP rail.
+     * beneficiary's transfers over the TRP rail, for the assets TRP carries (BTC, ETH, and USDC on a named
+     * network).
      */
     public readonly ?string $travelAddress;
+
+    /**
+     * Read-only. SHA-256 of the lowercased address, in lowercase hex. An entry imported by its hash only
+     * is matched on it.
+     */
+    public readonly ?string $addressHash;
+
+    /**
+     * The destination tag or memo that is part of the wallet on a memo network (XRP, XLM, EOS, ATOM,
+     * HBAR); `""` for the whole address. An entry with a memo matches only transfers naming that memo; one
+     * without matches the whole address.
+     */
+    public readonly ?string $memo;
+
+    /**
+     * Your per-wallet travel address for this wallet: give it to the sending VASP so its TRP inquiry names
+     * this wallet. Empty for a wallet recorded as another VASP's, while Travel Rule is off, and before
+     * your VASP profile is saved.
+     */
+    public readonly ?string $receivingTravelAddress;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -61,7 +90,9 @@ final class WalletAddressEntry extends BaseModel
         $this->entityType = Hydrate::string($data['entity_type'] ?? null);
         $this->isOwnershipVerified = Hydrate::bool($data['is_ownership_verified'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
-        $this->selfDeclared = Hydrate::bool($data['self_declared'] ?? null);
         $this->travelAddress = Hydrate::string($data['travel_address'] ?? null);
+        $this->addressHash = Hydrate::string($data['address_hash'] ?? null);
+        $this->memo = Hydrate::string($data['memo'] ?? null);
+        $this->receivingTravelAddress = Hydrate::string($data['receiving_travel_address'] ?? null);
     }
 }

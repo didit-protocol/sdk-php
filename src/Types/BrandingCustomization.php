@@ -76,6 +76,13 @@ final class BrandingCustomization extends BaseModel
     /** Read-only URL of the rectangular logo. Upload via `image_rectangular`. */
     public readonly ?string $logoRectangular;
 
+    /**
+     * Read-only. Temporary signed URL of the rectangular logo for dark mode, shown on a dark background.
+     * `null` when no dark logo is set or rectangular logos are not shown for your account. Upload it with
+     * `image_rectangular_dark`.
+     */
+    public readonly ?string $logoRectangularDark;
+
     /** Read-only URL of the favicon. Upload via `image_favicon`. */
     public readonly ?string $favicon;
 
@@ -123,6 +130,7 @@ final class BrandingCustomization extends BaseModel
         $this->fontUrl = Hydrate::string($data['font_url'] ?? null);
         $this->logoSquare = Hydrate::string($data['logo_square'] ?? null);
         $this->logoRectangular = Hydrate::string($data['logo_rectangular'] ?? null);
+        $this->logoRectangularDark = Hydrate::string($data['logo_rectangular_dark'] ?? null);
         $this->favicon = Hydrate::string($data['favicon'] ?? null);
         $this->appPublicName = Hydrate::string($data['app_public_name'] ?? null);
         $this->privacyPolicyUrl = Hydrate::string($data['privacy_policy_url'] ?? null);

@@ -17,6 +17,12 @@ final class CasesBulkUpdateStatusParamsResolution
 
     public const VALID_THREAT = 'VALID_THREAT';
 
+    public const INCONCLUSIVE = 'INCONCLUSIVE';
+
+    public const REQUIREMENTS_NOT_MET = 'REQUIREMENTS_NOT_MET';
+
+    public const REQUIREMENTS_SATISFIED = 'REQUIREMENTS_SATISFIED';
+
     private function __construct()
     {
     }

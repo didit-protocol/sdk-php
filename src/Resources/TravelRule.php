@@ -19,6 +19,9 @@ use Didit\Types;
 /**
  * The `travel_rule` resource.
  *
+ * @phpstan-import-type TravelRuleCounterpartyDecisionRequest from Params
+ * @phpstan-import-type TravelRuleCounterpartyQuestionnaireRequest from Params
+ * @phpstan-import-type TravelRuleCounterpartyScreeningRequest from Params
  * @phpstan-import-type TravelRuleInboundRequest from Params
  * @phpstan-import-type TravelRuleListVaspsParams from Params
  * @phpstan-import-type TravelRuleSettingsUpdate from Params
@@ -28,10 +31,19 @@ final class TravelRule extends BaseResource
 {
     public readonly TravelRule\WalletAddresses $walletAddresses;
 
+    public readonly TravelRule\Workspace $workspace;
+
+    public readonly TravelRule\CounterpartyContacts $counterpartyContacts;
+
+    public readonly TravelRule\Transfers $transfers;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
         $this->walletAddresses = new TravelRule\WalletAddresses($requester);
+        $this->workspace = new TravelRule\Workspace($requester);
+        $this->counterpartyContacts = new TravelRule\CounterpartyContacts($requester);
+        $this->transfers = new TravelRule\Transfers($requester);
     }
 
     /**
@@ -74,16 +86,44 @@ final class TravelRule extends BaseResource
             method: 'PUT',
             path: '/v3/travel-rule/settings/',
             bodyTypes: ['json'],
+            jsonHints: ['data_sharing_fields' => ['o'], 'matching_rules' => ['o', ['individual' => ['o'], 'company' => ['o']]]],
         ), [], $params, $options);
 
         return Types\TravelRuleSettingsDetail::fromResponse($response);
     }
 
     /**
+     * Send the compliance email confirmation.
+     *
+     * Emails a single-use confirmation link to your VASP profile's compliance_email. Opening the link and
+     * pressing its confirm button confirms the address, which the Didit network needs before it lists your
+     * profile. A new request replaces the previous link; the link stops working when the compliance email
+     * changes. One email per minute per address.
+     *
+     * `POST /v3/travel-rule/settings/compliance-email/confirmation/`
+     *
+     * @throws DiditException
+     */
+    public function sendComplianceEmailConfirmation(
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleSendComplianceEmailConfirmationResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/travel-rule/settings/compliance-email/confirmation/',
+        ), [], [], $options);
+
+        return Types\TravelRuleSendComplianceEmailConfirmationResponse::fromResponse($response);
+    }
+
+    /**
      * Search the VASP directory.
      *
-     * Paginated search across discoverable Didit customers with Travel Rule enabled, plus VASPs catalogued
-     * in the internal counterparty registry. Excludes your own application's profile.
+     * Paginated, name-sorted search of the VASP directory: the shared directory entries, which Didit
+     * builds from the ESMA interim MiCA register, the public TRISA directory, the global LEI register and
+     * its own curation, plus the members of the Didit network. Each row carries the routes your
+     * application has to it today. Your own application's profile is never listed. Rows also carry the
+     * shared due-diligence assessment and your application's own decision, entity screening and
+     * questionnaires.
      *
      * `GET /v3/travel-rule/vasps/`
      *
@@ -99,8 +139,226 @@ final class TravelRule extends BaseResource
         return $this->requester->requestPage(new Operation(
             method: 'GET',
             path: '/v3/travel-rule/vasps/',
-            query: ['search' => 'search', 'limit' => 'limit', 'offset' => 'offset'],
+            query: ['search' => 'search', 'network' => 'network', 'jurisdiction' => 'jurisdiction', 'reachable' => 'reachable', 'kind' => 'kind', 'risk' => 'risk', 'responsiveness' => 'responsiveness', 'limit' => 'limit', 'offset' => 'offset'],
         ), [], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\VaspDirectoryEntry::class));
+    }
+
+    /**
+     * Get a VASP directory entry.
+     *
+     * One directory entry or Didit network member by the id the search returned, with the same fields and
+     * the routes your application has to it.
+     *
+     * `GET /v3/travel-rule/vasps/{vasp_id}/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function retrieveVasp(string $vaspId, ?RequestOptions $options = null): Types\VaspDirectoryEntry
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/travel-rule/vasps/{vasp_id}/',
+        ), ['vasp_id' => $vaspId], [], $options);
+
+        return Types\VaspDirectoryEntry::fromResponse($response);
+    }
+
+    /**
+     * Get your decision on a VASP.
+     *
+     * Your application's decision on a counterparty (a directory entry or a Didit network member):
+     * approved, restricted or blocked. An entity of a brand with no decision of its own follows the
+     * brand's decision, named in inherited_from. Private to your application.
+     *
+     * `GET /v3/travel-rule/vasps/{vasp_id}/decision/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function retrieveVaspDecision(
+        string $vaspId,
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleCounterpartyDecisionResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/travel-rule/vasps/{vasp_id}/decision/',
+        ), ['vasp_id' => $vaspId], [], $options);
+
+        return Types\TravelRuleCounterpartyDecisionResponse::fromResponse($response);
+    }
+
+    /**
+     * Set your decision on a VASP.
+     *
+     * Make or change your application's decision on a counterparty: APPROVED, RESTRICTED or BLOCKED, with
+     * an optional reason. It never changes the shared directory entry and acts only through your
+     * transaction rules (counterparty_dd_status). A decision on a brand also covers each of its entities
+     * that has no decision of its own.
+     *
+     * `PUT /v3/travel-rule/vasps/{vasp_id}/decision/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     * @param TravelRuleCounterpartyDecisionRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function updateVaspDecision(
+        string $vaspId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleCounterpartyDecisionResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'PUT',
+            path: '/v3/travel-rule/vasps/{vasp_id}/decision/',
+            bodyTypes: ['json'],
+        ), ['vasp_id' => $vaspId], $params, $options);
+
+        return Types\TravelRuleCounterpartyDecisionResponse::fromResponse($response);
+    }
+
+    /**
+     * Clear your decision on a VASP.
+     *
+     * Clear your application's own decision on a counterparty. The response shows the decision that
+     * applies afterwards: null, or for an entity of a brand the brand's decision, which the entity follows
+     * again.
+     *
+     * `DELETE /v3/travel-rule/vasps/{vasp_id}/decision/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function clearVaspDecision(
+        string $vaspId,
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleCounterpartyDecisionResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'DELETE',
+            path: '/v3/travel-rule/vasps/{vasp_id}/decision/',
+        ), ['vasp_id' => $vaspId], [], $options);
+
+        return Types\TravelRuleCounterpartyDecisionResponse::fromResponse($response);
+    }
+
+    /**
+     * Get a VASP's entity screening.
+     *
+     * Whether counterparty screening is on for your application, what one screening costs your
+     * organization, how long a result stays fresh, and your latest sanctions and adverse-media screening
+     * of the counterparty. Reading it is free.
+     *
+     * `GET /v3/travel-rule/vasps/{vasp_id}/screening/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function retrieveVaspScreening(
+        string $vaspId,
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleCounterpartyScreeningStatus2 {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/travel-rule/vasps/{vasp_id}/screening/',
+        ), ['vasp_id' => $vaspId], [], $options);
+
+        return Types\TravelRuleCounterpartyScreeningStatus2::fromResponse($response);
+    }
+
+    /**
+     * Screen a VASP.
+     *
+     * Screen the counterparty entity against sanctions and adverse media for your application. Opt-in:
+     * counterparty_screening_enabled must be on in your Travel Rule settings. Each new screening is billed
+     * at your organization's Company AML Screening price; a screening younger than 30 days is returned
+     * instead (200, not billed) unless you send refresh: true. One screening of a counterparty runs at a
+     * time per application. The result is private to your application. Sandbox applications are never
+     * screened.
+     *
+     * `POST /v3/travel-rule/vasps/{vasp_id}/screening/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     * @param TravelRuleCounterpartyScreeningRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function screenVasp(
+        string $vaspId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleCounterpartyScreeningResult {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/travel-rule/vasps/{vasp_id}/screening/',
+            bodyTypes: ['json'],
+        ), ['vasp_id' => $vaspId], $params, $options);
+
+        return Types\TravelRuleCounterpartyScreeningResult::fromResponse($response);
+    }
+
+    /**
+     * List due-diligence questionnaires with a VASP.
+     *
+     * Every due-diligence questionnaire your application sent the counterparty, newest first, with its
+     * status and, once answered, the answers. Private to your application.
+     *
+     * `GET /v3/travel-rule/vasps/{vasp_id}/questionnaires/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listVaspQuestionnaires(
+        string $vaspId,
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleCounterpartyQuestionnaireList {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/travel-rule/vasps/{vasp_id}/questionnaires/',
+        ), ['vasp_id' => $vaspId], [], $options);
+
+        return Types\TravelRuleCounterpartyQuestionnaireList::fromResponse($response);
+    }
+
+    /**
+     * Send a due-diligence questionnaire to a VASP.
+     *
+     * Email Didit's standard due-diligence questionnaire to a compliance address on record for the
+     * counterparty, with a single-use answer link. The counterparty has 30 days to answer every question;
+     * the answers stay current for 365 days. A new send replaces your earlier unanswered questionnaire to
+     * the same counterparty, whose link stops working. One email per minute per address.
+     *
+     * `POST /v3/travel-rule/vasps/{vasp_id}/questionnaires/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     * @param TravelRuleCounterpartyQuestionnaireRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function sendVaspQuestionnaire(
+        string $vaspId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleCounterpartyQuestionnaire {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/travel-rule/vasps/{vasp_id}/questionnaires/',
+            bodyTypes: ['json'],
+        ), ['vasp_id' => $vaspId], $params, $options);
+
+        return Types\TravelRuleCounterpartyQuestionnaire::fromResponse($response);
     }
 
     /**
@@ -108,8 +366,8 @@ final class TravelRule extends BaseResource
      *
      * Register Travel Rule data for a crypto deposit that already settled on-chain before any exchange
      * took place. Creates an inbound travelRule transaction (or reuses an unclaimed deposit) and resolves
-     * the transfer against your wallet address book. A transaction.created webhook fires for newly-created
-     * transactions.
+     * the transfer against your wallet address book. For a newly created transaction, Didit sends
+     * transaction.created first and the travel_rule.status.updated webhooks after it.
      *
      * `POST /v3/travel-rule/inbound/`
      *
@@ -124,7 +382,7 @@ final class TravelRule extends BaseResource
             method: 'POST',
             path: '/v3/travel-rule/inbound/',
             bodyTypes: ['json'],
-            jsonHints: ['originator_data' => ['o'], 'beneficiary_data' => ['o'], 'originating_vasp' => ['o']],
+            jsonHints: ['originator_data' => ['o'], 'beneficiary_data' => ['o'], 'originating_vasp' => ['o'], 'utxo' => ['o', ['inputs' => ['l', ['o']], 'outputs' => ['l', ['o']]]]],
         ), [], $params, $options);
 
         return Types\TravelRuleInboundResponse::fromResponse($response);
@@ -146,7 +404,7 @@ final class TravelRule extends BaseResource
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
     public function createWidgetSession(
-        array $params,
+        array $params = [],
         ?RequestOptions $options = null,
     ): Types\TravelRuleWidgetSessionResponse {
         $response = $this->requester->request(new Operation(

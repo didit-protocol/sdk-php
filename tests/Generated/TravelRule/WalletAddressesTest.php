@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated\TravelRule;
 
+use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -18,7 +19,7 @@ final class WalletAddressesTest extends GeneratedTestCase
 {
     public function testList(): void
     {
-        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","self_declared":true,"travel_address":"travel_address-value"}]}');
+        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value"}]}');
 
         $result = $this->client->travelRule->walletAddresses->list([
             'limit' => 1,
@@ -38,12 +39,12 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\WalletAddressEntry::class, $result->results);
         self::assertFalse($result->hasNextPage());
-        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","self_declared":true,"travel_address":"travel_address-value"}]}'), $result->toArray());
+        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value"}]}'), $result->toArray());
     }
 
     public function testCreate(): void
     {
-        $this->queueJson(201, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","self_declared":true,"travel_address":"travel_address-value"}');
+        $this->queueJson(201, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value"}');
 
         $result = $this->client->travelRule->walletAddresses->create([
             'address' => 'address-value',
@@ -53,6 +54,7 @@ final class WalletAddressesTest extends GeneratedTestCase
             'entity_type' => 'entity_type-value',
             'self_declared' => true,
             'travel_address' => 'travel_address-value',
+            'memo' => 'memo-value',
         ]);
 
         $request = $this->lastRequest();
@@ -62,9 +64,9 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","self_declared":true,"travel_address":"travel_address-value"}', $this->canonicalBody($request));
+        self::assertSame('{"address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","self_declared":true,"travel_address":"travel_address-value","memo":"memo-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","self_declared":true,"travel_address":"travel_address-value"}'), $result->toArray());
+        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
     }
 
@@ -106,5 +108,30 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(204, $result->rawResponse()?->status);
+    }
+
+    public function testBulkImport(): void
+    {
+        $this->queueJson(200, '{"total":3,"created":2,"existing":1,"duplicate":0,"failed":0,"rows":[{"row":1,"status":"existing","entry_id":"11111111-2222-3333-4444-555555555555","errors":{},"duplicate_of_row":null},{"row":2,"status":"created","entry_id":"22222222-3333-4444-5555-666666666666","errors":{},"duplicate_of_row":null},{"row":3,"status":"created","entry_id":"33333333-4444-5555-6666-777777777777","errors":{},"duplicate_of_row":null}]}');
+
+        $result = $this->client->travelRule->walletAddresses->bulkImport([
+            'file' => File::fromBytes('fake-file-bytes', 'file.jpg', 'image/jpeg'),
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/travel-rule/wallet-addresses/import/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertStringStartsWith('multipart/form-data; boundary=', $request->getHeaderLine('Content-Type'));
+        self::assertSame([
+            'file' => [
+                'file:file.jpg:image/jpeg:fake-file-bytes',
+            ],
+        ], $this->multipartFields($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"total":3,"created":2,"existing":1,"duplicate":0,"failed":0,"rows":[{"row":1,"status":"existing","entry_id":"11111111-2222-3333-4444-555555555555","errors":{},"duplicate_of_row":null},{"row":2,"status":"created","entry_id":"22222222-3333-4444-5555-666666666666","errors":{},"duplicate_of_row":null},{"row":3,"status":"created","entry_id":"33333333-4444-5555-6666-777777777777","errors":{},"duplicate_of_row":null}]}'), $result->toArray());
+        self::assertSame(3, $result->total);
     }
 }

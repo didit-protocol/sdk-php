@@ -7,7 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * What happens to the underlying transaction when a transfer expires. Default HOLD.
+ * What happens to the underlying transaction when a transfer expires. Default HOLD. sunrise_policy and
+ * non_responsive_policy take precedence when they apply and are set.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Didit\Resources;
 
 use Didit\Core\BaseResource;
+use Didit\Core\BinaryContent;
 use Didit\Core\Hydrate;
 use Didit\Core\Operation;
 use Didit\Core\Page;
@@ -22,10 +23,10 @@ use Didit\Types;
  * @phpstan-import-type BusinessesCreateParams from Params
  * @phpstan-import-type BusinessesListParams from Params
  * @phpstan-import-type BusinessesSetAmlMonitoringParams from Params
- * @phpstan-import-type BusinessesSetOngoingMonitoringParams from Params
  * @phpstan-import-type BusinessesSetSessionOngoingMonitoringParams from Params
  * @phpstan-import-type BusinessesUpdateParams from Params
  * @phpstan-import-type BusinessesUpdateStatusParams from Params
+ * @phpstan-import-type OngoingMonitoringToggleRequest from Params
  */
 final class Businesses extends BaseResource
 {
@@ -83,7 +84,10 @@ final class Businesses extends BaseResource
      *
      * Partial update of a business: `display_name`, `legal_name`, `registration_number`, `country_code`,
      * `status`, `metadata`. `metadata` fully replaces. Setting `status` to `BLOCKED` adds the
-     * `vendor_data` to the system blocklist; moving away from `BLOCKED` removes that entry.
+     * `vendor_data` to the system blocklist; moving away from `BLOCKED` removes that entry. Every edit is
+     * recorded in the company's activity: a status change with the optional `reason`, and a change to
+     * `display_name`, `legal_name`, `registration_number`, `country_code` or `metadata` as a profile
+     * update.
      *
      * `PATCH /v3/businesses/{vendor_data}/`
      *
@@ -111,9 +115,11 @@ final class Businesses extends BaseResource
     /**
      * Update business status.
      *
-     * Flip only the lifecycle `status` of a business, VendorBusinessStatusChoices
-     * (`ACTIVE`/`FLAGGED`/`BLOCKED`, NOT session statuses). `BLOCKED` adds `vendor_data` to the system
-     * blocklist.
+     * Flip only the lifecycle `status` of a business: `ACTIVE`, `FLAGGED` or `BLOCKED` (not session
+     * statuses). `BLOCKED` adds the `vendor_data` to the system blocklist; moving away from `BLOCKED`
+     * removes that entry. Each change is recorded in the company's activity, with the optional `reason`.
+     * Sending the current status changes nothing and records no `reason`. The `business.status.updated`
+     * webhook does not carry `reason`.
      *
      * `PATCH /v3/businesses/{vendor_data}/update-status/`
      *
@@ -183,7 +189,7 @@ final class Businesses extends BaseResource
     public function setAmlMonitoring(
         array $params,
         ?RequestOptions $options = null,
-    ): Types\BusinessesSetAmlMonitoringResponse200|Types\BusinessesSetAmlMonitoringResponse202 {
+    ): Types\AMLMonitoringToggleResult|Types\AMLMonitoringJob {
         $response = $this->requester->request(new Operation(
             method: 'POST',
             path: '/v3/businesses/aml-monitoring/',
@@ -191,8 +197,8 @@ final class Businesses extends BaseResource
         ), [], $params, $options);
 
         return match ($response->status) {
-            202 => Types\BusinessesSetAmlMonitoringResponse202::fromResponse($response),
-            default => Types\BusinessesSetAmlMonitoringResponse200::fromResponse($response),
+            202 => Types\AMLMonitoringJob::fromResponse($response),
+            default => Types\AMLMonitoringToggleResult::fromResponse($response),
         };
     }
 
@@ -232,7 +238,7 @@ final class Businesses extends BaseResource
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/vendor-businesses/toggle-ongoing-monitoring/`
      *
-     * @param BusinessesSetOngoingMonitoringParams $params
+     * @param OngoingMonitoringToggleRequest $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
@@ -240,7 +246,7 @@ final class Businesses extends BaseResource
     public function setOngoingMonitoring(
         array $params,
         ?RequestOptions $options = null,
-    ): Types\BusinessesSetOngoingMonitoringResponse200|Types\BusinessesSetOngoingMonitoringResponse202 {
+    ): Types\OngoingMonitoringToggleResult|Types\OngoingMonitoringJob {
         $response = $this->requester->request(new Operation(
             method: 'PATCH',
             path: '/v3/organization/{organization_id}/application/{application_id}/vendor-businesses/toggle-ongoing-monitoring/',
@@ -249,8 +255,8 @@ final class Businesses extends BaseResource
         ), [], $params, $options);
 
         return match ($response->status) {
-            202 => Types\BusinessesSetOngoingMonitoringResponse202::fromResponse($response),
-            default => Types\BusinessesSetOngoingMonitoringResponse200::fromResponse($response),
+            202 => Types\OngoingMonitoringJob::fromResponse($response),
+            default => Types\OngoingMonitoringToggleResult::fromResponse($response),
         };
     }
 
@@ -270,14 +276,14 @@ final class Businesses extends BaseResource
     public function retrieveOngoingMonitoringJob(
         string $jobId,
         ?RequestOptions $options = null,
-    ): Types\BusinessesRetrieveOngoingMonitoringJobResponse {
+    ): Types\OngoingMonitoringJob {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/organization/{organization_id}/application/{application_id}/vendor-businesses/toggle-ongoing-monitoring/{job_id}/',
             applicationScope: true,
         ), ['job_id' => $jobId], [], $options);
 
-        return Types\BusinessesRetrieveOngoingMonitoringJobResponse::fromResponse($response);
+        return Types\OngoingMonitoringJob::fromResponse($response);
     }
 
     /**
@@ -298,7 +304,7 @@ final class Businesses extends BaseResource
     public function setSessionOngoingMonitoring(
         array $params,
         ?RequestOptions $options = null,
-    ): Types\BusinessesSetSessionOngoingMonitoringResponse200|Types\BusinessesSetSessionOngoingMonitoringResponse202 {
+    ): Types\OngoingMonitoringToggleResult|Types\OngoingMonitoringJob {
         $response = $this->requester->request(new Operation(
             method: 'PATCH',
             path: '/v3/organization/{organization_id}/application/{application_id}/businesses/toggle-ongoing-monitoring/',
@@ -307,8 +313,8 @@ final class Businesses extends BaseResource
         ), [], $params, $options);
 
         return match ($response->status) {
-            202 => Types\BusinessesSetSessionOngoingMonitoringResponse202::fromResponse($response),
-            default => Types\BusinessesSetSessionOngoingMonitoringResponse200::fromResponse($response),
+            202 => Types\OngoingMonitoringJob::fromResponse($response),
+            default => Types\OngoingMonitoringToggleResult::fromResponse($response),
         };
     }
 
@@ -328,14 +334,14 @@ final class Businesses extends BaseResource
     public function retrieveSessionOngoingMonitoringJob(
         string $jobId,
         ?RequestOptions $options = null,
-    ): Types\BusinessesRetrieveSessionOngoingMonitoringJobResponse {
+    ): Types\OngoingMonitoringJob {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/organization/{organization_id}/application/{application_id}/businesses/toggle-ongoing-monitoring/{job_id}/',
             applicationScope: true,
         ), ['job_id' => $jobId], [], $options);
 
-        return Types\BusinessesRetrieveSessionOngoingMonitoringJobResponse::fromResponse($response);
+        return Types\OngoingMonitoringJob::fromResponse($response);
     }
 
     /**
@@ -353,13 +359,40 @@ final class Businesses extends BaseResource
     public function listNetworks(
         string $vendorBusinessUuid,
         ?RequestOptions $options = null,
-    ): Types\BusinessesListNetworksResponse {
+    ): Types\EntityNetworkMembershipList {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/organization/{organization_id}/application/{application_id}/businesses/{vendor_business_uuid}/networks/',
             applicationScope: true,
         ), ['vendor_business_uuid' => $vendorBusinessUuid], [], $options);
 
-        return Types\BusinessesListNetworksResponse::fromResponse($response);
+        return Types\EntityNetworkMembershipList::fromResponse($response);
+    }
+
+    /**
+     * Download a business session PDF report.
+     *
+     * Render the PDF report of one Business Verification (KYB) session: company registry data, key people
+     * and beneficial owners, documents, AML results and the other workflow features, plus the session's
+     * tags and review activity. With white-label customization on, the report carries your logo and
+     * privacy policy URL. The body is the PDF itself (`application/pdf`), not JSON.
+     *
+     * `GET /v3/organization/{organization_id}/application/{application_id}/businesses/{business_session_id}/pdf/`
+     *
+     * @param string $businessSessionId `session_id` of the Business Verification (KYB) session, as returned when the session was created
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function generateSessionPdf(string $businessSessionId, ?RequestOptions $options = null): BinaryContent
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/organization/{organization_id}/application/{application_id}/businesses/{business_session_id}/pdf/',
+            applicationScope: true,
+            accept: 'application/pdf, application/json',
+        ), ['business_session_id' => $businessSessionId], [], $options);
+
+        return BinaryContent::fromResponse($response);
     }
 }

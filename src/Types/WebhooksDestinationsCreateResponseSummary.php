@@ -10,7 +10,8 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Delivery health summary (all zero/null on a brand-new destination).
+ * Delivery metrics for the last `metrics_window_days` (30) days. `last_delivery_at` is the most recent
+ * attempt, whenever it was made.
  */
 final class WebhooksDestinationsCreateResponseSummary extends BaseModel
 {
@@ -35,6 +36,9 @@ final class WebhooksDestinationsCreateResponseSummary extends BaseModel
     /** The `last_delivery_at` field. */
     public readonly ?\DateTimeImmutable $lastDeliveryAt;
 
+    /** Length in days of the window the other summary metrics cover. Always `30`. */
+    public readonly ?int $metricsWindowDays;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -48,5 +52,6 @@ final class WebhooksDestinationsCreateResponseSummary extends BaseModel
         $this->avgResponseTimeMs = Hydrate::int($data['avg_response_time_ms'] ?? null);
         $this->maxResponseTimeMs = Hydrate::int($data['max_response_time_ms'] ?? null);
         $this->lastDeliveryAt = Hydrate::dateTime($data['last_delivery_at'] ?? null);
+        $this->metricsWindowDays = Hydrate::int($data['metrics_window_days'] ?? null);
     }
 }

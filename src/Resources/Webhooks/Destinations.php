@@ -11,6 +11,7 @@ use Didit\Core\Hydrate;
 use Didit\Core\ListResponse;
 use Didit\Core\NoContent;
 use Didit\Core\Operation;
+use Didit\Core\Page;
 use Didit\Exception\DiditException;
 use Didit\Params;
 use Didit\RequestOptions;
@@ -20,6 +21,8 @@ use Didit\Types;
  * The `webhooks.destinations` resource.
  *
  * @phpstan-import-type WebhooksDestinationsCreateParams from Params
+ * @phpstan-import-type WebhooksDestinationsListDeliveriesParams from Params
+ * @phpstan-import-type WebhooksDestinationsRetrieveAnalyticsParams from Params
  * @phpstan-import-type WebhooksDestinationsUpdateParams from Params
  */
 final class Destinations extends BaseResource
@@ -27,9 +30,12 @@ final class Destinations extends BaseResource
     /**
      * List webhook destinations.
      *
-     * List all webhook destinations (unpaginated array, oldest first). Each row includes URL, subscribed
-     * events, and delivery health metrics. The signing secret is NOT included in the list, fetch a single
-     * destination (`GET /v3/webhook/destinations/{destination_uuid}/`) to read `secret_shared_key`.
+     * List all webhook destinations (unpaginated array, oldest first). Each item carries the destination's
+     * configuration, its delivery metrics for the last 30 days (`metrics_window_days`) with one
+     * `daily_points` entry per day, and its health (`health_status`, `failing_streak`, `failing_since`,
+     * `last_success_at`). The list has no `summary` object and never includes the signing secret: each
+     * item shows only `secret_last4`. Fetch a single destination (`GET
+     * /v3/webhook/destinations/{destination_uuid}/`) to read `secret_shared_key`.
      *
      * `GET /v3/webhook/destinations/`
      *
@@ -54,7 +60,7 @@ final class Destinations extends BaseResource
      * signing secret (also readable later via `GET /v3/webhook/destinations/{destination_uuid}/`). Always
      * send `subscribed_events` with at least one event (no wildcards): an explicit empty list is rejected
      * with 400, and omitting the field creates a destination subscribed to nothing, which never receives a
-     * webhook. The `(application, url)` pair must be unique among non-deleted destinations.
+     * webhook. The `(application, url)` pair must be unique among the application's destinations.
      *
      * `POST /v3/webhook/destinations/`
      *
@@ -77,9 +83,10 @@ final class Destinations extends BaseResource
     /**
      * Get webhook destination.
      *
-     * Retrieve one webhook destination with its `secret_shared_key` signing secret and delivery health
-     * summary. API-key callers always receive the secret in full; Console users without `read:webhooks`
-     * see an empty string.
+     * Retrieve one webhook destination with its `secret_shared_key` signing secret, its health
+     * (`health_status`, `failing_streak`, `failing_since`, `last_success_at`) and a delivery `summary` for
+     * the last 30 days. API-key callers always receive the secret in full; Console users without
+     * `read:webhooks` see an empty string.
      *
      * `GET /v3/webhook/destinations/{destination_uuid}/`
      *
@@ -103,8 +110,9 @@ final class Destinations extends BaseResource
     /**
      * Update webhook destination.
      *
-     * Update a webhook destination. **`subscribed_events` is REPLACED wholesale, not merged**, fetch
-     * first, append, resend. Secret is not rotated.
+     * Update a webhook destination. **`subscribed_events` is REPLACED wholesale, not merged**: fetch
+     * first, append, resend. Secret is not rotated. A `uuid` in the body is ignored: the path names the
+     * destination.
      *
      * `PATCH /v3/webhook/destinations/{destination_uuid}/`
      *
@@ -131,9 +139,11 @@ final class Destinations extends BaseResource
     /**
      * Delete webhook destination.
      *
-     * Delete a webhook destination. Future events stop being pushed to its URL. Past delivery records are
-     * not affected and stay queryable from the Business Console, so deleting a destination is not a way to
-     * remove your delivery history. Calling again returns 404.
+     * Permanently delete a webhook destination, its signing secret and its entire delivery log. This
+     * cannot be undone. No new webhook is sent to the destination's URL; other destinations subscribed to
+     * the same events keep receiving them. Afterwards the destination no longer appears in `GET
+     * /v3/webhook/destinations/`, and every route under `/v3/webhook/destinations/{destination_uuid}/`,
+     * including its deliveries, a delivery's detail and its resend, answers 404.
      *
      * `DELETE /v3/webhook/destinations/{destination_uuid}/`
      *
@@ -150,5 +160,128 @@ final class Destinations extends BaseResource
         ), ['destination_uuid' => $destinationUuid], [], $options);
 
         return NoContent::fromResponse($response);
+    }
+
+    /**
+     * Get webhook destination analytics.
+     *
+     * Delivery totals, failure rate and response times for one webhook destination, over the whole range
+     * (`summary`) and per UTC day (`points`). Every attempt counts as a delivery: the first send of an
+     * event, each automatic [retry](https://docs.didit.me/integration/webhooks#retry-policy) and each
+     * resend. A delivery is failed when its recorded HTTP status is 400 or above, so timeouts (recorded as
+     * `504`) and connection failures (`503`) count as failed; a delivery still queued counts in
+     * `total_deliveries` only. Delivery records are available for about 30 days. A scoped API key needs
+     * `webhooks: read`.
+     *
+     * `GET /v3/webhook/destinations/{destination_uuid}/analytics/`
+     *
+     * @param string $destinationUuid UUID of the destination (the `uuid` returned by `GET /v3/webhook/destinations/`)
+     * @param WebhooksDestinationsRetrieveAnalyticsParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function retrieveAnalytics(
+        string $destinationUuid,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\WebhooksDestinationsRetrieveAnalyticsResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/webhook/destinations/{destination_uuid}/analytics/',
+            query: ['date_from' => 'date_from', 'date_to' => 'date_to'],
+        ), ['destination_uuid' => $destinationUuid], $params, $options);
+
+        return Types\WebhooksDestinationsRetrieveAnalyticsResponse::fromResponse($response);
+    }
+
+    /**
+     * List webhook destination deliveries.
+     *
+     * Page through every delivery attempt to one webhook destination, newest first. The first send of each
+     * event, each automatic [retry](https://docs.didit.me/integration/webhooks#retry-policy) and each
+     * resend are separate entries. Entries carry the HTTP status and response time but not the payload:
+     * fetch one delivery to read its headers and body. `count` is exact up to 100 and reads 100 above
+     * that, so follow `next` until it is `null`. Delivery records are available for about 30 days.
+     *
+     * `GET /v3/webhook/destinations/{destination_uuid}/deliveries/`
+     *
+     * @param string $destinationUuid UUID of the destination (the `uuid` returned by `GET /v3/webhook/destinations/`)
+     * @param WebhooksDestinationsListDeliveriesParams $params
+     *
+     * @return Page<Types\WebhookDestinationDelivery>
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listDeliveries(string $destinationUuid, array $params = [], ?RequestOptions $options = null): Page
+    {
+        return $this->requester->requestPage(new Operation(
+            method: 'GET',
+            path: '/v3/webhook/destinations/{destination_uuid}/deliveries/',
+            query: ['limit' => 'limit', 'offset' => 'offset', 'date_from' => 'date_from', 'date_to' => 'date_to'],
+        ), ['destination_uuid' => $destinationUuid], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\WebhookDestinationDelivery::class));
+    }
+
+    /**
+     * Get webhook destination delivery.
+     *
+     * Retrieve one delivery attempt to a webhook destination with the exact request headers and JSON body
+     * Didit sent, the HTTP status your endpoint returned and the response time. `request_header` and
+     * `request_body` are JSON text: parse them to read the signature headers and the payload, for example
+     * to check your [signature
+     * verification](https://docs.didit.me/integration/webhooks#signature-verification) against the
+     * destination's `secret_shared_key`. A delivery never contains the signing secret, and Didit does not
+     * record your endpoint's response body.
+     *
+     * `GET /v3/webhook/destinations/{destination_uuid}/deliveries/{delivery_uuid}/`
+     *
+     * @param string $destinationUuid UUID of the destination the delivery was sent to
+     * @param string $deliveryUuid UUID of the delivery: the `uuid` of an entry returned by `GET /v3/webhook/destinations/{destination_uuid}/deliveries/`
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function retrieveDelivery(
+        string $destinationUuid,
+        string $deliveryUuid,
+        ?RequestOptions $options = null,
+    ): Types\WebhookDestinationDeliveryDetail {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/webhook/destinations/{destination_uuid}/deliveries/{delivery_uuid}/',
+        ), ['destination_uuid' => $destinationUuid, 'delivery_uuid' => $deliveryUuid], [], $options);
+
+        return Types\WebhookDestinationDeliveryDetail::fromResponse($response);
+    }
+
+    /**
+     * Resend webhook destination delivery.
+     *
+     * Send a past delivery again, for example after your endpoint was down. Didit takes the stored
+     * payload, sets a fresh `timestamp`, signs it again with the destination's current `secret_shared_key`
+     * (`X-Signature`, `X-Signature-V2`, `X-Signature-Simple` and `X-Timestamp`) and posts it to the
+     * delivery's `request_url`, even if the destination's URL has changed since or the destination is
+     * disabled. `event_id` and the rest of the payload are unchanged, so deduplicate on `event_id`.
+     *
+     * `POST /v3/webhook/destinations/{destination_uuid}/deliveries/{delivery_uuid}/resend/`
+     *
+     * @param string $destinationUuid UUID of the destination the delivery was sent to
+     * @param string $deliveryUuid UUID of the delivery to resend: the `uuid` of an entry returned by `GET /v3/webhook/destinations/{destination_uuid}/deliveries/`
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function resendDelivery(
+        string $destinationUuid,
+        string $deliveryUuid,
+        ?RequestOptions $options = null,
+    ): Types\WebhookDestinationDeliveryDetail {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/webhook/destinations/{destination_uuid}/deliveries/{delivery_uuid}/resend/',
+        ), ['destination_uuid' => $destinationUuid, 'delivery_uuid' => $deliveryUuid], [], $options);
+
+        return Types\WebhookDestinationDeliveryDetail::fromResponse($response);
     }
 }

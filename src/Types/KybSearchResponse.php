@@ -22,7 +22,7 @@ final class KybSearchResponse extends BaseModel
     public readonly ?string $requestId;
 
     /** The `kyb_registry` field. */
-    public readonly ?KybSearchResponseKybRegistry $kybRegistry;
+    public readonly ?KYBRegistrySearchResults $kybRegistry;
 
     /** Echo of the `vendor_data` you sent. */
     public readonly ?string $vendorData;
@@ -44,7 +44,7 @@ final class KybSearchResponse extends BaseModel
     {
         parent::__construct($data);
         $this->requestId = Hydrate::string($data['request_id'] ?? null);
-        $this->kybRegistry = Hydrate::model($data['kyb_registry'] ?? null, KybSearchResponseKybRegistry::class);
+        $this->kybRegistry = Hydrate::model($data['kyb_registry'] ?? null, KYBRegistrySearchResults::class);
         $this->vendorData = Hydrate::string($data['vendor_data'] ?? null);
         $this->metadata = Hydrate::assoc($data['metadata'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
