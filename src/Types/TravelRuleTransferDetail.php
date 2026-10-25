@@ -30,9 +30,9 @@ final class TravelRuleTransferDetail extends BaseModel
      * The rail the transfer was routed over, or null when no rail was selected (for example below the
      * threshold, a self-hosted counterparty wallet, an after-deposit registration, or no reachable
      * counterparty). INTERNAL means both sides are Didit applications; EMAIL means the counterparty was
-     * reached by an emailed pickup link. TEST_VASP means the Didit Test VASP answered a sandbox
-     * application's transfer. Over GTR, VERIFYVASP and SYGNA, Didit reads the counterparty's answer from
-     * the network's response or by polling it every 5 minutes.
+     * reached by an emailed pickup link. TEST_VASP means the Didit Test VASP answered the sandbox
+     * transfer. Over GTR, VERIFYVASP and SYGNA, Didit reads the counterparty's answer from the network's
+     * response or by polling it every 5 minutes.
      *
      * Known values: {@see TravelRuleTransferDetailRail}.
      */

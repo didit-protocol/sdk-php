@@ -653,9 +653,11 @@ final class Sessions extends BaseResource
      * Regenerate a Key People party's KYC session.
      *
      * Give a Key People party of a Business Verification (KYB) session a new individual KYC session after
-     * its previous one was deleted, so the Key People check can finish again; send no request body. It
-     * works only when the party's KYC session was deleted (`kyc_session_deleted: true`): a party whose KYC
-     * session still exists (in any status), a party that never had one, or a company party returns `409`.
+     * its previous one was deleted or expired before the person started it, so the Key People check can
+     * finish again; send no request body. It works when the party's KYC session was deleted
+     * (`kyc_session_deleted: true`) or expired before the person started it (`Expired`, never started). A
+     * session still in progress or one that ended in any other status (`Approved`, `Declined`, `In
+     * Review`, `Abandoned`, ...) returns `409` unless it was deleted.
      *
      * `POST /v3/session/{sessionId}/kyb/parties/{partyUuid}/regenerate/`
      *
