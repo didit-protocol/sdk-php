@@ -4,6 +4,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # Guzzle 8 breaks HttpTransport
+    ignore:
+      - dependency-name: "guzzlehttp/guzzle"
+        update-types: ["version-update:semver-major"]
     open-pull-requests-limit: 5
     commit-message:
       prefix: chore
