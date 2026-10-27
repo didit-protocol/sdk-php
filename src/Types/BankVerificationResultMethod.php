@@ -9,8 +9,10 @@ namespace Didit\Types;
 /**
  * How the account was verified: `open_banking` (bank sign-in: the person signed in at their bank),
  * `account_lookup` (account check: the person typed the account details and the bank confirmed the
- * name), `microdeposits` or `statement` (a statement upload). `null` until an account is evaluated.
- * Workflow rules read the same value as `bank.method`.
+ * name), `microdeposits` or `statement` (a statement upload). `none` when the person continued without
+ * a bank before any attempt was evaluated, so no account was verified. After an evaluated attempt, it
+ * stays the method of that attempt. `null` until an account is evaluated, and when the workflow
+ * narrows the data it returns. Workflow rules read the same value as `bank.method`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -23,6 +25,8 @@ final class BankVerificationResultMethod
     public const MICRODEPOSITS = 'microdeposits';
 
     public const STATEMENT = 'statement';
+
+    public const NONE = 'none';
 
     private function __construct()
     {

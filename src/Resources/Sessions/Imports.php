@@ -19,9 +19,13 @@ use Didit\Types;
 /**
  * The `sessions.imports` resource.
  *
+ * @phpstan-import-type SessionsImportsCheckProviderParams from Params
  * @phpstan-import-type SessionsImportsCreateParams from Params
  * @phpstan-import-type SessionsImportsListErrorsParams from Params
+ * @phpstan-import-type SessionsImportsListJobsParams from Params
  * @phpstan-import-type SessionsImportsRetrieveTemplateParams from Params
+ * @phpstan-import-type SessionsImportsRetryParams from Params
+ * @phpstan-import-type SessionsImportsStartParams from Params
  */
 final class Imports extends BaseResource
 {
@@ -29,10 +33,11 @@ final class Imports extends BaseResource
      * Create a verification import job.
      *
      * Create an asynchronous import job for historical User Verification sessions, Business Verification
-     * sessions, transaction monitoring records, or workflow custom status rules. Use this to migrate from
-     * providers such as Sumsub, MetaMap, Veriff, Onfido, Persona, Trulioo, Jumio, Incode, iDenfy, or any
-     * other provider after transforming the export into Didit's canonical CSV/NDJSON format. Imports are
-     * disabled by default and must be enabled per organization by Didit.
+     * sessions, transaction monitoring records, or workflow custom status rules. Set `source=provider` to
+     * migrate from another provider: Didit reads Sumsub, Onfido, Persona and ComplyCube with your
+     * read-only key, reads Veriff, iDenfy and MetaMap records by the IDs you upload in `file`, and imports
+     * an export file in Didit's format for the other providers. Record IDs are namespaced by provider
+     * (`sumsub:<id>`) so a re-run skips everything already in Didit.
      *
      * `POST /v3/session/imports/`
      *
@@ -47,6 +52,7 @@ final class Imports extends BaseResource
             method: 'POST',
             path: '/v3/session/imports/',
             bodyTypes: ['json', 'multipart'],
+            jsonHints: ['credentials' => ['o'], 'options' => ['o'], 'status_mapping' => ['o']],
         ), [], $params, $options);
 
         return Types\SessionImportJob::fromResponse($response);
@@ -121,5 +127,205 @@ final class Imports extends BaseResource
             path: '/v3/session/imports/{importId}/errors/',
             query: ['limit' => 'limit', 'offset' => 'offset'],
         ), ['importId' => $importId], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\SessionImportError::class));
+    }
+
+    /**
+     * List migration providers.
+     *
+     * The 15 providers you can migrate verifications from: what each needs to connect, whether its API can
+     * list records, the permissions its key needs and its default status mapping.
+     *
+     * `GET /v3/session/imports/providers/`
+     *
+     * @throws DiditException
+     */
+    public function listProviders(?RequestOptions $options = null): Types\SessionsImportsListProvidersResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/session/imports/providers/',
+        ), [], [], $options);
+
+        return Types\SessionsImportsListProvidersResponse::fromResponse($response);
+    }
+
+    /**
+     * Check a provider key.
+     *
+     * Read the provider with your key before creating a migration. Nothing is stored.
+     *
+     * `POST /v3/session/imports/providers/check/`
+     *
+     * @param SessionsImportsCheckProviderParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function checkProvider(
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\SessionsImportsCheckProviderResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/imports/providers/check/',
+            bodyTypes: ['json'],
+            jsonHints: ['credentials' => ['o'], 'options' => ['o']],
+        ), [], $params, $options);
+
+        return Types\SessionsImportsCheckProviderResponse::fromResponse($response);
+    }
+
+    /**
+     * Start a dry run.
+     *
+     * Start a migration whose dry run finished (`READY`): the same job imports for real, with the status
+     * mapping and face templates choice as sent now.
+     *
+     * `POST /v3/session/imports/{importId}/start/`
+     *
+     * @param SessionsImportsStartParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function start(string $importId, array $params = [], ?RequestOptions $options = null): Types\SessionImportJob
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/imports/{importId}/start/',
+            bodyTypes: ['json'],
+            jsonHints: ['status_mapping' => ['o']],
+        ), ['importId' => $importId], $params, $options);
+
+        return Types\SessionImportJob::fromResponse($response);
+    }
+
+    /**
+     * Pause an import job.
+     *
+     * Pause a queued or running import.
+     *
+     * `POST /v3/session/imports/{importId}/pause/`
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function pause(string $importId, ?RequestOptions $options = null): Types\SessionImportJob
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/imports/{importId}/pause/',
+        ), ['importId' => $importId], [], $options);
+
+        return Types\SessionImportJob::fromResponse($response);
+    }
+
+    /**
+     * Resume an import job.
+     *
+     * Resume an import you paused. A job paused by the provider's rate limit resumes by itself.
+     *
+     * `POST /v3/session/imports/{importId}/resume/`
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function resume(string $importId, ?RequestOptions $options = null): Types\SessionImportJob
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/imports/{importId}/resume/',
+        ), ['importId' => $importId], [], $options);
+
+        return Types\SessionImportJob::fromResponse($response);
+    }
+
+    /**
+     * Cancel an import job.
+     *
+     * Cancel an import. What was imported stays; the uploaded file and the key are erased.
+     *
+     * `POST /v3/session/imports/{importId}/cancel/`
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function cancel(string $importId, ?RequestOptions $options = null): Types\SessionImportJob
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/imports/{importId}/cancel/',
+        ), ['importId' => $importId], [], $options);
+
+        return Types\SessionImportJob::fromResponse($response);
+    }
+
+    /**
+     * Retry a migration.
+     *
+     * Run a migration that ended again as a new job, with a new key (the old one was erased). It keeps the
+     * provider, workflow, region, status mapping and face templates choice; everything already in Didit is
+     * skipped.
+     *
+     * `POST /v3/session/imports/{importId}/retry/`
+     *
+     * @param SessionsImportsRetryParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function retry(string $importId, array $params = [], ?RequestOptions $options = null): Types\SessionImportJob
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/imports/{importId}/retry/',
+            bodyTypes: ['multipart'],
+            jsonHints: ['credentials' => ['o']],
+        ), ['importId' => $importId], $params, $options);
+
+        return Types\SessionImportJob::fromResponse($response);
+    }
+
+    /**
+     * List import jobs.
+     *
+     * Every import of the application in one shape: verification imports and migrations, people and
+     * businesses.
+     *
+     * `GET /v3/import-jobs/`
+     *
+     * @param SessionsImportsListJobsParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listJobs(array $params = [], ?RequestOptions $options = null): Types\SessionsImportsListJobsResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/import-jobs/',
+            query: ['scope' => 'scope', 'limit' => 'limit'],
+        ), [], $params, $options);
+
+        return Types\SessionsImportsListJobsResponse::fromResponse($response);
+    }
+
+    /**
+     * List active import jobs.
+     *
+     * What is running or waiting, plus what just ended, for a progress indicator.
+     *
+     * `GET /v3/import-jobs/active/`
+     *
+     * @throws DiditException
+     */
+    public function listActiveJobs(?RequestOptions $options = null): Types\SessionsImportsListActiveJobsResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/import-jobs/active/',
+        ), [], [], $options);
+
+        return Types\SessionsImportsListActiveJobsResponse::fromResponse($response);
     }
 }

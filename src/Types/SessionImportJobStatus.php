@@ -23,6 +23,8 @@ final class SessionImportJobStatus
 
     public const CANCELLED = 'CANCELLED';
 
+    public const READY = 'READY';
+
     private function __construct()
     {
     }

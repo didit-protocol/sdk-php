@@ -23,7 +23,11 @@ final class BankVerificationResultBilling extends BaseModel
     /** The marketplace platform fee charged, for `byok`. */
     public readonly ?string $marketplaceFee;
 
-    /** The usage line the charge was booked on. */
+    /**
+     * The usage line the charge was booked on: `bank_verification` for a bank sign-in or an account check,
+     * `bank_statement_upload` for a statement upload with no charged bank attempt before it, and
+     * `bank_byok_fee` for the marketplace fee on your own provider. `null` when nothing was billed.
+     */
     public readonly ?string $usageType;
 
     /**
