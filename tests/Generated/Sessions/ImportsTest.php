@@ -26,6 +26,20 @@ final class ImportsTest extends GeneratedTestCase
             'workflow_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
             'source_format' => 'csv',
             'source_file_url' => 'https://example.com/callback',
+            'source' => 'file',
+            'provider' => 'sumsub',
+            'credentials' => [
+                'key' => 'credentials-value',
+            ],
+            'options' => [
+                'region' => 'region-value',
+            ],
+            'status_mapping' => [
+                'key' => 'Approved',
+            ],
+            'dry_run' => true,
+            'face_templates' => true,
+            'lawful_basis_confirmed' => true,
             'file' => File::fromBytes('fake-file-bytes', 'file.jpg', 'image/jpeg'),
         ]);
 
@@ -48,6 +62,30 @@ final class ImportsTest extends GeneratedTestCase
             ],
             'source_file_url' => [
                 'https://example.com/callback',
+            ],
+            'source' => [
+                'file',
+            ],
+            'provider' => [
+                'sumsub',
+            ],
+            'credentials' => [
+                '{"key":"credentials-value"}',
+            ],
+            'options' => [
+                '{"region":"region-value"}',
+            ],
+            'status_mapping' => [
+                '{"key":"Approved"}',
+            ],
+            'dry_run' => [
+                'true',
+            ],
+            'face_templates' => [
+                'true',
+            ],
+            'lawful_basis_confirmed' => [
+                'true',
             ],
             'file' => [
                 'file:file.jpg:image/jpeg:fake-file-bytes',
@@ -82,7 +120,7 @@ final class ImportsTest extends GeneratedTestCase
 
     public function testRetrieve(): void
     {
-        $this->queueJson(200, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z"}');
+        $this->queueJson(200, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}');
 
         $result = $this->client->sessions->imports->retrieve('importId-1');
 
@@ -94,7 +132,7 @@ final class ImportsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z"}'), $result->toArray());
+        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
     }
 
@@ -121,5 +159,203 @@ final class ImportsTest extends GeneratedTestCase
         self::assertContainsOnlyInstancesOf(Types\SessionImportError::class, $result->results);
         self::assertFalse($result->hasNextPage());
         self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"uuid":"5a6b7c8d-9e0f-4a1b-8c2d-3e4f5a6b7c8d","row_number":17,"external_id":"ext-000017","error":"status: invalid value \'unknown_status\'","raw_row":{"external_id":"ext-000017","status":"unknown_status","first_name":"Jane"},"created_at":"2026-05-17T08:44:02Z"}]}'), $result->toArray());
+    }
+
+    public function testListProviders(): void
+    {
+        $this->queueJson(200, '{"providers":[{"key":"sumsub","name":"name-value","mode":"api_list","record_noun":"record_noun-value","credential_fields":[{"name":"name-value","label":"label-value","secret":true}],"regions":["regions-value"],"required_permissions":["required_permissions-value"],"docs_url":"docs_url-value","status_mapping":{"key":"Approved"}}],"mapping_targets":["mapping_targets-value"],"skipped_statuses":["skipped_statuses-value"]}');
+
+        $result = $this->client->sessions->imports->listProviders();
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/session/imports/providers/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"providers":[{"key":"sumsub","name":"name-value","mode":"api_list","record_noun":"record_noun-value","credential_fields":[{"name":"name-value","label":"label-value","secret":true}],"regions":["regions-value"],"required_permissions":["required_permissions-value"],"docs_url":"docs_url-value","status_mapping":{"key":"Approved"}}],"mapping_targets":["mapping_targets-value"],"skipped_statuses":["skipped_statuses-value"]}'), $result->toArray());
+    }
+
+    public function testCheckProvider(): void
+    {
+        $this->queueJson(200, '{"ok":true,"provider":"provider-value","credential_hint":"credential_hint-value"}');
+
+        $result = $this->client->sessions->imports->checkProvider([
+            'provider' => 'sumsub',
+            'credentials' => [
+                'key' => 'credentials-value',
+            ],
+            'options' => [
+                'region' => 'region-value',
+            ],
+            'record_ids' => [
+                'record_ids-value',
+            ],
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/session/imports/providers/check/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"provider":"sumsub","credentials":{"key":"credentials-value"},"options":{"region":"region-value"},"record_ids":["record_ids-value"]}', $this->canonicalBody($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"ok":true,"provider":"provider-value","credential_hint":"credential_hint-value"}'), $result->toArray());
+        self::assertTrue($result->ok);
+    }
+
+    public function testStart(): void
+    {
+        $this->queueJson(200, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}');
+
+        $result = $this->client->sessions->imports->start('importId-1', [
+            'status_mapping' => [
+                'key' => 'Approved',
+            ],
+            'face_templates' => true,
+            'lawful_basis_confirmed' => true,
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/session/imports/importId-1/start/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"status_mapping":{"key":"Approved"},"face_templates":true,"lawful_basis_confirmed":true}', $this->canonicalBody($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}'), $result->toArray());
+        self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
+    }
+
+    public function testPause(): void
+    {
+        $this->queueJson(200, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}');
+
+        $result = $this->client->sessions->imports->pause('importId-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/session/imports/importId-1/pause/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}'), $result->toArray());
+        self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
+    }
+
+    public function testResume(): void
+    {
+        $this->queueJson(200, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}');
+
+        $result = $this->client->sessions->imports->resume('importId-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/session/imports/importId-1/resume/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}'), $result->toArray());
+        self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
+    }
+
+    public function testCancel(): void
+    {
+        $this->queueJson(200, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}');
+
+        $result = $this->client->sessions->imports->cancel('importId-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/session/imports/importId-1/cancel/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}'), $result->toArray());
+        self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
+    }
+
+    public function testRetry(): void
+    {
+        $this->queueJson(201, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}');
+
+        $result = $this->client->sessions->imports->retry('importId-1', [
+            'credentials' => [
+                'key' => 'credentials-value',
+            ],
+            'file' => File::fromBytes('fake-file-bytes', 'file.jpg', 'image/jpeg'),
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/session/imports/importId-1/retry/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertStringStartsWith('multipart/form-data; boundary=', $request->getHeaderLine('Content-Type'));
+        self::assertSame([
+            'credentials' => [
+                '{"key":"credentials-value"}',
+            ],
+            'file' => [
+                'file:file.jpg:image/jpeg:fake-file-bytes',
+            ],
+        ], $this->multipartFields($request));
+        self::assertSame(201, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"PENDING","import_type":"user_verification","source_format":"csv","source_filename":"source_filename-value","total_rows":1,"processed_rows":1,"checkpoint_row":1,"created_count":1,"updated_count":1,"skipped_count":1,"failed_count":1,"total_media_bytes":1,"last_error":"last_error-value","created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z","state":"ready","source":"file","provider":"provider-value","provider_options":{"key":"value"},"credential_hint":"credential_hint-value","credentials_expires_at":"2026-01-15T10:30:00Z","resumes_at":"2026-01-15T10:30:00Z","status_mapping":{"key":"status_mapping-value"},"is_dry_run":true,"dry_run_summary":{"key":"value"},"face_templates_enabled":true,"lawful_basis_confirmed_at":"2026-01-15T10:30:00Z","not_finished_count":1,"same_person_count":1,"face_templates_count":1,"face_duplicates_count":1,"face_blocklist_hits_count":1,"created_by_name":"created_by_name-value","created_by_email":"created_by_email-value"}'), $result->toArray());
+        self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
+    }
+
+    public function testListJobs(): void
+    {
+        $this->queueJson(200, '{"results":[{"id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"sessions","source":"file","provider":"provider-value","provider_name":"provider_name-value","filename":"filename-value","state":"ready","status":"status-value","is_dry_run":true,"credential_hint":"credential_hint-value","resumes_at":"2026-01-15T10:30:00Z","last_error":"last_error-value","started_by":{"name":"name-value","email":"email-value"},"progress":{"total":1,"processed":1,"imported":1,"updated":1,"already_in_didit":1,"failed":1,"not_finished":1,"same_person":1},"face_templates":{"enabled":true,"built":1,"duplicates":1,"blocklisted":1},"eta_seconds":1,"created_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z"}],"counts":{"all":1,"running_and_waiting":1,"needs_attention":1,"done":1}}');
+
+        $result = $this->client->sessions->imports->listJobs([
+            'scope' => 'all',
+            'limit' => 1,
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/import-jobs/', $request->getUri()->getPath());
+        self::assertSame([
+            'scope' => 'all',
+            'limit' => '1',
+        ], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"results":[{"id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"sessions","source":"file","provider":"provider-value","provider_name":"provider_name-value","filename":"filename-value","state":"ready","status":"status-value","is_dry_run":true,"credential_hint":"credential_hint-value","resumes_at":"2026-01-15T10:30:00Z","last_error":"last_error-value","started_by":{"name":"name-value","email":"email-value"},"progress":{"total":1,"processed":1,"imported":1,"updated":1,"already_in_didit":1,"failed":1,"not_finished":1,"same_person":1},"face_templates":{"enabled":true,"built":1,"duplicates":1,"blocklisted":1},"eta_seconds":1,"created_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z"}],"counts":{"all":1,"running_and_waiting":1,"needs_attention":1,"done":1}}'), $result->toArray());
+    }
+
+    public function testListActiveJobs(): void
+    {
+        $this->queueJson(200, '{"results":[{"id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"sessions","source":"file","provider":"provider-value","provider_name":"provider_name-value","filename":"filename-value","state":"ready","status":"status-value","is_dry_run":true,"credential_hint":"credential_hint-value","resumes_at":"2026-01-15T10:30:00Z","last_error":"last_error-value","started_by":{"name":"name-value","email":"email-value"},"progress":{"total":1,"processed":1,"imported":1,"updated":1,"already_in_didit":1,"failed":1,"not_finished":1,"same_person":1},"face_templates":{"enabled":true,"built":1,"duplicates":1,"blocklisted":1},"eta_seconds":1,"created_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z"}],"running":1}');
+
+        $result = $this->client->sessions->imports->listActiveJobs();
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/import-jobs/active/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"results":[{"id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"sessions","source":"file","provider":"provider-value","provider_name":"provider_name-value","filename":"filename-value","state":"ready","status":"status-value","is_dry_run":true,"credential_hint":"credential_hint-value","resumes_at":"2026-01-15T10:30:00Z","last_error":"last_error-value","started_by":{"name":"name-value","email":"email-value"},"progress":{"total":1,"processed":1,"imported":1,"updated":1,"already_in_didit":1,"failed":1,"not_finished":1,"same_person":1},"face_templates":{"enabled":true,"built":1,"duplicates":1,"blocklisted":1},"eta_seconds":1,"created_at":"2026-01-15T10:30:00Z","started_at":"2026-01-15T10:30:00Z","completed_at":"2026-01-15T10:30:00Z"}],"running":1}'), $result->toArray());
+        self::assertSame(1, $result->running);
     }
 }

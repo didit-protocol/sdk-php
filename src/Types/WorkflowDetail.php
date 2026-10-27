@@ -119,6 +119,37 @@ final class WorkflowDetail extends BaseModel
     public readonly ?\DateTimeImmutable $updatedAt;
 
     /**
+     * Whether a simple KYC or KYB workflow runs Bank verification. It runs after the contact steps and
+     * before database validation, AML and IP analysis. Set in the console.
+     */
+    public readonly ?bool $isBankVerificationEnabled;
+
+    /**
+     * Bank verification settings of a simple workflow, with the same keys a `BANK_VERIFICATION` node takes
+     * (for example `bank_countries` and `bank_method_order`). Every key is optional and an absent key
+     * keeps its default, so `{}` means all defaults. See [Bank verification
+     * settings](/management-api/workflows/feature-configs#bank-verification).
+     *
+     * @var array<string, mixed>|null
+     */
+    public readonly ?array $bankVerificationConfig;
+
+    /**
+     * Whether a simple KYC workflow runs Location verification. It runs after the contact steps and before
+     * Bank verification. Never on KYB workflows. Set in the console.
+     */
+    public readonly ?bool $isGeolocationEnabled;
+
+    /**
+     * Location verification settings of a simple workflow, with the same keys a `GEOLOCATION` node takes
+     * (for example `is_geolocation_geofencing_enabled` and `geolocation_max_attempts`). Every key is
+     * optional and an absent key keeps its default, so `{}` means all defaults.
+     *
+     * @var array<string, mixed>|null
+     */
+    public readonly ?array $geolocationConfig;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -149,5 +180,9 @@ final class WorkflowDetail extends BaseModel
         $this->kybRoleSettings = Hydrate::list($data['kyb_role_settings'] ?? null, Hydrate::assoc(...));
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
         $this->updatedAt = Hydrate::dateTime($data['updated_at'] ?? null);
+        $this->isBankVerificationEnabled = Hydrate::bool($data['is_bank_verification_enabled'] ?? null);
+        $this->bankVerificationConfig = Hydrate::assoc($data['bank_verification_config'] ?? null);
+        $this->isGeolocationEnabled = Hydrate::bool($data['is_geolocation_enabled'] ?? null);
+        $this->geolocationConfig = Hydrate::assoc($data['geolocation_config'] ?? null);
     }
 }

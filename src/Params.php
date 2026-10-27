@@ -1809,19 +1809,52 @@ namespace Didit;
  *     workflow_id: string,
  *     vendor_data?: string|null,
  * }
+ * @phpstan-type SessionsImportsCheckProviderParams array{
+ *     provider: string,
+ *     credentials: array<string, string>,
+ *     options?: SessionsImportsCheckProviderParamsOptions,
+ *     record_ids?: list<string>,
+ * }
+ * @phpstan-type SessionsImportsCheckProviderParamsOptions array{
+ *     region?: string,
+ * }
  * @phpstan-type SessionsImportsCreateParams array{
  *     import_type?: string,
  *     workflow_id?: string,
  *     source_format?: string,
  *     source_file_url?: string,
+ *     source?: string,
+ *     provider?: string,
+ *     credentials?: array<string, string>,
+ *     options?: SessionsImportsCreateParamsOptions,
+ *     status_mapping?: array<string, string>,
+ *     dry_run?: bool,
+ *     face_templates?: bool,
+ *     lawful_basis_confirmed?: bool,
  *     file?: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
+ * }
+ * @phpstan-type SessionsImportsCreateParamsOptions array{
+ *     region?: string,
  * }
  * @phpstan-type SessionsImportsListErrorsParams array{
  *     limit?: int,
  *     offset?: int,
  * }
+ * @phpstan-type SessionsImportsListJobsParams array{
+ *     scope?: string,
+ *     limit?: int,
+ * }
  * @phpstan-type SessionsImportsRetrieveTemplateParams array{
  *     import_type?: string,
+ * }
+ * @phpstan-type SessionsImportsRetryParams array{
+ *     credentials?: array<string, string>,
+ *     file?: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
+ * }
+ * @phpstan-type SessionsImportsStartParams array{
+ *     status_mapping?: array<string, string>,
+ *     face_templates?: bool,
+ *     lawful_basis_confirmed?: bool,
  * }
  * @phpstan-type SessionsListAmlScreeningHistoryParams array{
  *     node_id?: string,

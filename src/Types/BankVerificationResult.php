@@ -11,8 +11,11 @@ use Didit\Core\Hydrate;
 
 /**
  * One Bank Verification step's result, for User and Business Verification. `method` says how the
- * account was verified. See [Bank verification
- * methods](/core-technology/bank-verification/verification-methods).
+ * account was verified, and `none` that the person continued without a bank before any attempt was
+ * evaluated. `continued_without_bank` says the person continued without a bank, also after an
+ * evaluated attempt. See [Bank verification
+ * methods](/core-technology/bank-verification/verification-methods) and [When the person cannot verify
+ * their bank](/core-technology/bank-verification/fallbacks).
  */
 final class BankVerificationResult extends BaseModel
 {
@@ -38,8 +41,10 @@ final class BankVerificationResult extends BaseModel
     /**
      * How the account was verified: `open_banking` (bank sign-in: the person signed in at their bank),
      * `account_lookup` (account check: the person typed the account details and the bank confirmed the
-     * name), `microdeposits` or `statement` (a statement upload). `null` until an account is evaluated.
-     * Workflow rules read the same value as `bank.method`.
+     * name), `microdeposits` or `statement` (a statement upload). `none` when the person continued without
+     * a bank before any attempt was evaluated, so no account was verified. After an evaluated attempt, it
+     * stays the method of that attempt. `null` until an account is evaluated, and when the workflow
+     * narrows the data it returns. Workflow rules read the same value as `bank.method`.
      *
      * Known values: {@see BankVerificationResultMethod}.
      */
@@ -94,8 +99,25 @@ final class BankVerificationResult extends BaseModel
     /** Whether the step ended without a match after the person left at their bank. */
     public readonly ?bool $connectionAbandoned;
 
-    /** Whether the person's bank or country could not be reached on this step. */
+    /**
+     * Whether the person's bank or country could not be reached on this step. Also `true` when the person
+     * continued without a bank because no method could verify their country or bank.
+     */
     public readonly ?bool $notCovered;
+
+    /**
+     * Whether the person left the step with **Continue without your bank**. `continuation` then says why.
+     * `method` is `none` when no attempt was evaluated before they continued. After an evaluated attempt,
+     * such as a holder that does not match, `method` stays the method of that attempt and its verdict and
+     * reason codes stand. Returned even when the workflow narrows the data it returns.
+     */
+    public readonly ?bool $continuedWithoutBank;
+
+    /**
+     * How the person continued without a bank. `null` when they did not. When the workflow narrows the
+     * data it returns, `reason` is still returned and every other key is `null`.
+     */
+    public readonly ?BankVerificationResultContinuation $continuation;
 
     /** When the bank evidence was deleted under `bank_evidence_retention_days`. `null` otherwise. */
     public readonly ?\DateTimeImmutable $evidencePurgedAt;
@@ -109,6 +131,9 @@ final class BankVerificationResult extends BaseModel
 
     /**
      * Why the verdict came out the way it did, for example `OWNER_NAME_PARTIAL`. Several may apply.
+     * `NOT_COVERED`: the person continued without a bank because no method could verify their country or
+     * bank. `SKIPPED`: the person chose to continue without a bank while a way to verify was there.
+     * Neither is added when an evaluated attempt already decided the step.
      *
      * @var list<string>|null
      */
@@ -144,6 +169,8 @@ final class BankVerificationResult extends BaseModel
         $this->signals = Hydrate::assoc($data['signals'] ?? null);
         $this->connectionAbandoned = Hydrate::bool($data['connection_abandoned'] ?? null);
         $this->notCovered = Hydrate::bool($data['not_covered'] ?? null);
+        $this->continuedWithoutBank = Hydrate::bool($data['continued_without_bank'] ?? null);
+        $this->continuation = Hydrate::model($data['continuation'] ?? null, BankVerificationResultContinuation::class);
         $this->evidencePurgedAt = Hydrate::dateTime($data['evidence_purged_at'] ?? null);
         $this->warnings = Hydrate::list($data['warnings'] ?? null, Hydrate::string(...));
         $this->reasonCodes = Hydrate::list($data['reason_codes'] ?? null, Hydrate::string(...));

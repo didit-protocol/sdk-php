@@ -208,8 +208,9 @@ final class SessionDecision extends BaseModel
     /**
      * Bank Verification results, one item per Bank Verification step, for User and Business Verification.
      * `null` until a step produces one. Each item's `method` says how the account was verified:
-     * `open_banking` (bank sign-in) or `account_lookup` (account check), or a `microdeposits` or
-     * `statement` fallback. See [Bank verification
+     * `open_banking` (bank sign-in) or `account_lookup` (account check), or a `statement` or
+     * `microdeposits` fallback, and `none` when the person continued without a bank before any attempt was
+     * evaluated (`continued_without_bank`). See [Bank verification
      * methods](/core-technology/bank-verification/verification-methods).
      *
      * @var list<BankVerificationResult>|null

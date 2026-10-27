@@ -69,6 +69,72 @@ final class SessionImportJob extends BaseModel
     public readonly ?\DateTimeImmutable $completedAt;
 
     /**
+     * The job's state as the console shows it; `errors` is a completed job with rejected rows.
+     *
+     * Known values: {@see SessionImportJobState}.
+     */
+    public readonly ?string $state;
+
+    /** Known values: {@see SessionImportJobSource}. */
+    public readonly ?string $source;
+
+    /** Migration source; empty for a file or API import. */
+    public readonly ?string $provider;
+
+    /** @var array<string, mixed>|null */
+    public readonly ?array $providerOptions;
+
+    /** The first characters of the key the migration holds. The key itself is never returned. */
+    public readonly ?string $credentialHint;
+
+    /** The `credentials_expires_at` field. */
+    public readonly ?\DateTimeImmutable $credentialsExpiresAt;
+
+    /** When a job paused by the provider's rate limit resumes by itself. */
+    public readonly ?\DateTimeImmutable $resumesAt;
+
+    /** @var array<string, string>|null */
+    public readonly ?array $statusMapping;
+
+    /** The `is_dry_run` field. */
+    public readonly ?bool $isDryRun;
+
+    /**
+     * What a dry run found: `total`, `by_status`, `already_in_didit`, `same_person`, `not_finished`,
+     * `failed`, `unmapped_statuses`.
+     *
+     * @var array<string, mixed>|null
+     */
+    public readonly ?array $dryRunSummary;
+
+    /** The `face_templates_enabled` field. */
+    public readonly ?bool $faceTemplatesEnabled;
+
+    /** The `lawful_basis_confirmed_at` field. */
+    public readonly ?\DateTimeImmutable $lawfulBasisConfirmedAt;
+
+    /** The `not_finished_count` field. */
+    public readonly ?int $notFinishedCount;
+
+    /** The `same_person_count` field. */
+    public readonly ?int $samePersonCount;
+
+    /** The `face_templates_count` field. */
+    public readonly ?int $faceTemplatesCount;
+
+    /** The `face_duplicates_count` field. */
+    public readonly ?int $faceDuplicatesCount;
+
+    /** The `face_blocklist_hits_count` field. */
+    public readonly ?int $faceBlocklistHitsCount;
+
+    /** The `created_by_name` field. */
+    public readonly ?string $createdByName;
+
+    /** The `created_by_email` field. */
+    public readonly ?string $createdByEmail;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -92,5 +158,24 @@ final class SessionImportJob extends BaseModel
         $this->updatedAt = Hydrate::dateTime($data['updated_at'] ?? null);
         $this->startedAt = Hydrate::dateTime($data['started_at'] ?? null);
         $this->completedAt = Hydrate::dateTime($data['completed_at'] ?? null);
+        $this->state = Hydrate::string($data['state'] ?? null);
+        $this->source = Hydrate::string($data['source'] ?? null);
+        $this->provider = Hydrate::string($data['provider'] ?? null);
+        $this->providerOptions = Hydrate::assoc($data['provider_options'] ?? null);
+        $this->credentialHint = Hydrate::string($data['credential_hint'] ?? null);
+        $this->credentialsExpiresAt = Hydrate::dateTime($data['credentials_expires_at'] ?? null);
+        $this->resumesAt = Hydrate::dateTime($data['resumes_at'] ?? null);
+        $this->statusMapping = Hydrate::map($data['status_mapping'] ?? null, Hydrate::string(...));
+        $this->isDryRun = Hydrate::bool($data['is_dry_run'] ?? null);
+        $this->dryRunSummary = Hydrate::assoc($data['dry_run_summary'] ?? null);
+        $this->faceTemplatesEnabled = Hydrate::bool($data['face_templates_enabled'] ?? null);
+        $this->lawfulBasisConfirmedAt = Hydrate::dateTime($data['lawful_basis_confirmed_at'] ?? null);
+        $this->notFinishedCount = Hydrate::int($data['not_finished_count'] ?? null);
+        $this->samePersonCount = Hydrate::int($data['same_person_count'] ?? null);
+        $this->faceTemplatesCount = Hydrate::int($data['face_templates_count'] ?? null);
+        $this->faceDuplicatesCount = Hydrate::int($data['face_duplicates_count'] ?? null);
+        $this->faceBlocklistHitsCount = Hydrate::int($data['face_blocklist_hits_count'] ?? null);
+        $this->createdByName = Hydrate::string($data['created_by_name'] ?? null);
+        $this->createdByEmail = Hydrate::string($data['created_by_email'] ?? null);
     }
 }

@@ -96,6 +96,8 @@ final class DiditClient extends BaseClient
 
     public readonly Resources\Analytics $analytics;
 
+    public readonly Resources\Pricing $pricing;
+
     public readonly Resources\Investigator $investigator;
 
     public readonly Resources\Account $account;
@@ -140,6 +142,7 @@ final class DiditClient extends BaseClient
         $this->blocklist = new Resources\Blocklist($this->requester);
         $this->monitoringEvents = new Resources\MonitoringEvents($this->requester);
         $this->analytics = new Resources\Analytics($this->requester);
+        $this->pricing = new Resources\Pricing($this->requester);
         $this->investigator = new Resources\Investigator($this->requester);
         $this->account = new Resources\Account($this->requester);
     }
