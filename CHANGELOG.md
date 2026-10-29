@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.1](https://github.com/didit-protocol/sdk-php/compare/v1.0.0...v1.0.1) (2026-10-29)
+
+
+### Bug Fixes
+
+* **release:** tag releases as v1.0.0 and stop pinning tests to 0.1.0 ([#15](https://github.com/didit-protocol/sdk-php/issues/15)) ([39f33fd](https://github.com/didit-protocol/sdk-php/commit/39f33fd85107a5c6554267c81c3a986cfda91632))
+
+
+### Miscellaneous Chores
+
+* release 1.0.1 ([fa87574](https://github.com/didit-protocol/sdk-php/commit/fa8757401b581cee9498f29efee06bcba5357a59))
+
 ## [1.0.0](https://github.com/didit-protocol/sdk-php/compare/didit-protocol/sdk-php-v0.1.0...didit-protocol/sdk-php-v1.0.0) (2026-10-29)
 
 
