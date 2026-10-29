@@ -9,9 +9,9 @@ namespace Didit\Types;
 /**
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
-final class TravelRuleSettingsDetailNetworksTrustRail
+final class TravelRuleWalletProofReviewMethod
 {
-    public const TRUST = 'TRUST';
+    public const SCREENSHOT = 'SCREENSHOT';
 
     private function __construct()
     {

@@ -215,7 +215,7 @@ final class SessionDecisionRegistryChecksCompany extends BaseModel
     /** The tier the registry delivered and that is billed. Also in `ownership.tier_delivered`. */
     public readonly ?string $registryTierDelivered;
 
-    /** `not_requested`, `pending`, `delivered` or `unavailable`. Also in `ownership.status`. */
+    /** `not_requested`, `pending`, `delivered`, `not_held` or `unavailable`. Also in `ownership.status`. */
     public readonly ?string $registryOwnershipStatus;
 
     /**

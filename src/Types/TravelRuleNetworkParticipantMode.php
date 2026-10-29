@@ -9,9 +9,11 @@ namespace Didit\Types;
 /**
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
-final class TravelRuleSettingsDetailNetworksGtrRail
+final class TravelRuleNetworkParticipantMode
 {
-    public const GTR = 'GTR';
+    public const PLATFORM = 'platform';
+
+    public const OWN = 'own';
 
     private function __construct()
     {

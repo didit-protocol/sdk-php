@@ -228,6 +228,13 @@ final class SessionDecisionIdVerifications extends BaseModel
     public readonly ?SessionDecisionIdVerificationsDocumentLiveness $documentLiveness;
 
     /**
+     * Address Validation of the address printed on this document: whether it exists and its normalised
+     * form, as the document read it (a later correction of `address` does not run it again). Present when
+     * this ID verification step enabled the Address Validation add-on; `null` otherwise.
+     */
+    public readonly ?AddressValidationResult $addressValidation;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -281,5 +288,6 @@ final class SessionDecisionIdVerifications extends BaseModel
         $this->warnings = Hydrate::list($data['warnings'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionIdVerificationsWarnings::class));
         $this->matches = Hydrate::list($data['matches'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionIdVerificationsMatches::class));
         $this->documentLiveness = Hydrate::model($data['document_liveness'] ?? null, SessionDecisionIdVerificationsDocumentLiveness::class);
+        $this->addressValidation = Hydrate::model($data['address_validation'] ?? null, AddressValidationResult::class);
     }
 }

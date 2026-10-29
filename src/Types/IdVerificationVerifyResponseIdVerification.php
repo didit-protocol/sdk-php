@@ -15,8 +15,10 @@ use Didit\Core\Hydrate;
 final class IdVerificationVerifyResponseIdVerification extends BaseModel
 {
     /**
-     * `Approved` when no warning resolves to a decline; `Declined` otherwise, the `warnings` list explains
-     * why.
+     * `Approved` when no warning resolves to a decline and the requested document-liveness check produced
+     * a usable result; `In Review` when that requested check produced no usable result
+     * (`DOCUMENT_LIVENESS_NOT_COMPUTED`); `Declined` when a warning resolves to a decline, the `warnings`
+     * list explains why.
      *
      * Known values: {@see IdVerificationVerifyResponseIdVerificationStatus}.
      */
@@ -142,7 +144,8 @@ final class IdVerificationVerifyResponseIdVerification extends BaseModel
 
     /**
      * Empty on a clean approval. Every entry explains one detected risk; entries with `log_type: "error"`
-     * set `status` to `Declined`.
+     * set `status` to `Declined`, and `DOCUMENT_LIVENESS_NOT_COMPUTED` (`log_type: "warning"`) sets it to
+     * `In Review`.
      *
      * @var list<IdVerificationVerifyResponseIdVerificationWarnings>|null
      */

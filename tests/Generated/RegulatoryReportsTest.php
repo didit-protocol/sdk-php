@@ -177,7 +177,9 @@ final class RegulatoryReportsTest extends GeneratedTestCase
     {
         $this->queueEmpty(204);
 
-        $result = $this->client->regulatoryReports->delete('reportUuid-1');
+        $result = $this->client->regulatoryReports->delete('reportUuid-1', [
+            'confirm_delete' => true,
+        ]);
 
         $request = $this->lastRequest();
         self::assertSame('DELETE', $request->getMethod());
@@ -185,7 +187,8 @@ final class RegulatoryReportsTest extends GeneratedTestCase
         self::assertSame('/v3/organization/org-7f3a/application/app-91c2/regulatory-reports/reportUuid-1/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('', (string) $request->getBody());
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"confirm_delete":true}', $this->canonicalBody($request));
         self::assertSame(204, $result->rawResponse()?->status);
     }
 

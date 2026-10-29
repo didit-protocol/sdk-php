@@ -25,6 +25,8 @@ final class TravelRuleTransferPatchRequestAction
 
     public const UPDATE_ORIGINATOR_WALLET = 'update_originator_wallet';
 
+    public const BENEFICIARY_VASP = 'beneficiary_vasp';
+
     private function __construct()
     {
     }

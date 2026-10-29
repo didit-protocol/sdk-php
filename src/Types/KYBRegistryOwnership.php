@@ -16,9 +16,10 @@ use Didit\Core\Hydrate;
 final class KYBRegistryOwnership extends BaseModel
 {
     /**
-     * `delivered` when the registry published ownership; `unavailable` when it did not (see
-     * `unavailable_reason`); `pending` while the registry is still fetching it; `not_requested` for the
-     * Basic tier.
+     * `delivered` when the registry published ownership; `not_held` when the ownership registry answered
+     * and does not list the company at all (see `unavailable_reason`); `unavailable` when it did not serve
+     * the ownership data for any other reason (see `unavailable_reason`); `pending` while the registry is
+     * still fetching it; `not_requested` for the Basic tier.
      *
      * Known values: {@see KYBRegistryOwnershipStatus}.
      */

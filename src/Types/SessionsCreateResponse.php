@@ -56,6 +56,13 @@ final class SessionsCreateResponse extends BaseModel
     public readonly mixed $metadata;
 
     /**
+     * The tags on the session, by name.
+     *
+     * @var list<string>|null
+     */
+    public readonly ?array $tags;
+
+    /**
      * Current status of the session. Newly created sessions return `Not Started`. If a non-finished
      * session already existed for the same `vendor_data` on the workflow's latest published version, the
      * returned status reflects that existing session.
@@ -100,6 +107,7 @@ final class SessionsCreateResponse extends BaseModel
         $this->url = Hydrate::string($data['url'] ?? null);
         $this->vendorData = Hydrate::string($data['vendor_data'] ?? null);
         $this->metadata = Hydrate::mixed($data['metadata'] ?? null);
+        $this->tags = Hydrate::list($data['tags'] ?? null, Hydrate::string(...));
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->callback = Hydrate::string($data['callback'] ?? null);
         $this->workflowId = Hydrate::string($data['workflow_id'] ?? null);

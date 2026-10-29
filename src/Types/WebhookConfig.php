@@ -70,6 +70,18 @@ final class WebhookConfig extends BaseModel
     public readonly ?int $faceRetentionDays;
 
     /**
+     * When the hosted flow and the native SDKs ask the person for explicit biometric consent before a face
+     * capture. `auto` (default) asks only where a trigger applies: a declared state, the person's IP, or
+     * the identity document's issuer is in Illinois, Texas or Colorado, or the person looks to be in the
+     * US without a known state. `always` asks every person whose workflow captures a face. `never` never
+     * shows the step, and you collect consent yourself before the selfie. Each change is recorded in the
+     * audit log. See [Biometric consent](https://docs.didit.me/getting-started/biometric-consent).
+     *
+     * Known values: {@see WebhookConfigBiometricConsentMode}.
+     */
+    public readonly ?string $biometricConsentMode;
+
+    /**
      * Every event type a destination can subscribe to, with a display label.
      *
      * @var list<WebhookConfigAvailableEvents>|null
@@ -107,6 +119,7 @@ final class WebhookConfig extends BaseModel
         $this->dataRetentionMonths = Hydrate::int($data['data_retention_months'] ?? null);
         $this->faceRetentionPolicy = Hydrate::string($data['face_retention_policy'] ?? null);
         $this->faceRetentionDays = Hydrate::int($data['face_retention_days'] ?? null);
+        $this->biometricConsentMode = Hydrate::string($data['biometric_consent_mode'] ?? null);
         $this->availableEvents = Hydrate::list($data['available_events'] ?? null, static fn (mixed $v) => Hydrate::model($v, WebhookConfigAvailableEvents::class));
         $this->allowedReturnHosts = Hydrate::list($data['allowed_return_hosts'] ?? null, Hydrate::string(...));
         $this->endpoints = Hydrate::list($data['endpoints'] ?? null, static fn (mixed $v) => Hydrate::model($v, WebhookConfigDestination::class));

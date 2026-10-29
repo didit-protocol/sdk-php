@@ -274,4 +274,26 @@ final class TransactionsTest extends GeneratedTestCase
         self::assertSame('binary-content', $result->contents());
         self::assertSame('application/pdf', $result->contentType());
     }
+
+    public function testBatchDelete(): void
+    {
+        $this->queueEmpty(204);
+
+        $result = $this->client->transactions->batchDelete([
+            'transaction_uuids' => [
+                '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
+            ],
+            'delete_all' => true,
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('DELETE', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/organization/org-7f3a/application/app-91c2/transactions/delete/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"transaction_uuids":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"delete_all":true}', $this->canonicalBody($request));
+        self::assertSame(204, $result->rawResponse()?->status);
+    }
 }

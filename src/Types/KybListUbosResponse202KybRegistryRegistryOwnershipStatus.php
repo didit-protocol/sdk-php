@@ -7,10 +7,11 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `delivered` when the ownership data came back, `unavailable` when an ownership tier was requested
- * but the registry had none for this company (see `registry_data.ownership_error`), `pending` when the
- * ownership section has not been retrieved from the registry yet and Didit is still completing it,
- * `not_requested` on the Lite tier.
+ * `delivered` when the ownership data came back, `not_held` when the ownership registry answered and
+ * does not list this company (see `registry_data.ownership_error`), `unavailable` when an ownership
+ * tier was requested but the registry had none for this company or could not be asked (see
+ * `registry_data.ownership_error`), `pending` when the ownership section has not been retrieved from
+ * the registry yet and Didit is still completing it, `not_requested` on the Lite tier.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -19,6 +20,8 @@ final class KybListUbosResponse202KybRegistryRegistryOwnershipStatus
     public const NOT_REQUESTED = 'not_requested';
 
     public const DELIVERED = 'delivered';
+
+    public const NOT_HELD = 'not_held';
 
     public const UNAVAILABLE = 'unavailable';
 

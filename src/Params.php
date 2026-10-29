@@ -24,6 +24,15 @@ namespace Didit;
  *     email: string,
  *     password: string,
  * }
+ * @phpstan-type AddressValidationRequest array{
+ *     address?: string,
+ *     address_line_1?: string,
+ *     address_line_2?: string,
+ *     city?: string,
+ *     region?: string,
+ *     postal_code?: string,
+ *     country: string,
+ * }
  * @phpstan-type AgeEstimationEstimateParams array{
  *     user_image: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
  *     face_liveness_score_decline_threshold?: float|int,
@@ -1628,6 +1637,9 @@ namespace Didit;
  *     why?: string,
  *     how?: string,
  * }
+ * @phpstan-type RegulatoryReportsDeleteParams array{
+ *     confirm_delete?: bool,
+ * }
  * @phpstan-type RegulatoryReportsListParams array{
  *     limit?: int,
  *     offset?: int,
@@ -1759,12 +1771,19 @@ namespace Didit;
  *     callback?: string,
  *     callback_method?: string,
  *     metadata?: mixed,
+ *     tags?: list<string>,
  *     language?: string,
  *     contact_details?: SessionsCreateParamsContactDetails,
  *     expected_details?: SessionsCreateParamsExpectedDetails,
  *     portrait_image?: string,
  *     sandbox_scenario?: string,
  *     sign?: SessionsCreateParamsSign,
+ *     user_state?: string,
+ *     biometric_consent?: SessionsCreateParamsBiometricConsent,
+ * }
+ * @phpstan-type SessionsCreateParamsBiometricConsent array{
+ *     given_at: \DateTimeInterface|string,
+ *     text_version: string,
  * }
  * @phpstan-type SessionsCreateParamsContactDetails array{
  *     email?: string,
@@ -2212,6 +2231,10 @@ namespace Didit;
  *     actions?: list<TransactionRuleAction>,
  *     metadata?: array<string, mixed>,
  * }
+ * @phpstan-type TransactionsBatchDeleteParams array{
+ *     transaction_uuids?: list<string>,
+ *     delete_all?: bool,
+ * }
  * @phpstan-type TransactionsCreateParams array{
  *     transaction_id: string,
  *     transaction_at?: \DateTimeInterface|string,
@@ -2459,6 +2482,31 @@ namespace Didit;
  *     reply_to?: string|null,
  *     files?: list<\Didit\File|\Psr\Http\Message\StreamInterface|resource>,
  * }
+ * @phpstan-type TravelRuleNetworkQuestionnaireAnswers array{
+ *     legal_name?: string,
+ *     registration_number?: string,
+ *     incorporation_country?: string,
+ *     registered_address?: string,
+ *     website?: string,
+ *     lei?: string,
+ *     licences?: list<TravelRuleNetworkQuestionnaireAnswersLicences>,
+ *     operating_jurisdictions?: list<string>,
+ *     compliance_officer_name?: string,
+ *     compliance_officer_email?: string,
+ *     aml_ctf_policy_attested?: bool,
+ *     sanctions_screening_attested?: bool,
+ *     data_protection_attested?: bool,
+ *     data_protection_contact_email?: string,
+ *     expected_monthly_transfers?: int,
+ *     expected_monthly_volume_usd?: string,
+ *     assets?: list<string>,
+ * }
+ * @phpstan-type TravelRuleNetworkQuestionnaireAnswersLicences array{
+ *     regulator: string,
+ *     jurisdiction: string,
+ *     licence_type: string,
+ *     licence_number: string,
+ * }
  * @phpstan-type TravelRuleOwnershipConfirmRequest array{
  *     confirmed: bool,
  *     wallet_address?: string,
@@ -2502,6 +2550,7 @@ namespace Didit;
  *     compliance_email?: string,
  *     wallet_address?: string,
  *     memo?: string,
+ *     beneficiary_vasp?: string,
  * }
  * @phpstan-type TravelRuleTransfersListParams array{
  *     direction?: string,
@@ -2529,6 +2578,15 @@ namespace Didit;
  *     file?: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
  * }
  * @phpstan-type TravelRuleWalletAddressesListParams array{
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type TravelRuleWalletProofDecision array{
+ *     decision: string,
+ *     note?: string,
+ * }
+ * @phpstan-type TravelRuleWalletProofsListParams array{
+ *     status?: string,
  *     limit?: int,
  *     offset?: int,
  * }
@@ -2756,6 +2814,7 @@ namespace Didit;
  *     data_retention_months?: int|null,
  *     face_retention_policy?: string,
  *     face_retention_days?: int|null,
+ *     biometric_consent_mode?: string,
  *     allowed_return_hosts?: list<string>,
  * }
  * @phpstan-type WorkflowsListParams array{

@@ -7,11 +7,15 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
+ * platform: carried by Didit's membership; own: onboarded under the application's own membership.
+ *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
-final class TravelRuleSettingsDetailNetworksSygnaRail
+final class TravelRuleNetworkParticipantSummaryMode
 {
-    public const SYGNA = 'SYGNA';
+    public const PLATFORM = 'platform';
+
+    public const OWN = 'own';
 
     private function __construct()
     {

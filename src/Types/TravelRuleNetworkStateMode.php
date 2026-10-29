@@ -7,12 +7,13 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * own: connected customer membership takes precedence; didit: configured platform membership allowed;
- * off: platform routing disabled with no own membership; unavailable: neither membership available.
+ * own: the application's connected membership is used; didit: Didit's membership carries the
+ * application as its own active participant; off: platform routing disabled in disabled_networks with
+ * no own membership; unavailable: nothing can send on this network yet (see state and reason).
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
-final class TravelRuleSettingsDetailNetworksVerifyvaspMode
+final class TravelRuleNetworkStateMode
 {
     public const OWN = 'own';
 

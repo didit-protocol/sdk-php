@@ -20,6 +20,7 @@ use Didit\Types;
  * The `regulatory_reports` resource.
  *
  * @phpstan-import-type RegulatoryReportsCreateParams from Params
+ * @phpstan-import-type RegulatoryReportsDeleteParams from Params
  * @phpstan-import-type RegulatoryReportsListParams from Params
  * @phpstan-import-type RegulatoryReportsRetrieveDownloadUrlParams from Params
  * @phpstan-import-type RegulatoryReportsUpdateParams from Params
@@ -131,22 +132,27 @@ final class RegulatoryReports extends BaseResource
     /**
      * Delete report.
      *
-     * Delete a draft or validated report. Finalized reports cannot be deleted (409).
+     * Delete a regulatory report permanently. The report, its copied narrative and reasons, its
+     * transaction links, and its generated goAML XML and PDF are erased, including every stored version of
+     * those files. The report disappears from lists and download URLs stop working. Other records,
+     * including the case, transactions, people and companies, are not deleted. There is no undo.
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/`
      *
      * @param string $reportUuid report UUID
+     * @param RegulatoryReportsDeleteParams $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function delete(string $reportUuid, ?RequestOptions $options = null): NoContent
+    public function delete(string $reportUuid, array $params = [], ?RequestOptions $options = null): NoContent
     {
         $response = $this->requester->request(new Operation(
             method: 'DELETE',
             path: '/v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/',
             applicationScope: true,
-        ), ['report_uuid' => $reportUuid], [], $options);
+            bodyTypes: ['json'],
+        ), ['report_uuid' => $reportUuid], $params, $options);
 
         return NoContent::fromResponse($response);
     }
