@@ -1,7 +1,7 @@
 # Didit PHP SDK (`sdk-php`)
 
 The official Didit server-side library for PHP: `didit-protocol/sdk-php` on Packagist.
-Status: in development, not released.
+Status: released (1.0.0 on 2026-10-29). Merging the release-please pull request publishes the next version.
 
 ## Read first
 

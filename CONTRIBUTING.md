@@ -54,18 +54,18 @@ A change to hand-written core behaviour that DESIGN.md describes (client options
 
 ## Releasing
 
-Nothing is released before the first release is approved (not before the 2026-11-01 Didit release). Until then the version stays 0.x and the repository stays private.
+1.0.0 was released on 2026-10-29. Merging the release pull request is the release approval (Alex, 2026-10-29); nobody tags or publishes by hand.
 
 1. Release Please (`.github/workflows/release-please.yml`) keeps a release pull request open with the next version and changelog. It runs only when the repository variable `RELEASES_ENABLED` is `true`, and it never creates tags: Packagist publishes every tag it sees.
 2. Merging that pull request creates no tag yet. The merged pull request stays labelled `autorelease: pending`, and no new release pull request opens until it is tagged.
-3. `.github/workflows/publish.yml` (also gated on `RELEASES_ENABLED`) checks that `Didit\Version::VERSION` equals the release manifest, runs the tests and PHPStan on the merge commit, then waits for a reviewer of the `packagist` environment. Only after that approval does it create the `vX.Y.Z` tag and the GitHub release, attest the build provenance of a source archive (GitHub artifact attestations), attach it to the release and ask Packagist to update. If the checks fail or the approval is rejected, nothing is tagged: fix `main` or run Publish again from the Actions tab.
+3. `.github/workflows/publish.yml` (also gated on `RELEASES_ENABLED`) checks that `Didit\Version::VERSION` equals the release manifest, runs the tests and PHPStan on the merge commit, then, in the `packagist` environment (it holds the Packagist secrets; no reviewers), creates the `vX.Y.Z` tag and the GitHub release, attest the build provenance of a source archive (GitHub artifact attestations), attach it to the release and ask Packagist to update. If the checks fail, nothing is tagged: fix `main` or run Publish again from the Actions tab.
 
-### One-time registry setup (a maintainer, before the first release)
+### One-time registry setup (done for 1.0.0 on 2026-10-29)
 
 1. Make the repository public (Packagist reads public GitHub repositories).
-2. Sign in to packagist.org with the Didit GitHub organisation account and submit `https://github.com/didit-protocol/sdk-php`; the package name `didit-protocol/sdk-php` comes from `composer.json`. Add the Didit maintainers to the package.
+2. The package is registered on packagist.org under the Didit account `didit`, which submitted `https://github.com/didit-protocol/sdk-php`; the package name `didit-protocol/sdk-php` comes from `composer.json`. Add the Didit maintainers to the package.
 3. Install the Packagist GitHub integration (or add the Packagist webhook) so new tags update the package automatically.
 4. Optional fallback: store `PACKAGIST_USERNAME` and `PACKAGIST_TOKEN` (the safe API token from the Packagist profile) as secrets of the `packagist` environment; `publish.yml` then calls the Packagist update API itself.
-5. Create the `packagist` environment in the repository settings with required reviewers, so every publish needs an approval.
+5. The `packagist` environment holds `PACKAGIST_USERNAME` and `PACKAGIST_TOKEN` and has no required reviewers; the Packagist webhook on this repository updates the package on every push.
 6. Set the repository variable `RELEASES_ENABLED` to `true`.
 7. Verify a release: `gh attestation verify sdk-php-vX.Y.Z.zip --repo didit-protocol/sdk-php`.

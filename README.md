@@ -3,8 +3,6 @@
 The official Didit PHP library.
 Identity verification (KYC), business verification (KYB), AML screening, biometrics, transaction monitoring, wallet screening, Travel Rule and customer authentication, from your backend, with typed requests and responses for every Didit server API.
 
-> In development. Not released yet: the first release is planned with the 2026-11-01 Didit release.
-
 - API reference: [docs.didit.me](https://docs.didit.me)
 - Design contract shared by every Didit server SDK: [docs/DESIGN.md](docs/DESIGN.md)
 - Runnable examples, including Laravel and Symfony webhook receivers: [examples/](examples/)
