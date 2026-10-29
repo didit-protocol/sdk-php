@@ -21,6 +21,10 @@ DATE = "2026-10-17"
 REMOVED = "GET /v3/session/imports/{importId}/"
 TEMPLATE = "GET /v3/session/imports/template/"
 ERRORS = "GET /v3/session/imports/{importId}/errors/"
+# The SDK version the deprecations are recorded against, and the next minor release, which ends them.
+CURRENT = re.search(r"VERSION = '([^']+)'", (REPO / "src" / "Version.php").read_text("utf-8")).group(1)
+_major, _minor, _patch = (int(part) for part in CURRENT.split("."))
+NEXT_MINOR = f"{_major}.{_minor + 1}.0"
 
 
 def _sha(path: Path) -> str:
@@ -131,7 +135,7 @@ class SpecSyncTest(unittest.TestCase):
         self.assertEqual(entry["key"], REMOVED)
         self.assertEqual(entry["x-didit-sdk"], {"resource": "sessions.imports", "method": "retrieve", "auth": "api_key", "server": True})
         self.assertEqual(entry["removed_on"], DATE)
-        self.assertEqual(entry["deprecated_since"], "0.1.0")
+        self.assertEqual(entry["deprecated_since"], CURRENT)
         self.assertIn("responses", entry["operation"])
         self.assertNotIn("#/components/responses", json.dumps(entry))
         self.assertIn("SessionImportJob", entry["components"]["schemas"])
@@ -171,7 +175,7 @@ class SpecSyncTest(unittest.TestCase):
         [entry] = self.read("deprecated-operations.json")["operations"]
         self.assertEqual(entry["key"], ERRORS)
         self.assertEqual(entry["x-didit-sdk"], self.overlay[ERRORS])
-        self.assertEqual((entry["removed_on"], entry["deprecated_since"]), (DATE, "0.1.0"))
+        self.assertEqual((entry["removed_on"], entry["deprecated_since"]), (DATE, CURRENT))
         self.assertIn("responses", entry["operation"])
         self.assertNotIn(ERRORS, self.read("overlay.json")["operations"])
         summary = self.summary.read_text("utf-8")
@@ -187,11 +191,11 @@ class SpecSyncTest(unittest.TestCase):
         self.assertEqual((code, out.strip()), (0, "No upstream change"))
 
         version = self.root / "src" / "Version.php"
-        version.write_text(version.read_text("utf-8").replace("'0.1.0'", "'0.2.0'"), "utf-8")
+        version.write_text(version.read_text("utf-8").replace(f"'{CURRENT}'", f"'{NEXT_MINOR}'"), "utf-8")
         code, _, err = self.sync()
         self.assertEqual(code, 0, err)
         self.assertFalse((self.root / "openapi" / "deprecated-operations.json").exists())
-        self.assertIn("`sessions.imports.list_errors()` deleted (deprecated since 0.1.0)", self.commit.read_text("utf-8"))
+        self.assertIn(f"`sessions.imports.list_errors()` deleted (deprecated since {CURRENT})", self.commit.read_text("utf-8"))
         self.assertNotIn("public function listErrors(", build(self.root)[0]["src/Resources/Sessions/Imports.php"])
 
     def test_operation_that_becomes_a_server_operation_again_is_not_deprecated(self) -> None:
@@ -228,11 +232,11 @@ class SpecSyncTest(unittest.TestCase):
         self.upstream(self.remove)
         self.assertEqual(self.sync()[0], 0)
         version = self.root / "src" / "Version.php"
-        version.write_text(version.read_text("utf-8").replace("'0.1.0'", "'0.2.0'"), "utf-8")
+        version.write_text(version.read_text("utf-8").replace(f"'{CURRENT}'", f"'{NEXT_MINOR}'"), "utf-8")
         code, _, err = self.sync()
         self.assertEqual(code, 0, err)
         self.assertFalse((self.root / "openapi" / "deprecated-operations.json").exists())
-        self.assertIn("`sessions.imports.retrieve()` deleted (deprecated since 0.1.0)", self.summary.read_text("utf-8"))
+        self.assertIn(f"`sessions.imports.retrieve()` deleted (deprecated since {CURRENT})", self.summary.read_text("utf-8"))
 
     def test_operation_that_comes_back_gets_its_naming_back(self) -> None:
         self.upstream(self.remove)
