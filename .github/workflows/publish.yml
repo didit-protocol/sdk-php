@@ -4,8 +4,8 @@ name: Publish
 # Packagist has no upload step: it publishes every tag it reads from the
 # repository, so the tag itself is the publish. release-please.yml therefore
 # never tags; this workflow finds the merged release pull request still
-# labelled "autorelease: pending", runs the checks on its merge commit, waits
-# for a required reviewer of the packagist environment, and only then lets
+# labelled "autorelease: pending", runs the checks on its merge commit, and
+# then (in the packagist environment, which holds its secrets) lets
 # Release Please create the vX.Y.Z tag and the GitHub release. It then attests
 # a source archive, attaches it to the release and asks Packagist to update.
 # A release made with the default token starts no other workflow, which is why
