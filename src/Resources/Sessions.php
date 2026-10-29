@@ -84,7 +84,7 @@ final class Sessions extends BaseResource
             method: 'POST',
             path: '/v3/session/',
             bodyTypes: ['json'],
-            jsonHints: ['metadata' => ['o'], 'contact_details' => ['o'], 'expected_details' => ['o'], 'sign' => ['o', ['documents' => ['l', ['o', ['fields' => ['l', ['o', ['anchor' => ['o'], 'validation' => ['o']]]]]]], 'field_values' => ['o']]]],
+            jsonHints: ['metadata' => ['o'], 'contact_details' => ['o'], 'expected_details' => ['o'], 'sign' => ['o', ['documents' => ['l', ['o', ['fields' => ['l', ['o', ['anchor' => ['o'], 'validation' => ['o']]]]]]], 'field_values' => ['o']]], 'biometric_consent' => ['o']],
         ), [], $params, $options);
 
         return Types\SessionsCreateResponse::fromResponse($response);

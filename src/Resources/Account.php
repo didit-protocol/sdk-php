@@ -39,7 +39,9 @@ final class Account extends BaseResource
      * Register Account.
      *
      * Step 1 of programmatic onboarding. Creates a pending account and emails a 6-char code (10 min TTL).
-     * Rate limit: 5/IP/hour.
+     * The address is checked before any account is created: one that cannot receive the code returns 400
+     * `email_undeliverable`. Rate limits: 5/IP/hour, plus a shared hourly budget per network (/24 for
+     * IPv4, /64 for IPv6).
      *
      * `POST /programmatic/register/`
      *

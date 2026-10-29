@@ -9,9 +9,15 @@ namespace Didit\Types;
 /**
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
-final class TravelRuleSettingsDetailNetworksVerifyvaspRail
+final class TravelRuleNetworkStateRail
 {
+    public const GTR = 'GTR';
+
+    public const TRUST = 'TRUST';
+
     public const VERIFYVASP = 'VERIFYVASP';
+
+    public const SYGNA = 'SYGNA';
 
     private function __construct()
     {

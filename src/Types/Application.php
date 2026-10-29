@@ -28,7 +28,8 @@ final class Application extends BaseModel
      * `https://verification.didit.me/v3/...` (sessions, workflows, AML, etc.). Treat as a credential;
      * never expose client-side. New keys start with `sk_live_` (live application) or `sk_test_` (sandbox
      * application), followed by 43 URL-safe characters (letters, digits, `-` and `_`). Keys created before
-     * this format have no prefix and keep working unchanged.
+     * this format have no prefix and keep working unchanged. For 72 hours after you recovered your
+     * account, list, retrieve and update return an empty string here instead of the key.
      */
     public readonly ?string $apiKey;
 

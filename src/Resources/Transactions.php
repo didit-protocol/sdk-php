@@ -9,6 +9,7 @@ namespace Didit\Resources;
 use Didit\Core\BaseResource;
 use Didit\Core\BinaryContent;
 use Didit\Core\Hydrate;
+use Didit\Core\NoContent;
 use Didit\Core\Operation;
 use Didit\Core\Page;
 use Didit\Core\Requester;
@@ -20,6 +21,7 @@ use Didit\Types;
 /**
  * The `transactions` resource.
  *
+ * @phpstan-import-type TransactionsBatchDeleteParams from Params
  * @phpstan-import-type TransactionsCreateParams from Params
  * @phpstan-import-type TransactionsCreateSdkTokenParams from Params
  * @phpstan-import-type TransactionsListParams from Params
@@ -255,5 +257,30 @@ final class Transactions extends BaseResource
         ), ['transaction_uuid' => $transactionUuid], [], $options);
 
         return BinaryContent::fromResponse($response);
+    }
+
+    /**
+     * Batch delete transactions.
+     *
+     * Delete one or more transactions permanently. Select them with `transaction_uuids`, or delete every
+     * transaction in the application with `delete_all: true`.
+     *
+     * `DELETE /v3/organization/{organization_id}/application/{application_id}/transactions/delete/`
+     *
+     * @param TransactionsBatchDeleteParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function batchDelete(array $params = [], ?RequestOptions $options = null): NoContent
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'DELETE',
+            path: '/v3/organization/{organization_id}/application/{application_id}/transactions/delete/',
+            applicationScope: true,
+            bodyTypes: ['json'],
+        ), [], $params, $options);
+
+        return NoContent::fromResponse($response);
     }
 }

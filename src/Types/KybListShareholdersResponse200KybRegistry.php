@@ -237,10 +237,11 @@ final class KybListShareholdersResponse200KybRegistry extends BaseModel
     public readonly ?string $registryTierDelivered;
 
     /**
-     * `delivered` when the ownership data came back, `unavailable` when an ownership tier was requested
-     * but the registry had none for this company (see `registry_data.ownership_error`), `pending` when the
-     * ownership section has not been retrieved from the registry yet and Didit is still completing it,
-     * `not_requested` on the Lite tier.
+     * `delivered` when the ownership data came back, `not_held` when the ownership registry answered and
+     * does not list this company (see `registry_data.ownership_error`), `unavailable` when an ownership
+     * tier was requested but the registry had none for this company or could not be asked (see
+     * `registry_data.ownership_error`), `pending` when the ownership section has not been retrieved from
+     * the registry yet and Didit is still completing it, `not_requested` on the Lite tier.
      *
      * Known values: {@see KybListShareholdersResponse200KybRegistryRegistryOwnershipStatus}.
      */

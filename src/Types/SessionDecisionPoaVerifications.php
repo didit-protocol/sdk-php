@@ -121,6 +121,14 @@ final class SessionDecisionPoaVerifications extends BaseModel
     public readonly ?array $detectedCodes;
 
     /**
+     * Address Validation of the address on this proof of address: whether it exists and its normalised
+     * form, as the document read it (a later correction of `poa_address` does not run it again). Present
+     * when this Proof of Address step enabled the Address Validation add-on and the upload passed the
+     * document checks; `null` otherwise.
+     */
+    public readonly ?AddressValidationResult $addressValidation;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -150,5 +158,6 @@ final class SessionDecisionPoaVerifications extends BaseModel
         $this->extraFiles = Hydrate::list($data['extra_files'] ?? null, Hydrate::string(...));
         $this->warnings = Hydrate::list($data['warnings'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionPoaVerificationsWarnings::class));
         $this->detectedCodes = Hydrate::list($data['detected_codes'] ?? null, static fn (mixed $v) => Hydrate::model($v, DocumentAIDetectedCode::class));
+        $this->addressValidation = Hydrate::model($data['address_validation'] ?? null, AddressValidationResult::class);
     }
 }

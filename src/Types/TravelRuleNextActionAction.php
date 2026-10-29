@@ -7,11 +7,11 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `select_counterparty_vasp`: the end user picks the destination VASP in the wallet-ownership widget.
- * `declare_self_hosted`: the end user declares the wallet self-hosted in the widget. `add_vasp_hint`:
- * tell Didit who the counterparty is, with a VASP name, LEI or travel address (for example a
- * `travel_address` on the destination wallet's address-book entry), then resend.
- * `update_compliance_email` and `resend` are `action` values of `PATCH
+ * `select_counterparty_vasp`: the end user picks the destination VASP in the wallet-ownership widget,
+ * or you PATCH `action=beneficiary_vasp`. `declare_self_hosted`: the end user declares the wallet
+ * self-hosted in the widget. `add_vasp_hint`: tell Didit who the counterparty is, with a VASP name,
+ * LEI or travel address (for example a `travel_address` on the destination wallet's address-book
+ * entry), then resend. `update_compliance_email` and `resend` are `action` values of `PATCH
  * /v3/transactions/{transaction_id}/travel-rule/`: give the counterparty's compliance email again, and
  * re-run routing.
  *

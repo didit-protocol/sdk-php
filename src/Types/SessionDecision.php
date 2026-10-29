@@ -315,6 +315,17 @@ final class SessionDecision extends BaseModel
     public readonly ?array $resubmissions;
 
     /**
+     * Whether the session required explicit biometric consent before a face capture, why, and the evidence
+     * of the answer. User Verification (KYC) sessions only; the same object is in the `decision` of
+     * session webhooks. `null` when the session was never evaluated, for example a workflow without a face
+     * capture. Fields with no recorded value are `null`. A native SDK below 4.10.0, or one that does not
+     * report its version, cannot show the consent step: its face captures run as before, and a session
+     * that required consent then reports `status: "pending"` with `reason:
+     * "BIOMETRIC_CONSENT_UNSUPPORTED_SDK"`.
+     */
+    public readonly ?SessionDecisionBiometricConsent $biometricConsent;
+
+    /**
      * The item's latest Investigator review, or null when it never had one. Carried by the V3 session and
      * business session decision (and so by `status.updated` webhooks).
      */
@@ -362,6 +373,7 @@ final class SessionDecision extends BaseModel
         $this->documentVerifications = Hydrate::list($data['document_verifications'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionDocumentVerifications::class));
         $this->environment = Hydrate::string($data['environment'] ?? null);
         $this->resubmissions = Hydrate::list($data['resubmissions'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionResubmissions::class));
+        $this->biometricConsent = Hydrate::model($data['biometric_consent'] ?? null, SessionDecisionBiometricConsent::class);
         $this->investigator = Hydrate::model($data['investigator'] ?? null, InvestigatorBlock::class);
     }
 }

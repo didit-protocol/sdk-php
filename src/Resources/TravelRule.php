@@ -37,6 +37,10 @@ final class TravelRule extends BaseResource
 
     public readonly TravelRule\Transfers $transfers;
 
+    public readonly TravelRule\Networks $networks;
+
+    public readonly TravelRule\WalletProofs $walletProofs;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
@@ -44,6 +48,8 @@ final class TravelRule extends BaseResource
         $this->workspace = new TravelRule\Workspace($requester);
         $this->counterpartyContacts = new TravelRule\CounterpartyContacts($requester);
         $this->transfers = new TravelRule\Transfers($requester);
+        $this->networks = new TravelRule\Networks($requester);
+        $this->walletProofs = new TravelRule\WalletProofs($requester);
     }
 
     /**

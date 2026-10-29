@@ -39,9 +39,9 @@ final class IdVerificationVerifyResponseIdVerificationWarnings extends BaseModel
     public readonly ?array $additionalData;
 
     /**
-     * Severity. `error` warnings drive `status` to `Declined`; `information` entries are advisory and
-     * never decline on their own. (`warning` is not produced by this endpoint, its options only accept
-     * `DECLINE` or `NO_ACTION`.).
+     * Severity. `error` warnings drive `status` to `Declined`; `warning` (only
+     * `DOCUMENT_LIVENESS_NOT_COMPUTED`, when the requested forgery check produced no usable score) drives
+     * `status` to `In Review`; `information` entries are advisory and never change the status.
      *
      * Known values: {@see IdVerificationVerifyResponseIdVerificationWarningsLogType}.
      */

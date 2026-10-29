@@ -174,7 +174,8 @@ final class Cases extends BaseResource
     /**
      * Delete case.
      *
-     * Delete a case. There is no undelete endpoint.
+     * Delete a case permanently. Its draft regulatory reports are deleted with it. Linked verifications,
+     * people, companies and transactions are not deleted. There is no undelete endpoint.
      *
      * `DELETE /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/`
      *

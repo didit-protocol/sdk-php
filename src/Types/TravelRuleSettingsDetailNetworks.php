@@ -10,22 +10,36 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Effective membership configuration for each network. No network, including GTR, is included by
- * default. This is not a live health or delivery check.
+ * Per network, how this application would send and why it cannot. No network, including GTR, is
+ * included by default: a network is reachable through your own connected membership, or through
+ * Didit's membership once Didit's membership of that network is live and your own participant on it is
+ * active. Not a live health or delivery check.
  */
 final class TravelRuleSettingsDetailNetworks extends BaseModel
 {
-    /** The `gtr` field. */
-    public readonly ?TravelRuleSettingsDetailNetworksGtr $gtr;
+    /**
+     * How Travel Rule messages on one network would be sent for this application, and why they cannot be.
+     * Configuration status, not a live health or delivery check.
+     */
+    public readonly ?TravelRuleNetworkState $gtr;
 
-    /** The `trust` field. */
-    public readonly ?TravelRuleSettingsDetailNetworksTrust $trust;
+    /**
+     * How Travel Rule messages on one network would be sent for this application, and why they cannot be.
+     * Configuration status, not a live health or delivery check.
+     */
+    public readonly ?TravelRuleNetworkState $trust;
 
-    /** The `verifyvasp` field. */
-    public readonly ?TravelRuleSettingsDetailNetworksVerifyvasp $verifyvasp;
+    /**
+     * How Travel Rule messages on one network would be sent for this application, and why they cannot be.
+     * Configuration status, not a live health or delivery check.
+     */
+    public readonly ?TravelRuleNetworkState $verifyvasp;
 
-    /** The `sygna` field. */
-    public readonly ?TravelRuleSettingsDetailNetworksSygna $sygna;
+    /**
+     * How Travel Rule messages on one network would be sent for this application, and why they cannot be.
+     * Configuration status, not a live health or delivery check.
+     */
+    public readonly ?TravelRuleNetworkState $sygna;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -33,9 +47,9 @@ final class TravelRuleSettingsDetailNetworks extends BaseModel
     public function __construct(array $data)
     {
         parent::__construct($data);
-        $this->gtr = Hydrate::model($data['gtr'] ?? null, TravelRuleSettingsDetailNetworksGtr::class);
-        $this->trust = Hydrate::model($data['trust'] ?? null, TravelRuleSettingsDetailNetworksTrust::class);
-        $this->verifyvasp = Hydrate::model($data['verifyvasp'] ?? null, TravelRuleSettingsDetailNetworksVerifyvasp::class);
-        $this->sygna = Hydrate::model($data['sygna'] ?? null, TravelRuleSettingsDetailNetworksSygna::class);
+        $this->gtr = Hydrate::model($data['gtr'] ?? null, TravelRuleNetworkState::class);
+        $this->trust = Hydrate::model($data['trust'] ?? null, TravelRuleNetworkState::class);
+        $this->verifyvasp = Hydrate::model($data['verifyvasp'] ?? null, TravelRuleNetworkState::class);
+        $this->sygna = Hydrate::model($data['sygna'] ?? null, TravelRuleNetworkState::class);
     }
 }
