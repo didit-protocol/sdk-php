@@ -1,0 +1,21 @@
+name: Feature request
+description: Suggest an improvement to the PHP SDK.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: What are you trying to do, and what makes it hard today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: The change you would like
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: |
+        API endpoints and fields come from the OpenAPI contract at docs.didit.me, so a missing endpoint is fixed there and reaches every Didit SDK.

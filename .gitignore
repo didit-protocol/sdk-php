@@ -1,0 +1,11 @@
+/vendor/
+composer.phar
+.phpunit.cache/
+.php-cs-fixer.cache
+coverage/
+.DS_Store
+.env
+.env.*
+/composer.lock
+/.phpstan.cache/
+__pycache__/
