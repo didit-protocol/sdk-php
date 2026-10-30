@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from helpers import write_sessions
+from helpers import document, naming, ok, write_openapi, write_sessions
 from didit_codegen import model, php, spec
 from didit_codegen.model import AnyT, ArrayT, FreeObjT, MapT, Prop, Scalar, Shape, ShapeT
 
