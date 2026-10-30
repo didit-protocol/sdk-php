@@ -96,5 +96,56 @@ class JsonHintTest(unittest.TestCase):
         self.assertIn("jsonHints: ['contact_details' => ['o'], 'metadata' => ['o']]", source)
 
 
+class MultiContentOneOfBodyTest(unittest.TestCase):
+    """A body that is a union in one content type and has another form (DESIGN 5.1)."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        row = {"$ref": "#/components/schemas/WalletAddressImportRow"}
+        paths = {
+            "/v3/travel-rule/wallet-addresses/import/": {
+                "post": {
+                    "summary": "Import wallet addresses",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {"oneOf": [
+                                    {"type": "object", "required": ["entries"],
+                                     "properties": {"entries": {"type": "array", "minItems": 1, "items": row}}},
+                                    {"type": "array", "minItems": 1, "items": row},
+                                ]},
+                            },
+                            "multipart/form-data": {
+                                "schema": {"type": "object", "required": ["file"],
+                                           "properties": {"file": {"type": "string", "format": "binary"}}},
+                            },
+                        },
+                    },
+                    "responses": ok({"type": "object", "properties": {"total": {"type": "integer"}}}),
+                }
+            }
+        }
+        schemas = {"WalletAddressImportRow": {"type": "object", "properties": {"address": {"type": "string"}}}}
+        overlay = {"POST /v3/travel-rule/wallet-addresses/import/": naming("travel_rule.wallet_addresses", "bulk_import")}
+        with tempfile.TemporaryDirectory() as tmp:
+            write_openapi(Path(tmp), document(paths, schemas), overlay)
+            s = spec.load(Path(tmp))
+        cls.reg = model.Registry()
+        cls.op = next(o for o in model.build(cls.reg, s.server_operations))
+
+    def test_every_branch_of_the_union_reaches_the_params(self) -> None:
+        body = {p.wire: p for p in self.op.body.props}
+        self.assertEqual(sorted(body), ["entries", "file"])
+        self.assertIsInstance(body["entries"].type, ArrayT)
+        # Required in one branch only, so not required of every caller.
+        self.assertFalse(body["entries"].required)
+        self.assertTrue(body["file"].required)
+
+    def test_the_generated_params_alias_lists_the_union_field(self) -> None:
+        source = php.emit_params(list(self.reg.shapes.values()), [])
+        self.assertIn("entries?: list<WalletAddressImportRow>,", source)
+
+
 if __name__ == "__main__":
     unittest.main()
