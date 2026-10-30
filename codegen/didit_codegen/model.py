@@ -529,11 +529,28 @@ def _merge_body_schemas(doc: Document, content: dict[str, Any]) -> tuple[dict[st
     required_sets = []
     for raw in schemas:
         s = doc.deref(raw)
+        if isinstance(s, dict) and ("oneOf" in s or "anyOf" in s):
+            # A content type that accepts more than one shape (an object or a
+            # bare array, say) contributes the properties of every branch; a
+            # key is required only when every branch requires it.
+            branches = s.get("oneOf") if "oneOf" in s else s.get("anyOf")
+            flat: dict[str, Any] = {}
+            branch_required: list[set[str]] = []
+            for branch in branches if isinstance(branches, list) else []:
+                b = doc.deref(branch)
+                if not isinstance(b, dict):
+                    continue
+                for key, prop in b.get("properties", {}).items():
+                    flat.setdefault(key, prop)
+                branch_required.append(set(b.get("required", [])))
+            s = {"properties": flat,
+                 "required": sorted(set.intersection(*branch_required)) if branch_required else [],
+                 "description": s.get("description", "")}
         if isinstance(s, dict) and isinstance(s.get("allOf"), list):
             parts = [doc.deref(x) for x in s["allOf"]]
             s = {"properties": {k: v for p in parts for k, v in p.get("properties", {}).items()},
                  "required": [r for p in parts for r in p.get("required", [])], "description": s.get("description", "")}
-        for key, prop in s.get("properties", {}).items():
+        for key, prop in (s.get("properties", {}) if isinstance(s, dict) else {}).items():
             existing = props.get(key)
             if existing is None:
                 props[key] = prop
@@ -544,10 +561,11 @@ def _merge_body_schemas(doc: Document, content: dict[str, Any]) -> tuple[dict[st
                     props[key] = {"oneOf": [existing, prop], "description": ea.get("description", "")}
                 elif ea.get("format") == "binary" and eb.get("format") != "binary":
                     props[key] = {"oneOf": [existing, prop], "description": ea.get("description", "")}
-        required_sets.append(set(s.get("required", [])))
+        required_sets.append(set(s.get("required", [])) if isinstance(s, dict) else set())
     required = set.intersection(*required_sets) if required_sets else set()
     first = doc.deref(schemas[0])
-    return {"type": "object", "properties": props, "required": [k for k in props if k in required], "description": first.get("description", "")}, None
+    description = first.get("description", "") if isinstance(first, dict) else ""
+    return {"type": "object", "properties": props, "required": [k for k in props if k in required], "description": description}, None
 
 
 def _response(reg: Registry, o: Operation, prefix: str) -> Response:
