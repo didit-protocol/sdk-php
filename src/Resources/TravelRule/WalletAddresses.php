@@ -146,6 +146,7 @@ final class WalletAddresses extends BaseResource
             method: 'POST',
             path: '/v3/travel-rule/wallet-addresses/import/',
             bodyTypes: ['json', 'multipart'],
+            jsonHints: ['entries' => ['l', ['o']]],
         ), [], $params, $options);
 
         return Types\WalletAddressImportReport::fromResponse($response);
