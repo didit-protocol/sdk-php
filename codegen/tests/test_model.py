@@ -138,9 +138,10 @@ class MultiContentOneOfBodyTest(unittest.TestCase):
         body = {p.wire: p for p in self.op.body.props}
         self.assertEqual(sorted(body), ["entries", "file"])
         self.assertIsInstance(body["entries"].type, ArrayT)
-        # Required in one branch only, so not required of every caller.
+        # Neither form is required of every caller: the JSON union keeps no
+        # key across its branches, and the multipart file is only one form.
         self.assertFalse(body["entries"].required)
-        self.assertTrue(body["file"].required)
+        self.assertFalse(body["file"].required)
 
     def test_the_generated_params_alias_lists_the_union_field(self) -> None:
         source = php.emit_params(list(self.reg.shapes.values()), [])
