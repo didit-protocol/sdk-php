@@ -2575,6 +2575,7 @@ namespace Didit;
  *     vout?: int|null,
  * }
  * @phpstan-type TravelRuleWalletAddressesBulkImportParams array{
+ *     entries?: list<WalletAddressImportRow>,
  *     file?: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
  * }
  * @phpstan-type TravelRuleWalletAddressesListParams array{
@@ -2681,6 +2682,19 @@ namespace Didit;
  *     holder_vendor_data?: string,
  *     entity_type?: string,
  *     travel_address?: string,
+ * }
+ * @phpstan-type WalletAddressImportRow array{
+ *     address?: string,
+ *     address_hash?: string,
+ *     chain?: string,
+ *     memo?: string,
+ *     holder_name?: string,
+ *     holder_vendor_data?: string,
+ *     entity_type?: string,
+ *     label?: string,
+ *     owner_type?: string,
+ *     travel_address?: string,
+ *     self_declared?: bool,
  * }
  * @phpstan-type WalletScreeningResult array{
  *     provider: string,

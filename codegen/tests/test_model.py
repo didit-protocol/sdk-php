@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from helpers import write_sessions
+from helpers import document, naming, ok, write_openapi, write_sessions
 from didit_codegen import model, php, spec
 from didit_codegen.model import AnyT, ArrayT, FreeObjT, MapT, Prop, Scalar, Shape, ShapeT
 
@@ -94,6 +94,58 @@ class JsonHintTest(unittest.TestCase):
         ops = model.build(reg, s.server_operations)
         source = php.emit_resource(php.walk(php.resource_tree(ops)).__next__())
         self.assertIn("jsonHints: ['contact_details' => ['o'], 'metadata' => ['o']]", source)
+
+
+class MultiContentOneOfBodyTest(unittest.TestCase):
+    """A body that is a union in one content type and has another form (DESIGN 5.1)."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        row = {"$ref": "#/components/schemas/WalletAddressImportRow"}
+        paths = {
+            "/v3/travel-rule/wallet-addresses/import/": {
+                "post": {
+                    "summary": "Import wallet addresses",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {"oneOf": [
+                                    {"type": "object", "required": ["entries"],
+                                     "properties": {"entries": {"type": "array", "minItems": 1, "items": row}}},
+                                    {"type": "array", "minItems": 1, "items": row},
+                                ]},
+                            },
+                            "multipart/form-data": {
+                                "schema": {"type": "object", "required": ["file"],
+                                           "properties": {"file": {"type": "string", "format": "binary"}}},
+                            },
+                        },
+                    },
+                    "responses": ok({"type": "object", "properties": {"total": {"type": "integer"}}}),
+                }
+            }
+        }
+        schemas = {"WalletAddressImportRow": {"type": "object", "properties": {"address": {"type": "string"}}}}
+        overlay = {"POST /v3/travel-rule/wallet-addresses/import/": naming("travel_rule.wallet_addresses", "bulk_import")}
+        with tempfile.TemporaryDirectory() as tmp:
+            write_openapi(Path(tmp), document(paths, schemas), overlay)
+            s = spec.load(Path(tmp))
+        cls.reg = model.Registry()
+        cls.op = next(o for o in model.build(cls.reg, s.server_operations))
+
+    def test_every_branch_of_the_union_reaches_the_params(self) -> None:
+        body = {p.wire: p for p in self.op.body.props}
+        self.assertEqual(sorted(body), ["entries", "file"])
+        self.assertIsInstance(body["entries"].type, ArrayT)
+        # Neither form is required of every caller: the JSON union keeps no
+        # key across its branches, and the multipart file is only one form.
+        self.assertFalse(body["entries"].required)
+        self.assertFalse(body["file"].required)
+
+    def test_the_generated_params_alias_lists_the_union_field(self) -> None:
+        source = php.emit_params(list(self.reg.shapes.values()), [])
+        self.assertIn("entries?: list<WalletAddressImportRow>,", source)
 
 
 if __name__ == "__main__":

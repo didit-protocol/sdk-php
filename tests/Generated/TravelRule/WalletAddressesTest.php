@@ -115,6 +115,9 @@ final class WalletAddressesTest extends GeneratedTestCase
         $this->queueJson(200, '{"total":3,"created":2,"existing":1,"duplicate":0,"failed":0,"rows":[{"row":1,"status":"existing","entry_id":"11111111-2222-3333-4444-555555555555","errors":{},"duplicate_of_row":null},{"row":2,"status":"created","entry_id":"22222222-3333-4444-5555-666666666666","errors":{},"duplicate_of_row":null},{"row":3,"status":"created","entry_id":"33333333-4444-5555-6666-777777777777","errors":{},"duplicate_of_row":null}]}');
 
         $result = $this->client->travelRule->walletAddresses->bulkImport([
+            'entries' => [
+                [],
+            ],
             'file' => File::fromBytes('fake-file-bytes', 'file.jpg', 'image/jpeg'),
         ]);
 
@@ -126,6 +129,9 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertStringStartsWith('multipart/form-data; boundary=', $request->getHeaderLine('Content-Type'));
         self::assertSame([
+            'entries' => [
+                '[{}]',
+            ],
             'file' => [
                 'file:file.jpg:image/jpeg:fake-file-bytes',
             ],
