@@ -85,6 +85,22 @@ final class DatabaseValidationTest extends GeneratedTestCase
             'emission_number' => 'emission_number-value',
             'bvn' => 'bvn-value',
             'bank_card_number' => 'bank_card_number-value',
+            'company_registration_number' => 'company_registration_number-value',
+            'company_name' => 'company_name-value',
+            'initials' => 'initials-value',
+            'licence_number' => 'licence_number-value',
+            'refugee_file_number' => 'refugee_file_number-value',
+            'bank_name' => 'bank_name-value',
+            'bank_account_number' => 'bank_account_number-value',
+            'account_type' => 'account_type-value',
+            'phone_number' => 'phone_number-value',
+            'right_thumb' => 'right_thumb-value',
+            'left_thumb' => 'left_thumb-value',
+            'score_level' => 1,
+            'max_matches' => 1,
+            'vehicle_register_number' => 'vehicle_register_number-value',
+            'vehicle_licence_plate' => 'vehicle_licence_plate-value',
+            'vin' => 'vin-value',
             'ssn' => 'ssn-value',
             'phone' => 'phone-value',
             'landline' => 'landline-value',
@@ -272,6 +288,54 @@ final class DatabaseValidationTest extends GeneratedTestCase
             ],
             'bank_card_number' => [
                 'bank_card_number-value',
+            ],
+            'company_registration_number' => [
+                'company_registration_number-value',
+            ],
+            'company_name' => [
+                'company_name-value',
+            ],
+            'initials' => [
+                'initials-value',
+            ],
+            'licence_number' => [
+                'licence_number-value',
+            ],
+            'refugee_file_number' => [
+                'refugee_file_number-value',
+            ],
+            'bank_name' => [
+                'bank_name-value',
+            ],
+            'bank_account_number' => [
+                'bank_account_number-value',
+            ],
+            'account_type' => [
+                'account_type-value',
+            ],
+            'phone_number' => [
+                'phone_number-value',
+            ],
+            'right_thumb' => [
+                'right_thumb-value',
+            ],
+            'left_thumb' => [
+                'left_thumb-value',
+            ],
+            'score_level' => [
+                '1',
+            ],
+            'max_matches' => [
+                '1',
+            ],
+            'vehicle_register_number' => [
+                'vehicle_register_number-value',
+            ],
+            'vehicle_licence_plate' => [
+                'vehicle_licence_plate-value',
+            ],
+            'vin' => [
+                'vin-value',
             ],
             'ssn' => [
                 'ssn-value',
