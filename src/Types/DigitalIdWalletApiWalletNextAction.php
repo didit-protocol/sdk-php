@@ -17,6 +17,9 @@ final class DigitalIdWalletApiWalletNextAction extends BaseModel
     /**
      * redirect: send the user's browser to url. confirm_in_app: show verification_code to the user, who
      * checks it matches the code in their wallet app and confirms there; then poll.
+     * request_digital_credential: in a user gesture on the origin you started with, ask the wallet with
+     * digital_credentials.request, then send what it returns to POST
+     * .../verifications/{request_id}/response/.
      *
      * Known values: {@see DigitalIdWalletApiWalletNextActionTypeEnum}.
      */
@@ -24,6 +27,9 @@ final class DigitalIdWalletApiWalletNextAction extends BaseModel
 
     /** redirect only: where the user signs in with the wallet. */
     public readonly ?string $url;
+
+    /** request_digital_credential only: the request to hand to the wallet. */
+    public readonly ?DigitalIdWalletApiWalletDigitalCredentialsRequest $digitalCredentials;
 
     /** confirm_in_app only: the 4-digit comparison code the wallet app shows too. */
     public readonly ?string $verificationCode;
@@ -43,6 +49,7 @@ final class DigitalIdWalletApiWalletNextAction extends BaseModel
         parent::__construct($data);
         $this->type = Hydrate::string($data['type'] ?? null);
         $this->url = Hydrate::string($data['url'] ?? null);
+        $this->digitalCredentials = Hydrate::model($data['digital_credentials'] ?? null, DigitalIdWalletApiWalletDigitalCredentialsRequest::class);
         $this->verificationCode = Hydrate::string($data['verification_code'] ?? null);
         $this->pollIntervalSeconds = Hydrate::int($data['poll_interval_seconds'] ?? null);
     }

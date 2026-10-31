@@ -661,6 +661,22 @@ namespace Didit;
  *     emission_number?: string,
  *     bvn?: string,
  *     bank_card_number?: string,
+ *     company_registration_number?: string,
+ *     company_name?: string,
+ *     initials?: string,
+ *     licence_number?: string,
+ *     refugee_file_number?: string,
+ *     bank_name?: string,
+ *     bank_account_number?: string,
+ *     account_type?: string,
+ *     phone_number?: string,
+ *     right_thumb?: string,
+ *     left_thumb?: string,
+ *     score_level?: int,
+ *     max_matches?: int,
+ *     vehicle_register_number?: string,
+ *     vehicle_licence_plate?: string,
+ *     vin?: string,
  *     ssn?: string,
  *     phone?: string,
  *     landline?: string,
@@ -778,6 +794,13 @@ namespace Didit;
  *     return_url: string,
  *     device?: string,
  * }
+ * @phpstan-type DigitalIdWalletApiGoogleWalletWalletVerificationStartRequest array{
+ *     vendor_data?: string|null,
+ *     metadata?: array<string, mixed>|null,
+ *     sandbox_scenario?: string,
+ *     country: string,
+ *     origin: string,
+ * }
  * @phpstan-type DigitalIdWalletApiGovbrWalletVerificationStartRequest array{
  *     vendor_data?: string|null,
  *     metadata?: array<string, mixed>|null,
@@ -880,6 +903,9 @@ namespace Didit;
  *     country?: string,
  *     return_url: string,
  *     device?: string,
+ * }
+ * @phpstan-type DigitalIdWalletApiWalletDigitalCredentialResponseRequest array{
+ *     response: array<string, mixed>,
  * }
  * @phpstan-type DocumentAiAnalyzeParams array{
  *     document: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
@@ -1129,6 +1155,14 @@ namespace Didit;
  *     country?: string,
  *     return_url: string,
  *     device?: string,
+ *     idempotency_key?: string,
+ * }
+ * @phpstan-type IdWalletsStartGoogleWalletParams array{
+ *     vendor_data?: string|null,
+ *     metadata?: array<string, mixed>|null,
+ *     sandbox_scenario?: string,
+ *     country: string,
+ *     origin: string,
  *     idempotency_key?: string,
  * }
  * @phpstan-type IdWalletsStartGovbrParams array{

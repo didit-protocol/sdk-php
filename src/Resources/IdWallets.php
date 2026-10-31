@@ -16,6 +16,7 @@ use Didit\Types;
 /**
  * The `id_wallets` resource.
  *
+ * @phpstan-import-type DigitalIdWalletApiWalletDigitalCredentialResponseRequest from Params
  * @phpstan-import-type IdWalletsStartAudkenniParams from Params
  * @phpstan-import-type IdWalletsStartBankidCzParams from Params
  * @phpstan-import-type IdWalletsStartBankidNoParams from Params
@@ -28,6 +29,7 @@ use Didit\Types;
  * @phpstan-import-type IdWalletsStartFranceconnectParams from Params
  * @phpstan-import-type IdWalletsStartFrejaidParams from Params
  * @phpstan-import-type IdWalletsStartFtnParams from Params
+ * @phpstan-import-type IdWalletsStartGoogleWalletParams from Params
  * @phpstan-import-type IdWalletsStartGovbrParams from Params
  * @phpstan-import-type IdWalletsStartGovukWalletParams from Params
  * @phpstan-import-type IdWalletsStartIdcardEeParams from Params
@@ -941,6 +943,69 @@ final class IdWallets extends BaseResource
         $response = $this->requester->request(new Operation(
             method: 'POST',
             path: '/v3/id-verification/wallets/eudi/',
+            headers: ['idempotency_key' => 'Idempotency-Key'],
+            bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['metadata' => ['o']],
+        ), [], $params, $options);
+
+        return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
+    }
+
+    /**
+     * Submit a wallet response.
+     *
+     * Digital Credentials API wallets (Google Wallet): send what the wallet returned to your page or app
+     * for a verification whose next_action is request_digital_credential. Didit decrypts it, checks the
+     * issuer's signature against the trusted issuer roots, every returned value against its signed digest,
+     * and the device signature over your origin and this request, then decides the verification: verified
+     * (billed once) or declined with the error code. Single use: a second submit returns the decided
+     * verification.
+     *
+     * `POST /v3/id-verification/wallets/verifications/{request_id}/response/`
+     *
+     * @param string $requestId the request_id the start endpoint returned
+     * @param DigitalIdWalletApiWalletDigitalCredentialResponseRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function submitVerificationResponse(
+        string $requestId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\DigitalIdWalletApiWalletVerificationResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/id-verification/wallets/verifications/{request_id}/response/',
+            bodyTypes: ['json', 'multipart', 'form'],
+            jsonHints: ['response' => ['o']],
+        ), ['request_id' => $requestId], $params, $options);
+
+        return Types\DigitalIdWalletApiWalletVerificationResponse::fromResponse($response);
+    }
+
+    /**
+     * Start Google Wallet verification.
+     *
+     * Start a Google Wallet sign-in (Google Wallet (ID pass) and US state issuers (mobile driving
+     * licence); USA, GBR, BRA, SGP, TWN) without any workflow. Billed once, only when the identity is
+     * verified. The response carries next_action.type=request_digital_credential with a request Didit
+     * signed for your application, usable only from origin.
+     *
+     * `POST /v3/id-verification/wallets/google-wallet/`
+     *
+     * @param IdWalletsStartGoogleWalletParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function startGoogleWallet(
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\DigitalIdWalletApiWalletVerificationResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/id-verification/wallets/google-wallet/',
             headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json', 'multipart', 'form'],
             jsonHints: ['metadata' => ['o']],
