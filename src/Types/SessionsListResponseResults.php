@@ -120,6 +120,29 @@ final class SessionsListResponseResults extends BaseModel
      */
     public readonly ?SessionsListResponseResultsAdditionalDetails $additionalDetails;
 
+    /** The Console reviewer the session is assigned to, or `null` when nobody holds it. */
+    public readonly ?SessionsListResponseResultsAssignee $assignee;
+
+    /** When the session started waiting for review. `null` unless the session is `In Review`. */
+    public readonly ?\DateTimeImmutable $waitingSince;
+
+    /**
+     * When the review is due, from the review deadline set for your application in the Console. `null`
+     * unless the session is `In Review` and a deadline is set.
+     */
+    public readonly ?\DateTimeImmutable $slaDueAt;
+
+    /**
+     * Up to a few of the session's most important warnings, for a quick triage view. The full list is in
+     * the decision.
+     *
+     * @var list<SessionsListResponseResultsTopWarnings>|null
+     */
+    public readonly ?array $topWarnings;
+
+    /** Number of warnings on the session. */
+    public readonly ?int $warningsCount;
+
     /** Identifier of the workflow this session was created with. */
     public readonly ?string $workflowId;
 
@@ -160,6 +183,11 @@ final class SessionsListResponseResults extends BaseModel
         $this->phoneNumber = Hydrate::model($data['phone_number'] ?? null, SessionsListResponseResultsPhoneNumber::class);
         $this->emailAddress = Hydrate::model($data['email_address'] ?? null, SessionsListResponseResultsEmailAddress::class);
         $this->additionalDetails = Hydrate::model($data['additional_details'] ?? null, SessionsListResponseResultsAdditionalDetails::class);
+        $this->assignee = Hydrate::model($data['assignee'] ?? null, SessionsListResponseResultsAssignee::class);
+        $this->waitingSince = Hydrate::dateTime($data['waiting_since'] ?? null);
+        $this->slaDueAt = Hydrate::dateTime($data['sla_due_at'] ?? null);
+        $this->topWarnings = Hydrate::list($data['top_warnings'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionsListResponseResultsTopWarnings::class));
+        $this->warningsCount = Hydrate::int($data['warnings_count'] ?? null);
         $this->workflowId = Hydrate::string($data['workflow_id'] ?? null);
         $this->workflowType = Hydrate::string($data['workflow_type'] ?? null);
         $this->workflowLabel = Hydrate::string($data['workflow_label'] ?? null);

@@ -15,6 +15,8 @@ final class DigitalIdWalletApiInteractionEnum
 
     public const IN_APP = 'in_app';
 
+    public const DIGITAL_CREDENTIALS = 'digital_credentials';
+
     private function __construct()
     {
     }

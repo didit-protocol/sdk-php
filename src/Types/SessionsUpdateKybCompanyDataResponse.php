@@ -189,12 +189,14 @@ final class SessionsUpdateKybCompanyDataResponse extends BaseModel
     public readonly ?array $accounts;
 
     /**
-     * Raw registry payload snapshot. Every key you PATCH is merged into this map (dates serialized as ISO
-     * strings), so the "extracted from registry" view reflects operator corrections.
-     *
-     * @var array<string, mixed>|null
+     * Didit's normalized registry detail for the company: the ownership outcome (`ownership_error`,
+     * `section_errors`, `ubo_resolution`, `lite_enrichment`), the corrections made with update-data, and
+     * registry facts that have no field of their own. It never carries the registry source's own record.
+     * Every key is optional and present only when the company has a value for it; new keys may be added.
+     * Read the canonical fields (`addresses`, `industries`, `ownership`,
+     * `beneficial_owners[].shareholding`) for anything they cover.
      */
-    public readonly ?array $registryData;
+    public readonly ?KYBRegistryData $registryData;
 
     /**
      * What the end user typed during the hosted registry-confirmation step. Never modified by this
@@ -262,7 +264,7 @@ final class SessionsUpdateKybCompanyDataResponse extends BaseModel
         $this->addresses = Hydrate::list($data['addresses'] ?? null, Hydrate::assoc(...));
         $this->industries = Hydrate::list($data['industries'] ?? null, Hydrate::assoc(...));
         $this->accounts = Hydrate::assoc($data['accounts'] ?? null);
-        $this->registryData = Hydrate::assoc($data['registry_data'] ?? null);
+        $this->registryData = Hydrate::model($data['registry_data'] ?? null, KYBRegistryData::class);
         $this->userProvidedData = Hydrate::assoc($data['user_provided_data'] ?? null);
         $this->confirmedByUserAt = Hydrate::dateTime($data['confirmed_by_user_at'] ?? null);
         $this->lastConsoleEditAt = Hydrate::dateTime($data['last_console_edit_at'] ?? null);

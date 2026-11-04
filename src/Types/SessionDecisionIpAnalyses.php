@@ -115,6 +115,34 @@ final class SessionDecisionIpAnalyses extends BaseModel
      */
     public readonly ?array $matches;
 
+    /** The `browser_version` field. */
+    public readonly ?string $browserVersion;
+
+    /** The `os_version` field. */
+    public readonly ?string $osVersion;
+
+    /** The browser's user agent string. */
+    public readonly ?string $userAgent;
+
+    /** The `Accept-Language` header the browser sent. */
+    public readonly ?string $acceptLanguage;
+
+    /** Identifier of the browsing session the verification ran in. */
+    public readonly ?string $sessionIdentifier;
+
+    /** Age of that browsing session in milliseconds when the step ran. */
+    public readonly ?int $sessionAgeMs;
+
+    /** Accuracy radius, in metres, of the coordinates the device reported. */
+    public readonly ?float $coordsAccuracy;
+
+    /**
+     * Raw device signals collected for the step.
+     *
+     * @var array<string, mixed>|null
+     */
+    public readonly ?array $rawDeviceData;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -147,5 +175,13 @@ final class SessionDecisionIpAnalyses extends BaseModel
         $this->poaDocument = Hydrate::model($data['poa_document'] ?? null, SessionDecisionIpAnalysesPoaDocument::class);
         $this->warnings = Hydrate::list($data['warnings'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionIpAnalysesWarnings::class));
         $this->matches = Hydrate::list($data['matches'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionIpAnalysesMatches::class));
+        $this->browserVersion = Hydrate::string($data['browser_version'] ?? null);
+        $this->osVersion = Hydrate::string($data['os_version'] ?? null);
+        $this->userAgent = Hydrate::string($data['user_agent'] ?? null);
+        $this->acceptLanguage = Hydrate::string($data['accept_language'] ?? null);
+        $this->sessionIdentifier = Hydrate::string($data['session_identifier'] ?? null);
+        $this->sessionAgeMs = Hydrate::int($data['session_age_ms'] ?? null);
+        $this->coordsAccuracy = Hydrate::float($data['coords_accuracy'] ?? null);
+        $this->rawDeviceData = Hydrate::assoc($data['raw_device_data'] ?? null);
     }
 }

@@ -40,6 +40,7 @@ final class BankTest extends GeneratedTestCase
                 'business_name' => 'business_name-value',
             ],
             'vendor_data' => 'vendor_data-value',
+            'consent' => true,
         ]);
 
         $request = $this->lastRequest();
@@ -49,7 +50,7 @@ final class BankTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"country":"country-value","account":{"iban":"iban-value","account_number":"account_number-value","sort_code":"sort_code-value","routing_number":"routing_number-value","transit_institution":"transit_institution-value","bsb":"bsb-value","ifsc":"ifsc-value","bank_code":"bank_code-value","bic":"bic-value","clabe":"clabe-value","cbu_cvu":"cbu_cvu-value","registration_id":"registration_id-value"},"holder":{"full_name":"full_name-value","business_name":"business_name-value"},"vendor_data":"vendor_data-value"}', $this->canonicalBody($request));
+        self::assertSame('{"country":"country-value","account":{"iban":"iban-value","account_number":"account_number-value","sort_code":"sort_code-value","routing_number":"routing_number-value","transit_institution":"transit_institution-value","bsb":"bsb-value","ifsc":"ifsc-value","bank_code":"bank_code-value","bic":"bic-value","clabe":"clabe-value","cbu_cvu":"cbu_cvu-value","registration_id":"registration_id-value"},"holder":{"full_name":"full_name-value","business_name":"business_name-value"},"vendor_data":"vendor_data-value","consent":true}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"c2f4a9e0-7b1d-4c3a-9e55-1d0a6b8f2a47","result":"close_match","holder_name":"MARIA R OLIVEIRA","account":"****6819","vendor_data":"payout_20481","created_at":"2026-10-21T14:32:08Z"}'), $result->toArray());
         self::assertSame('c2f4a9e0-7b1d-4c3a-9e55-1d0a6b8f2a47', $result->requestId);

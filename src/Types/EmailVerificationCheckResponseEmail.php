@@ -90,6 +90,9 @@ final class EmailVerificationCheckResponseEmail extends BaseModel
      */
     public readonly ?EmailSocialFootprint $emailSocial;
 
+    /** Email intelligence signals. Present only when `enable_enrichment` was `true` on the check. */
+    public readonly ?EmailIntelligence $emailIntelligence;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -108,5 +111,6 @@ final class EmailVerificationCheckResponseEmail extends BaseModel
         $this->lifecycle = Hydrate::list($data['lifecycle'] ?? null, static fn (mixed $v) => Hydrate::model($v, EmailVerificationCheckResponseEmailLifecycle::class));
         $this->matches = Hydrate::list($data['matches'] ?? null, static fn (mixed $v) => Hydrate::model($v, EmailVerificationCheckResponseEmailMatches::class));
         $this->emailSocial = Hydrate::model($data['email_social'] ?? null, EmailSocialFootprint::class);
+        $this->emailIntelligence = Hydrate::model($data['email_intelligence'] ?? null, EmailIntelligence::class);
     }
 }

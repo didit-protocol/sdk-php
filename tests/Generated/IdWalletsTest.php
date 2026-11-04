@@ -835,4 +835,56 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"eudi","name":"EUDI Wallet","issuing_authority":"The user\'s own member state; the issuer differs per country"},"country":"AUT","status":"Not Finished","outcome":"pending","error":null,"interaction":"redirect","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"redirect","url":"https://wallet.example.com/authorize"},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
         self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
     }
+
+    public function testSubmitVerificationResponse(): void
+    {
+        $this->queueJson(200, '{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"google_wallet","name":"Google Wallet","issuing_authority":"Google Wallet (ID pass) and US state issuers (mobile driving licence)"},"country":"USA","status":"Approved","outcome":"verified","error":null,"interaction":"digital_credentials","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":null,"identity":{"full_name":"Alex Example","first_name":"Alex","last_name":"Example","date_of_birth":"1990-01-31","nationality":"USA","issuing_state":"USA"},"attributes":{"document_number":"X0000000","document_expiry_date":"2030-01-31"},"level_of_assurance":"substantial","verified_at":"2026-01-01T10:01:00Z","signature_valid":true,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}');
+
+        $result = $this->client->idWallets->submitVerificationResponse('requestId-1', [
+            'response' => [
+                'key' => 'value',
+            ],
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/id-verification/wallets/verifications/requestId-1/response/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"response":{"key":"value"}}', $this->canonicalBody($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"google_wallet","name":"Google Wallet","issuing_authority":"Google Wallet (ID pass) and US state issuers (mobile driving licence)"},"country":"USA","status":"Approved","outcome":"verified","error":null,"interaction":"digital_credentials","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":null,"identity":{"full_name":"Alex Example","first_name":"Alex","last_name":"Example","date_of_birth":"1990-01-31","nationality":"USA","issuing_state":"USA"},"attributes":{"document_number":"X0000000","document_expiry_date":"2030-01-31"},"level_of_assurance":"substantial","verified_at":"2026-01-01T10:01:00Z","signature_valid":true,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
+        self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
+    }
+
+    public function testStartGoogleWallet(): void
+    {
+        $this->queueJson(201, '{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"google_wallet","name":"Google Wallet","issuing_authority":"Google Wallet (ID pass) and US state issuers (mobile driving licence)"},"country":"USA","status":"Not Finished","outcome":"pending","error":null,"interaction":"digital_credentials","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"request_digital_credential","digital_credentials":{"protocol":"openid4vp-v1-signed","request":{"requests":[{"protocol":"openid4vp-v1-signed","data":{"request":"<compact JWS signed by Didit>"}}]}}},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}');
+
+        $result = $this->client->idWallets->startGoogleWallet([
+            'vendor_data' => 'vendor_data-value',
+            'metadata' => [
+                'key' => 'value',
+            ],
+            'sandbox_scenario' => 'sandbox_scenario-value',
+            'country' => 'USA',
+            'origin' => 'origin-value',
+            'idempotency_key' => 'idempotency_key-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/id-verification/wallets/google-wallet/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"USA","origin":"origin-value"}', $this->canonicalBody($request));
+        self::assertSame(201, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"request_id":"00000000-0000-4000-8000-000000000001","wallet_verification":{"wallet":{"id":"google_wallet","name":"Google Wallet","issuing_authority":"Google Wallet (ID pass) and US state issuers (mobile driving licence)"},"country":"USA","status":"Not Finished","outcome":"pending","error":null,"interaction":"digital_credentials","simulated":false,"expires_at":"2026-01-01T10:10:00Z","next_action":{"type":"request_digital_credential","digital_credentials":{"protocol":"openid4vp-v1-signed","request":{"requests":[{"protocol":"openid4vp-v1-signed","data":{"request":"<compact JWS signed by Didit>"}}]}}},"identity":null,"attributes":null,"level_of_assurance":null,"verified_at":null,"signature_valid":null,"credential_type":"person_identification"},"vendor_data":"your-customer-reference","metadata":{"reference":"example"},"created_at":"2026-01-01T10:00:00Z"}'), $result->toArray());
+        self::assertSame('00000000-0000-4000-8000-000000000001', $result->requestId);
+    }
 }

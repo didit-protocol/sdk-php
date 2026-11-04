@@ -107,6 +107,16 @@ final class WebhookConfig extends BaseModel
     public readonly ?array $endpoints;
 
     /**
+     * Origins (for example `https://app.example.com`; `http` only for `localhost`) the hosted verification
+     * flow may be embedded in and may send the user back to with a session callback. Server-to-server
+     * calls are not affected. An empty list means no restriction. Didit stores each origin in lower case
+     * without a default port. An invalid entry fails with `400` on `allowed_domains`.
+     *
+     * @var list<string>|null
+     */
+    public readonly ?array $allowedDomains;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -123,5 +133,6 @@ final class WebhookConfig extends BaseModel
         $this->availableEvents = Hydrate::list($data['available_events'] ?? null, static fn (mixed $v) => Hydrate::model($v, WebhookConfigAvailableEvents::class));
         $this->allowedReturnHosts = Hydrate::list($data['allowed_return_hosts'] ?? null, Hydrate::string(...));
         $this->endpoints = Hydrate::list($data['endpoints'] ?? null, static fn (mixed $v) => Hydrate::model($v, WebhookConfigDestination::class));
+        $this->allowedDomains = Hydrate::list($data['allowed_domains'] ?? null, Hydrate::string(...));
     }
 }

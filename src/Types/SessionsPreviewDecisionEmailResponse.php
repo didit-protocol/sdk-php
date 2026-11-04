@@ -56,6 +56,12 @@ final class SessionsPreviewDecisionEmailResponse extends BaseModel
     public readonly ?string $html;
 
     /**
+     * The email's words as plain text, as the person's Messages thread keeps them, for a compact preview
+     * (the HTML stays the email the person receives).
+     */
+    public readonly ?string $text;
+
+    /**
      * The language the email is written in. English (`en`) when the `email_language` you asked for is not
      * offered.
      */
@@ -99,6 +105,7 @@ final class SessionsPreviewDecisionEmailResponse extends BaseModel
         $this->senderKind = Hydrate::string($data['sender_kind'] ?? null);
         $this->subject = Hydrate::string($data['subject'] ?? null);
         $this->html = Hydrate::string($data['html'] ?? null);
+        $this->text = Hydrate::string($data['text'] ?? null);
         $this->language = Hydrate::string($data['language'] ?? null);
         $this->willBeSent = Hydrate::bool($data['will_be_sent'] ?? null);
         $this->notSentReason = Hydrate::string($data['not_sent_reason'] ?? null);

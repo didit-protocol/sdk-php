@@ -9,6 +9,7 @@ namespace Didit\Resources;
 use Didit\Core\BaseResource;
 use Didit\Core\BinaryContent;
 use Didit\Core\Hydrate;
+use Didit\Core\NoContent;
 use Didit\Core\Operation;
 use Didit\Core\Page;
 use Didit\Core\Requester;
@@ -24,26 +25,33 @@ use Didit\Types;
  * @phpstan-import-type SessionsAddImagesParams from Params
  * @phpstan-import-type SessionsBatchDeleteParams from Params
  * @phpstan-import-type SessionsBulkUpdateAmlHitStatusParams from Params
+ * @phpstan-import-type SessionsCreateKybPartyDraftParams from Params
  * @phpstan-import-type SessionsCreateParams from Params
+ * @phpstan-import-type SessionsDeleteKybPartyDraftParams from Params
  * @phpstan-import-type SessionsDeleteParams from Params
  * @phpstan-import-type SessionsExportAmlScreeningHistoryParams from Params
  * @phpstan-import-type SessionsImportSharedParams from Params
  * @phpstan-import-type SessionsListAmlScreeningHistoryParams from Params
  * @phpstan-import-type SessionsListEventsParams from Params
+ * @phpstan-import-type SessionsListKybExtractedPartiesParams from Params
+ * @phpstan-import-type SessionsListKybPartyDraftsParams from Params
  * @phpstan-import-type SessionsListParams from Params
  * @phpstan-import-type SessionsPreviewDecisionEmailParams from Params
  * @phpstan-import-type SessionsPreviewResubmissionParams from Params
  * @phpstan-import-type SessionsRetrieveDecisionParams from Params
  * @phpstan-import-type SessionsShareParams from Params
+ * @phpstan-import-type SessionsSubmitKybPartiesParams from Params
  * @phpstan-import-type SessionsUpdateAmlHitStatusParams from Params
  * @phpstan-import-type SessionsUpdateAmlStatusParams from Params
  * @phpstan-import-type SessionsUpdateDataParams from Params
  * @phpstan-import-type SessionsUpdateDocumentAiDataParams from Params
  * @phpstan-import-type SessionsUpdateFeatureStatusParams from Params
  * @phpstan-import-type SessionsUpdateKybCompanyDataParams from Params
+ * @phpstan-import-type SessionsUpdateKybPartyDraftParams from Params
  * @phpstan-import-type SessionsUpdateKybPartyParams from Params
  * @phpstan-import-type SessionsUpdatePoaDataParams from Params
  * @phpstan-import-type SessionsUpdateStatusParams from Params
+ * @phpstan-import-type SessionsUploadKybDocumentsParams from Params
  */
 final class Sessions extends BaseResource
 {
@@ -226,7 +234,7 @@ final class Sessions extends BaseResource
         return $this->requester->requestPage(new Operation(
             method: 'GET',
             path: '/v3/sessions/',
-            query: ['session_kind' => 'session_kind', 'limit' => 'limit', 'offset' => 'offset', 'status' => 'status', 'vendor_data' => 'vendor_data', 'search' => 'search', 'workflow_id' => 'workflow_id', 'date_from' => 'date_from', 'date_to' => 'date_to', 'country' => 'country', 'document_type' => 'document_type', 'document_name' => 'document_name', 'region' => 'region', 'didit_internal_id' => 'didit_internal_id', 'session_type' => 'session_type', 'api_service' => 'api_service', 'screened_full_name' => 'screened_full_name', 'warning' => 'warning', 'status_initialized_as_in_review' => 'status_initialized_as_in_review', 'is_kyc_to_be_reviewed' => 'is_kyc_to_be_reviewed', 'euuid' => 'euuid', 'organization_name' => 'organization_name'],
+            query: ['session_kind' => 'session_kind', 'limit' => 'limit', 'offset' => 'offset', 'status' => 'status', 'vendor_data' => 'vendor_data', 'search' => 'search', 'workflow_id' => 'workflow_id', 'date_from' => 'date_from', 'date_to' => 'date_to', 'tags' => 'tags', 'decided_from' => 'decided_from', 'decided_to' => 'decided_to', 'country' => 'country', 'document_type' => 'document_type', 'document_name' => 'document_name', 'region' => 'region', 'didit_internal_id' => 'didit_internal_id', 'session_type' => 'session_type', 'api_service' => 'api_service', 'screened_full_name' => 'screened_full_name', 'warning' => 'warning', 'status_initialized_as_in_review' => 'status_initialized_as_in_review', 'is_kyc_to_be_reviewed' => 'is_kyc_to_be_reviewed', 'euuid' => 'euuid', 'organization_name' => 'organization_name'],
         ), [], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\SessionsListResponseResults::class));
     }
 
@@ -405,7 +413,8 @@ final class Sessions extends BaseResource
      * Set the review status of a **single AML hit** (a potential sanction / PEP / watchlist /
      * adverse-media match) returned by AML screening, without changing the overall session decision.
      * Identify the hit by its `hit_id` (the `id` of an entry in the AML check's `hits` array, see the
-     * session decision).
+     * session decision). A hit id returned in the earlier format is still accepted; the response always
+     * names the hit by its current `id`.
      *
      * `PATCH /v3/session/{sessionId}/update-aml-hit-status/`
      *
@@ -736,7 +745,7 @@ final class Sessions extends BaseResource
         return $this->requester->requestPage(new Operation(
             method: 'GET',
             path: '/v3/session/{sessionId}/aml-screening-history/',
-            query: ['node_id' => 'node_id', 'limit' => 'limit', 'offset' => 'offset', 'ordering' => 'ordering'],
+            query: ['node_id' => 'node_id', 'month' => 'month', 'limit' => 'limit', 'offset' => 'offset', 'ordering' => 'ordering'],
         ), ['sessionId' => $sessionId], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\AMLScreeningRun::class));
     }
 
@@ -748,7 +757,7 @@ final class Sessions extends BaseResource
      * is streamed whole (no pagination) and starts with a header line; an empty cell means unknown,
      * dataset dates are never estimated, and a value that would start a spreadsheet formula is prefixed
      * with an apostrophe. Works for KYC and KYB session IDs; pass `node_id` when the session ran more than
-     * one AML step. Errors are returned as JSON, not CSV.
+     * one AML step. Pass `month` to export one calendar month. Errors are returned as JSON, not CSV.
      *
      * `GET /v3/session/{sessionId}/aml-screening-history/export/`
      *
@@ -766,7 +775,7 @@ final class Sessions extends BaseResource
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/session/{sessionId}/aml-screening-history/export/',
-            query: ['node_id' => 'node_id'],
+            query: ['node_id' => 'node_id', 'month' => 'month'],
             accept: 'text/csv, application/json',
         ), ['sessionId' => $sessionId], $params, $options);
 
@@ -950,5 +959,282 @@ final class Sessions extends BaseResource
         ), ['sessionId' => $sessionId], $params, $options);
 
         return Types\SessionsPreviewDecisionEmailResponse::fromResponse($response);
+    }
+
+    /**
+     * Upload KYB documents to a session.
+     *
+     * Upload one or more corporate documents (articles of incorporation, shareholder register, certificate
+     * of incorporation, ...) to the KYB Documents step of a Business Verification session, from your own
+     * server instead of the hosted page. Didit runs the hosted pipeline: compression, OCR, tampering and
+     * cross-document checks, document grouping, and advances the session when the required document groups
+     * are satisfied. The step costs one flat fee however many files you send. The session must be open and
+     * on the KYB Documents step, and the company chosen at the registry step must exist.
+     *
+     * `POST /v3/session/{sessionId}/kyb/documents/`
+     *
+     * @param string $sessionId UUID of the Business Verification (KYB) session
+     * @param SessionsUploadKybDocumentsParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function uploadKybDocuments(
+        string $sessionId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\SessionsUploadKybDocumentsResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/{sessionId}/kyb/documents/',
+            query: ['node_id' => 'node_id'],
+            bodyTypes: ['multipart'],
+        ), ['sessionId' => $sessionId], $params, $options);
+
+        return Types\SessionsUploadKybDocumentsResponse::fromResponse($response);
+    }
+
+    /**
+     * List the parties named by the uploaded documents.
+     *
+     * Return the shareholders and directors that the documents uploaded to this KYB session name, merged
+     * per person and attributed to the documents that named them. Show them to your applicant to confirm,
+     * then declare them with the party draft endpoints. A range stays a range: `ownership_percent.text`
+     * keeps the verbatim figure and `min` / `max` the numbers read from it. Nobody is labelled a UBO here;
+     * that is decided when the parties are submitted, from the role settings and ownership thresholds of
+     * the workflow.
+     *
+     * `GET /v3/session/{sessionId}/kyb/extracted-parties/`
+     *
+     * @param string $sessionId UUID of the Business Verification (KYB) session
+     * @param SessionsListKybExtractedPartiesParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listKybExtractedParties(
+        string $sessionId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\SessionsListKybExtractedPartiesResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/session/{sessionId}/kyb/extracted-parties/',
+            query: ['node_id' => 'node_id'],
+        ), ['sessionId' => $sessionId], $params, $options);
+
+        return Types\SessionsListKybExtractedPartiesResponse::fromResponse($response);
+    }
+
+    /**
+     * List the KYB party drafts.
+     *
+     * List the parties you are preparing for this KYB session, oldest first. A draft is not a declared
+     * party: it does not appear in the decision or the console and creates no verification session until
+     * you submit it with `POST /v3/session/{sessionId}/kyb/parties/submit/`. Requires `write:businesses`.
+     *
+     * `GET /v3/session/{sessionId}/kyb/parties/drafts/`
+     *
+     * @param string $sessionId UUID of the Business Verification (KYB) session
+     * @param SessionsListKybPartyDraftsParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listKybPartyDrafts(
+        string $sessionId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\SessionsListKybPartyDraftsResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/session/{sessionId}/kyb/parties/drafts/',
+            query: ['node_id' => 'node_id'],
+        ), ['sessionId' => $sessionId], $params, $options);
+
+        return Types\SessionsListKybPartyDraftsResponse::fromResponse($response);
+    }
+
+    /**
+     * Create a KYB party draft.
+     *
+     * Add a party (a person or a company) to the list you are preparing for this KYB session. The same
+     * fields and rules as the hosted Key People screen apply: a person needs `full_name` or `first_name`
+     * and `last_name`, at least one role and a nationality; a company needs `company_name` and the country
+     * of incorporation in `nationality`. Nothing is declared or billed until `POST
+     * /v3/session/{sessionId}/kyb/parties/submit/`. Requires `write:businesses`.
+     *
+     * `POST /v3/session/{sessionId}/kyb/parties/drafts/`
+     *
+     * @param string $sessionId UUID of the Business Verification (KYB) session
+     * @param SessionsCreateKybPartyDraftParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function createKybPartyDraft(
+        string $sessionId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\SessionsCreateKybPartyDraftResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/{sessionId}/kyb/parties/drafts/',
+            query: ['node_id' => 'node_id'],
+            bodyTypes: ['json'],
+            jsonHints: ['custom_fields' => ['o']],
+        ), ['sessionId' => $sessionId], $params, $options);
+
+        return Types\SessionsCreateKybPartyDraftResponse::fromResponse($response);
+    }
+
+    /**
+     * Edit a KYB party draft.
+     *
+     * Change fields of one party draft. The edit is merged into the stored draft and the merged party is
+     * validated as a whole, so an edit that would leave the party incomplete is rejected. Changing
+     * `first_name` or `last_name` replaces the stored full name. Requires `write:businesses`.
+     *
+     * `PATCH /v3/session/{sessionId}/kyb/parties/drafts/{draftId}/`
+     *
+     * @param string $sessionId UUID of the Business Verification (KYB) session
+     * @param string $draftId UUID of the party draft (`draft_id` returned when it was created)
+     * @param SessionsUpdateKybPartyDraftParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function updateKybPartyDraft(
+        string $sessionId,
+        string $draftId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\SessionsUpdateKybPartyDraftResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'PATCH',
+            path: '/v3/session/{sessionId}/kyb/parties/drafts/{draftId}/',
+            query: ['node_id' => 'node_id'],
+            bodyTypes: ['json'],
+            jsonHints: ['custom_fields' => ['o']],
+        ), ['sessionId' => $sessionId, 'draftId' => $draftId], $params, $options);
+
+        return Types\SessionsUpdateKybPartyDraftResponse::fromResponse($response);
+    }
+
+    /**
+     * Delete a KYB party draft.
+     *
+     * Drop one party draft. Declared parties are not affected. Requires `write:businesses`.
+     *
+     * `DELETE /v3/session/{sessionId}/kyb/parties/drafts/{draftId}/`
+     *
+     * @param string $sessionId UUID of the Business Verification (KYB) session
+     * @param string $draftId UUID of the party draft (`draft_id` returned when it was created)
+     * @param SessionsDeleteKybPartyDraftParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function deleteKybPartyDraft(
+        string $sessionId,
+        string $draftId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): NoContent {
+        $response = $this->requester->request(new Operation(
+            method: 'DELETE',
+            path: '/v3/session/{sessionId}/kyb/parties/drafts/{draftId}/',
+            query: ['node_id' => 'node_id'],
+        ), ['sessionId' => $sessionId, 'draftId' => $draftId], $params, $options);
+
+        return NoContent::fromResponse($response);
+    }
+
+    /**
+     * Submit the KYB party drafts.
+     *
+     * Declare the stored drafts as the company's key people. This is the hosted Key People step under your
+     * API key: Didit decides from the role settings and ownership thresholds of the workflow which parties
+     * must be verified, creates one individual KYC session (or a KYB sub-session for a corporate owner)
+     * for each of them, sends the emails the workflow asks for, and advances the session. Each child
+     * session is billed like in the hosted flow. The drafts are consumed.
+     *
+     * `POST /v3/session/{sessionId}/kyb/parties/submit/`
+     *
+     * @param string $sessionId UUID of the Business Verification (KYB) session
+     * @param SessionsSubmitKybPartiesParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function submitKybParties(
+        string $sessionId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\SessionsSubmitKybPartiesResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/{sessionId}/kyb/parties/submit/',
+            query: ['node_id' => 'node_id'],
+            bodyTypes: ['json'],
+        ), ['sessionId' => $sessionId], $params, $options);
+
+        return Types\SessionsSubmitKybPartiesResponse::fromResponse($response);
+    }
+
+    /**
+     * Export every file of a session.
+     *
+     * Start preparing one ZIP with every image, video and document of a User Verification (KYC) or
+     * Business Verification (KYB) session, in original quality: the files are stored in the ZIP as they
+     * were captured, never recompressed. Answers `202` with the export; read it with `GET
+     * /v3/session/{sessionId}/files-export/{exportId}/` until `status` is `READY`, then download
+     * `download_url`. While an export of the same session is still being prepared, that export is returned
+     * instead of a new one.
+     *
+     * `POST /v3/session/{sessionId}/files-export/`
+     *
+     * @param string $sessionId UUID of the verification session (the `session_id` returned by `POST /v3/session/`)
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function exportFiles(string $sessionId, ?RequestOptions $options = null): Types\SessionFilesExport
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/{sessionId}/files-export/',
+        ), ['sessionId' => $sessionId], [], $options);
+
+        return Types\SessionFilesExport::fromResponse($response);
+    }
+
+    /**
+     * Get a session files export.
+     *
+     * Progress of an export started with `POST /v3/session/{sessionId}/files-export/`. Once `status` is
+     * `READY`, `download_url` is a signed URL of the ZIP that stays valid for a short time; read the
+     * export again for a new one until `expires_at`. Each read that hands out a download link is written
+     * to the session's audit log. An export of a deleted session returns `404`.
+     *
+     * `GET /v3/session/{sessionId}/files-export/{exportId}/`
+     *
+     * @param string $sessionId UUID of the verification session (the `session_id` returned by `POST /v3/session/`)
+     * @param string $exportId the `export_id` returned by `POST /v3/session/{sessionId}/files-export/`
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function getFilesExport(
+        string $sessionId,
+        string $exportId,
+        ?RequestOptions $options = null,
+    ): Types\SessionFilesExport {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/session/{sessionId}/files-export/{exportId}/',
+        ), ['sessionId' => $sessionId, 'exportId' => $exportId], [], $options);
+
+        return Types\SessionFilesExport::fromResponse($response);
     }
 }

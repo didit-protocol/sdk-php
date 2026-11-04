@@ -7,12 +7,15 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `aes`. `qes` (Qualified Electronic Signature, QES) is coming soon.
+ * `simple` (default) or `aes`. `qes` (Qualified Electronic Signature, QES) is an add-on that is not
+ * available yet.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
 final class SignatureResultLevel
 {
+    public const SIMPLE = 'simple';
+
     public const AES = 'aes';
 
     public const QES = 'qes';

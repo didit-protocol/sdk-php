@@ -37,6 +37,8 @@ final class SessionsListResponseResultsFeaturesFeature
 
     public const DATABASE_VALIDATION = 'DATABASE_VALIDATION';
 
+    public const GEOLOCATION = 'GEOLOCATION';
+
     private function __construct()
     {
     }

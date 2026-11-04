@@ -25,16 +25,16 @@ final class Signatures extends BaseResource
     /**
      * Download a signed document.
      *
-     * Download the signed PDF of one document of an Electronic Signature step. Use the `signed_file` path
-     * of `signatures[].documents[]` in the decision. The PDF holds the document the signer was shown with
-     * their field values stamped, the evidence page (unless `signature_evidence_page` is off) and the
-     * PAdES signature with its timestamp. Didit checks the file against `sha256_signed` before returning
-     * it.
+     * Download the signed PDF of one document of an E-signature step. Use the `signed_file` path of
+     * `signatures[].documents[]` in the decision. The PDF holds the document the signer was shown with
+     * their field values stamped and the evidence page (unless `signature_evidence_page` is off). An
+     * Advanced (AES) PDF also carries the PAdES signature with its timestamp; a Simple PDF has no digital
+     * signature, seal or timestamp. Didit checks the file against `sha256_signed` before returning it.
      *
      * `GET /v3/session/{sessionId}/signatures/{nodeId}/documents/{documentId}/file/`
      *
      * @param string $sessionId the User Verification (KYC) or Business Verification (KYB) session
-     * @param string $nodeId the Electronic Signature step: `node_id` of the item in `signatures[]`
+     * @param string $nodeId the E-signature step: `node_id` of the item in `signatures[]`
      * @param string $documentId `id` of the document in `signatures[].documents[]`.
      *
      * @throws DiditException
@@ -58,15 +58,15 @@ final class Signatures extends BaseResource
     /**
      * Download the signature evidence.
      *
-     * Download a signer's evidence PDF: the level and format, the signer and their verified identity
-     * session, the code confirmation, the IP address, each document with its original SHA-256 and field
-     * values, the certificate, the timestamp and the SHA-256 of every signed file. Use the `evidence_file`
-     * path of the signer's item in `signatures[]`.
+     * Download a signer's evidence PDF: the level and format, the signer, the IP address, each document
+     * with its original SHA-256 and field values and the SHA-256 of every signed file, plus, for an
+     * Advanced (AES) signature, the verified identity session, the code confirmation, the certificate and
+     * the timestamp. Use the `evidence_file` path of the signer's item in `signatures[]`.
      *
      * `GET /v3/session/{sessionId}/signatures/{nodeId}/evidence/`
      *
      * @param string $sessionId the User Verification (KYC) or Business Verification (KYB) session
-     * @param string $nodeId the Electronic Signature step: `node_id` of the item in `signatures[]`
+     * @param string $nodeId the E-signature step: `node_id` of the item in `signatures[]`
      * @param SessionsSignaturesDownloadEvidenceParams $params
      *
      * @throws DiditException
@@ -97,7 +97,7 @@ final class Signatures extends BaseResource
      * `GET /v3/session/{sessionId}/signatures/{nodeId}/fields/{fieldId}/image/`
      *
      * @param string $sessionId the User Verification (KYC) or Business Verification (KYB) session
-     * @param string $nodeId the Electronic Signature step: `node_id` of the item in `signatures[]`
+     * @param string $nodeId the E-signature step: `node_id` of the item in `signatures[]`
      * @param string $fieldId the field on this signer's copy, as in the field's `image_url`
      *
      * @throws DiditException
@@ -121,16 +121,17 @@ final class Signatures extends BaseResource
     /**
      * Validate signatures again.
      *
-     * Re-check the signed documents of an Electronic Signature step. Didit re-reads every signed PDF,
-     * checks its SHA-256 and validates the PAdES signature, the certificate, the revocation data and the
-     * timestamp, then saves the result in each signer's `validation` and returns the updated items.
-     * Nothing is signed again. Send `signature_id` to check one signer; without it, every signer of the
-     * step is checked, and the call fails if any of them hasn't signed.
+     * Re-check the signed documents of an E-signature step. Didit re-reads every signed PDF, checks its
+     * SHA-256 and, for an Advanced (AES) signature, validates the PAdES signature, the certificate, the
+     * revocation data and the timestamp (a Simple signature has no digital signature, so only the file
+     * integrity is checked), then saves the result in each signer's `validation` and returns the updated
+     * items. Nothing is signed again. Send `signature_id` to check one signer; without it, every signer of
+     * the step is checked, and the call fails if any of them hasn't signed.
      *
      * `POST /v3/session/{sessionId}/signatures/{nodeId}/validate/`
      *
      * @param string $sessionId the User Verification (KYC) or Business Verification (KYB) session
-     * @param string $nodeId the Electronic Signature step: `node_id` of the item in `signatures[]`
+     * @param string $nodeId the E-signature step: `node_id` of the item in `signatures[]`
      * @param SessionsSignaturesValidateParams $params
      *
      * @throws DiditException

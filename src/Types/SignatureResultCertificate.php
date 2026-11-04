@@ -10,7 +10,8 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * The certificate the documents were signed with. `null` until signed.
+ * The certificate the documents were signed with. `null` until signed, and always `null` for a Simple
+ * signature.
  */
 final class SignatureResultCertificate extends BaseModel
 {

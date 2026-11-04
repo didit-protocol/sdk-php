@@ -24,6 +24,7 @@ final class TransactionsTest extends GeneratedTestCase
             'limit' => 1,
             'offset' => 1,
             'travel_rule_status' => 'travel_rule_status-value',
+            'assignee' => 'assignee-value',
         ]);
 
         $request = $this->lastRequest();
@@ -34,6 +35,7 @@ final class TransactionsTest extends GeneratedTestCase
             'limit' => '1',
             'offset' => '1',
             'travel_rule_status' => 'travel_rule_status-value',
+            'assignee' => 'assignee-value',
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());

@@ -14,7 +14,11 @@ use Didit\Core\Hydrate;
  */
 final class AMLScreeningHits extends BaseModel
 {
-    /** Unique identifier of the match. */
+    /**
+     * Didit's stable identifier for the hit: `hit_` followed by 24 hexadecimal characters. The same
+     * matched entity keeps the same `id` when the subject is screened again. Pass it as `hit_id` to the
+     * AML hit review endpoints.
+     */
     public readonly ?string $id;
 
     /** Source URL for the match. */
@@ -42,7 +46,7 @@ final class AMLScreeningHits extends BaseModel
     /**
      * List of dataset categories where the match was found. Indicates whether the entity appeared in PEP
      * lists (with level), sanctions databases, adverse media, warnings/regulatory enforcement, or other
-     * compliance datasets.
+     * compliance datasets. `Other Lists` when the entity's source states none of these categories.
      *
      * @var list<string>|null
      */
