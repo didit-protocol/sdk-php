@@ -36,8 +36,7 @@ final class Imports extends BaseResource
      * sessions, transaction monitoring records, or workflow custom status rules. Set `source=provider` to
      * migrate from another provider: Didit reads Sumsub, Onfido, Persona and ComplyCube with your
      * read-only key, reads Veriff, iDenfy and MetaMap records by the IDs you upload in `file`, and imports
-     * an export file in Didit's format for the other providers. Record IDs are namespaced by provider
-     * (`sumsub:<id>`) so a re-run skips everything already in Didit.
+     * an export file in Didit's format for the other providers.
      *
      * `POST /v3/session/imports/`
      *

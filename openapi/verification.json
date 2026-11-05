@@ -1681,7 +1681,7 @@
     "/v3/session/imports/": {
       "post": {
         "summary": "Create a verification import job",
-        "description": "Create an asynchronous import job for historical User Verification sessions, Business Verification sessions, transaction monitoring records, or workflow custom status rules. Set `source=provider` to migrate from another provider: Didit reads Sumsub, Onfido, Persona and ComplyCube with your read-only key, reads Veriff, iDenfy and MetaMap records by the IDs you upload in `file`, and imports an export file in Didit's format for the other providers. Record IDs are namespaced by provider (`sumsub:<id>`) so a re-run skips everything already in Didit. Imports are disabled by default and must be enabled per organization by Didit.",
+        "description": "Create an asynchronous import job for historical User Verification sessions, Business Verification sessions, transaction monitoring records, or workflow custom status rules. Set `source=provider` to migrate from another provider: Didit reads Sumsub, Onfido, Persona and ComplyCube with your read-only key, reads Veriff, iDenfy and MetaMap records by the IDs you upload in `file`, and imports an export file in Didit's format for the other providers. Record IDs are namespaced by provider (`sumsub:<id>`) so a re-run skips everything already in Didit, and a record imported through a file with the provider's bare ID is recognised too, in both directions, so moving between a file import and a provider migration never imports a record twice. An application can run up to 4 import jobs at once; a job interrupted by a deploy or a worker restart continues from its last imported row by itself. Imports are disabled by default and must be enabled per organization by Didit.",
         "operationId": "post_v3_session_imports_create",
         "x-didit-sdk": {
           "resource": "sessions.imports",
@@ -2047,13 +2047,13 @@
             }
           },
           "429": {
-            "description": "The application already has an active import job (PENDING/PROCESSING/PAUSED). Wait for it to finish before starting another.",
+            "description": "The application already has 4 active import jobs (PENDING/PROCESSING/PAUSED), the most it can run at once. Wait for one to finish before starting another.",
             "content": {
               "application/json": {
                 "examples": {
                   "Active job": {
                     "value": {
-                      "detail": "This application already has an active import job. Wait for it to finish before starting another."
+                      "detail": "This application already has 4 active import jobs, the most it can run at once. Wait for one to finish before starting another."
                     }
                   }
                 }
