@@ -13,6 +13,7 @@ use Didit\Exception\ApiTimeoutException;
 use Didit\Exception\InternalServerException;
 use Didit\Exception\RateLimitException;
 use Didit\RequestOptions;
+use Didit\Tests\Support\GuzzleErrors;
 use Didit\Tests\Support\MockHttpClient;
 use Didit\Tests\Support\TestClient;
 use GuzzleHttp\Exception\ConnectException;
@@ -492,11 +493,10 @@ final class RetryTest extends TestCase
     private static function guzzleError(string $class, int $errno, string $error): \Throwable
     {
         $request = new Request('POST', 'https://verification.didit.me/v3/session/');
-        $context = ['errno' => $errno, 'error' => $error];
 
         return ConnectException::class === $class
-            ? new ConnectException("cURL error {$errno}: {$error}", $request, null, $context)
-            : new RequestException("cURL error {$errno}: {$error}", $request, null, null, $context);
+            ? GuzzleErrors::connect("cURL error {$errno}: {$error}", $request, $errno, $error)
+            : GuzzleErrors::request("cURL error {$errno}: {$error}", $request, $errno, $error);
     }
 
     private static function networkError(string $message): NetworkExceptionInterface

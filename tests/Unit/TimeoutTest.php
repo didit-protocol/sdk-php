@@ -12,18 +12,18 @@ use Didit\Exception\ConfigurationException;
 use Didit\Exception\InternalServerException;
 use Didit\Exception\NotFoundException;
 use Didit\RequestOptions;
+use Didit\Tests\Support\GuzzleErrors;
 use Didit\Tests\Support\PhpProcess;
 use Didit\Tests\Support\TestClient;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\RequestInterface;
 use Symfony\Component\HttpClient\MockHttpClient as SymfonyMockHttpClient;
 use Symfony\Component\HttpClient\Psr18Client;
 use Symfony\Component\HttpClient\Response\MockResponse;
@@ -38,7 +38,7 @@ final class TimeoutTest extends TestCase
 {
     private TestClient $support;
 
-    /** @var \ArrayObject<int, array<mixed>> Guzzle history entries */
+    /** @var \ArrayObject<int, array{options: array<mixed>}> The options of each request Guzzle sent */
     private \ArrayObject $history;
 
     private MockHandler $guzzleMock;
@@ -122,11 +122,11 @@ final class TimeoutTest extends TestCase
     public function testGuzzleTimeoutBecomesApiTimeoutException(): void
     {
         $request = new Request('GET', 'https://verification.didit.me/v3/session/abc/decision/');
-        $this->guzzleMock->append(new ConnectException(
+        $this->guzzleMock->append(GuzzleErrors::connect(
             'cURL error 28: Operation timed out after 2500 milliseconds with 0 bytes received (see https://curl.haxx.se/libcurl/c/libcurl-errors.html)',
             $request,
-            null,
-            ['errno' => 28, 'error' => 'Operation timed out after 2500 milliseconds with 0 bytes received'],
+            28,
+            'Operation timed out after 2500 milliseconds with 0 bytes received',
         ));
         $client = $this->support->client(TestClient::options(maxRetries: 0, timeout: 2.5), httpClient: $this->guzzle());
 
@@ -280,13 +280,19 @@ final class TimeoutTest extends TestCase
     }
 
     /**
-     * @param array<string, mixed> $config
+     * @param array{allow_redirects?: bool, http_errors?: bool} $config
      */
     private function guzzle(array $config = []): Client
     {
         $stack = HandlerStack::create($this->guzzleMock);
-        $history = $this->history; // the same ArrayObject, so entries land in $this->history
-        $stack->push(Middleware::history($history));
+        // Not Middleware::history(): its container type differs between Guzzle 7 and 8.
+        $stack->push(function (callable $handler): callable {
+            return function (RequestInterface $request, array $options) use ($handler) {
+                $this->history[] = ['options' => $options];
+
+                return $handler($request, $options);
+            };
+        });
 
         return new Client(['handler' => $stack] + $config);
     }
@@ -300,10 +306,8 @@ final class TimeoutTest extends TestCase
     {
         $entry = $this->history[$index] ?? null;
         self::assertNotNull($entry, "request {$index} was sent");
-        $options = $entry['options'] ?? null;
-        self::assertIsArray($options);
 
-        return $options;
+        return $entry['options'];
     }
 
     private static function okResponse(): Response

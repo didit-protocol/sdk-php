@@ -99,9 +99,16 @@ final class HttpTransport
     {
         $message = $e->getMessage();
         $errno = null;
-        if ($e instanceof \GuzzleHttp\Exception\ConnectException || $e instanceof \GuzzleHttp\Exception\RequestException) {
-            $context = $e->getHandlerContext();
-            $errno = isset($context['errno']) && \is_int($context['errno']) ? $context['errno'] : null;
+        if ($e instanceof \GuzzleHttp\Exception\TransferException) {
+            // Guzzle 7 carries the cURL details as handler context; Guzzle 8 dropped it and keeps
+            // only "cURL error <errno>: ..." in the message, so read the errno from there.
+            /** @var array<string, mixed> $context */
+            $context = method_exists($e, 'getHandlerContext') ? $e->getHandlerContext() : [];
+            if (isset($context['errno']) && \is_int($context['errno'])) {
+                $errno = $context['errno'];
+            } elseif (1 === preg_match('/^cURL error (\d+):/', $message, $found)) {
+                $errno = (int) $found[1];
+            }
             if (isset($context['error']) && \is_string($context['error']) && '' !== $context['error']) {
                 $message = $context['error'];
             }

@@ -11,10 +11,10 @@ use Didit\DiditClient;
 use Didit\Exception\ApiConnectionException;
 use Didit\Exception\NotFoundException;
 use Didit\File;
+use Didit\Tests\Support\GuzzleErrors;
 use Didit\Tests\Support\MockHttpClient;
 use Didit\Tests\Support\PhpProcess;
 use Didit\Tests\Support\TestClient;
-use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
@@ -78,7 +78,7 @@ final class LoggingTest extends TestCase
     public function testOneLinePerAttemptWithTheRetryNumber(): void
     {
         $this->support->http->queueJson(503, ['detail' => 'busy'], ['X-Request-Id' => 'req_a']);
-        $this->support->http->queueException(new ConnectException('cURL error 7: Failed to connect', new Request('GET', 'https://verification.didit.me/'), null, ['errno' => 7]));
+        $this->support->http->queueException(GuzzleErrors::connect('cURL error 7: Failed to connect', new Request('GET', 'https://verification.didit.me/'), 7, ''));
         $this->support->http->queueJson(404, ['detail' => 'gone']);
 
         try {
@@ -96,7 +96,7 @@ final class LoggingTest extends TestCase
 
     public function testConnectionErrorWithoutRetriesIsLogged(): void
     {
-        $this->support->http->queueException(new ConnectException('cURL error 6: Could not resolve host', new Request('GET', 'https://verification.didit.me/'), null, ['errno' => 6]));
+        $this->support->http->queueException(GuzzleErrors::connect('cURL error 6: Could not resolve host', new Request('GET', 'https://verification.didit.me/'), 6, ''));
 
         try {
             $this->support->client(TestClient::options(maxRetries: 0), $this->logger())->sessions->retrieveDecision('abc');
