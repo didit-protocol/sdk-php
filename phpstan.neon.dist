@@ -20,3 +20,11 @@ parameters:
     # The generated DiditClient::initResources() runs once, from the constructor or BaseClient::fromRequester().
     additionalConstructors:
         - Didit\Core\BaseClient::initResources
+    ignoreErrors:
+        # getallheaders() is typed array|false or plain array depending on the polyfills the installed
+        # dependency set brings (Guzzle 7 vs 8), so the is_array() guard is only redundant on some of them.
+        -
+            message: '#^Call to function is_array\(\) with array will always evaluate to true\.$#'
+            identifier: function.alreadyNarrowedType
+            path: examples/webhooks/plain_php.php
+            reportUnmatched: false

@@ -17,10 +17,9 @@ use Didit\Exception\NotFoundException;
 use Didit\Exception\PermissionDeniedException;
 use Didit\Exception\RateLimitException;
 use Didit\Exception\UnprocessableEntityException;
+use Didit\Tests\Support\GuzzleErrors;
 use Didit\Tests\Support\MockHttpClient;
 use Didit\Tests\Support\TestClient;
-use GuzzleHttp\Exception\ConnectException;
-use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Psr7\HttpFactory;
 use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -242,37 +241,37 @@ final class ErrorsTest extends TestCase
     {
         $request = new Request('GET', self::URL);
         yield 'guzzle errno 6 resolve' => [
-            new ConnectException('cURL error 6: Could not resolve host: verification.didit.me', $request, null, ['errno' => 6, 'error' => 'Could not resolve host: verification.didit.me']),
+            GuzzleErrors::connect('cURL error 6: Could not resolve host: verification.didit.me', $request, 6, 'Could not resolve host: verification.didit.me'),
             ApiConnectionException::class,
             false,
         ];
         yield 'guzzle errno 7 connect' => [
-            new ConnectException('cURL error 7: Failed to connect to verification.didit.me port 443', $request, null, ['errno' => 7, 'error' => 'Failed to connect to verification.didit.me port 443: Connection refused']),
+            GuzzleErrors::connect('cURL error 7: Failed to connect to verification.didit.me port 443', $request, 7, 'Failed to connect to verification.didit.me port 443: Connection refused'),
             ApiConnectionException::class,
             false,
         ];
         yield 'guzzle errno 35 tls' => [
-            new ConnectException('cURL error 35: SSL connect error', $request, null, ['errno' => 35, 'error' => 'SSL connect error']),
+            GuzzleErrors::connect('cURL error 35: SSL connect error', $request, 35, 'SSL connect error'),
             ApiConnectionException::class,
             false,
         ];
         yield 'guzzle errno 28 read timeout' => [
-            new ConnectException('cURL error 28: Operation timed out after 60001 milliseconds with 0 bytes received', $request, null, ['errno' => 28, 'error' => 'Operation timed out after 60001 milliseconds with 0 bytes received']),
+            GuzzleErrors::connect('cURL error 28: Operation timed out after 60001 milliseconds with 0 bytes received', $request, 28, 'Operation timed out after 60001 milliseconds with 0 bytes received'),
             ApiTimeoutException::class,
             true,
         ];
         yield 'guzzle errno 28 connect timeout' => [
-            new ConnectException('cURL error 28: Connection timed out after 10001 milliseconds', $request, null, ['errno' => 28, 'error' => 'Connection timed out after 10001 milliseconds']),
+            GuzzleErrors::connect('cURL error 28: Connection timed out after 10001 milliseconds', $request, 28, 'Connection timed out after 10001 milliseconds'),
             ApiTimeoutException::class,
             false,
         ];
         yield 'guzzle errno 52 empty reply' => [
-            new ConnectException('cURL error 52: Empty reply from server', $request, null, ['errno' => 52, 'error' => 'Empty reply from server']),
+            GuzzleErrors::connect('cURL error 52: Empty reply from server', $request, 52, 'Empty reply from server'),
             ApiConnectionException::class,
             true,
         ];
         yield 'guzzle request exception errno 56 reset' => [
-            new RequestException('cURL error 56: Recv failure: Connection reset by peer', $request, null, null, ['errno' => 56, 'error' => 'Recv failure: Connection reset by peer']),
+            GuzzleErrors::request('cURL error 56: Recv failure: Connection reset by peer', $request, 56, 'Recv failure: Connection reset by peer'),
             ApiConnectionException::class,
             true,
         ];
