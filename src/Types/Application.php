@@ -11,6 +11,8 @@ use Didit\Core\Hydrate;
 
 /**
  * Full application record. `uuid`, `client_id`, and `api_key` never change after creation.
+ * `data_location` doesn't either, except once on the live application created with your organization,
+ * before it is used (see the update request).
  */
 final class Application extends BaseModel
 {
@@ -56,6 +58,16 @@ final class Application extends BaseModel
     public readonly ?\DateTimeImmutable $createdAt;
 
     /**
+     * Where the application's verification data is stored and processed, chosen when the application is
+     * created. `eu` is the European Union (Ireland), the default. `au` (Australia, Sydney) and `mx`
+     * (Mexico) are coming soon: a request that names them answers 400 `This data location is not available
+     * yet.` An organization's Sandbox application is always in the European Union.
+     *
+     * Known values: {@see ApplicationDataLocation}.
+     */
+    public readonly ?string $dataLocation;
+
+    /**
      * The application's products. Always all three, in this order: `identity`, `transactions`,
      * `authentication`. A new application has `identity` enabled with every module on, and `transactions`
      * and `authentication` disabled. Read-only: a `products` key in a create or update body is ignored.
@@ -80,6 +92,7 @@ final class Application extends BaseModel
         $this->privacyUrl = Hydrate::string($data['privacy_url'] ?? null);
         $this->description = Hydrate::string($data['description'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
+        $this->dataLocation = Hydrate::string($data['data_location'] ?? null);
         $this->products = Hydrate::list($data['products'] ?? null, static fn (mixed $v) => Hydrate::model($v, ApplicationProduct::class));
     }
 }

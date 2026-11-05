@@ -107,7 +107,9 @@ final class ReviewItem extends BaseModel
     /**
      * Extra context for system-generated entries. Console detail-page views carry `{"system_event":
      * "DETAIL_VIEWED", "detail_type": "verification"}` so they can be filtered out of notification logic.
-     * `null` for ordinary entries.
+     * A `COMMENT` its author edited in the Console carries `edited_at`, the ISO 8601 time of the last edit
+     * (`comment` and `mentioned_emails` then hold the edited text and its mentions). `null` for ordinary
+     * entries.
      *
      * @var array<string, mixed>|null
      */

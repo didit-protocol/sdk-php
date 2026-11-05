@@ -68,7 +68,14 @@ final class KybListUbosResponse202KybRegistry extends BaseModel
     /** Registry-reported risk level, when available. */
     public readonly ?string $riskLevel;
 
-    /** Registry verification status, when available. */
+    /**
+     * Cross-jurisdiction verification status: `verified` when the registry status establishes standing
+     * (`active`), `failed` when it says the company is no longer standing (for example `dissolved`),
+     * otherwise `unknown`. `null` for a company that did not come from a registry and while a selection is
+     * still `pending`.
+     *
+     * Known values: {@see KybListUbosResponse202KybRegistryVerificationStatus}.
+     */
     public readonly ?string $verificationStatus;
 
     /** Always `true` for this endpoint, the profile was retrieved from an official registry. */

@@ -56,8 +56,9 @@ final class Applications extends BaseResource
     /**
      * Create Application.
      *
-     * Create an application inside an organization. The response includes `api_key`; persist it now
-     * (recoverable via GET). Requires owner/admin JWT.
+     * Create an application inside an organization, in the data location you choose (`data_location`, the
+     * European Union by default; it can't be changed afterwards). The response includes `api_key`; persist
+     * it now (recoverable via GET). Requires owner/admin JWT.
      *
      * `POST /organizations/me/{org_id}/applications/`
      *
@@ -110,7 +111,9 @@ final class Applications extends BaseResource
      * Update Application.
      *
      * Update application metadata (name, URLs, redirect URIs). `api_key` and `client_id` are never
-     * rotated. `products` is read-only: a `products` key in the body is ignored. Requires owner/admin JWT.
+     * rotated. `products` is read-only: a `products` key in the body is ignored. `data_location` can't be
+     * changed after the application is created, except once on the live application created with your
+     * organization, while it is unused (see the request body). Requires owner/admin JWT.
      *
      * `PATCH /organizations/me/{org_id}/applications/{app_id}/`
      *

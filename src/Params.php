@@ -83,6 +83,7 @@ namespace Didit;
  *     terms_url?: string,
  *     privacy_url?: string,
  *     description?: string,
+ *     data_location?: string,
  * }
  * @phpstan-type ApplicationUpdateRequest array{
  *     name?: string,
@@ -91,6 +92,7 @@ namespace Didit;
  *     terms_url?: string,
  *     privacy_url?: string,
  *     description?: string,
+ *     data_location?: string,
  * }
  * @phpstan-type BankAccountCheckHolder array{
  *     full_name?: string,

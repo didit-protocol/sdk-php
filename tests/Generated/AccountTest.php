@@ -40,7 +40,7 @@ final class AccountTest extends GeneratedTestCase
 
     public function testVerifyEmail(): void
     {
-        $this->queueJson(200, '{"access_token":"sample-access-token","refresh_token":"sample-refresh-token","expires_in":86400,"organization":{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer"},"application":{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"developer","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key"}}');
+        $this->queueJson(200, '{"access_token":"sample-access-token","refresh_token":"sample-refresh-token","expires_in":86400,"organization":{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer"},"application":{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"developer","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","data_location":"eu"}}');
 
         $result = $this->client->account->verifyEmail([
             'email' => 'user@example.com',
@@ -57,7 +57,7 @@ final class AccountTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"email":"user@example.com","code":"code-value"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"access_token":"sample-access-token","refresh_token":"sample-refresh-token","expires_in":86400,"organization":{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer"},"application":{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"developer","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key"}}'), $result->toArray());
+        self::assertSame($this->decoded('{"access_token":"sample-access-token","refresh_token":"sample-refresh-token","expires_in":86400,"organization":{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer"},"application":{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"developer","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","data_location":"eu"}}'), $result->toArray());
         self::assertSame('sample-access-token', $result->accessToken);
     }
 

@@ -46,8 +46,10 @@ final class SessionDecisionIdVerifications extends BaseModel
     public readonly ?string $walletProvider;
 
     /**
-     * Why a non-document method ended the ID step. Set on the declined report when a lookup or a wallet
-     * sign-in failed and the country's fallback switch was `decline`. `null` otherwise.
+     * Why a non-document method did not end the ID step. Set when a lookup or a wallet sign-in failed: on
+     * the document verification the user continued with when the country's fallback switch was
+     * `fallback_to_document` (`action` is `fallback_to_document`), or on the declined report when it was
+     * `decline`. `null` otherwise.
      */
     public readonly ?SessionDecisionIdVerificationsFallbackFrom $fallbackFrom;
 
