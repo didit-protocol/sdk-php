@@ -1,5 +1,29 @@
 # Changelog
 
+## [2.0.0](https://github.com/didit-protocol/sdk-php/compare/v1.0.1...v2.0.0) (2026-11-05)
+
+
+### ⚠ BREAKING CHANGES
+
+* **spec:** the API spec sync changes the SDK surface.
+    - `email.assess_risk()` (`POST /v3/email/risk/`): response 200 `email.email_intelligence.reason_codes[]`: type changed from string to object
+    - `phone.assess_risk()` (`POST /v3/phone/risk/`): response 200 `phone.phone_intelligence.reason_codes[]`: type changed from string to object
+
+### Bug Fixes
+
+* support Guzzle 7 and 8 in transport classification and tests ([0fe656c](https://github.com/didit-protocol/sdk-php/commit/0fe656ce894bf833e1961d45bdccc1dcc092a7fe))
+
+
+### Miscellaneous Chores
+
+* **deps-dev:** Update guzzlehttp/guzzle requirement ([0de2587](https://github.com/didit-protocol/sdk-php/commit/0de258791689f191e6e05e2335dc40034a13bca8))
+* **deps-dev:** Update guzzlehttp/guzzle requirement from ^7.8 to ^7.8 || ^8.0 in the dev-tools group ([9d76c89](https://github.com/didit-protocol/sdk-php/commit/9d76c89b8863433c92cd347c680f4d296e02d26c))
+* merge main ([16d41f2](https://github.com/didit-protocol/sdk-php/commit/16d41f290932c4d43850cd678898e1aa61e7065c))
+* **spec:** sync API spec 2026-11-04 ([3c55001](https://github.com/didit-protocol/sdk-php/commit/3c55001addec6eecd70120ab346f87a81d8423c1))
+* **spec:** sync API spec 2026-11-04 ([8af66c0](https://github.com/didit-protocol/sdk-php/commit/8af66c0bdfdc0a24759b253de326405f5f28bbe5))
+* **spec:** sync API spec 2026-11-05 ([555abc6](https://github.com/didit-protocol/sdk-php/commit/555abc659a260c8fe7c259fde819290590032539))
+* **spec:** sync API spec 2026-11-05 ([2f81f04](https://github.com/didit-protocol/sdk-php/commit/2f81f04a20260ad91bd59e048a198d6d9dd9ac0b))
+
 ## [1.0.1](https://github.com/didit-protocol/sdk-php/compare/v1.0.0...v1.0.1) (2026-10-29)
 
 
