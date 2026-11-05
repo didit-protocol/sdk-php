@@ -28,7 +28,7 @@ final class BillingRetrieveBalanceResponse extends BaseModel
 
     /**
      * USD amount that will be charged and added to the balance on each auto-refill, at face value. Set
-     * from \$50 to \$10,000 in Console → Billing. `null` when auto-refill is disabled or unset.
+     * from \$50 to \$20,000 in Console → Billing. `null` when auto-refill is disabled or unset.
      */
     public readonly ?string $autoRefillAmount;
 

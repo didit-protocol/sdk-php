@@ -10,8 +10,10 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Why a non-document method ended the ID step. Set on the declined report when a lookup or a wallet
- * sign-in failed and the country's fallback switch was `decline`. `null` otherwise.
+ * Why a non-document method did not end the ID step. Set when a lookup or a wallet sign-in failed: on
+ * the document verification the user continued with when the country's fallback switch was
+ * `fallback_to_document` (`action` is `fallback_to_document`), or on the declined report when it was
+ * `decline`. `null` otherwise.
  */
 final class SessionDecisionIdVerificationsFallbackFrom extends BaseModel
 {
@@ -25,7 +27,11 @@ final class SessionDecisionIdVerificationsFallbackFrom extends BaseModel
     /** The outcome that ended it, e.g. `no_match`, `provider_error`, `cancelled`, `timeout`. */
     public readonly ?string $reason;
 
-    /** The configured action that was taken, e.g. `decline`. */
+    /**
+     * The configured action that was taken: `fallback_to_document` or `decline`.
+     *
+     * Known values: {@see SessionDecisionIdVerificationsFallbackFromAction}.
+     */
     public readonly ?string $action;
 
     /**

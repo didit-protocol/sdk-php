@@ -32,6 +32,16 @@ final class ApplicationCredentialsSummary extends BaseModel
     public readonly ?string $apiKey;
 
     /**
+     * Where the application's verification data is stored and processed, chosen when the application is
+     * created. `eu` is the European Union (Ireland), the default. `au` (Australia, Sydney) and `mx`
+     * (Mexico) are coming soon: a request that names them answers 400 `This data location is not available
+     * yet.` An organization's Sandbox application is always in the European Union.
+     *
+     * Known values: {@see ApplicationDataLocation}.
+     */
+    public readonly ?string $dataLocation;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -41,5 +51,6 @@ final class ApplicationCredentialsSummary extends BaseModel
         $this->name = Hydrate::string($data['name'] ?? null);
         $this->clientId = Hydrate::string($data['client_id'] ?? null);
         $this->apiKey = Hydrate::string($data['api_key'] ?? null);
+        $this->dataLocation = Hydrate::string($data['data_location'] ?? null);
     }
 }
