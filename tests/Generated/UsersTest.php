@@ -126,6 +126,8 @@ final class UsersTest extends GeneratedTestCase
                 '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
             ],
             'delete_all' => true,
+            'retain_face_embeddings' => true,
+            'face_retention_days' => 1,
         ]);
 
         $request = $this->lastRequest();
@@ -135,7 +137,7 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"vendor_data_list":["vendor_data_list-value"],"didit_internal_id_list":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"delete_all":true}', $this->canonicalBody($request));
+        self::assertSame('{"vendor_data_list":["vendor_data_list-value"],"didit_internal_id_list":["3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"],"delete_all":true,"retain_face_embeddings":true,"face_retention_days":1}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"deleted":2}'), $result->toArray());
         self::assertSame(2, $result->deleted);

@@ -17,6 +17,7 @@ use Didit\Types;
  * The `analytics` resource.
  *
  * @phpstan-import-type AnalyticsRetrieveParams from Params
+ * @phpstan-import-type AnalyticsRetrieveTodayParams from Params
  */
 final class Analytics extends BaseResource
 {
@@ -47,5 +48,32 @@ final class Analytics extends BaseResource
         ), [], $params, $options);
 
         return Types\AnalyticsRetrieveResponse::fromResponse($response);
+    }
+
+    /**
+     * Get today's verifications by hour.
+     *
+     * Today's user verification (KYC) sessions, from local midnight in `tz`, counted per local hour they
+     * were created in, next to the same hours of the same weekday one week before, and split by the
+     * outcome each one holds now: approved, in review or declined. This is the volume card of the Business
+     * Console's Home.
+     *
+     * `GET /v3/organization/{organization_id}/application/{application_id}/analytics/today/`
+     *
+     * @param AnalyticsRetrieveTodayParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function retrieveToday(array $params = [], ?RequestOptions $options = null): Types\ApplicationAnalyticsToday
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/organization/{organization_id}/application/{application_id}/analytics/today/',
+            applicationScope: true,
+            query: ['tz' => 'tz'],
+        ), [], $params, $options);
+
+        return Types\ApplicationAnalyticsToday::fromResponse($response);
     }
 }

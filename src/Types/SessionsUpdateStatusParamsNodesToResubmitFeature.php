@@ -64,6 +64,8 @@ final class SessionsUpdateStatusParamsNodesToResubmitFeature
 
     public const KYB = 'KYB';
 
+    public const GEOLOCATION = 'GEOLOCATION';
+
     private function __construct()
     {
     }

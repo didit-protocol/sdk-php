@@ -40,10 +40,10 @@ final class PhoneIntelligence extends BaseModel
     public readonly ?string $carrierType;
 
     /**
-     * Machine-readable codes explaining the score. Values can grow over time, so do not reject unknown
-     * codes.
+     * Signals that explain the score, each with a stable Didit code, a direction, a message and an impact
+     * level. New codes can appear over time, so do not reject unknown codes.
      *
-     * @var list<string>|null
+     * @var list<PhoneIntelligenceReasonCodes>|null
      */
     public readonly ?array $reasonCodes;
 
@@ -61,6 +61,6 @@ final class PhoneIntelligence extends BaseModel
         $this->isPorted = Hydrate::bool($data['is_ported'] ?? null);
         $this->isRecentlyPorted = Hydrate::bool($data['is_recently_ported'] ?? null);
         $this->carrierType = Hydrate::string($data['carrier_type'] ?? null);
-        $this->reasonCodes = Hydrate::list($data['reason_codes'] ?? null, Hydrate::string(...));
+        $this->reasonCodes = Hydrate::list($data['reason_codes'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneIntelligenceReasonCodes::class));
     }
 }

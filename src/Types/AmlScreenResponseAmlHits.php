@@ -17,7 +17,11 @@ use Didit\Core\Hydrate;
  */
 final class AmlScreenResponseAmlHits extends BaseModel
 {
-    /** Stable identifier of the matched entity in the screening datasets. */
+    /**
+     * Didit's stable identifier for the hit: `hit_` followed by 24 hexadecimal characters. The same
+     * matched entity keeps the same `id` when the subject is screened again. Pass it as `hit_id` to the
+     * AML hit review endpoints.
+     */
     public readonly ?string $id;
 
     /** Source URL for the matched entity, when available. */
@@ -48,7 +52,9 @@ final class AmlScreenResponseAmlHits extends BaseModel
     public readonly ?string $caption;
 
     /**
-     * Datasets the entity appears in (e.g. `PEP`, `PEP Level 1`, sanctions list names).
+     * Risk categories the entity is listed under: `PEP` (with its level, `PEP Level 1` to `PEP Level 4`),
+     * `Sanctions`, `Adverse Media`, `Warnings and Regulatory Enforcement`, `Fitness and Probity`, `SIP`,
+     * `SIE` or `Insolvency`. `Other Lists` when the entity's source states none of these categories.
      *
      * @var list<string>|null
      */

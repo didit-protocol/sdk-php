@@ -14,7 +14,11 @@ use Didit\Core\Hydrate;
  */
 final class SignatureResultConfirmation extends BaseModel
 {
-    /** Known values: {@see SignatureResultConfirmationChannel}. */
+    /**
+     * `null` for a Simple signature, which has no code.
+     *
+     * Known values: {@see SignatureResultConfirmationChannel}.
+     */
     public readonly ?string $channel;
 
     /** The masked contact the code went to. */

@@ -18,8 +18,8 @@ final class SessionsBulkUpdateAmlHitStatusResponse extends BaseModel
     public readonly ?string $message;
 
     /**
-     * The `hit_id` of every entry in `hit_updates`, in request order, including hits whose status did not
-     * change.
+     * The `id` of the hit each entry in `hit_updates` names, as the session decision returns it, in
+     * request order, including hits whose status did not change.
      *
      * @var list<string>|null
      */

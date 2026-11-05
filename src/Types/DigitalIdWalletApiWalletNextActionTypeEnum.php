@@ -15,6 +15,8 @@ final class DigitalIdWalletApiWalletNextActionTypeEnum
 
     public const CONFIRM_IN_APP = 'confirm_in_app';
 
+    public const REQUEST_DIGITAL_CREDENTIAL = 'request_digital_credential';
+
     private function __construct()
     {
     }

@@ -46,10 +46,10 @@ final class EmailIntelligence extends BaseModel
     public readonly ?float $noOfBreaches;
 
     /**
-     * Machine-readable codes explaining the score. Values can grow over time, so do not reject unknown
-     * codes.
+     * Signals that explain the score, each with a stable Didit code, a direction, a message and an impact
+     * level. New codes can appear over time, so do not reject unknown codes.
      *
-     * @var list<string>|null
+     * @var list<EmailIntelligenceReasonCodes>|null
      */
     public readonly ?array $reasonCodes;
 
@@ -69,6 +69,6 @@ final class EmailIntelligence extends BaseModel
         $this->isFreeDomain = Hydrate::bool($data['is_free_domain'] ?? null);
         $this->isBreached = Hydrate::bool($data['is_breached'] ?? null);
         $this->noOfBreaches = Hydrate::float($data['no_of_breaches'] ?? null);
-        $this->reasonCodes = Hydrate::list($data['reason_codes'] ?? null, Hydrate::string(...));
+        $this->reasonCodes = Hydrate::list($data['reason_codes'] ?? null, static fn (mixed $v) => Hydrate::model($v, EmailIntelligenceReasonCodes::class));
     }
 }

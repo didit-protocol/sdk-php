@@ -36,6 +36,8 @@ final class WebhookEvent
 
     public const WORKFLOW_COMPLIANCE_CHANGED = 'workflow.compliance_changed';
 
+    public const TRANSACTION_RULE_SUGGESTIONS_CREATED = 'transaction_rule_suggestions.created';
+
     public const AUTH_SIGNUP = 'auth.signup';
 
     public const AUTH_LOGIN = 'auth.login';

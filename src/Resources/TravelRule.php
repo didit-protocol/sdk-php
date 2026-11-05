@@ -41,6 +41,8 @@ final class TravelRule extends BaseResource
 
     public readonly TravelRule\WalletProofs $walletProofs;
 
+    public readonly TravelRule\UnmatchedDeposits $unmatchedDeposits;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
@@ -50,6 +52,7 @@ final class TravelRule extends BaseResource
         $this->transfers = new TravelRule\Transfers($requester);
         $this->networks = new TravelRule\Networks($requester);
         $this->walletProofs = new TravelRule\WalletProofs($requester);
+        $this->unmatchedDeposits = new TravelRule\UnmatchedDeposits($requester);
     }
 
     /**

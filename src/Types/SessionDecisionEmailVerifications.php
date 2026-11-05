@@ -75,6 +75,12 @@ final class SessionDecisionEmailVerifications extends BaseModel
      */
     public readonly ?array $matches;
 
+    /** Email intelligence signals. Present only when the email intelligence add-on ran for this address. */
+    public readonly ?EmailIntelligence $emailIntelligence;
+
+    /** Social footprint of the address. Present only when the social footprint add-on ran for this address. */
+    public readonly ?EmailSocialFootprint $emailSocial;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -93,5 +99,7 @@ final class SessionDecisionEmailVerifications extends BaseModel
         $this->warnings = Hydrate::list($data['warnings'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionEmailVerificationsWarnings::class));
         $this->lifecycle = Hydrate::list($data['lifecycle'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionEmailVerificationsLifecycle::class));
         $this->matches = Hydrate::list($data['matches'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionEmailVerificationsMatches::class));
+        $this->emailIntelligence = Hydrate::model($data['email_intelligence'] ?? null, EmailIntelligence::class);
+        $this->emailSocial = Hydrate::model($data['email_social'] ?? null, EmailSocialFootprint::class);
     }
 }

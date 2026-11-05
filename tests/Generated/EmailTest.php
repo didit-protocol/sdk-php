@@ -101,6 +101,10 @@ final class EmailTest extends GeneratedTestCase
             'duplicated_email_action' => 'NO_ACTION',
             'breached_email_action' => 'NO_ACTION',
             'disposable_email_action' => 'NO_ACTION',
+            'enable_enrichment' => true,
+            'email_intelligence_score_action' => 'NO_ACTION',
+            'recent_email_breach_action' => 'NO_ACTION',
+            'frequent_email_breach_action' => 'NO_ACTION',
             'enable_social' => true,
             'email_no_social_presence_action' => 'NO_ACTION',
         ]);
@@ -112,7 +116,7 @@ final class EmailTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"email":"user@example.com","code":"code-value","duplicated_email_action":"NO_ACTION","breached_email_action":"NO_ACTION","disposable_email_action":"NO_ACTION","enable_social":true,"email_no_social_presence_action":"NO_ACTION"}', $this->canonicalBody($request));
+        self::assertSame('{"email":"user@example.com","code":"code-value","duplicated_email_action":"NO_ACTION","breached_email_action":"NO_ACTION","disposable_email_action":"NO_ACTION","enable_enrichment":true,"email_intelligence_score_action":"NO_ACTION","recent_email_breach_action":"NO_ACTION","frequent_email_breach_action":"NO_ACTION","enable_social":true,"email_no_social_presence_action":"NO_ACTION"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Approved","message":"The verification code is correct.","email":{"status":"Approved","email":"alice@example.com","is_breached":false,"breaches":[],"is_disposable":false,"is_undeliverable":false,"verification_attempts":1,"verified_at":"2026-06-12T01:24:47.311323Z","warnings":[],"lifecycle":[{"type":"EMAIL_VERIFICATION_MESSAGE_SENT","timestamp":"2026-06-12T01:23:39.580554+00:00","details":{"status":"Success","reason":null},"fee":0.02},{"type":"VALID_CODE_ENTERED","timestamp":"2026-06-12T01:24:47.311201+00:00","details":{"code_tried":"123456","status":"Approved"},"fee":0},{"type":"EMAIL_VERIFICATION_APPROVED","timestamp":"2026-06-12T01:24:47.384292+00:00","details":null,"fee":0}],"matches":[]},"vendor_data":"user-1234","metadata":null,"created_at":"2026-06-12T01:24:47.401719+00:00"}'), $result->toArray());
         self::assertSame('e39cb057-92fc-4b59-b84e-02fec29a0f24', $result->requestId);

@@ -31,12 +31,12 @@ final class SessionDecisionRegistryChecks extends BaseModel
     public readonly ?SessionDecisionRegistryChecksCompany $company;
 
     /**
-     * Raw ownership snapshot kept for reviewers; its shape differs by registry source and is not a stable
-     * contract. Read `company.beneficial_owners` and `company.ownership` instead.
-     *
-     * @var array<string, mixed>|null
+     * The cap table the registry proved, as it stood when the ownership tier was delivered: direct
+     * `shareholders` and `beneficial_owners`. Null when the registry proved no ownership. It never carries
+     * the registry source's own rows; read `company.beneficial_owners` and `company.ownership` for the
+     * current record.
      */
-    public readonly ?array $ownershipStructure;
+    public readonly ?KYBOwnershipStructure $ownershipStructure;
 
     /** @var list<array<string, mixed>>|null */
     public readonly ?array $warnings;
@@ -51,7 +51,7 @@ final class SessionDecisionRegistryChecks extends BaseModel
         $this->nodeId = Hydrate::string($data['node_id'] ?? null);
         $this->dataResolved = Hydrate::bool($data['data_resolved'] ?? null);
         $this->company = Hydrate::model($data['company'] ?? null, SessionDecisionRegistryChecksCompany::class);
-        $this->ownershipStructure = Hydrate::assoc($data['ownership_structure'] ?? null);
+        $this->ownershipStructure = Hydrate::model($data['ownership_structure'] ?? null, KYBOwnershipStructure::class);
         $this->warnings = Hydrate::list($data['warnings'] ?? null, Hydrate::assoc(...));
     }
 }
