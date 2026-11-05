@@ -17,6 +17,9 @@ final class AMLScreeningRun extends BaseModel
     /** Identifier of this screening run. */
     public readonly ?string $uuid;
 
+    /** The monitoring run this screening belongs to. Every verification screened in the same run shares it. */
+    public readonly ?string $runId;
+
     /** When this subject's re-screen finished. Results are ordered by it, newest first. */
     public readonly ?\DateTimeImmutable $completedAt;
 
@@ -57,6 +60,18 @@ final class AMLScreeningRun extends BaseModel
     /** Number of hits this run left the check in. */
     public readonly ?int $totalHits;
 
+    /**
+     * Number of hits this run found that the check did not have before it. `0` when nothing new was found;
+     * `null` when the run failed or was recorded before this count existed.
+     */
+    public readonly ?int $newHits;
+
+    /**
+     * Number of entities this run screened for the verification: `1` when the subject was screened, `0`
+     * when the run failed.
+     */
+    public readonly ?int $entitiesScreened;
+
     /** Dataset freshness behind this run, or `null` when no dates were available. */
     public readonly ?AMLDatasetFreshness $datasetFreshness;
 
@@ -67,6 +82,7 @@ final class AMLScreeningRun extends BaseModel
     {
         parent::__construct($data);
         $this->uuid = Hydrate::string($data['uuid'] ?? null);
+        $this->runId = Hydrate::string($data['run_id'] ?? null);
         $this->completedAt = Hydrate::dateTime($data['completed_at'] ?? null);
         $this->startedAt = Hydrate::dateTime($data['started_at'] ?? null);
         $this->outcome = Hydrate::string($data['outcome'] ?? null);
@@ -75,6 +91,8 @@ final class AMLScreeningRun extends BaseModel
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->score = Hydrate::float($data['score'] ?? null);
         $this->totalHits = Hydrate::int($data['total_hits'] ?? null);
+        $this->newHits = Hydrate::int($data['new_hits'] ?? null);
+        $this->entitiesScreened = Hydrate::int($data['entities_screened'] ?? null);
         $this->datasetFreshness = Hydrate::model($data['dataset_freshness'] ?? null, AMLDatasetFreshness::class);
     }
 }

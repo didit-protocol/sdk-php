@@ -7,6 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
+ * `null` for a Simple signature, which has no code.
+ *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
 final class SignatureResultConfirmationChannel

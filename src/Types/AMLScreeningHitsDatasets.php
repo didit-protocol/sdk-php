@@ -35,6 +35,8 @@ final class AMLScreeningHitsDatasets
 
     public const INSOLVENCY = 'Insolvency';
 
+    public const OTHER_LISTS = 'Other Lists';
+
     private function __construct()
     {
     }

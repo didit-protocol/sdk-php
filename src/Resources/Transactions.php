@@ -64,7 +64,7 @@ final class Transactions extends BaseResource
         return $this->requester->requestPage(new Operation(
             method: 'GET',
             path: '/v3/transactions/',
-            query: ['limit' => 'limit', 'offset' => 'offset', 'travel_rule_status' => 'travel_rule_status'],
+            query: ['limit' => 'limit', 'offset' => 'offset', 'travel_rule_status' => 'travel_rule_status', 'assignee' => 'assignee'],
         ), [], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\TransactionsListResponseResults::class));
     }
 

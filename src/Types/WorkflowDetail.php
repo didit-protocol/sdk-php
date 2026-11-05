@@ -119,6 +119,12 @@ final class WorkflowDetail extends BaseModel
     public readonly ?\DateTimeImmutable $updatedAt;
 
     /**
+     * Which E-signature levels can sign right now. Check it before you set `signature_level`. Returned on
+     * `kyc`, `kyb` and graph workflows.
+     */
+    public readonly ?WorkflowDetailSignatureAvailability $signatureAvailability;
+
+    /**
      * Whether a simple KYC or KYB workflow runs Bank verification. It runs after the contact steps (and
      * Location verification) and before database validation, AML and IP analysis. Bank verification is not
      * generally available yet: turning it on is refused wherever it is not enabled.
@@ -181,6 +187,7 @@ final class WorkflowDetail extends BaseModel
         $this->kybRoleSettings = Hydrate::list($data['kyb_role_settings'] ?? null, Hydrate::assoc(...));
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
         $this->updatedAt = Hydrate::dateTime($data['updated_at'] ?? null);
+        $this->signatureAvailability = Hydrate::model($data['signature_availability'] ?? null, WorkflowDetailSignatureAvailability::class);
         $this->isBankVerificationEnabled = Hydrate::bool($data['is_bank_verification_enabled'] ?? null);
         $this->bankVerificationConfig = Hydrate::assoc($data['bank_verification_config'] ?? null);
         $this->isGeolocationEnabled = Hydrate::bool($data['is_geolocation_enabled'] ?? null);

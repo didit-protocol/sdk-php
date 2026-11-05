@@ -49,6 +49,13 @@ final class SessionDecisionFaceMatches extends BaseModel
     public readonly ?array $warnings;
 
     /**
+     * Whether the eyes, mouth and face are covered in the captured image. Returned by `GET
+     * /v3/session/{sessionId}/decision/` only; it is not part of webhook payloads. `null` when no coverage
+     * reading exists.
+     */
+    public readonly ?SessionDecisionFaceMatchesFaceCoverage $faceCoverage;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -61,5 +68,6 @@ final class SessionDecisionFaceMatches extends BaseModel
         $this->sourceImage = Hydrate::string($data['source_image'] ?? null);
         $this->targetImage = Hydrate::string($data['target_image'] ?? null);
         $this->warnings = Hydrate::list($data['warnings'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionFaceMatchesWarnings::class));
+        $this->faceCoverage = Hydrate::model($data['face_coverage'] ?? null, SessionDecisionFaceMatchesFaceCoverage::class);
     }
 }

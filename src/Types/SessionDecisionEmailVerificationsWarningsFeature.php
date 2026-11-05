@@ -46,6 +46,10 @@ final class SessionDecisionEmailVerificationsWarningsFeature
 
     public const KYB_KEY_PEOPLE = 'KYB_KEY_PEOPLE';
 
+    public const GEOLOCATION = 'GEOLOCATION';
+
+    public const SIGNATURE = 'SIGNATURE';
+
     private function __construct()
     {
     }

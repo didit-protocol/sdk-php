@@ -10,7 +10,8 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * The trusted timestamp in the signature. `null` until signed.
+ * The RFC 3161 timestamp in the signature, issued by Didit. `null` until signed, and always `null` for
+ * a Simple signature.
  */
 final class SignatureResultTimestamp extends BaseModel
 {

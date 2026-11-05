@@ -234,6 +234,25 @@ final class SessionDecisionIdVerifications extends BaseModel
      */
     public readonly ?AddressValidationResult $addressValidation;
 
+    /** Region or state of the document's issuing country where the document identifies one. */
+    public readonly ?string $region;
+
+    /**
+     * Snapshot of the data extracted from the document that the person was shown to review, kept next to
+     * the confirmed values so you can compare what was read with what the person confirmed. `null` when
+     * the person was not asked to review.
+     *
+     * @var array<string, mixed>|null
+     */
+    public readonly ?array $extractedData;
+
+    /**
+     * Data read from the document's barcodes. Empty when the document has none or none was read.
+     *
+     * @var list<array<string, mixed>>|null
+     */
+    public readonly ?array $barcodes;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -289,5 +308,8 @@ final class SessionDecisionIdVerifications extends BaseModel
         $this->matches = Hydrate::list($data['matches'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionIdVerificationsMatches::class));
         $this->documentLiveness = Hydrate::model($data['document_liveness'] ?? null, SessionDecisionIdVerificationsDocumentLiveness::class);
         $this->addressValidation = Hydrate::model($data['address_validation'] ?? null, AddressValidationResult::class);
+        $this->region = Hydrate::string($data['region'] ?? null);
+        $this->extractedData = Hydrate::assoc($data['extracted_data'] ?? null);
+        $this->barcodes = Hydrate::list($data['barcodes'] ?? null, Hydrate::assoc(...));
     }
 }

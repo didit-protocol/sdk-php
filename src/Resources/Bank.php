@@ -23,10 +23,9 @@ final class Bank extends BaseResource
     /**
      * Check a bank account.
      *
-     * Check that a bank account belongs to the person or company you name, before you send money to it. No
-     * session and no sign-in: send the name and the account, read the result. It is the [account
-     * check](/core-technology/bank-verification/account-check) of the Bank Verification step, run from
-     * your backend.
+     * **Not available in production yet.** Bank Verification is switched off in production, so until it is
+     * switched on this endpoint answers `404` with `bank_verification_not_available`. Do not build on it
+     * yet. The rest of this description is what the endpoint does once it is available.
      *
      * `POST /v3/bank/account-check/`
      *

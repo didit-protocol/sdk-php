@@ -37,6 +37,12 @@ final class SessionDecision extends BaseModel
      */
     public readonly ?string $sharedFromSession;
 
+    /**
+     * `session_number` of the source session when this session was imported from another application of
+     * your organization. `null` otherwise.
+     */
+    public readonly ?int $sharedFromSessionNumber;
+
     /** The number of the session. */
     public readonly ?int $sessionNumber;
 
@@ -54,6 +60,21 @@ final class SessionDecision extends BaseModel
     public readonly ?string $status;
 
     /**
+     * Present when a reviewer set `status` by hand. `null` when the status is the automatic one. Use it to
+     * tell a manual approval from an automatic one.
+     */
+    public readonly ?SessionDecisionStatusOverride $statusOverride;
+
+    /** How the status was reached: who set it and which warnings did. */
+    public readonly ?SessionDecisionDecisionTrace $decisionTrace;
+
+    /**
+     * A summary of other records linked to the session. `null` when there is nothing to show, and for
+     * workflows that declare an age assurance standard.
+     */
+    public readonly ?SessionDecisionLinkedRecords $linkedRecords;
+
+    /**
      * Stable identifier of the workflow group that produced this session. Workflows are versioned, this
      * value identifies the workflow itself, not the specific version.
      */
@@ -62,9 +83,10 @@ final class SessionDecision extends BaseModel
     /**
      * List of verification features configured for this session, as display names: `ID_VERIFICATION`,
      * `NFC`, `LIVENESS`, `FACE_MATCH`, `POA`, `PHONE`, `EMAIL_VERIFICATION`, `AML`, `IP_ANALYSIS`,
-     * `DATABASE_VALIDATION`, `QUESTIONNAIRE`, `AGE_ESTIMATION`, `FACE_SEARCH` (Business Verification
-     * sessions use the KYB feature set: `KYB_REGISTRY`, `KYB_DOCUMENTS`, `KYB_KEY_PEOPLE`, `AML`, `PHONE`,
-     * `EMAIL_VERIFICATION`, `IP_ANALYSIS`, `QUESTIONNAIRE`).
+     * `DATABASE_VALIDATION`, `QUESTIONNAIRE`, `AGE_ESTIMATION`, `FACE_SEARCH`, `GEOLOCATION` (Location
+     * verification) (Business Verification sessions use the KYB feature set: `KYB_REGISTRY`,
+     * `KYB_DOCUMENTS`, `KYB_KEY_PEOPLE`, `AML`, `PHONE`, `EMAIL_VERIFICATION`, `IP_ANALYSIS`,
+     * `QUESTIONNAIRE`).
      *
      * @var list<string>|null
      */
@@ -218,10 +240,9 @@ final class SessionDecision extends BaseModel
     public readonly ?array $bankVerifications;
 
     /**
-     * Electronic Signature results, one item per signer and signature step, for User and Business
-     * Verification. Present only when the workflow has an Electronic Signature step; an empty array until
-     * a signer reaches it. See the [Electronic Signature
-     * report](/core-technology/electronic-signature/report-electronic-signature).
+     * E-signature results, one item per signer and signature step, for User and Business Verification.
+     * Present only when the workflow has an E-signature step; an empty array until a signer reaches it.
+     * See the [E-signature report](/core-technology/electronic-signature/report-electronic-signature).
      *
      * @var list<SignatureResult>|null
      */
@@ -249,6 +270,24 @@ final class SessionDecision extends BaseModel
     public readonly ?array $ipAnalyses;
 
     /**
+     * **Array of Location verification results**, one per Location verification step: that step's accepted
+     * attempt. `null` until a Location verification step has produced data. Earlier attempts of the same
+     * step are in `geolocation_attempts`.
+     *
+     * @var list<GeolocationCheck>|null
+     */
+    public readonly ?array $geolocationChecks;
+
+    /**
+     * Every attempt of every Location verification step of this session, oldest first. Attempts that a
+     * resubmission replaced are left out. A workflow that withholds `geolocation_checks` through its
+     * response attributes withholds this list too.
+     *
+     * @var list<GeolocationAttempt>|null
+     */
+    public readonly ?array $geolocationAttempts;
+
+    /**
      * **Array of Database Validation reports**, always a JSON array, never a singular
      * `database_validation` object. `null` until at least one DB validation step has produced data. Each
      * item is the full report, including `node_id`, feature-level `status`, `screened_data`, the
@@ -259,8 +298,30 @@ final class SessionDecision extends BaseModel
      */
     public readonly ?array $databaseValidations;
 
+    /**
+     * Why a configured database validation produced no result, as `{code, message}` plus context fields.
+     * Present only when `database_validations` is `null` for a workflow that has the step, so you can tell
+     * "the registry agreed" from "nothing ran". `null` otherwise.
+     */
+    public readonly ?SessionDecisionDatabaseValidationNotPerformedReason $databaseValidationNotPerformedReason;
+
     /** @var list<SessionDecisionReviews>|null */
     public readonly ?array $reviews;
+
+    /** The Console reviewer the session is assigned to, or `null` when nobody holds it. */
+    public readonly ?SessionDecisionAssignee $assignee;
+
+    /**
+     * When the session started waiting for review. `null` unless the session is `In Review` and your
+     * application sets a review deadline.
+     */
+    public readonly ?\DateTimeImmutable $waitingSince;
+
+    /**
+     * When the review is due. `null` unless the session is `In Review` and your application sets a review
+     * deadline.
+     */
+    public readonly ?\DateTimeImmutable $slaDueAt;
 
     /** Timestamp at which the session was created (ISO 8601, UTC). */
     public readonly ?\DateTimeImmutable $createdAt;
@@ -305,6 +366,12 @@ final class SessionDecision extends BaseModel
     public readonly ?string $environment;
 
     /**
+     * The sandbox scenario the session was created with. `null` for live sessions and for sandbox sessions
+     * created without one.
+     */
+    public readonly ?string $sandboxScenario;
+
+    /**
      * Returned only with `include=resubmissions`, for user and business sessions. One entry per
      * resubmission request, oldest first. Each entry carries the results the resubmitted steps returned
      * before the request, so earlier submissions stay readable. Deleting the session deletes every
@@ -331,6 +398,28 @@ final class SessionDecision extends BaseModel
      */
     public readonly ?InvestigatorBlock $investigator;
 
+    /** When the live biometric data of this session is deleted. */
+    public readonly ?BiometricRetention $biometricRetention;
+
+    /**
+     * The result of a Fraud Check API call. `null` for every other session.
+     *
+     * @var array<string, mixed>|null
+     */
+    public readonly ?array $fraudCheck;
+
+    /**
+     * Expiring URL of the full-session recording. Returned only when your organization records
+     * full-session video.
+     */
+    public readonly ?string $fullSessionVideo;
+
+    /**
+     * When the full-session recording was made. Returned only when your organization records full-session
+     * video.
+     */
+    public readonly ?\DateTimeImmutable $fullSessionVideoRecordedAt;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -340,9 +429,13 @@ final class SessionDecision extends BaseModel
         $this->sessionId = Hydrate::string($data['session_id'] ?? null);
         $this->sessionKind = Hydrate::string($data['session_kind'] ?? null);
         $this->sharedFromSession = Hydrate::string($data['shared_from_session'] ?? null);
+        $this->sharedFromSessionNumber = Hydrate::int($data['shared_from_session_number'] ?? null);
         $this->sessionNumber = Hydrate::int($data['session_number'] ?? null);
         $this->sessionUrl = Hydrate::string($data['session_url'] ?? null);
         $this->status = Hydrate::string($data['status'] ?? null);
+        $this->statusOverride = Hydrate::model($data['status_override'] ?? null, SessionDecisionStatusOverride::class);
+        $this->decisionTrace = Hydrate::model($data['decision_trace'] ?? null, SessionDecisionDecisionTrace::class);
+        $this->linkedRecords = Hydrate::model($data['linked_records'] ?? null, SessionDecisionLinkedRecords::class);
         $this->workflowId = Hydrate::string($data['workflow_id'] ?? null);
         $this->features = Hydrate::list($data['features'] ?? null, Hydrate::string(...));
         $this->vendorData = Hydrate::string($data['vendor_data'] ?? null);
@@ -364,16 +457,27 @@ final class SessionDecision extends BaseModel
         $this->signatures = Hydrate::list($data['signatures'] ?? null, static fn (mixed $v) => Hydrate::model($v, SignatureResult::class));
         $this->amlScreenings = Hydrate::list($data['aml_screenings'] ?? null, static fn (mixed $v) => Hydrate::model($v, AMLScreening::class));
         $this->ipAnalyses = Hydrate::list($data['ip_analyses'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionIpAnalyses::class));
+        $this->geolocationChecks = Hydrate::list($data['geolocation_checks'] ?? null, static fn (mixed $v) => Hydrate::model($v, GeolocationCheck::class));
+        $this->geolocationAttempts = Hydrate::list($data['geolocation_attempts'] ?? null, static fn (mixed $v) => Hydrate::model($v, GeolocationAttempt::class));
         $this->databaseValidations = Hydrate::list($data['database_validations'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionDatabaseValidations::class));
+        $this->databaseValidationNotPerformedReason = Hydrate::model($data['database_validation_not_performed_reason'] ?? null, SessionDecisionDatabaseValidationNotPerformedReason::class);
         $this->reviews = Hydrate::list($data['reviews'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionReviews::class));
+        $this->assignee = Hydrate::model($data['assignee'] ?? null, SessionDecisionAssignee::class);
+        $this->waitingSince = Hydrate::dateTime($data['waiting_since'] ?? null);
+        $this->slaDueAt = Hydrate::dateTime($data['sla_due_at'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
         $this->expiresAt = Hydrate::dateTime($data['expires_at'] ?? null);
         $this->registryChecks = Hydrate::list($data['registry_checks'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionRegistryChecks::class));
         $this->keyPeopleChecks = Hydrate::list($data['key_people_checks'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionKeyPeopleChecks::class));
         $this->documentVerifications = Hydrate::list($data['document_verifications'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionDocumentVerifications::class));
         $this->environment = Hydrate::string($data['environment'] ?? null);
+        $this->sandboxScenario = Hydrate::string($data['sandbox_scenario'] ?? null);
         $this->resubmissions = Hydrate::list($data['resubmissions'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionResubmissions::class));
         $this->biometricConsent = Hydrate::model($data['biometric_consent'] ?? null, SessionDecisionBiometricConsent::class);
         $this->investigator = Hydrate::model($data['investigator'] ?? null, InvestigatorBlock::class);
+        $this->biometricRetention = Hydrate::model($data['biometric_retention'] ?? null, BiometricRetention::class);
+        $this->fraudCheck = Hydrate::assoc($data['fraud_check'] ?? null);
+        $this->fullSessionVideo = Hydrate::string($data['full_session_video'] ?? null);
+        $this->fullSessionVideoRecordedAt = Hydrate::dateTime($data['full_session_video_recorded_at'] ?? null);
     }
 }

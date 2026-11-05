@@ -10,7 +10,7 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * One signer's result for one Electronic Signature step. See the [Electronic Signature
+ * One signer's result for one E-signature step. See the [E-signature
  * report](/core-technology/electronic-signature/report-electronic-signature).
  */
 final class SignatureResult extends BaseModel
@@ -36,31 +36,45 @@ final class SignatureResult extends BaseModel
     public readonly ?string $verdict;
 
     /**
-     * `aes`. `qes` (Qualified Electronic Signature, QES) is coming soon.
+     * `simple` (default) or `aes`. `qes` (Qualified Electronic Signature, QES) is an add-on that is not
+     * available yet.
      *
      * Known values: {@see SignatureResultLevel}.
      */
     public readonly ?string $level;
 
-    /** Known values: {@see SignatureResultFormat}. */
+    /**
+     * `pdf` for a Simple signature, `pades` for Advanced (AES).
+     *
+     * Known values: {@see SignatureResultFormat}.
+     */
     public readonly ?string $format;
 
-    /** `PAdES-B-LT` once signed. */
+    /** `PAdES-B-LT` once an Advanced (AES) signature is signed, otherwise null. */
     public readonly ?string $profile;
 
     /** The `signer` field. */
     public readonly ?SignatureResultSigner $signer;
 
-    /** The `identity_used` field. */
+    /**
+     * The verified identity the signature relies on. Empty for a Simple signature with no verified
+     * identity.
+     */
     public readonly ?SignatureResultIdentityUsed $identityUsed;
 
-    /** The certificate the documents were signed with. `null` until signed. */
+    /**
+     * The certificate the documents were signed with. `null` until signed, and always `null` for a Simple
+     * signature.
+     */
     public readonly ?SignatureResultCertificate $certificate;
 
     /** The `confirmation` field. */
     public readonly ?SignatureResultConfirmation $confirmation;
 
-    /** The trusted timestamp in the signature. `null` until signed. */
+    /**
+     * The RFC 3161 timestamp in the signature, issued by Didit. `null` until signed, and always `null` for
+     * a Simple signature.
+     */
     public readonly ?SignatureResultTimestamp $timestamp;
 
     /** @var list<SignatureResultDocuments>|null */
@@ -85,7 +99,7 @@ final class SignatureResult extends BaseModel
     public readonly ?string $evidenceFile;
 
     /**
-     * Warnings raised for this signer. See [Electronic Signature
+     * Warnings raised for this signer. See [E-signature
      * warnings](/core-technology/electronic-signature/warnings-electronic-signature).
      *
      * @var list<SignatureResultWarnings>|null

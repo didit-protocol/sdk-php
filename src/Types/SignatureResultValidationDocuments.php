@@ -35,10 +35,16 @@ final class SignatureResultValidationDocuments extends BaseModel
     /** EU Trusted List check. For AES: `{"status": "not_applicable", "reason": "aes_not_qualified"}`. */
     public readonly ?SignatureResultValidationDocumentsTrustedList $trustedList;
 
-    /** The certificate the documents were signed with. `null` until signed. */
+    /**
+     * The certificate the documents were signed with. `null` until signed, and always `null` for a Simple
+     * signature.
+     */
     public readonly ?SignatureResultValidationDocumentsCertificate $certificate;
 
-    /** The trusted timestamp in the signature. `null` until signed. */
+    /**
+     * The RFC 3161 timestamp in the signature, issued by Didit. `null` until signed, and always `null` for
+     * a Simple signature.
+     */
     public readonly ?SignatureResultValidationDocumentsTimestamp $timestamp;
 
     /**

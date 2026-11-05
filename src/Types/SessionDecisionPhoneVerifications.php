@@ -83,6 +83,12 @@ final class SessionDecisionPhoneVerifications extends BaseModel
      */
     public readonly ?array $matches;
 
+    /** Phone intelligence signals. Present only when the phone intelligence add-on ran for this number. */
+    public readonly ?PhoneIntelligence $phoneIntelligence;
+
+    /** Social footprint of the number. Present only when the social footprint add-on ran for this number. */
+    public readonly ?PhoneSocialFootprint $phoneSocial;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -105,5 +111,7 @@ final class SessionDecisionPhoneVerifications extends BaseModel
         $this->lifecycle = Hydrate::list($data['lifecycle'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionPhoneVerificationsLifecycle::class));
         $this->warnings = Hydrate::list($data['warnings'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionPhoneVerificationsWarnings::class));
         $this->matches = Hydrate::list($data['matches'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionPhoneVerificationsMatches::class));
+        $this->phoneIntelligence = Hydrate::model($data['phone_intelligence'] ?? null, PhoneIntelligence::class);
+        $this->phoneSocial = Hydrate::model($data['phone_social'] ?? null, PhoneSocialFootprint::class);
     }
 }

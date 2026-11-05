@@ -10,7 +10,8 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * SignatureResultIdentityUsed.
+ * The verified identity the signature relies on. Empty for a Simple signature with no verified
+ * identity.
  */
 final class SignatureResultIdentityUsed extends BaseModel
 {

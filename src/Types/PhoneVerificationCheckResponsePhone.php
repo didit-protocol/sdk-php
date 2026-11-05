@@ -95,6 +95,9 @@ final class PhoneVerificationCheckResponsePhone extends BaseModel
      */
     public readonly ?PhoneSocialFootprint $phoneSocial;
 
+    /** Phone intelligence signals. Present only when `enable_enrichment` was `true` on the check. */
+    public readonly ?PhoneIntelligence $phoneIntelligence;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -117,5 +120,6 @@ final class PhoneVerificationCheckResponsePhone extends BaseModel
         $this->lifecycle = Hydrate::list($data['lifecycle'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneVerificationCheckResponsePhoneLifecycle::class));
         $this->matches = Hydrate::list($data['matches'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneVerificationCheckResponsePhoneMatches::class));
         $this->phoneSocial = Hydrate::model($data['phone_social'] ?? null, PhoneSocialFootprint::class);
+        $this->phoneIntelligence = Hydrate::model($data['phone_intelligence'] ?? null, PhoneIntelligence::class);
     }
 }

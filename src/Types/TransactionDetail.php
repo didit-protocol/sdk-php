@@ -183,7 +183,7 @@ final class TransactionDetail extends BaseModel
     public readonly ?array $activities;
 
     /**
-     * Alerts raised by rules and providers.
+     * Always empty today. An open alert is a transaction with status `IN_REVIEW` or `AWAITING_USER`.
      *
      * @var list<TransactionDetailAlerts>|null
      */

@@ -176,13 +176,14 @@ final class SessionDecisionRegistryChecksCompany extends BaseModel
     public readonly ?array $accounts;
 
     /**
-     * Raw record returned by the registry source, kept for reviewers. Its shape differs by country and
-     * source and is not a stable contract: read the canonical fields (`addresses`, `industries`,
-     * `ownership`, `beneficial_owners[].shareholding`) instead.
-     *
-     * @var array<string, mixed>|null
+     * Didit's normalized registry detail for the company: the ownership outcome (`ownership_error`,
+     * `section_errors`, `ubo_resolution`, `lite_enrichment`), the corrections made with update-data, and
+     * registry facts that have no field of their own. It never carries the registry source's own record.
+     * Every key is optional and present only when the company has a value for it; new keys may be added.
+     * Read the canonical fields (`addresses`, `industries`, `ownership`,
+     * `beneficial_owners[].shareholding`) for anything they cover.
      */
-    public readonly ?array $registryData;
+    public readonly ?KYBRegistryData $registryData;
 
     /**
      * Data confirmed or edited by the end user.
@@ -217,6 +218,9 @@ final class SessionDecisionRegistryChecksCompany extends BaseModel
 
     /** `not_requested`, `pending`, `delivered`, `not_held` or `unavailable`. Also in `ownership.status`. */
     public readonly ?string $registryOwnershipStatus;
+
+    /** The latest registry monitor for the company, or `null` when none exists. */
+    public readonly ?SessionDecisionRegistryChecksCompanyRegistryMonitoring $registryMonitoring;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -264,7 +268,7 @@ final class SessionDecisionRegistryChecksCompany extends BaseModel
         $this->addresses = Hydrate::list($data['addresses'] ?? null, static fn (mixed $v) => Hydrate::model($v, KYBRegistryAddress::class));
         $this->industries = Hydrate::list($data['industries'] ?? null, static fn (mixed $v) => Hydrate::model($v, KYBRegistryIndustry::class));
         $this->accounts = Hydrate::assoc($data['accounts'] ?? null);
-        $this->registryData = Hydrate::assoc($data['registry_data'] ?? null);
+        $this->registryData = Hydrate::model($data['registry_data'] ?? null, KYBRegistryData::class);
         $this->userProvidedData = Hydrate::assoc($data['user_provided_data'] ?? null);
         $this->confirmedByUserAt = Hydrate::dateTime($data['confirmed_by_user_at'] ?? null);
         $this->lastConsoleEditAt = Hydrate::dateTime($data['last_console_edit_at'] ?? null);
@@ -273,5 +277,6 @@ final class SessionDecisionRegistryChecksCompany extends BaseModel
         $this->registryTier = Hydrate::string($data['registry_tier'] ?? null);
         $this->registryTierDelivered = Hydrate::string($data['registry_tier_delivered'] ?? null);
         $this->registryOwnershipStatus = Hydrate::string($data['registry_ownership_status'] ?? null);
+        $this->registryMonitoring = Hydrate::model($data['registry_monitoring'] ?? null, SessionDecisionRegistryChecksCompanyRegistryMonitoring::class);
     }
 }

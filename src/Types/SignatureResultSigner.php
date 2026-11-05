@@ -14,7 +14,10 @@ use Didit\Core\Hydrate;
  */
 final class SignatureResultSigner extends BaseModel
 {
-    /** Verified name. */
+    /**
+     * The signer's name. Verified (from the approved ID verification or the session) except at the Simple
+     * level without a verified session name, where it is the name the signer typed and is not verified.
+     */
     public readonly ?string $name;
 
     /** Known values: {@see SignatureResultSignerCapacity}. */

@@ -37,8 +37,10 @@ final class TransactionRuleCondition extends BaseModel
     public readonly ?string $operator;
 
     /**
-     * Comparison value. Its shape depends on the operator and value_type; omit for the presence-check
-     * operators.
+     * Comparison value. Its shape depends on the operator and value_type; omit it for the presence-check
+     * operators. Every other operator needs a value that is not `null` or an empty list, otherwise the
+     * rule is refused with `400`. `contains_any` needs a list of strings, and `contains`, `not_contains`
+     * and `regex` need a single string.
      */
     public readonly mixed $value;
 
