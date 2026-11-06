@@ -101,7 +101,7 @@ final class AuthenticationContractTest extends TestCase
             'get_session' => $auth->getSession('test-access-token'),
             'revoke_session' => $auth->revokeSession('test-access-token'),
             'create_step_up' => $auth->createStepUp('test-access-token', StepUp::ACTION_PAYOUT, '900.00', 'EUR'),
-            'retrieve_step_up' => $auth->retrieveStepUp('test-access-token', '94efc2c3-ca84-42fe-900b-6fb61669a7a1'),
+            'retrieve_step_up' => $auth->retrieveStepUp('test-access-token', 'step-up-1'),
             default => self::fail("{$method}: add the method to the module, to METHODS and to call()"),
         };
     }
