@@ -363,7 +363,7 @@ class SpecSyncTest(unittest.TestCase):
 
     def test_authentication_documentation_change(self) -> None:
         def describe(doc: dict[str, Any]) -> None:
-            doc["paths"]["/session/"]["get"]["description"] = "Reads the session."
+            doc["paths"]["/session/"]["get"]["responses"]["200"]["description"] = "The session."
         self.upstream_authentication(describe)
         code, _, err = self.sync()
         self.assertEqual(code, 0, err)
