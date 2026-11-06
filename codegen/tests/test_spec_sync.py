@@ -380,6 +380,27 @@ class SpecSyncTest(unittest.TestCase):
         self.assertIn(f"- {line}", summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0])
         self.assertIn(f"api(spec): {line}", summary.split("BEGIN_COMMIT_OVERRIDE", 1)[1])
 
+    def test_a_change_to_one_grant_and_an_untyped_field_reach_the_release_notes(self) -> None:
+        # The refresh grant is the second variant of the token request; `status` loses its type.
+        def require_scope(doc: dict[str, Any]) -> None:
+            doc["components"]["schemas"]["RefreshTokenGrantRequest"]["required"].append("scope")
+        def untype(doc: dict[str, Any]) -> None:
+            doc["components"]["schemas"]["SessionDecision"]["properties"]["status"] = {}
+        self.upstream_authentication(require_scope)
+        self.upstream(untype)
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        summary = self.summary.read_text("utf-8")
+        self.assertEqual(summary.splitlines()[0], f"feat(spec): sync API spec {DATE}")
+        breaking = summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0]
+        override = summary.split("BEGIN_COMMIT_OVERRIDE", 1)[1]
+        for line in (
+            "`authentication.exchange_code()` (`authentication POST /token/`): request body `scope`: now required",
+            "`sessions.retrieve_decision()` (`GET /v3/session/{sessionId}/decision/`): response 200 `status`: type changed from string to any",
+        ):
+            self.assertIn(f"- {line}", breaking)
+            self.assertIn(f"api(spec): {line}", override)
+
     def test_authentication_documentation_change(self) -> None:
         def describe(doc: dict[str, Any]) -> None:
             doc["paths"]["/session/"]["get"]["responses"]["200"]["description"] = "The session."
