@@ -87,7 +87,7 @@ final class AuthenticationContractTest extends TestCase
                 parse_str((string) $request->getBody(), $form);
                 self::assertSame($operation['discriminator'], $form['grant_type'] ?? null, $name);
             }
-            self::assertIsObject($result, $name);
+            self::assertStringStartsWith('Didit\\', $result::class, $name);
         }
     }
 
@@ -102,6 +102,7 @@ final class AuthenticationContractTest extends TestCase
             'revoke_session' => $auth->revokeSession('test-access-token'),
             'create_step_up' => $auth->createStepUp('test-access-token', StepUp::ACTION_PAYOUT, '900.00', 'EUR'),
             'retrieve_step_up' => $auth->retrieveStepUp('test-access-token', '94efc2c3-ca84-42fe-900b-6fb61669a7a1'),
+            default => self::fail("{$method}: add the method to the module, to METHODS and to call()"),
         };
     }
 
@@ -199,13 +200,12 @@ final class AuthenticationContractTest extends TestCase
             if (!str_starts_with((string) $status, '2')) {
                 continue;
             }
-            self::assertIsArray($response);
-            $media = $response['content']['application/json'] ?? null;
+            $media = self::at($response, 'content', 'application/json');
             if (!\is_array($media)) {
                 return ['status' => (int) $status, 'body' => null];
             }
             $examples = $media['examples'] ?? null;
-            $example = \is_array($examples) && [] !== $examples ? (reset($examples)['value'] ?? null) : ($media['example'] ?? null);
+            $example = \is_array($examples) && [] !== $examples ? self::at(reset($examples), 'value') : ($media['example'] ?? null);
             self::assertNotNull($example, "response {$status} has an example");
 
             return ['status' => (int) $status, 'body' => json_encode($example, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES)];
@@ -225,10 +225,19 @@ final class AuthenticationContractTest extends TestCase
      */
     private static function issuerUrl(): string
     {
-        $default = self::document()['servers'][0]['variables']['issuer']['default'] ?? null;
+        $default = self::at(self::document(), 'servers', 0, 'variables', 'issuer', 'default');
         self::assertIsString($default);
 
         return 'https://' . $default;
+    }
+
+    private static function at(mixed $value, string|int ...$keys): mixed
+    {
+        foreach ($keys as $key) {
+            $value = \is_array($value) ? ($value[$key] ?? null) : null;
+        }
+
+        return $value;
     }
 
     /**
