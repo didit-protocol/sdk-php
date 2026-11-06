@@ -4,14 +4,16 @@
 Usage:
     python3 codegen/spec_sync.py [--offline-dir DIR] [--summary-file PATH] [--commit-message-file PATH] [--date YYYY-MM-DD]
 
-Updates openapi/verification.json, openapi/account.json and openapi/SOURCE.json
-when upstream changed, maintains openapi/overlay.json and
-openapi/deprecated-operations.json (including deleting deprecated methods
-once they have shipped for one minor version), and writes the pull request
-summary (Markdown, first line is the title) and the commit message, which
-carries a BREAKING CHANGE footer when the sync breaks the SDK surface, so
-release-please never ships it as a patch. Prints "No upstream change" and
-writes nothing when there is nothing to do. Exit codes: 0 done, 1 download or
+Updates openapi/verification.json, openapi/account.json,
+openapi/authentication.json and openapi/SOURCE.json when upstream changed,
+maintains openapi/overlay.json and openapi/deprecated-operations.json
+(including deleting deprecated methods once they have shipped for one minor
+version), and writes the pull request summary (Markdown, first line is the
+title) and the commit message. The type is feat(spec) when callers can observe
+the change and chore(spec) when only documentation changed; the summary opens
+with the changes that can break typed code and ends with the
+BEGIN_COMMIT_OVERRIDE block release-please reads (DESIGN sections 3.1 and 13).
+Prints "No upstream change" and writes nothing when there is nothing to do. Exit codes: 0 done, 1 download or
 input error, 2 the new documents cannot be generated (for example an operation
 without SDK naming); openapi/ is left untouched and the summary file, when
 given, also says what to fix.
@@ -108,7 +110,7 @@ def write(root: Path, files: dict[str, bytes | None]) -> None:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("--offline-dir", type=Path, help="read openapi-25.json and openapi-auth.json from DIR instead of downloading")
+    parser.add_argument("--offline-dir", type=Path, help="read openapi-25.json, openapi-auth.json and openapi-authentication.json from DIR instead of downloading")
     parser.add_argument("--summary-file", type=Path, help="write the pull request summary here (default: stdout)")
     parser.add_argument("--commit-message-file", type=Path, help="write the commit message here")
     parser.add_argument("--date", help="sync date YYYY-MM-DD (default: today, UTC)")

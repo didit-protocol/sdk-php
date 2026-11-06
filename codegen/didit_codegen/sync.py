@@ -617,7 +617,7 @@ def release_section(r: Report) -> str:
     """How the sync releases (docs/DESIGN.md section 13), ending with the block
     release-please reads instead of the commits of the pull request."""
     if r.type == "feat":
-        what = "`feat(spec)`: callers can observe this change, so it releases a minor version."
+        what = "`feat(spec)`: callers can observe what changed, so this releases a minor version."
     else:
         what = "`chore(spec)`: only documentation changed, so this releases nothing on its own; it ships with the next release."
     return "\n".join([
