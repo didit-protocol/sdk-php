@@ -149,7 +149,7 @@ class FixtureTest(unittest.TestCase):
             listed,
         )
         self.assertIn(
-            "- `kyb.shareholders()` (`POST /v3/kyb/shareholders/`): response 200, 202 `kyb_registry.registry_data`: can now be null",
+            "- `kyb.list_shareholders()` (`POST /v3/kyb/shareholders/`): response 200, 202 `kyb_registry.registry_data`: can now be null",
             listed,
         )
         bump, notes = release(squash(summary))
@@ -164,7 +164,7 @@ class FixtureTest(unittest.TestCase):
         self.assertEqual(result.report.title, "chore(spec): sync API spec 2026-11-06")
         self.assertEqual(result.report.breaking, [])
         self.assertIn("## Breaking changes\n\nNone detected.\n", result.summary)
-        self.assertIn("- `POST /v3/poa/` (`proof_of_address.verify`): request body (documentation only)", result.summary)
+        self.assertIn("- `POST /v3/poa/` (`proof_of_address.verify`): request body, response 200 (documentation only)", result.summary)
         self.assertEqual(squash(result.summary), [("chore", False, "sync API spec 2026-11-06")])
         self.assertEqual(release(squash(result.summary)), (None, {}))
 
@@ -211,7 +211,7 @@ class ContinuePullRequestTest(unittest.TestCase):
             "BEGIN_COMMIT_OVERRIDE\nfeat(spec): sync API spec 2026-11-06\n\n"
             "BEGIN_NESTED_COMMIT\napi(spec): `x.a()`: `a` can now be null\nEND_NESTED_COMMIT\nEND_COMMIT_OVERRIDE\n"
         ), body)
-        self.assertNotIn("BEGIN_COMMIT_OVERRIDE", comment)
+        self.assertNotIn("END_COMMIT_OVERRIDE", comment)
         self.assertIn("- `x.a()`: `a` can now be null", comment)
         self.assertEqual(release(release_commits(title, body))[0], "minor")
 
