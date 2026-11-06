@@ -579,17 +579,24 @@ def sync(root: Path, fetched: dict[str, bytes], date: str, fetched_at: str) -> R
 
 
 def render(r: Report) -> str:
-    lines = [r.title, ""]
-    lines.append("Automated sync of the upstream OpenAPI documents (docs/DESIGN.md section 3.1).")
-    lines.append("")
+    lines = [r.title, "", "## Breaking changes", ""]
+    if r.breaking:
+        lines += [
+            "These changes mirror the API and can break typed code. They ship in a minor version (docs/DESIGN.md section 13),",
+            f'and the release notes list them under "{API_CHANGES_SECTION}".',
+            "",
+        ]
+        lines += [f"- {b.text}" for b in r.sorted_breaking]
+    else:
+        lines.append("None detected.")
+    lines += ["", "## Upstream documents", "", "Automated sync of the upstream OpenAPI documents (docs/DESIGN.md section 3.1).", ""]
     if r.files:
         lines += ["| File | Upstream | SHA-256 |", "|---|---|---|"]
         for name, old, new in r.files:
-            lines.append(f"| `openapi/{name}` | {UPSTREAM[name][0]} | `{old[:12]}` -> `{new[:12]}` |")
+            before = f"`{old[:12]}`" if old else "none"
+            lines.append(f"| `openapi/{name}` | {UPSTREAM[name][0]} | {before} -> `{new[:12]}` |")
     else:
         lines.append("The upstream documents did not change.")
-    lines += ["", "## Breaking changes", ""]
-    lines += _items(r.breaking) if r.breaking else ["None detected."]
     if r.added or r.removed or r.changed:
         lines += ["", "## Operations"]
         for title, items in (("Added", r.added), ("Removed", r.removed), ("Changed", r.changed)):
@@ -599,14 +606,112 @@ def render(r: Report) -> str:
         if items:
             lines += ["", f"## {title}", ""] + _items(items)
     text = "\n".join(lines) + "\n"
-    footer = r.breaking_footer
-    limit = MAX_SUMMARY - (len(footer) + 2 if footer else 0)
+    tail = "\n" + release_section(r)
+    limit = MAX_SUMMARY - len(tail)
     if len(text) > limit:
         text = text[:limit].rsplit("\n", 1)[0] + "\n\n(Summary truncated; run `python3 codegen/spec_sync.py` locally for the full list.)\n"
-    if footer:
-        # Also in the pull request body, for squash merges that use it as the commit message.
-        text += "\n" + footer + "\n"
-    return text
+    return text + tail
+
+
+def release_section(r: Report) -> str:
+    """How the sync releases (docs/DESIGN.md section 13), ending with the block
+    release-please reads instead of the commits of the pull request."""
+    if r.type == "feat":
+        what = "`feat(spec)`: callers can observe this change, so it releases a minor version."
+    else:
+        what = "`chore(spec)`: only documentation changed, so this releases nothing on its own; it ships with the next release."
+    return "\n".join([
+        "## Release",
+        "",
+        what,
+        "Release Please reads the block below instead of the commits, so the type survives a squash merge with the title; keep it when you edit this description.",
+        'Merge with "Squash and merge": after a merge commit the release notes repeat each line for the merge commit and for every commit of this pull request.',
+        "",
+        r.override,
+    ]) + "\n"
+
+
+OVERRIDE = re.compile(r"BEGIN_COMMIT_OVERRIDE\n(.*?)\nEND_COMMIT_OVERRIDE", re.S)
+NESTED = re.compile(r"BEGIN_NESTED_COMMIT\n(.*?)\nEND_NESTED_COMMIT", re.S)
+SYNC_HEADER = re.compile(r"^(?P<type>[a-z]+)\(spec\): sync API spec (?P<date>\d{4}-\d{2}-\d{2})$")
+
+
+def _nested(lines: list[str]) -> str:
+    # release-please only splits a message into several commits at nested blocks
+    # for a type outside the standard list, such as API_CHANGE_TYPE.
+    return "\n".join(f"BEGIN_NESTED_COMMIT\n{line}\nEND_NESTED_COMMIT" for line in lines)
+
+
+def override_block(lines: list[str]) -> str:
+    """``lines[0]`` is the sync's own commit; the rest become nested commits."""
+    head, rest = lines[0], list(lines[1:])
+    shown: list[str] = []
+    size = 0
+    for line in rest:
+        if size + len(line) > MAX_OVERRIDE:
+            shown.append(f"{API_CHANGE_TYPE}(spec): {len(rest) - len(shown)} more, listed in the spec sync pull request")
+            break
+        shown.append(line)
+        size += len(line) + 40
+    body = f"{head}\n\n{_nested(shown)}" if shown else head
+    return f"BEGIN_COMMIT_OVERRIDE\n{body}\nEND_COMMIT_OVERRIDE"
+
+
+def continue_pull_request(previous_title: str, previous_body: str, summary: str) -> tuple[str, str, str]:
+    """``(title, description, comment)`` for a sync pushed on top of an open pull
+    request that holds commits from people. The description keeps listing the
+    changes since main, but its override block gains this sync's lines and
+    ``feat`` wins over ``chore``, so release-please releases every sync on the
+    branch; the comment is this sync's summary."""
+    previous_body = previous_body.replace("\r\n", "\n")
+    found = OVERRIDE.search(summary)
+    if found is None:
+        raise ValueError("the summary has no BEGIN_COMMIT_OVERRIDE block")
+    head, _, rest = found.group(1).partition("\n")
+    this = SYNC_HEADER.match(head)
+    if this is None:
+        raise ValueError(f"unexpected first line of the override block: {head!r}")
+    lines = [m.group(1).strip() for m in NESTED.finditer(rest)]
+
+    previous = OVERRIDE.search(previous_body)
+    old_head, _, old_rest = previous.group(1).partition("\n") if previous else ("", "", "")
+    earlier = SYNC_HEADER.match(old_head) or SYNC_HEADER.match(previous_title.strip())
+    if previous is None:
+        earlier_type = "feat"  # nobody recorded what the earlier syncs changed: release at least a minor
+    else:
+        earlier_type = earlier["type"] if earlier else this["type"]
+    kind = "feat" if "feat" in (this["type"], earlier_type) else earlier_type
+    title = f"{kind}(spec): sync API spec {this['date']}"
+
+    if previous is None:
+        first, kept = title, ""
+    elif SYNC_HEADER.match(old_head):
+        first, kept = title, old_rest
+    else:
+        first, kept = old_head, old_rest + "\n" + _nested([title])  # a first line someone wrote stays
+    kept = kept.strip("\n")
+    present = {m.group(1).strip() for m in NESTED.finditer(kept)}
+    new = [line for line in lines if line not in present]
+    nested = "\n".join(part for part in (kept, _nested(new)) if part)
+    block = f"BEGIN_COMMIT_OVERRIDE\n{first}\n\n{nested}\nEND_COMMIT_OVERRIDE" if nested else f"BEGIN_COMMIT_OVERRIDE\n{first}\nEND_COMMIT_OVERRIDE"
+
+    note = "The release lines of this sync were added to the `BEGIN_COMMIT_OVERRIDE` block of the description."
+    if previous is None:
+        note += (
+            " The description had no such block, so the earlier syncs on this branch count as `feat(spec)`;"
+            " change its first line to `chore(spec)` when they only changed documentation."
+        )
+        body = previous_body.rstrip("\n") + "\n\n## Release\n\n" + _CONTINUED + "\n\n" + block + "\n"
+    else:
+        body = previous_body[: previous.start()] + block + previous_body[previous.end():]
+    comment = summary.partition("\n")[2].lstrip("\n").split("\n## Release\n", 1)[0].rstrip("\n")
+    return title, body, f"{comment}\n\n{note}\n"
+
+
+_CONTINUED = (
+    "Release Please reads the block below instead of the commits; later syncs on top of this branch add their lines to it. "
+    'Keep it when you edit this description, and merge with "Squash and merge".'
+)
 
 
 def _items(items: list[str]) -> list[str]:
