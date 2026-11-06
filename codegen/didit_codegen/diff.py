@@ -475,9 +475,26 @@ def changed_operations(old: Document, new: Document, prefix: str) -> list[OpChan
             d.parameters(pa["parameters"], pb["parameters"])
             d.request_body(oa.get("requestBody"), ob.get("requestBody"))
             d.responses(oa, ob)
-            change.breaking = list(dict.fromkeys(d.breaking))
+            change.breaking = merge_statuses(d.breaking)
             change.notes = list(dict.fromkeys(d.notes))
         out.append(change)
+    return out
+
+
+def merge_statuses(breaks: list[Break]) -> list[Break]:
+    """One entry per field and kind: the same change in several success
+    responses (``response 200`` and ``response 202``) reads ``response 200, 202``."""
+    merged: dict[tuple[str, str, bool], list[str]] = {}
+    for b in breaks:
+        statuses = merged.setdefault((b.field, b.kind, b.where.startswith("response ")), [])
+        if b.where not in statuses:
+            statuses.append(b.where)
+    out = []
+    for (path, kind, response), wheres in merged.items():
+        if response:
+            out.append(Break("response " + ", ".join(w.removeprefix("response ") for w in wheres), path, kind))
+        else:
+            out.extend(Break(w, path, kind) for w in wheres)
     return out
 
 
