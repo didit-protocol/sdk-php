@@ -476,11 +476,12 @@ class _Sync:
                 continue
             if n not in GENERATED:
                 self.hand_written_operations(n)
+            upstream_ops = diff.operations(new, UPSTREAM[n][3])
             for change in diff.changed_operations(old, new, UPSTREAM[n][3]):
                 if n in GENERATED:
                     naming = ident(self.new_naming(change.key))
                 else:
-                    naming = ident(diff.operations(new, UPSTREAM[n][3])[change.key][0].get("x-didit-sdk"))
+                    naming = ident(upstream_ops[change.key][0].get("x-didit-sdk"))
                 label = f"`{change.key}`" + (f" (`{naming}`)" if naming else "")
                 line = f"{label}: {', '.join(change.parts)}" + (" (documentation only)" if change.docs_only else "")
                 details = [f"breaking: {b}" for b in change.breaking] + change.notes

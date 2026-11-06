@@ -14,7 +14,6 @@ We acknowledge reports within three working days and keep you informed until the
 ## Supported versions
 
 Security fixes go to the latest minor version.
-Before 1.0.0 every release may contain breaking changes, so upgrade to the latest 0.x.
 
 ## Handling secrets with this SDK
 
