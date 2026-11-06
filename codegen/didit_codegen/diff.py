@@ -392,9 +392,11 @@ class Details:
         self.notes: list[str] = []
         self._active: set[tuple[Any, ...]] = set()
 
-    def schema(self, a: Any, b: Any, label: str, path: str, mode: str) -> None:
+    def schema(self, a: Any, b: Any, label: str, path: str, mode: str, named: bool = True) -> None:
         """``mode`` is ``request`` or ``response``. A schema shared by several
-        fields is compared at each of them; only recursion stops the walk."""
+        fields is compared at each of them; only recursion stops the walk.
+        ``named`` is False for the variants of an object union: the generator
+        merges them into one type, so their component names name nothing."""
         ra = a.get("$ref") if isinstance(a, dict) else None
         rb = b.get("$ref") if isinstance(b, dict) else None
         key = (ra, rb, mode)
@@ -405,12 +407,12 @@ class Details:
         if ra or rb:
             self._active.add(key)
         try:
-            self._schema(a, b, label, path, mode)
+            self._schema(a, b, label, path, mode, named)
         finally:
             if ra or rb:
                 self._active.discard(key)
 
-    def _schema(self, raw_a: Any, raw_b: Any, label: str, path: str, mode: str) -> None:
+    def _schema(self, raw_a: Any, raw_b: Any, label: str, path: str, mode: str, named: bool) -> None:
         a = flatten(self.old, raw_a)
         b = flatten(self.new, raw_b)
         ka, kb = _kind(self.old, a), _kind(self.new, b)
@@ -418,7 +420,8 @@ class Details:
             # No type at all is a type too: the generator reads it as any value.
             self.breaking.append(Break(label, path, f"{ka or 'any'}->{kb or 'any'}"))
             return
-        self._type_name(raw_a, raw_b, label, path)
+        if named:
+            self._type_name(raw_a, raw_b, label, path)
         if nullable(self.new, raw_b) and not nullable(self.old, raw_a):
             self.breaking.append(Break(label, path, "now-null"))
         va, vb = _object_variants(self.old, raw_a), _object_variants(self.new, raw_b)
@@ -427,7 +430,7 @@ class Details:
             # behind the same field of another and behind the shared required list.
             pairs, every = _pair_variants(va, vb)
             for x, y in pairs:
-                self.schema(x, y, label, path, mode)
+                self.schema(x, y, label, path, mode, named=False)
             if every:
                 return
         if not isinstance(a, dict) or not isinstance(b, dict):
