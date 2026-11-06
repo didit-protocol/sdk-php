@@ -16,7 +16,7 @@ from pathlib import Path
 from helpers import REPO
 import sync_pull_request
 from didit_codegen.sync import (
-    API_CHANGE_TYPE, API_CHANGES_SECTION, Breaking, Report, Result, continue_pull_request, render, sync,
+    API_CHANGE_TYPE, API_CHANGES_SECTION, RELEASES, Breaking, Report, Result, continue_pull_request, render, sync,
 )
 
 FIXTURES = REPO / "codegen" / "tests" / "fixtures" / "spec-sync"
@@ -194,6 +194,10 @@ class ReleasePleaseConfigTest(unittest.TestCase):
         self.assertEqual(release(release_commits("chore(spec): sync API spec 2026-11-07", body))[0], "minor")
 
 
+def _breaking(body: str) -> str:
+    return body.split("## Breaking changes\n", 1)[1].split("\n## ", 1)[0]
+
+
 def _summary(date: str, observable: bool = False, breaking: tuple[str, ...] = ()) -> str:
     report = Report(date, observable=observable)
     report.breaking = [Breaking(f"POST /v3/{field}/", field, "now-null", f"`x.{field}()`: `{field}` can now be null") for field in breaking]
@@ -222,20 +226,49 @@ class ContinuePullRequestTest(unittest.TestCase):
         self.assertEqual(title3, "feat(spec): sync API spec 2026-11-08")
         self.assertEqual(body3.count("api(spec): `x.a()`"), 1)
         self.assertEqual(body3.count("api(spec): `x.b()`"), 1)
+        self.assertEqual(
+            [line for line in _breaking(body3).splitlines() if line.startswith("- ")],
+            ["- `x.a()`: `a` can now be null", "- `x.b()`: `b` can now be null"],
+        )
+        self.assertIn(RELEASES["feat"], body3)
+        later = body3.split("## Later syncs\n\n", 1)[1].split("\n\n", 1)[0].splitlines()
+        self.assertEqual([line[:23] for line in later], ["- 2026-11-06 (`feat(spe", "- 2026-11-07 (`feat(spe", "- 2026-11-08 (`chore(sp"])
+        self.assertLess(body3.index("## Later syncs"), body3.index("## Release"))
         bump, notes = release(release_commits(title3, body3))
         self.assertEqual((bump, len(notes[API_CHANGES_SECTION])), ("minor", 2))
+
+    def test_a_breaking_sync_on_a_documentation_only_pull_request_updates_the_description(self) -> None:
+        previous = _summary("2026-11-05").partition("\n")[2].lstrip("\n")
+        self.assertIn("None detected.", previous)
+        self.assertIn(RELEASES["chore"], previous)
+        title, body, _ = continue_pull_request("chore(spec): sync API spec 2026-11-05", previous, _summary("2026-11-06", breaking=("a",)))
+        self.assertEqual(title, "feat(spec): sync API spec 2026-11-06")
+        self.assertTrue(body.startswith("## Breaking changes\n\nThese changes mirror the API"), body)
+        self.assertIn("\n- `x.a()`: `a` can now be null\n", _breaking(body))
+        self.assertNotIn("None detected", body)
+        self.assertNotIn(RELEASES["chore"], body)
+        self.assertNotIn("releases nothing", body)
+        self.assertEqual(body.count(RELEASES["feat"]), 1)
+        self.assertEqual(release(release_commits(title, body))[0], "minor")
 
     def test_documentation_only_stays_chore(self) -> None:
         previous = _summary("2026-11-05").partition("\n")[2].replace("\n", "\r\n")
         title, body, _ = continue_pull_request("chore(spec): sync API spec 2026-11-05", previous, _summary("2026-11-06"))
         self.assertEqual(title, "chore(spec): sync API spec 2026-11-06")
         self.assertIn("BEGIN_COMMIT_OVERRIDE\nchore(spec): sync API spec 2026-11-06\nEND_COMMIT_OVERRIDE", body)
+        self.assertIn("## Breaking changes\n\nNone detected.\n", body)
+        self.assertIn(RELEASES["chore"], body)
         self.assertEqual(release(release_commits(title, body)), (None, {}))
 
     def test_without_a_block_the_earlier_syncs_count_as_feat(self) -> None:
         title, body, comment = continue_pull_request("chore(spec): sync API spec 2026-11-05", "Old description.", _summary("2026-11-06"))
         self.assertEqual(title, "feat(spec): sync API spec 2026-11-06")
-        self.assertTrue(body.startswith("Old description.\n\n## Release\n"))
+        # Nothing recorded the earlier breaking changes, so the list does not claim to be complete.
+        self.assertTrue(body.startswith(
+            "## Breaking changes\n\nNone detected.\n\nThe description had no such list before the sync of 2026-11-06"
+        ), body)
+        self.assertIn("\nOld description.\n\n## Later syncs\n", body)
+        self.assertIn("## Release\n\n" + RELEASES["feat"] + "\n", body)
         self.assertIn("count as `feat(spec)`", comment)
 
     def test_a_first_line_someone_wrote_stays(self) -> None:
