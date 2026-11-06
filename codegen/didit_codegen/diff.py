@@ -32,7 +32,7 @@ class Break:
     ``where`` is ``response 200``, ``request body`` or ``query parameter `x```;
     ``field`` is the path below it (``a.b[].c``, empty for the whole schema or
     parameter); ``kind`` is ``now-null``, ``<old>-><new>`` (type changed: a
-    coarse type such as ``string->object``, or the component schemas the
+    coarse type such as ``string->object`` or ``string->any``, or the component schemas the
     generator names the type after, such as ``SessionDecision->SessionDecisionV2``),
     ``removed``, ``enum-removed:<value>``, ``now-required``, ``new-required``,
     ``content-type:<old>-><new>`` or ``content-type-removed:<type>``.
@@ -324,6 +324,41 @@ def flatten(doc: Document, s: Any) -> Any:
     return s
 
 
+def _object_variants(doc: Document, s: Any, _refs: frozenset[str] = frozenset()) -> list[Any] | None:
+    """The variants of the ``oneOf``/``anyOf`` of more than one object that ``s``
+    is, here or through ``$ref``, a one-part ``allOf`` or one variant and ``null``."""
+    if not isinstance(s, dict):
+        return None
+    ref = s.get("$ref")
+    if isinstance(ref, str):
+        return None if ref in _refs else _object_variants(doc, doc.resolve(ref), _refs | {ref})
+    all_of = s.get("allOf")
+    if isinstance(all_of, list) and len(all_of) == 1:
+        return _object_variants(doc, all_of[0], _refs)
+    variants = _variants(doc, s)
+    if not variants:
+        return None
+    if len(variants) == 1:
+        return _object_variants(doc, variants[0], _refs)
+    return variants if all(_objectish(flatten(doc, v)) for v in variants) else None
+
+
+def _pair_variants(old: list[Any], new: list[Any]) -> tuple[list[tuple[Any, Any]], bool]:
+    """Matches the variants of two object unions: the same component first, the
+    others in order. The flag says whether every variant has its pair; when the
+    number of variants changed only the same components are paired."""
+    refs = [v.get("$ref") if isinstance(v, dict) else None for v in new]
+    matched: dict[int, int] = {}
+    for i, v in enumerate(old):
+        ref = v.get("$ref") if isinstance(v, dict) else None
+        if ref is not None and ref in refs and refs.index(ref) not in matched.values():
+            matched[i] = refs.index(ref)
+    if len(old) != len(new):
+        return [(old[i], new[j]) for i, j in matched.items()], False
+    rest = iter(j for j in range(len(new)) if j not in matched.values())
+    return [(v, new[matched[i]] if i in matched else new[next(rest)]) for i, v in enumerate(old)], True
+
+
 def _at(label: str, path: str) -> str:
     return f"{label} `{path}`" if path else label
 
@@ -379,12 +414,22 @@ class Details:
         a = flatten(self.old, raw_a)
         b = flatten(self.new, raw_b)
         ka, kb = _kind(self.old, a), _kind(self.new, b)
-        if ka and kb and ka != kb:
-            self.breaking.append(Break(label, path, f"{ka}->{kb}"))
+        if ka != kb:
+            # No type at all is a type too: the generator reads it as any value.
+            self.breaking.append(Break(label, path, f"{ka or 'any'}->{kb or 'any'}"))
             return
         self._type_name(raw_a, raw_b, label, path)
         if nullable(self.new, raw_b) and not nullable(self.old, raw_a):
             self.breaking.append(Break(label, path, "now-null"))
+        va, vb = _object_variants(self.old, raw_a), _object_variants(self.new, raw_b)
+        if va is not None and vb is not None:
+            # Variant by variant: merged, a change to a field of one variant hides
+            # behind the same field of another and behind the shared required list.
+            pairs, every = _pair_variants(va, vb)
+            for x, y in pairs:
+                self.schema(x, y, label, path, mode)
+            if every:
+                return
         if not isinstance(a, dict) or not isinstance(b, dict):
             return
         self._enum(a, b, label, path)
