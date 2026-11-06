@@ -244,12 +244,14 @@ class _Sync:
         self.fetched_at = fetched_at
         self.version = package_version(root)
         self.report = Report(date)
-        self.old_bytes = {n: (self.openapi / n).read_bytes() for n in UPSTREAM}
+        # None: no copy in openapi/ yet (the first sync of a new upstream document).
+        self.old_bytes = {n: (self.openapi / n).read_bytes() if (self.openapi / n).exists() else None for n in UPSTREAM}
         self.new_bytes = dict(fetched)
-        self.old_docs = {n: Document(UPSTREAM[n][2], json.loads(self.old_bytes[n])) for n in UPSTREAM}
+        self.old_docs = {n: Document(UPSTREAM[n][2], json.loads(self.old_bytes[n] or EMPTY_DOCUMENT)) for n in UPSTREAM}
         self.new_docs = {n: Document(UPSTREAM[n][2], json.loads(self.new_bytes[n])) for n in UPSTREAM}
-        self.old_ops = {k: (n, v) for n in UPSTREAM for k, v in diff.operations(self.old_docs[n], UPSTREAM[n][3]).items()}
-        self.new_ops = {k: (n, v) for n in UPSTREAM for k, v in diff.operations(self.new_docs[n], UPSTREAM[n][3]).items()}
+        # Naming, deprecation and removal apply to the generated documents only.
+        self.old_ops = {k: (n, v) for n in GENERATED for k, v in diff.operations(self.old_docs[n], UPSTREAM[n][3]).items()}
+        self.new_ops = {k: (n, v) for n in GENERATED for k, v in diff.operations(self.new_docs[n], UPSTREAM[n][3]).items()}
 
         self.overlay_text = (self.openapi / "overlay.json").read_text("utf-8")
         self.overlay_file = json.loads(self.overlay_text)
@@ -286,7 +288,8 @@ class _Sync:
     def run(self) -> Result:
         upstream_changed = [n for n in UPSTREAM if self.new_bytes[n] != self.old_bytes[n]]
         for n in upstream_changed:
-            self.report.files.append((n, sha256(self.old_bytes[n]), sha256(self.new_bytes[n])))
+            old = self.old_bytes[n]
+            self.report.files.append((n, sha256(old) if old is not None else "", sha256(self.new_bytes[n])))
         self.upstream_naming()
         self.returning_operations()
         self.expire_entries()
@@ -307,6 +310,7 @@ class _Sync:
             if normalize_naming(entry) == normalize_naming(upstream):
                 self.report.naming.append(f"`{key}`: overlay entry deleted, upstream carries the same `x-didit-sdk`")
             else:
+                self.report.observable = True
                 self.report.naming.append(
                     f"`{key}`: overlay entry deleted, upstream `x-didit-sdk` differs and wins: "
                     f"`{_compact(entry)}` -> `{_compact(upstream)}`"
@@ -342,7 +346,7 @@ class _Sync:
             if minor_of(since) < current:
                 what = "alias" if entry.get("alias") else "method"
                 self.report.deprecations.append(f"`{name}()` deleted: deprecated {what} since {since}, one minor version has shipped")
-                self.report.breaking.append(f"`{name}()` deleted (deprecated since {since})")
+                self.report.breaking.append(Breaking(key, "", "deleted", f"`{name}()` deleted (deprecated since {since})"))
                 continue
             if entry.get("alias"):
                 current_name = ident(self.new_naming(key)) if key in self.new_ops else None
@@ -371,9 +375,9 @@ class _Sync:
                 continue
             self.deprecate(key, naming, "removed")
             self.report.removed.append(f"`{key}` (`{name}`): kept as a deprecated method for one minor version")
-            self.report.breaking.append(
-                f"`{key}` was removed upstream: `{name}()` is deprecated and will be deleted in the next minor version"
-            )
+            self.report.breaking.append(Breaking(
+                key, "", "removed", f"`{key}` was removed upstream: `{name}()` is deprecated and will be deleted in the next minor version",
+            ))
             self.report.deprecations.append(f"`{name}()` deprecated: `{key}` was removed upstream on {self.date}")
 
     def deprecate(self, key: str, naming: Any, why: str) -> None:
@@ -382,7 +386,7 @@ class _Sync:
         for alias in [e for e in self.entries if e["key"] == key and e.get("alias")]:
             self.entries.remove(alias)
             alias_name = ident(alias["x-didit-sdk"])
-            self.report.breaking.append(f"`{alias_name}()` deleted: deprecated alias of the {why} operation `{key}`")
+            self.report.breaking.append(Breaking(key, "", "deleted", f"`{alias_name}()` deleted: deprecated alias of the {why} operation `{key}`"))
         self.entries[:] = [e for e in self.entries if e["key"] != key]
         doc_name = self.old_ops[key][0]
         op, item = self.old_ops[key][1]
@@ -407,26 +411,30 @@ class _Sync:
             old_name, new_name = ident(old), ident(new)
             if old_name and new_name is None:
                 if old_name in idents:
-                    self.report.breaking.append(
-                        f"`{key}`: no longer a server operation; `{old_name}()` is removed, the name now belongs to `{idents[old_name]}`"
-                    )
+                    self.report.breaking.append(Breaking(
+                        key, "", "removed",
+                        f"`{key}`: no longer a server operation; `{old_name}()` is removed, the name now belongs to `{idents[old_name]}`",
+                    ))
                     continue
                 self.deprecate(key, old, "withdrawn")
-                self.report.breaking.append(
-                    f"`{key}` is no longer a server operation: `{old_name}()` is deprecated and will be deleted in the next minor version"
-                )
+                self.report.breaking.append(Breaking(
+                    key, "", "withdrawn",
+                    f"`{key}` is no longer a server operation: `{old_name}()` is deprecated and will be deleted in the next minor version",
+                ))
                 self.report.deprecations.append(f"`{old_name}()` deprecated: `{key}` stopped being a server operation on {self.date}")
                 continue
             if old_name is None and new_name:
+                self.report.observable = True
                 self.report.naming.append(f"`{key}`: now a server operation, `{new_name}()` added")
                 continue
             if old_name is None:
                 continue
             if old_name != new_name:
                 if old_name in idents:
-                    self.report.breaking.append(
-                        f"`{key}`: renamed from `{old_name}()` to `{new_name}()`; no alias, `{old_name}` now names `{idents[old_name]}`"
-                    )
+                    self.report.breaking.append(Breaking(
+                        key, "", "renamed",
+                        f"`{key}`: renamed from `{old_name}()` to `{new_name}()`; no alias, `{old_name}` now names `{idents[old_name]}`",
+                    ))
                     continue
                 if not any(e["key"] == key and e.get("alias") and ident(e["x-didit-sdk"]) == old_name for e in self.entries):
                     self.entries.append({
@@ -437,13 +445,18 @@ class _Sync:
                         "deprecated_since": self.version,
                     })
                 self.report.naming.append(f"`{key}`: renamed from `{old_name}()` to `{new_name}()`")
-                self.report.breaking.append(
-                    f"`{key}`: `{old_name}()` renamed to `{new_name}()`; the old name is a deprecated alias until the next minor version"
-                )
+                self.report.breaking.append(Breaking(
+                    key, "", "renamed",
+                    f"`{key}`: `{old_name}()` renamed to `{new_name}()`; the old name is a deprecated alias until the next minor version",
+                ))
                 self.report.deprecations.append(f"`{old_name}()` kept as a deprecated alias of `{new_name}()` for one minor version")
             if old.get("scope") != new.get("scope"):
-                self.report.breaking.append(f"`{key}` (`{new_name}`): scope changed from {old.get('scope')} to {new.get('scope')}")
+                self.report.breaking.append(Breaking(
+                    key, "", f"scope:{old.get('scope')}->{new.get('scope')}",
+                    f"`{key}` (`{new_name}`): scope changed from {old.get('scope')} to {new.get('scope')}",
+                ))
             if old.get("auth") != new.get("auth"):
+                self.report.observable = True
                 self.report.naming.append(f"`{key}` (`{new_name}`): auth changed from {old.get('auth')} to {new.get('auth')}")
 
     def describe_changes(self) -> None:
