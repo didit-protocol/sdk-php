@@ -284,34 +284,48 @@ def _at(label: str, path: str) -> str:
 
 
 class Details:
-    """Collects breaking changes and notable additions between two operations."""
+    """Collects the changes that can break typed code and notable additions
+    between two operations (docs/DESIGN.md section 3.1)."""
 
-    def __init__(self, old: Document, new: Document) -> None:
+    def __init__(self, old: Document, new: Document, same: Comparer | None = None) -> None:
         self.old = old
         self.new = new
-        self.breaking: list[str] = []
+        # Prunes unchanged subtrees; shared across operations for its memo.
+        self.same = same if same is not None else Comparer(old, new, ignore_docs=True)
+        self.breaking: list[Break] = []
         self.notes: list[str] = []
-        self._seen: set[tuple[Any, ...]] = set()
+        self._active: set[tuple[Any, ...]] = set()
 
     def schema(self, a: Any, b: Any, label: str, path: str, mode: str) -> None:
-        """``mode`` is ``request`` or ``response``."""
+        """``mode`` is ``request`` or ``response``. A schema shared by several
+        fields is compared at each of them; only recursion stops the walk."""
         ra = a.get("$ref") if isinstance(a, dict) else None
         rb = b.get("$ref") if isinstance(b, dict) else None
-        if ra or rb:
-            seen = (ra, rb, mode)
-            if seen in self._seen:
-                return
-            self._seen.add(seen)
-        a = flatten(self.old, a)
-        b = flatten(self.new, b)
-        ka, kb = _kind(self.old, a), _kind(self.new, b)
-        where = _at(label, path)
-        if ka and kb and ka != kb:
-            self.breaking.append(f"{where}: type changed from {ka} to {kb}")
+        key = (ra, rb, mode)
+        if (ra or rb) and key in self._active:
             return
+        if self.same.equal(a, b):
+            return
+        if ra or rb:
+            self._active.add(key)
+        try:
+            self._schema(a, b, label, path, mode)
+        finally:
+            if ra or rb:
+                self._active.discard(key)
+
+    def _schema(self, raw_a: Any, raw_b: Any, label: str, path: str, mode: str) -> None:
+        a = flatten(self.old, raw_a)
+        b = flatten(self.new, raw_b)
+        ka, kb = _kind(self.old, a), _kind(self.new, b)
+        if ka and kb and ka != kb:
+            self.breaking.append(Break(label, path, f"{ka}->{kb}"))
+            return
+        if mode == "response" and nullable(self.new, raw_b) and not nullable(self.old, raw_a):
+            self.breaking.append(Break(label, path, "now-null"))
         if not isinstance(a, dict) or not isinstance(b, dict):
             return
-        self._enum(a, b, where)
+        self._enum(a, b, label, path)
         if a.get("properties") or b.get("properties"):
             self._properties(a, b, label, path, mode)
         if ka == "array":
@@ -320,16 +334,16 @@ class Details:
         if isinstance(ap_a, dict) and isinstance(ap_b, dict):
             self.schema(ap_a, ap_b, label, path + "{}", mode)
 
-    def _enum(self, a: dict[str, Any], b: dict[str, Any], where: str) -> None:
+    def _enum(self, a: dict[str, Any], b: dict[str, Any], label: str, path: str) -> None:
         va, vb = a.get("enum"), b.get("enum")
         if not isinstance(va, list) or not isinstance(vb, list):
             return
         for v in va:
             if v not in vb and v is not None:
-                self.breaking.append(f"{where}: enum value `{v}` removed")
+                self.breaking.append(Break(label, path, f"enum-removed:{v}"))
         added = [f"`{v}`" for v in vb if v not in va and v is not None]
         if added:
-            self.notes.append(f"{where}: enum value {', '.join(added)} added")
+            self.notes.append(f"{_at(label, path)}: enum value {', '.join(added)} added")
 
     def _properties(self, a: dict[str, Any], b: dict[str, Any], label: str, path: str, mode: str) -> None:
         pa, pb = a.get("properties", {}), b.get("properties", {})
@@ -340,17 +354,17 @@ class Details:
             if self._flag(self.old, prop, hidden):
                 continue
             if name not in pb or self._flag(self.new, pb[name], hidden):
-                self.breaking.append(f"{_at(label, child)}: field removed")
+                self.breaking.append(Break(label, child, "removed"))
                 continue
             if mode == "request" and name in req_b and name not in req_a:
-                self.breaking.append(f"{_at(label, child)}: now required")
+                self.breaking.append(Break(label, child, "now-required"))
             self.schema(prop, pb[name], label, child, mode)
         for name, prop in pb.items():
             if name in pa or self._flag(self.new, prop, hidden):
                 continue
             child = f"{path}.{name}" if path else name
             if mode == "request" and name in req_b:
-                self.breaking.append(f"{_at(label, child)}: new required field")
+                self.breaking.append(Break(label, child, "new-required"))
             else:
                 self.notes.append(f"{_at(label, child)}: field added")
 
@@ -366,17 +380,17 @@ class Details:
             label = f"{p['in']} parameter `{p['name']}`"
             q = pb.get(key)
             if q is None:
-                self.breaking.append(f"{label}: removed")
+                self.breaking.append(Break(label, "", "removed"))
                 continue
             if q.get("required") and not p.get("required"):
-                self.breaking.append(f"{label}: now required")
+                self.breaking.append(Break(label, "", "now-required"))
             self.schema(p.get("schema", {}), q.get("schema", {}), label, "", "request")
         for key, q in pb.items():
             if key in pa:
                 continue
             label = f"{q['in']} parameter `{q['name']}`"
             if q.get("required"):
-                self.breaking.append(f"{label}: new required parameter")
+                self.breaking.append(Break(label, "", "new-required"))
             else:
                 self.notes.append(f"{label}: added")
 
@@ -386,20 +400,20 @@ class Details:
         if ra is None and rb is None:
             return
         if rb is None:
-            self.breaking.append("request body: removed")
+            self.breaking.append(Break("request body", "", "removed"))
             return
         cb = rb.get("content") or {}
         if ra is None:
             required = sorted({r for m in cb.values() for r in flatten(self.new, m.get("schema", {})).get("required", [])})
             if rb.get("required") and required:
-                self.breaking.append(f"request body: added with required fields {', '.join(f'`{r}`' for r in required)}")
+                self.breaking.extend(Break("request body", r, "new-required") for r in required)
             else:
                 self.notes.append("request body: added")
             return
         ca = ra.get("content") or {}
         for ct in ca:
             if ct not in cb:
-                self.breaking.append(f"request body: content type `{ct}` removed")
+                self.breaking.append(Break("request body", "", f"content-type-removed:{ct}"))
         for ct in cb:
             if ct not in ca:
                 self.notes.append(f"request body: content type `{ct}` added")
@@ -427,7 +441,7 @@ class Details:
             main_a = _main_type(ca)
             main_b = _main_type(cb)
             if main_a != main_b:
-                self.breaking.append(f"response {s2}: content type changed from {main_a or 'none'} to {main_b or 'none'}")
+                self.breaking.append(Break(f"response {s2}", "", f"content-type:{main_a or 'none'}->{main_b or 'none'}"))
             elif main_a is not None:
                 self.schema(ca[main_a].get("schema", {}), cb[main_b].get("schema", {}), f"response {s2}", "", "response")
 
@@ -457,7 +471,7 @@ def changed_operations(old: Document, new: Document, prefix: str) -> list[OpChan
         docs_only = all(structural.equal(pa.get(n), pb.get(n), n == "parameters") for n in differing)
         change = OpChange(key, differing, docs_only)
         if not docs_only:
-            d = Details(old, new)
+            d = Details(old, new, structural)
             d.parameters(pa["parameters"], pb["parameters"])
             d.request_body(oa.get("requestBody"), ob.get("requestBody"))
             d.responses(oa, ob)
