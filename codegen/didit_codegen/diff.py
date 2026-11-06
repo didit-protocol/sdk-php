@@ -263,6 +263,13 @@ def _kind(doc: Document, s: Any) -> str:
     typ = s.get("type")
     if isinstance(typ, list):
         typ = next((t for t in typ if t != "null"), None)
+    if typ is None and isinstance(s.get("enum"), list):
+        # An enum without a type is typed by its values, as the generator reads it.
+        values = [v for v in s["enum"] if v is not None]
+        if values and all(isinstance(v, str) for v in values):
+            typ = "string"
+        elif values and all(isinstance(v, int) and not isinstance(v, bool) for v in values):
+            typ = "integer"
     if typ == "string":
         fmt = s.get("format")
         return f"string({fmt})" if fmt in ("date-time", "binary") else "string"
