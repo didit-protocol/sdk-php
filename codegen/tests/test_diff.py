@@ -35,8 +35,11 @@ BASE_PATHS: dict[str, Any] = {
 }
 
 
-def _changes(mutate: Any) -> list[diff.OpChange]:
+def _changes(mutate: Any, before: Any = None) -> list[diff.OpChange]:
+    """``before`` edits both versions, ``mutate`` only the new one."""
     old = document(copy.deepcopy(BASE_PATHS), copy.deepcopy(BASE_SCHEMAS))
+    if before is not None:
+        before(old)
     new = copy.deepcopy(old)
     mutate(new)
     return diff.changed_operations(Document("verification", old), Document("verification", new), "")
@@ -64,7 +67,7 @@ class OperationsTest(unittest.TestCase):
         [change] = _changes(mutate)
         self.assertEqual(change.parts, ["response 200"])
         self.assertTrue(change.docs_only)
-        self.assertEqual(change.breaking, [])
+        self.assertEqual(_text(change), [])
 
     def test_a_property_named_like_a_doc_key_is_structural(self) -> None:
         def mutate(d: dict[str, Any]) -> None:
@@ -74,10 +77,14 @@ class OperationsTest(unittest.TestCase):
         self.assertEqual(change.notes, ["response 200 `description`: field added"])
 
 
+def _text(change: diff.OpChange) -> list[str]:
+    return [str(b) for b in change.breaking]
+
+
 class BreakingTest(unittest.TestCase):
     def _breaking(self, mutate: Any) -> list[str]:
         [change] = _changes(mutate)
-        return change.breaking
+        return _text(change)
 
     def test_removed_response_field(self) -> None:
         self.assertEqual(
@@ -94,7 +101,7 @@ class BreakingTest(unittest.TestCase):
         def mutate(d: dict[str, Any]) -> None:
             d["components"]["schemas"]["Decision"]["properties"]["status"]["enum"] = ["Approved", "In Review"]
         [change] = _changes(mutate)
-        self.assertEqual(change.breaking, ["response 200 `status`: enum value `Declined` removed"])
+        self.assertEqual(_text(change), ["response 200 `status`: enum value `Declined` removed"])
         self.assertEqual(change.notes, ["response 200 `status`: enum value `In Review` added"])
 
     def test_request_fields(self) -> None:
@@ -105,7 +112,7 @@ class BreakingTest(unittest.TestCase):
             body["properties"]["language"] = {"type": "string"}
             del body["properties"]["workflow_id"]
         [change] = _changes(mutate)
-        self.assertEqual(change.breaking, [
+        self.assertEqual(_text(change), [
             "request body `workflow_id`: field removed",
             "request body `vendor_data`: now required",
             "request body `callback`: new required field",
@@ -117,7 +124,7 @@ class BreakingTest(unittest.TestCase):
             _post(d)["parameters"] = [{"name": "region", "in": "query", "required": True, "schema": {"type": "string"}}]
         [change] = _changes(mutate)
         self.assertEqual(change.parts, ["parameters"])
-        self.assertEqual(change.breaking, [
+        self.assertEqual(_text(change), [
             "query parameter `dry_run`: removed",
             "query parameter `region`: new required parameter",
         ])
@@ -126,6 +133,78 @@ class BreakingTest(unittest.TestCase):
         def mutate(d: dict[str, Any]) -> None:
             _post(d)["responses"] = {"200": {"description": "pdf", "content": {"application/pdf": {}}}}
         self.assertEqual(self._breaking(mutate), ["response 200: content type changed from application/json to application/pdf"])
+
+
+class NowNullTest(unittest.TestCase):
+    """A response field that can now be null breaks typed code (DESIGN 3.1), in every form the generator reads."""
+
+    @staticmethod
+    def _breaking(mutate: Any, before: Any = None) -> list[tuple[str, str, str]]:
+        [change] = _changes(mutate, before)
+        return [(b.where, b.field, b.kind) for b in change.breaking]
+
+    def test_nullable_true(self) -> None:
+        def mutate(d: dict[str, Any]) -> None:
+            d["components"]["schemas"]["Decision"]["properties"]["score"]["nullable"] = True
+        self.assertEqual(self._breaking(mutate), [("response 200", "score", "now-null")])
+        self.assertEqual([str(b) for b in _changes(mutate)[0].breaking], ["response 200 `score`: can now be null"])
+
+    def test_nullable_through_a_ref(self) -> None:
+        # `registry_data` on 2026-11-04: an inline object became a $ref to a nullable schema.
+        def mutate(d: dict[str, Any]) -> None:
+            d["components"]["schemas"]["Score"] = {"type": "integer", "nullable": True}
+            d["components"]["schemas"]["Decision"]["properties"]["score"] = {"$ref": "#/components/schemas/Score"}
+        self.assertEqual(self._breaking(mutate), [("response 200", "score", "now-null")])
+
+    def test_openapi_3_1_forms(self) -> None:
+        forms: list[dict[str, Any]] = [
+            {"type": ["integer", "null"]},
+            {"oneOf": [{"type": "integer"}, {"type": "null"}]},
+            {"anyOf": [{"type": "null"}, {"type": "integer"}]},
+            {"allOf": [{"type": "integer", "nullable": True}]},
+        ]
+        for form in forms:
+            with self.subTest(form=form):
+                def mutate(d: dict[str, Any]) -> None:
+                    d["components"]["schemas"]["Decision"]["properties"]["score"] = copy.deepcopy(form)
+                self.assertEqual(self._breaking(mutate), [("response 200", "score", "now-null")])
+
+    def test_a_request_field_that_accepts_null_breaks_nothing(self) -> None:
+        def mutate(d: dict[str, Any]) -> None:
+            _body(d)["properties"]["vendor_data"]["nullable"] = True
+        [change] = _changes(mutate)
+        self.assertFalse(change.docs_only)
+        self.assertEqual(change.breaking, [])
+
+    def test_a_schema_shared_by_two_fields_is_reported_at_both(self) -> None:
+        # `email_intelligence.reason_codes[]` and `enrichment.reason_codes[]` on 2026-11-04.
+        def before(d: dict[str, Any]) -> None:
+            props = d["components"]["schemas"]["Decision"]["properties"]
+            props["first"] = {"type": "array", "items": {"type": "string"}}
+            props["second"] = {"type": "array", "items": {"type": "string"}}
+        def mutate(d: dict[str, Any]) -> None:
+            d["components"]["schemas"]["Reason"] = {"type": "object", "properties": {"code": {"type": "string"}}}
+            for name in ("first", "second"):
+                d["components"]["schemas"]["Decision"]["properties"][name]["items"] = {"$ref": "#/components/schemas/Reason"}
+        self.assertEqual(self._breaking(mutate, before), [
+            ("response 200", "first[]", "string->object"),
+            ("response 200", "second[]", "string->object"),
+        ])
+
+    def test_the_same_change_in_two_success_responses_is_one_entry(self) -> None:
+        def before(d: dict[str, Any]) -> None:
+            _post(d)["responses"]["202"] = ok({"$ref": "#/components/schemas/Decision"})["200"]
+        def mutate(d: dict[str, Any]) -> None:
+            d["components"]["schemas"]["Decision"]["properties"]["score"]["nullable"] = True
+        [change] = _changes(mutate, before)
+        self.assertEqual([str(b) for b in change.breaking], ["response 200, 202 `score`: can now be null"])
+        self.assertEqual([(b.field, b.kind) for b in change.breaking], [("score", "now-null")])
+
+    def test_extension_keys_are_documentation(self) -> None:
+        def mutate(d: dict[str, Any]) -> None:
+            d["components"]["schemas"]["Decision"]["properties"]["status"]["x-readme-id"] = "status"
+        [change] = _changes(mutate)
+        self.assertTrue(change.docs_only)
 
 
 class SchemaChangesTest(unittest.TestCase):
