@@ -210,7 +210,7 @@ def nullable(doc: Document, s: Any, _refs: frozenset[str] = frozenset()) -> bool
         return nullable(doc, all_of[0], _refs)
     ref = s.get("$ref")
     if isinstance(ref, str) and ref not in _refs:
-        return nullable(doc, doc.deref({"$ref": ref}), _refs | {ref})
+        return nullable(doc, doc.resolve(ref), _refs | {ref})
     return False
 
 
@@ -260,8 +260,12 @@ def flatten(doc: Document, s: Any) -> Any:
                 required.extend(p.get("required", []))
         merged.update({"type": "object", "properties": props, "required": required})
         return merged
-    variants = s.get("oneOf") or s.get("anyOf")
-    if isinstance(variants, list) and variants:
+    variants = _variants(doc, s)
+    if variants and len(variants) == 1:
+        rest = {k: v for k, v in s.items() if k not in ("oneOf", "anyOf")}
+        part = flatten(doc, variants[0])
+        return {**part, **rest} if isinstance(part, dict) else part
+    if variants:
         flat = [flatten(doc, v) for v in variants]
         if all(_objectish(v) for v in flat):
             props = {}
