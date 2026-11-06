@@ -311,7 +311,14 @@ Choices this PHP SDK makes where [DESIGN.md](docs/DESIGN.md) leaves the idiom op
 ## Supported runtimes and versioning
 
 PHP 8.1 to 8.4, tested on Linux, macOS and Windows.
-The SDK follows [semantic versioning](https://semver.org); before 1.0.0, breaking changes bump the minor version.
+The SDK follows [semantic versioning](https://semver.org), with one rule for API changes:
+
+- A change that mirrors the Didit API ships in a minor version, even when it can break typed code: a type change, a field that can now be null, or a removed field, operation or enum value. The API already behaves that way for every caller, so an older SDK version is not safer. The release notes list these changes under "API changes that can break typed code"; read that section before you upgrade, because a `^2.1` constraint installs new minor versions.
+- A major version is only for a change to the SDK's own design: renaming or removing a method or resource the API still has, changing client configuration, errors, retries, pagination or webhook verification, or dropping a PHP version.
+- A method whose operation was removed upstream stays one more minor version, marked `@deprecated`.
+- A change limited to the API documentation releases nothing on its own.
+
+The package moved to 2.0.0 on 2026-11-05 under an earlier rule and continues from there.
 The API surface is generated from the OpenAPI contract at docs.didit.me and a daily job keeps it current; see [CONTRIBUTING.md](CONTRIBUTING.md).
 Security issues: see [SECURITY.md](SECURITY.md).
 

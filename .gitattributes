@@ -1,8 +1,9 @@
 # Line endings stay LF on every platform (the tests compare exact bytes).
 * text=auto eol=lf
 
-# Upstream copies are kept byte for byte.
+# Upstream copies are kept byte for byte, like the pinned spec sync fixtures.
 /openapi/*.json -text
+/codegen/tests/fixtures/**/*.json -text
 
 # Generated code: collapsed in pull request diffs.
 /src/Resources/** linguist-generated=true

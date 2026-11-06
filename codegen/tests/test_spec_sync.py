@@ -62,6 +62,7 @@ class SpecSyncTest(unittest.TestCase):
         (self.root / "openapi" / "overlay.json").write_text(self.overlay_text, "utf-8")
         (self.offline / "openapi-25.json").write_text(self.verification_text, "utf-8")
         shutil.copy(REPO / "openapi" / "account.json", self.offline / "openapi-auth.json")
+        shutil.copy(REPO / "openapi" / "authentication.json", self.offline / "openapi-authentication.json")
         self.summary = self.root / "summary.md"
         self.commit = self.root / "commit.txt"
 
@@ -71,6 +72,11 @@ class SpecSyncTest(unittest.TestCase):
         doc = json.loads(json.dumps(self.verification))
         mutate(doc)
         (self.offline / "openapi-25.json").write_text(json.dumps(doc, indent=2) + "\n", "utf-8")
+
+    def upstream_authentication(self, mutate: Callable[[dict[str, Any]], None]) -> None:
+        doc = json.loads((REPO / "openapi" / "authentication.json").read_text("utf-8"))
+        mutate(doc)
+        (self.offline / "openapi-authentication.json").write_text(json.dumps(doc, indent=2) + "\n", "utf-8")
 
     def sync(self, *extra: str) -> tuple[int, str, str]:
         out, err = io.StringIO(), io.StringIO()
@@ -142,18 +148,24 @@ class SpecSyncTest(unittest.TestCase):
         self.assertNotIn(REMOVED, self.read("overlay.json")["operations"])
 
         summary = self.summary.read_text("utf-8")
-        self.assertEqual(summary.splitlines()[0], f"chore(spec): sync API spec {DATE}")
+        self.assertEqual(summary.splitlines()[0], f"feat(spec): sync API spec {DATE}")
+        self.assertTrue(summary.splitlines()[2] == "## Breaking changes", summary[:200])
         breaking = summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0]
-        self.assertIn(f"`{REMOVED}` was removed upstream: `sessions.imports.retrieve()` is deprecated", breaking)
+        line = f"`{REMOVED}` was removed upstream: `sessions.imports.retrieve()` is deprecated and will be deleted in the next minor version"
+        self.assertIn(f"- {line}", breaking)
         self.assertIn("**Removed (1)**", summary)
-        # The commit and the pull request body carry a BREAKING CHANGE footer, so release-please
-        # never ships the sync in a patch release.
+        # A minor release (DESIGN 13): feat(spec) plus one api(spec) line per breaking change,
+        # in the commit and in the override block release-please reads, never a BREAKING CHANGE footer.
         commit = self.commit.read_text("utf-8")
-        self.assertEqual(commit.splitlines()[0], f"chore(spec): sync API spec {DATE}")
-        footer = commit.split("\n\n")[-1]
-        self.assertTrue(footer.startswith("BREAKING CHANGE: the API spec sync changes the SDK surface.\n- "), commit)
-        self.assertIn(f"`{REMOVED}` was removed upstream", footer)
-        self.assertTrue(summary.rstrip("\n").endswith(footer.rstrip("\n")))
+        self.assertEqual(commit.splitlines()[0], f"feat(spec): sync API spec {DATE}")
+        self.assertIn(f"BEGIN_NESTED_COMMIT\napi(spec): {line}\nEND_NESTED_COMMIT", commit)
+        self.assertTrue(summary.endswith(
+            f"BEGIN_COMMIT_OVERRIDE\nfeat(spec): sync API spec {DATE}\n\n"
+            f"BEGIN_NESTED_COMMIT\napi(spec): {line}\nEND_NESTED_COMMIT\nEND_COMMIT_OVERRIDE\n"
+        ), summary[-600:])
+        for text in (summary, commit):
+            self.assertNotIn("BREAKING CHANGE", text)
+            self.assertNotIn("(spec)!", text)
 
         # The generator still builds the method, with its component type, from the entry alone.
         files, _ = build(self.root)
@@ -180,7 +192,8 @@ class SpecSyncTest(unittest.TestCase):
         self.assertNotIn(ERRORS, self.read("overlay.json")["operations"])
         summary = self.summary.read_text("utf-8")
         self.assertIn(f"`{ERRORS}` is no longer a server operation: `sessions.imports.list_errors()` is deprecated", summary)
-        self.assertIn("BREAKING CHANGE: ", self.commit.read_text("utf-8"))
+        self.assertIn(f"api(spec): `{ERRORS}` is no longer a server operation", self.commit.read_text("utf-8"))
+        self.assertNotIn("BREAKING CHANGE", self.commit.read_text("utf-8"))
 
         # The method stays, deprecated, until the next minor version.
         files, _ = build(self.root)
@@ -224,9 +237,30 @@ class SpecSyncTest(unittest.TestCase):
         self.assertIn(f"- `{ERRORS}` (`sessions.imports.list_errors`): ", changed)
         self.assertIn("breaking: response 200 `count`: type changed from integer to string", changed)
         breaking = summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0]
-        self.assertIn(f"`sessions.imports.list_errors()` (`{ERRORS}`): response 200 `count`: type changed from integer to string", breaking)
-        self.assertIn("BREAKING CHANGE: ", self.commit.read_text("utf-8"))
+        line = f"`sessions.imports.list_errors()` (`{ERRORS}`): response 200 `count`: type changed from integer to string"
+        self.assertIn(line, breaking)
+        self.assertIn(f"api(spec): {line}", summary.split("BEGIN_COMMIT_OVERRIDE", 1)[1])
+        self.assertTrue(self.commit.read_text("utf-8").startswith(f"feat(spec): sync API spec {DATE}\n"))
         self.assertFalse((self.root / "openapi" / "deprecated-operations.json").exists())
+
+    def test_renamed_type_is_a_feature_and_listed(self) -> None:
+        # Same content under a new component name: the generator renames the public type.
+        def rename(doc: dict[str, Any]) -> None:
+            schemas = doc["components"]["schemas"]
+            schemas["SessionDecisionV2"] = schemas.pop("SessionDecision")
+            text = json.dumps(doc).replace('"#/components/schemas/SessionDecision"', '"#/components/schemas/SessionDecisionV2"')
+            doc.clear()
+            doc.update(json.loads(text))
+        self.upstream(rename)
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        summary = self.summary.read_text("utf-8")
+        self.assertTrue(summary.startswith(f"feat(spec): sync API spec {DATE}\n"))
+        breaking = summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0]
+        line = "`sessions.retrieve_decision()` (`GET /v3/session/{sessionId}/decision/`): response 200: type changed from SessionDecision to SessionDecisionV2"
+        self.assertIn(f"- {line}", breaking)
+        self.assertIn(f"api(spec): {line}", summary.split("BEGIN_COMMIT_OVERRIDE", 1)[1])
+        self.assertIn("- removed `SessionDecision`", summary)
 
     def test_deprecation_ends_after_one_minor_version(self) -> None:
         self.upstream(self.remove)
@@ -303,13 +337,79 @@ class SpecSyncTest(unittest.TestCase):
         self.assertEqual(source["webhook-vectors.json"], before["webhook-vectors.json"])
         self.assertEqual((self.root / "openapi" / "SOURCE.json").read_text("utf-8"), json.dumps(source, indent=1))
         summary = self.summary.read_text("utf-8")
-        self.assertIn("None detected.", summary)
+        self.assertIn("## Breaking changes\n\nNone detected.\n", summary)
         self.assertNotIn("BREAKING CHANGE", summary)
+        # Documentation only: chore(spec), which releases nothing on its own.
+        self.assertEqual(summary.splitlines()[0], f"chore(spec): sync API spec {DATE}")
+        self.assertTrue(summary.endswith(f"BEGIN_COMMIT_OVERRIDE\nchore(spec): sync API spec {DATE}\nEND_COMMIT_OVERRIDE\n"))
         self.assertEqual(
             self.commit.read_text("utf-8"),
             f"chore(spec): sync API spec {DATE}\n\nGenerated by .github/workflows/spec-sync.yml from the upstream OpenAPI documents.\n",
         )
         self.assertTrue(re.search(r"\| `openapi/verification.json` \| https://docs.didit.me/openapi-25.json \| `[0-9a-f]{12}` -> `[0-9a-f]{12}` \|", summary))
+
+    # authentication.json: synced and reported, never generated or deprecated (DESIGN 10) ------------
+
+    def test_authentication_operation_added_upstream(self) -> None:
+        def add(doc: dict[str, Any]) -> None:
+            doc["paths"]["/sessions/"] = {"get": {
+                "x-didit-sdk": {"resource": "authentication", "method": "list_sessions", "auth": "access_token", "server": True},
+                "responses": {"200": {"description": "ok"}},
+            }}
+        self.upstream_authentication(add)
+        before = self.snapshot()
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        after = self.snapshot()
+        self.assertEqual(sorted(k for k in after if after[k] != before.get(k)), ["SOURCE.json", "authentication.json"])
+        self.assertEqual(self.read("SOURCE.json")["authentication.json"]["url"], "https://docs.didit.me/openapi-authentication.json")
+        summary = self.summary.read_text("utf-8")
+        self.assertEqual(summary.splitlines()[0], f"feat(spec): sync API spec {DATE}")
+        self.assertIn("- `authentication GET /sessions/`: `authentication.list_sessions()`, update `src/Authentication`", summary)
+        self.assertIn("## Breaking changes\n\nNone detected.\n", summary)
+
+    def test_authentication_operation_removed_upstream(self) -> None:
+        def remove(doc: dict[str, Any]) -> None:
+            del doc["paths"]["/step-up/{step_up_id}/"]
+        self.upstream_authentication(remove)
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        self.assertFalse((self.root / "openapi" / "deprecated-operations.json").exists())
+        summary = self.summary.read_text("utf-8")
+        line = "`authentication GET /step-up/{step_up_id}/` was removed upstream: `authentication.retrieve_step_up()` is removed with it"
+        self.assertIn(f"- {line}", summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0])
+        self.assertIn(f"api(spec): {line}", summary.split("BEGIN_COMMIT_OVERRIDE", 1)[1])
+
+    def test_a_change_to_one_grant_and_an_untyped_field_reach_the_release_notes(self) -> None:
+        # The refresh grant is the second variant of the token request; `status` loses its type.
+        def require_scope(doc: dict[str, Any]) -> None:
+            doc["components"]["schemas"]["RefreshTokenGrantRequest"]["required"].append("scope")
+        def untype(doc: dict[str, Any]) -> None:
+            doc["components"]["schemas"]["SessionDecision"]["properties"]["status"] = {}
+        self.upstream_authentication(require_scope)
+        self.upstream(untype)
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        summary = self.summary.read_text("utf-8")
+        self.assertEqual(summary.splitlines()[0], f"feat(spec): sync API spec {DATE}")
+        breaking = summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0]
+        override = summary.split("BEGIN_COMMIT_OVERRIDE", 1)[1]
+        for line in (
+            "`authentication.exchange_code()` (`authentication POST /token/`): request body `scope`: now required",
+            "`sessions.retrieve_decision()` (`GET /v3/session/{sessionId}/decision/`): response 200 `status`: type changed from string to any",
+        ):
+            self.assertIn(f"- {line}", breaking)
+            self.assertIn(f"api(spec): {line}", override)
+
+    def test_authentication_documentation_change(self) -> None:
+        def describe(doc: dict[str, Any]) -> None:
+            doc["paths"]["/session/"]["get"]["responses"]["200"]["description"] = "The session."
+        self.upstream_authentication(describe)
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        summary = self.summary.read_text("utf-8")
+        self.assertEqual(summary.splitlines()[0], f"chore(spec): sync API spec {DATE}")
+        self.assertIn("- `authentication GET /session/` (`authentication.get_session`): response 200 (documentation only)", summary)
 
 
 if __name__ == "__main__":

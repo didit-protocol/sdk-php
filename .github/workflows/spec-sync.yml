@@ -2,7 +2,15 @@ name: Spec sync
 
 # docs/DESIGN.md section 3.1: download the upstream OpenAPI documents daily and,
 # when they changed, regenerate the SDK, run every check and open (or update)
-# the pull request "chore(spec): sync API spec YYYY-MM-DD" from chore/spec-sync.
+# the pull request "<type>(spec): sync API spec YYYY-MM-DD" from chore/spec-sync.
+#
+# The type follows DESIGN 13: feat(spec) when callers can observe the change (a
+# minor release, also when it can break typed code), chore(spec) when only
+# documentation changed (no release on its own); never "!" or a BREAKING CHANGE
+# footer. The pull request body opens with "Breaking changes" and ends with a
+# BEGIN_COMMIT_OVERRIDE block: release-please reads it instead of the commits,
+# so the type, and one api(spec) line per breaking change for the release notes
+# section "API changes that can break typed code", survive a squash merge.
 #
 # A pull request opened or pushed with the default GITHUB_TOKEN does not trigger
 # other workflows, so CI would not run on it. When the SPEC_SYNC_TOKEN secret is
@@ -11,9 +19,11 @@ name: Spec sync
 #
 # The sync never removes commits that people added to the open pull request
 # (DESIGN 15: hand-written core changes go there). When the branch holds any
-# commit not made by this workflow, the sync builds on top of it and pushes a
-# fast-forward; otherwise it starts again from main and replaces the branch
-# only if nobody pushed to it while the checks ran.
+# commit not made by this workflow, the sync builds on top of it, pushes a
+# fast-forward and adds its breaking changes and release lines to the
+# description (feat wins over chore) and its other changes in a comment;
+# otherwise it starts again from main and replaces the branch only if nobody
+# pushed to it while the checks ran.
 
 on:
   schedule:
@@ -147,8 +157,8 @@ jobs:
             git switch --force-create "$BRANCH"
           fi
           git add --all -- openapi src tests/Generated
-          # The message ends with a BREAKING CHANGE footer when the sync breaks
-          # the SDK surface (the pull request body carries it too).
+          # feat(spec) or chore(spec), with the breaking changes as nested
+          # api(spec) commits, like the override block of the body.
           git commit --quiet --file "$RUNNER_TEMP/commit.txt"
 
           # Push only when the content differs from the open branch (ignoring the
@@ -171,11 +181,15 @@ jobs:
 
           number="$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number // empty')"
           if [ -n "$number" ] && [ "$MODE" = continue ]; then
-            # The description still lists the changes since main; this sync's
-            # own changes go in a comment.
-            gh pr edit "$number" --title "$title"
+            # This sync's breaking changes and release lines join the description,
+            # the title takes feat over chore, and its other changes go in a comment.
             if [ "$pushed" = true ]; then
-              gh pr comment "$number" --body-file "$RUNNER_TEMP/body.md"
+              gh pr view "$number" --json title,body > "$RUNNER_TEMP/previous.json"
+              python3 codegen/sync_pull_request.py --previous "$RUNNER_TEMP/previous.json" \
+                --summary "$RUNNER_TEMP/summary.md" --out "$RUNNER_TEMP/continued"
+              gh pr edit "$number" --title "$(head -n 1 "$RUNNER_TEMP/continued/title.txt")" \
+                --body-file "$RUNNER_TEMP/continued/body.md"
+              gh pr comment "$number" --body-file "$RUNNER_TEMP/continued/comment.md"
             fi
           elif [ -n "$number" ]; then
             gh pr edit "$number" --title "$title" --body-file "$RUNNER_TEMP/body.md"
