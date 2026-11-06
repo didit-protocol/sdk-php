@@ -9,7 +9,9 @@ namespace Didit\Types;
 /**
  * What to do when document manipulation is suspected (`SUSPECTED_DOCUMENT_MANIPULATION`), e.g. the PDF
  * was modified after digital signing, processed by a known PDF editor, shows overlay-text
- * manipulation, or has inconsistent EXIF dates.
+ * manipulation, or has inconsistent EXIF dates. Also governs `POA_DOCUMENT_UNPROVEN_TEXT_REPLACEMENT`
+ * (a re-typed text field the file cannot prove changed or unchanged): `DECLINE` declines it too,
+ * `NO_ACTION` keeps it as a warning.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

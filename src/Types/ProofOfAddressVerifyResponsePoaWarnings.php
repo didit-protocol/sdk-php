@@ -32,7 +32,10 @@ final class ProofOfAddressVerifyResponsePoaWarnings extends BaseModel
      * Extra context for some risks, e.g. `POA_DOCUMENT_EXPIRED` includes `expiration_reason`
      * (`printed_expiration` or `age_window`), `document_type`, `document_subtype`, and `issue_date`, plus
      * `expiration_date` on the `printed_expiration` path or `max_age_months` on the `age_window` path;
-     * `SUSPECTED_DOCUMENT_MANIPULATION` includes `reason` and `detection_method`. `null` for most risks.
+     * `SUSPECTED_DOCUMENT_MANIPULATION` includes `reason` and `detection_method`;
+     * `POA_DOCUMENT_UNPROVEN_TEXT_REPLACEMENT` includes `reason`, `detection_method`
+     * (`unproven_text_replacement`), `replaced_text`, `manipulated_regions` and `manipulated_blocks`.
+     * `null` for most risks.
      *
      * @var array<string, mixed>|null
      */
