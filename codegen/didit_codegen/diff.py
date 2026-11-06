@@ -1,6 +1,6 @@
 """Compares two versions of an upstream document, operation by operation
 (docs/DESIGN.md section 3.1): added, removed and changed operations, changed
-component schemas, and the changes that break SDK users.
+component schemas, and the changes that can break typed code.
 """
 
 from __future__ import annotations
@@ -13,9 +13,52 @@ from .spec import HTTP_METHODS, Document
 SCHEMA_REF = "#/components/schemas/"
 
 # Keys that only document; a change limited to them is "documentation only".
+# Extension keys (`x-...`) document too: the generator reads none of them
+# inside an operation's parameters, request body or responses.
 DOC_KEYS = frozenset({"description", "summary", "title", "example", "examples", "externalDocs", "x-codeSamples"})
 # Keys whose value maps names (properties, media types, statuses) to objects.
 NAME_MAPS = frozenset({"properties", "content", "responses", "headers", "schemas", "parameters", "patternProperties"})
+
+
+def _doc_key(key: str) -> bool:
+    return key in DOC_KEYS or key.startswith("x-")
+
+
+@dataclass(frozen=True)
+class Break:
+    """A change that can break typed code (docs/DESIGN.md section 3.1).
+
+    ``where`` is ``response 200``, ``request body`` or ``query parameter `x```;
+    ``field`` is the path below it (``a.b[].c``, empty for the whole schema or
+    parameter); ``kind`` is ``now-null``, ``<old>-><new>`` (type changed),
+    ``removed``, ``enum-removed:<value>``, ``now-required``, ``new-required``,
+    ``content-type:<old>-><new>`` or ``content-type-removed:<type>``.
+    """
+
+    where: str
+    field: str
+    kind: str
+
+    def __str__(self) -> str:
+        at = _at(self.where, self.field)
+        kind = self.kind
+        if kind == "now-null":
+            return f"{at}: can now be null"
+        if kind == "removed":
+            return f"{at}: field removed" if self.field else f"{at}: removed"
+        if kind == "now-required":
+            return f"{at}: now required"
+        if kind == "new-required":
+            return f"{at}: new required field" if self.field else f"{at}: new required parameter"
+        if kind.startswith("enum-removed:"):
+            return f"{at}: enum value `{kind.split(':', 1)[1]}` removed"
+        if kind.startswith("content-type-removed:"):
+            return f"{at}: content type `{kind.split(':', 1)[1]}` removed"
+        if kind.startswith("content-type:"):
+            old, new = kind.split(":", 1)[1].split("->", 1)
+            return f"{at}: content type changed from {old} to {new}"
+        old, new = kind.split("->", 1)
+        return f"{at}: type changed from {old} to {new}"
 
 
 @dataclass
@@ -23,7 +66,7 @@ class OpChange:
     key: str
     parts: list[str]  # "parameters", "request body", "response 200"
     docs_only: bool
-    breaking: list[str] = field(default_factory=list)
+    breaking: list[Break] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
 
 
@@ -80,8 +123,8 @@ class Comparer:
             if not names and ("$ref" in a or "$ref" in b):
                 return self._refs(a, b)
             keys = set(a) | set(b)
-            if not names:
-                keys -= self.ignore
+            if not names and self.ignore:
+                keys = {k for k in keys if not _doc_key(k)}
             for k in keys:
                 if k not in a or k not in b:
                     return False
@@ -126,7 +169,7 @@ def strip_docs(node: Any, names: bool = False) -> Any:
         return {
             k: strip_docs(v, not names and k in NAME_MAPS)
             for k, v in node.items()
-            if names or k not in DOC_KEYS
+            if names or not _doc_key(k)
         }
     if isinstance(node, list):
         return [strip_docs(v) for v in node]
@@ -136,12 +179,47 @@ def strip_docs(node: Any, names: bool = False) -> Any:
 # Breaking-change details ----------------------------------------------------
 
 
+def _is_null(doc: Document, s: Any) -> bool:
+    """``{"type": "null"}``, the null variant of a ``oneOf``/``anyOf`` (OpenAPI 3.1)."""
+    s = doc.deref(s)
+    return isinstance(s, dict) and s.get("type") == "null"
+
+
+def _variants(doc: Document, s: dict[str, Any]) -> list[Any] | None:
+    """The ``oneOf``/``anyOf`` variants of ``s`` other than ``null``, or None."""
+    variants = s.get("oneOf") or s.get("anyOf")
+    if not isinstance(variants, list) or not variants:
+        return None
+    return [v for v in variants if not _is_null(doc, v)]
+
+
+def nullable(doc: Document, s: Any, _refs: frozenset[str] = frozenset()) -> bool:
+    """Whether ``s`` accepts null: ``nullable: true`` (OpenAPI 3.0), a ``null``
+    type or variant (3.1), here or through ``$ref`` and a one-part ``allOf``,
+    as the generator reads it."""
+    if not isinstance(s, dict):
+        return False
+    typ = s.get("type")
+    if s.get("nullable") is True or typ == "null" or (isinstance(typ, list) and "null" in typ):
+        return True
+    variants = s.get("oneOf") or s.get("anyOf")
+    if isinstance(variants, list) and any(_is_null(doc, v) or nullable(doc, v, _refs) for v in variants):
+        return True
+    all_of = s.get("allOf")
+    if isinstance(all_of, list) and len(all_of) == 1:
+        return nullable(doc, all_of[0], _refs)
+    ref = s.get("$ref")
+    if isinstance(ref, str) and ref not in _refs:
+        return nullable(doc, doc.deref({"$ref": ref}), _refs | {ref})
+    return False
+
+
 def _kind(doc: Document, s: Any) -> str:
     """A coarse type name; an empty string means any type."""
     if not isinstance(s, dict):
         return ""
-    variants = s.get("oneOf") or s.get("anyOf")
-    if isinstance(variants, list) and variants:
+    variants = _variants(doc, s)
+    if variants:
         kinds = sorted({_kind(doc, flatten(doc, v)) or "any" for v in variants})
         return "|".join(kinds)
     typ = s.get("type")
