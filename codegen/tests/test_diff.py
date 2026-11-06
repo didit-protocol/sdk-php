@@ -135,6 +135,22 @@ class BreakingTest(unittest.TestCase):
             _post(d)["responses"] = {"200": {"description": "pdf", "content": {"application/pdf": {}}}}
         self.assertEqual(self._breaking(mutate), ["response 200: content type changed from application/json to application/pdf"])
 
+    def test_a_field_that_loses_or_gains_its_type(self) -> None:
+        # An empty schema is any value: the generator's enum type becomes `mixed`, and back.
+        def untype(d: dict[str, Any]) -> None:
+            d["components"]["schemas"]["Decision"]["properties"]["status"] = {}
+        self.assertEqual(self._breaking(untype), ["response 200 `status`: type changed from string to any"])
+        def retype(d: dict[str, Any]) -> None:
+            _body(d)["properties"]["vendor_data"] = {"type": "object", "properties": {"id": {"type": "string"}}}
+        [change] = _changes(retype, lambda d: _body(d)["properties"].update(vendor_data={"description": "Anything."}))
+        self.assertEqual(_text(change), ["request body `vendor_data`: type changed from any to object"])
+
+    def test_an_enum_without_a_type_is_typed_by_its_values(self) -> None:
+        def untyped(d: dict[str, Any]) -> None:
+            del d["components"]["schemas"]["Decision"]["properties"]["status"]["type"]
+        [change] = _changes(untyped)
+        self.assertEqual(change.breaking, [])
+
 
 class NowNullTest(unittest.TestCase):
     """A field or parameter that can now be null breaks typed code (DESIGN 3.1), in a response or
@@ -259,6 +275,61 @@ class TypeNameTest(unittest.TestCase):
         self.assertFalse(change.docs_only)
         self.assertEqual(change.breaking, [])
         self.assertEqual(change.notes, ["request body: now the type `SessionRequest`"])
+
+
+class VariantTest(unittest.TestCase):
+    """A ``oneOf`` of objects is compared variant by variant: merged, a change to one variant's
+    field hides behind the same field of the other (the token request's two grants)."""
+
+    @staticmethod
+    def _grants(d: dict[str, Any]) -> None:
+        d["components"]["schemas"]["CodeGrant"] = {
+            "type": "object",
+            "required": ["grant_type", "code"],
+            "properties": {"grant_type": {"type": "string", "enum": ["code"]}, "code": {"type": "string"}, "scope": {"type": "string"}},
+        }
+        d["components"]["schemas"]["RefreshGrant"] = {
+            "type": "object",
+            "required": ["grant_type", "refresh_token"],
+            "properties": {
+                "grant_type": {"type": "string", "enum": ["refresh"]}, "refresh_token": {"type": "string"}, "scope": {"type": "string"},
+            },
+        }
+        d["components"]["schemas"]["Grant"] = {"oneOf": [
+            {"$ref": "#/components/schemas/CodeGrant"}, {"$ref": "#/components/schemas/RefreshGrant"},
+        ]}
+        _post(d)["requestBody"]["content"]["application/json"]["schema"] = {"$ref": "#/components/schemas/Grant"}
+        _post(d)["responses"] = ok({"oneOf": [{"$ref": "#/components/schemas/CodeGrant"}, {"$ref": "#/components/schemas/RefreshGrant"}]})
+
+    def _breaking(self, mutate: Any) -> list[str]:
+        [change] = _changes(mutate, self._grants)
+        return _text(change)
+
+    def test_a_change_to_the_second_variant_only(self) -> None:
+        def scope(d: dict[str, Any]) -> dict[str, Any]:
+            return d["components"]["schemas"]["RefreshGrant"]["properties"]["scope"]
+        cases: list[tuple[Any, list[str]]] = [
+            (lambda d: d["components"]["schemas"]["RefreshGrant"]["required"].append("scope"), ["request body `scope`: now required"]),
+            (lambda d: scope(d).update(nullable=True), ["request body `scope`: can now be null", "response 200 `scope`: can now be null"]),
+            (lambda d: scope(d).update(type="integer"), [
+                "request body `scope`: type changed from string to integer",
+                "response 200 `scope`: type changed from string to integer",
+            ]),
+        ]
+        for mutate, expected in cases:
+            with self.subTest(expected=expected[0]):
+                self.assertEqual(self._breaking(mutate), expected)
+
+    def test_a_field_removed_from_one_variant(self) -> None:
+        def mutate(d: dict[str, Any]) -> None:
+            del d["components"]["schemas"]["RefreshGrant"]["properties"]["scope"]
+        self.assertEqual(self._breaking(mutate), ["request body `scope`: field removed", "response 200 `scope`: field removed"])
+
+    def test_variants_in_a_new_order_change_nothing(self) -> None:
+        def mutate(d: dict[str, Any]) -> None:
+            d["components"]["schemas"]["Grant"]["oneOf"].reverse()
+        [change] = _changes(mutate, self._grants)
+        self.assertEqual((change.breaking, change.notes), ([], []))
 
 
 class SchemaChangesTest(unittest.TestCase):
