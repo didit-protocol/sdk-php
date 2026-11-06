@@ -243,6 +243,25 @@ class SpecSyncTest(unittest.TestCase):
         self.assertTrue(self.commit.read_text("utf-8").startswith(f"feat(spec): sync API spec {DATE}\n"))
         self.assertFalse((self.root / "openapi" / "deprecated-operations.json").exists())
 
+    def test_renamed_type_is_a_feature_and_listed(self) -> None:
+        # Same content under a new component name: the generator renames the public type.
+        def rename(doc: dict[str, Any]) -> None:
+            schemas = doc["components"]["schemas"]
+            schemas["SessionDecisionV2"] = schemas.pop("SessionDecision")
+            text = json.dumps(doc).replace('"#/components/schemas/SessionDecision"', '"#/components/schemas/SessionDecisionV2"')
+            doc.clear()
+            doc.update(json.loads(text))
+        self.upstream(rename)
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        summary = self.summary.read_text("utf-8")
+        self.assertTrue(summary.startswith(f"feat(spec): sync API spec {DATE}\n"))
+        breaking = summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0]
+        line = "`sessions.retrieve_decision()` (`GET /v3/session/{sessionId}/decision/`): response 200: type changed from SessionDecision to SessionDecisionV2"
+        self.assertIn(f"- {line}", breaking)
+        self.assertIn(f"api(spec): {line}", summary.split("BEGIN_COMMIT_OVERRIDE", 1)[1])
+        self.assertIn("- removed `SessionDecision`", summary)
+
     def test_deprecation_ends_after_one_minor_version(self) -> None:
         self.upstream(self.remove)
         self.assertEqual(self.sync()[0], 0)
