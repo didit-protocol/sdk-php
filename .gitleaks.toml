@@ -2,7 +2,8 @@
 #
 # The default gitleaks rules apply everywhere. Only two things are allowed:
 # - the upstream API documents in openapi/, which are byte-for-byte copies of
-#   the public docs at docs.didit.me and carry example values;
+#   the public docs at docs.didit.me and carry example values, and the earlier
+#   copies the spec sync tests use as fixtures (codegen/tests/fixtures/spec-sync);
 # - synthetic webhook secrets that start with whsec_test_.
 # Every other test value is generated at test time or written so that it does
 # not look like a credential.
@@ -17,7 +18,9 @@ description = "Upstream OpenAPI copies and synthetic webhook test secrets"
 paths = [
   '''^openapi/verification\.json$''',
   '''^openapi/account\.json$''',
+  '''^openapi/authentication\.json$''',
   '''^openapi/webhook-vectors\.json$''',
+  '''^codegen/tests/fixtures/spec-sync/[0-9-]+/(before|after)\.json$''',
 ]
 regexTarget = "match"
 regexes = [
