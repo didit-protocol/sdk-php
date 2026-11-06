@@ -8,6 +8,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from . import model, naming
 from .spec import HTTP_METHODS, Document
 
 SCHEMA_REF = "#/components/schemas/"
@@ -30,7 +31,9 @@ class Break:
 
     ``where`` is ``response 200``, ``request body`` or ``query parameter `x```;
     ``field`` is the path below it (``a.b[].c``, empty for the whole schema or
-    parameter); ``kind`` is ``now-null``, ``<old>-><new>`` (type changed),
+    parameter); ``kind`` is ``now-null``, ``<old>-><new>`` (type changed: a
+    coarse type such as ``string->object``, or the component schemas the
+    generator names the type after, such as ``SessionDecision->SessionDecisionV2``),
     ``removed``, ``enum-removed:<value>``, ``now-required``, ``new-required``,
     ``content-type:<old>-><new>`` or ``content-type-removed:<type>``.
     """
@@ -117,6 +120,28 @@ class Comparer:
         self.ignore = DOC_KEYS if ignore_docs else frozenset()
         self._memo: dict[tuple[Any, Any], bool] = {}
         self._active: set[tuple[Any, Any]] = set()
+        self._named: dict[tuple[bool, str], bool] = {}
+
+    def type_name(self, doc: Document, ref: Any) -> str | None:
+        """The component ``ref`` points to when the generator names a public type
+        after it (an object or enum, also as array items or map values), else None."""
+        if not isinstance(ref, str) or not ref.startswith(SCHEMA_REF):
+            return None
+        key = (doc is self.new, ref)
+        if key not in self._named:
+            self._named[key] = names_type(doc, ref)
+        return ref[len(SCHEMA_REF):] if self._named[key] else None
+
+    def renamed(self, ref_a: Any, ref_b: Any) -> bool:
+        """Whether the generated type changes name: a field now uses a differently
+        named component, or an inline schema became a named component or the other
+        way round. Its content can be identical, but typed code names the type."""
+        if ref_a == ref_b:
+            return False
+        a, b = self.type_name(self.old, ref_a), self.type_name(self.new, ref_b)
+        if a is None or b is None:
+            return a != b
+        return naming.class_name(a) != naming.class_name(b)
 
     def equal(self, a: Any, b: Any, names: bool = False) -> bool:
         if isinstance(a, dict) and isinstance(b, dict):
@@ -137,6 +162,8 @@ class Comparer:
 
     def _refs(self, a: dict[str, Any], b: dict[str, Any]) -> bool:
         key = (a.get("$ref"), b.get("$ref"))
+        if self.renamed(*key):
+            return False
         pure = set(a) <= {"$ref"} and set(b) <= {"$ref"}
         if pure and key in self._memo:
             return self._memo[key]
@@ -161,6 +188,17 @@ def _expand(doc: Document, node: dict[str, Any]) -> Any:
     if isinstance(target, dict) and siblings:
         return {**target, **siblings}
     return target
+
+
+def names_type(doc: Document, ref: str) -> bool:
+    """Whether the generator emits a type named after the component ``ref``,
+    asked of the generator itself: a string alias or an array of another
+    component names nothing, so renaming it changes no code."""
+    origin = f"{doc.name}:{ref}"
+    reg = model.Registry()
+    reg.convert(doc, {"$ref": ref}, "", "response", origin)
+    own = (origin + ".", origin + "[]", origin + "{}")
+    return any(t.origin == origin or t.origin.startswith(own) for t in (*reg.models.values(), *reg.enums.values()))
 
 
 def strip_docs(node: Any, names: bool = False) -> Any:
@@ -283,6 +321,22 @@ def _at(label: str, path: str) -> str:
     return f"{label} `{path}`" if path else label
 
 
+def _ref(doc: Document, s: Any) -> Any:
+    """The ``$ref`` the generator names the type of ``s`` after, also through a
+    one-part ``allOf`` or a ``oneOf``/``anyOf`` of one variant and ``null``."""
+    if not isinstance(s, dict):
+        return None
+    if "$ref" in s:
+        return s["$ref"]
+    all_of = s.get("allOf")
+    if isinstance(all_of, list) and len(all_of) == 1:
+        return _ref(doc, all_of[0])
+    variants = _variants(doc, s)
+    if variants is not None and len(variants) == 1:
+        return _ref(doc, variants[0])
+    return None
+
+
 class Details:
     """Collects the changes that can break typed code and notable additions
     between two operations (docs/DESIGN.md section 3.1)."""
@@ -321,7 +375,8 @@ class Details:
         if ka and kb and ka != kb:
             self.breaking.append(Break(label, path, f"{ka}->{kb}"))
             return
-        if mode == "response" and nullable(self.new, raw_b) and not nullable(self.old, raw_a):
+        self._type_name(raw_a, raw_b, label, path)
+        if nullable(self.new, raw_b) and not nullable(self.old, raw_a):
             self.breaking.append(Break(label, path, "now-null"))
         if not isinstance(a, dict) or not isinstance(b, dict):
             return
@@ -333,6 +388,18 @@ class Details:
         ap_a, ap_b = a.get("additionalProperties"), b.get("additionalProperties")
         if isinstance(ap_a, dict) and isinstance(ap_b, dict):
             self.schema(ap_a, ap_b, label, path + "{}", mode)
+
+    def _type_name(self, raw_a: Any, raw_b: Any, label: str, path: str) -> None:
+        ref_a, ref_b = _ref(self.old, raw_a), _ref(self.new, raw_b)
+        if not self.same.renamed(ref_a, ref_b):
+            return
+        a, b = self.same.type_name(self.old, ref_a), self.same.type_name(self.new, ref_b)
+        if a and b:
+            self.breaking.append(Break(label, path, f"{a}->{b}"))
+        elif b:
+            self.notes.append(f"{_at(label, path)}: now the type `{b}`")
+        elif a:
+            self.notes.append(f"{_at(label, path)}: no longer the type `{a}`")
 
     def _enum(self, a: dict[str, Any], b: dict[str, Any], label: str, path: str) -> None:
         va, vb = a.get("enum"), b.get("enum")

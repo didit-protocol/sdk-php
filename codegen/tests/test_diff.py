@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import unittest
 from typing import Any
 
@@ -136,7 +137,8 @@ class BreakingTest(unittest.TestCase):
 
 
 class NowNullTest(unittest.TestCase):
-    """A response field that can now be null breaks typed code (DESIGN 3.1), in every form the generator reads."""
+    """A field or parameter that can now be null breaks typed code (DESIGN 3.1), in a response or
+    a request, in every form the generator reads."""
 
     @staticmethod
     def _breaking(mutate: Any, before: Any = None) -> list[tuple[str, str, str]]:
@@ -169,12 +171,15 @@ class NowNullTest(unittest.TestCase):
                     d["components"]["schemas"]["Decision"]["properties"]["score"] = copy.deepcopy(form)
                 self.assertEqual(self._breaking(mutate), [("response 200", "score", "now-null")])
 
-    def test_a_request_field_that_accepts_null_breaks_nothing(self) -> None:
+    def test_a_request_field_or_parameter_that_can_now_be_null(self) -> None:
         def mutate(d: dict[str, Any]) -> None:
             _body(d)["properties"]["vendor_data"]["nullable"] = True
+            _post(d)["parameters"][0]["schema"] = {"type": ["boolean", "null"]}
         [change] = _changes(mutate)
-        self.assertFalse(change.docs_only)
-        self.assertEqual(change.breaking, [])
+        self.assertEqual([str(b) for b in change.breaking], [
+            "query parameter `dry_run`: can now be null",
+            "request body `vendor_data`: can now be null",
+        ])
 
     def test_a_schema_shared_by_two_fields_is_reported_at_both(self) -> None:
         # `email_intelligence.reason_codes[]` and `enrichment.reason_codes[]` on 2026-11-04.
@@ -205,6 +210,55 @@ class NowNullTest(unittest.TestCase):
             d["components"]["schemas"]["Decision"]["properties"]["status"]["x-readme-id"] = "status"
         [change] = _changes(mutate)
         self.assertTrue(change.docs_only)
+
+
+class TypeNameTest(unittest.TestCase):
+    """The generator names a type after its component schema, so a field that now uses a differently
+    named component changes a public type even when the content is the same."""
+
+    @staticmethod
+    def _rename(d: dict[str, Any], old: str, new: str) -> None:
+        schemas = d["components"]["schemas"]
+        schemas[new] = schemas.pop(old)
+        text = json.dumps(d).replace(f'"#/components/schemas/{old}"', f'"#/components/schemas/{new}"')
+        d.clear()
+        d.update(json.loads(text))
+
+    def test_a_renamed_component_changes_the_type(self) -> None:
+        [change] = _changes(lambda d: self._rename(d, "Decision", "DecisionV2"))
+        self.assertFalse(change.docs_only)
+        self.assertEqual(change.parts, ["response 200"])
+        self.assertEqual([(b.where, b.field, b.kind) for b in change.breaking], [("response 200", "", "Decision->DecisionV2")])
+        self.assertEqual([str(b) for b in change.breaking], ["response 200: type changed from Decision to DecisionV2"])
+
+    def test_a_renamed_component_below_a_field_and_in_a_request(self) -> None:
+        def before(d: dict[str, Any]) -> None:
+            d["components"]["schemas"]["Reason"] = {"type": "string", "enum": ["a", "b"]}
+            d["components"]["schemas"]["Decision"]["properties"]["reasons"] = {
+                "type": "array", "items": {"$ref": "#/components/schemas/Reason"},
+            }
+            _body(d)["properties"]["reason"] = {"allOf": [{"$ref": "#/components/schemas/Reason"}]}
+        [change] = _changes(lambda d: self._rename(d, "Reason", "ReasonCode"), before)
+        self.assertEqual([str(b) for b in change.breaking], [
+            "request body `reason`: type changed from Reason to ReasonCode",
+            "response 200 `reasons[]`: type changed from Reason to ReasonCode",
+        ])
+
+    def test_a_renamed_component_that_names_no_type_changes_nothing(self) -> None:
+        # A string alias generates no class, so its name is not part of the SDK.
+        def before(d: dict[str, Any]) -> None:
+            d["components"]["schemas"]["Score"] = {"type": "integer"}
+            d["components"]["schemas"]["Decision"]["properties"]["score"] = {"$ref": "#/components/schemas/Score"}
+        self.assertEqual(_changes(lambda d: self._rename(d, "Score", "Points"), before), [])
+
+    def test_an_inline_schema_that_becomes_a_component(self) -> None:
+        def mutate(d: dict[str, Any]) -> None:
+            d["components"]["schemas"]["SessionRequest"] = _body(d)
+            _post(d)["requestBody"]["content"]["application/json"]["schema"] = {"$ref": "#/components/schemas/SessionRequest"}
+        [change] = _changes(mutate)
+        self.assertFalse(change.docs_only)
+        self.assertEqual(change.breaking, [])
+        self.assertEqual(change.notes, ["request body: now the type `SessionRequest`"])
 
 
 class SchemaChangesTest(unittest.TestCase):

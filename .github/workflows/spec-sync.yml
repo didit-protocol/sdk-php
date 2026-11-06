@@ -20,9 +20,10 @@ name: Spec sync
 # The sync never removes commits that people added to the open pull request
 # (DESIGN 15: hand-written core changes go there). When the branch holds any
 # commit not made by this workflow, the sync builds on top of it, pushes a
-# fast-forward and adds its release lines to the override block of the
-# description (feat wins over chore); otherwise it starts again from main and
-# replaces the branch only if nobody pushed to it while the checks ran.
+# fast-forward and adds its breaking changes and release lines to the
+# description (feat wins over chore) and its other changes in a comment;
+# otherwise it starts again from main and replaces the branch only if nobody
+# pushed to it while the checks ran.
 
 on:
   schedule:
@@ -180,8 +181,8 @@ jobs:
 
           number="$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number // empty')"
           if [ -n "$number" ] && [ "$MODE" = continue ]; then
-            # The description still lists the changes since main; this sync's
-            # release lines join its override block and its changes go in a comment.
+            # This sync's breaking changes and release lines join the description,
+            # the title takes feat over chore, and its other changes go in a comment.
             if [ "$pushed" = true ]; then
               gh pr view "$number" --json title,body > "$RUNNER_TEMP/previous.json"
               python3 codegen/sync_pull_request.py --previous "$RUNNER_TEMP/previous.json" \
