@@ -14,6 +14,7 @@ import unittest
 from pathlib import Path
 
 from helpers import REPO
+import sync_pull_request
 from didit_codegen.sync import (
     API_CHANGE_TYPE, API_CHANGES_SECTION, Breaking, Report, Result, continue_pull_request, render, sync,
 )
@@ -243,6 +244,21 @@ class ContinuePullRequestTest(unittest.TestCase):
         self.assertEqual(title, "feat(spec): sync API spec 2026-11-06")
         commits = release_commits(title, body)
         self.assertEqual(commits, [("feat", False, "verify the new event"), ("feat", False, "sync API spec 2026-11-06")])
+
+    def test_the_command_the_workflow_runs(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            out = Path(tmp)
+            (out / "previous.json").write_text(json.dumps({
+                "title": "chore(spec): sync API spec 2026-11-05", "body": _summary("2026-11-05").partition("\n")[2],
+            }), "utf-8")
+            (out / "summary.md").write_text(_summary("2026-11-06", observable=True), "utf-8")
+            code = sync_pull_request.main([
+                "--previous", str(out / "previous.json"), "--summary", str(out / "summary.md"), "--out", str(out / "continued"),
+            ])
+            self.assertEqual(code, 0)
+            self.assertEqual((out / "continued" / "title.txt").read_text("utf-8"), "feat(spec): sync API spec 2026-11-06\n")
+            self.assertIn("BEGIN_COMMIT_OVERRIDE\nfeat(spec): sync API spec 2026-11-06\nEND_COMMIT_OVERRIDE", (out / "continued" / "body.md").read_text("utf-8"))
+            self.assertTrue((out / "continued" / "comment.md").read_text("utf-8").startswith("## Breaking changes\n"))
 
 
 if __name__ == "__main__":
