@@ -7,9 +7,10 @@ Usage:
 
 PR.json is the output of `gh pr view --json title,body`; SUMMARY.md is what
 codegen/spec_sync.py wrote for this sync. Writes DIR/title.txt and DIR/body.md,
-the pull request title and description, whose BEGIN_COMMIT_OVERRIDE block now
-also carries this sync's release lines (feat wins over chore), and
-DIR/comment.md, this sync's summary.
+the pull request title and description, whose "Breaking changes" list and
+BEGIN_COMMIT_OVERRIDE block now also carry this sync's entries (feat wins over
+chore in the title and the "Release" section), and DIR/comment.md, this sync's
+summary.
 """
 
 from __future__ import annotations

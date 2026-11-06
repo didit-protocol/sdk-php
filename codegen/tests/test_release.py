@@ -270,6 +270,11 @@ class ContinuePullRequestTest(unittest.TestCase):
         self.assertIn("\nOld description.\n\n## Later syncs\n", body)
         self.assertIn("## Release\n\n" + RELEASES["feat"] + "\n", body)
         self.assertIn("count as `feat(spec)`", comment)
+        # A later sync adds its entries and keeps saying so.
+        _, body2, _ = continue_pull_request(title, body, _summary("2026-11-07", breaking=("a",)))
+        self.assertIn("\n- `x.a()`: `a` can now be null\n", _breaking(body2))
+        self.assertIn("before the sync of 2026-11-06: changes of earlier syncs", _breaking(body2))
+        self.assertEqual(body2.count("## Breaking changes"), 1)
 
     def test_a_first_line_someone_wrote_stays(self) -> None:
         previous = "BEGIN_COMMIT_OVERRIDE\nfeat(webhooks): verify the new event\nEND_COMMIT_OVERRIDE\n"
