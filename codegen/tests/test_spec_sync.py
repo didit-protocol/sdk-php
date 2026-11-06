@@ -62,6 +62,7 @@ class SpecSyncTest(unittest.TestCase):
         (self.root / "openapi" / "overlay.json").write_text(self.overlay_text, "utf-8")
         (self.offline / "openapi-25.json").write_text(self.verification_text, "utf-8")
         shutil.copy(REPO / "openapi" / "account.json", self.offline / "openapi-auth.json")
+        shutil.copy(REPO / "openapi" / "authentication.json", self.offline / "openapi-authentication.json")
         self.summary = self.root / "summary.md"
         self.commit = self.root / "commit.txt"
 
@@ -142,18 +143,24 @@ class SpecSyncTest(unittest.TestCase):
         self.assertNotIn(REMOVED, self.read("overlay.json")["operations"])
 
         summary = self.summary.read_text("utf-8")
-        self.assertEqual(summary.splitlines()[0], f"chore(spec): sync API spec {DATE}")
+        self.assertEqual(summary.splitlines()[0], f"feat(spec): sync API spec {DATE}")
+        self.assertTrue(summary.splitlines()[2] == "## Breaking changes", summary[:200])
         breaking = summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0]
-        self.assertIn(f"`{REMOVED}` was removed upstream: `sessions.imports.retrieve()` is deprecated", breaking)
+        line = f"`{REMOVED}` was removed upstream: `sessions.imports.retrieve()` is deprecated and will be deleted in the next minor version"
+        self.assertIn(f"- {line}", breaking)
         self.assertIn("**Removed (1)**", summary)
-        # The commit and the pull request body carry a BREAKING CHANGE footer, so release-please
-        # never ships the sync in a patch release.
+        # A minor release (DESIGN 13): feat(spec) plus one api(spec) line per breaking change,
+        # in the commit and in the override block release-please reads, never a BREAKING CHANGE footer.
         commit = self.commit.read_text("utf-8")
-        self.assertEqual(commit.splitlines()[0], f"chore(spec): sync API spec {DATE}")
-        footer = commit.split("\n\n")[-1]
-        self.assertTrue(footer.startswith("BREAKING CHANGE: the API spec sync changes the SDK surface.\n- "), commit)
-        self.assertIn(f"`{REMOVED}` was removed upstream", footer)
-        self.assertTrue(summary.rstrip("\n").endswith(footer.rstrip("\n")))
+        self.assertEqual(commit.splitlines()[0], f"feat(spec): sync API spec {DATE}")
+        self.assertIn(f"BEGIN_NESTED_COMMIT\napi(spec): {line}\nEND_NESTED_COMMIT", commit)
+        self.assertTrue(summary.endswith(
+            f"BEGIN_COMMIT_OVERRIDE\nfeat(spec): sync API spec {DATE}\n\n"
+            f"BEGIN_NESTED_COMMIT\napi(spec): {line}\nEND_NESTED_COMMIT\nEND_COMMIT_OVERRIDE\n"
+        ), summary[-600:])
+        for text in (summary, commit):
+            self.assertNotIn("BREAKING CHANGE", text)
+            self.assertNotIn("(spec)!", text)
 
         # The generator still builds the method, with its component type, from the entry alone.
         files, _ = build(self.root)
@@ -180,7 +187,8 @@ class SpecSyncTest(unittest.TestCase):
         self.assertNotIn(ERRORS, self.read("overlay.json")["operations"])
         summary = self.summary.read_text("utf-8")
         self.assertIn(f"`{ERRORS}` is no longer a server operation: `sessions.imports.list_errors()` is deprecated", summary)
-        self.assertIn("BREAKING CHANGE: ", self.commit.read_text("utf-8"))
+        self.assertIn(f"api(spec): `{ERRORS}` is no longer a server operation", self.commit.read_text("utf-8"))
+        self.assertNotIn("BREAKING CHANGE", self.commit.read_text("utf-8"))
 
         # The method stays, deprecated, until the next minor version.
         files, _ = build(self.root)
@@ -224,8 +232,10 @@ class SpecSyncTest(unittest.TestCase):
         self.assertIn(f"- `{ERRORS}` (`sessions.imports.list_errors`): ", changed)
         self.assertIn("breaking: response 200 `count`: type changed from integer to string", changed)
         breaking = summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0]
-        self.assertIn(f"`sessions.imports.list_errors()` (`{ERRORS}`): response 200 `count`: type changed from integer to string", breaking)
-        self.assertIn("BREAKING CHANGE: ", self.commit.read_text("utf-8"))
+        line = f"`sessions.imports.list_errors()` (`{ERRORS}`): response 200 `count`: type changed from integer to string"
+        self.assertIn(line, breaking)
+        self.assertIn(f"api(spec): {line}", summary.split("BEGIN_COMMIT_OVERRIDE", 1)[1])
+        self.assertTrue(self.commit.read_text("utf-8").startswith(f"feat(spec): sync API spec {DATE}\n"))
         self.assertFalse((self.root / "openapi" / "deprecated-operations.json").exists())
 
     def test_deprecation_ends_after_one_minor_version(self) -> None:
@@ -303,8 +313,11 @@ class SpecSyncTest(unittest.TestCase):
         self.assertEqual(source["webhook-vectors.json"], before["webhook-vectors.json"])
         self.assertEqual((self.root / "openapi" / "SOURCE.json").read_text("utf-8"), json.dumps(source, indent=1))
         summary = self.summary.read_text("utf-8")
-        self.assertIn("None detected.", summary)
+        self.assertIn("## Breaking changes\n\nNone detected.\n", summary)
         self.assertNotIn("BREAKING CHANGE", summary)
+        # Documentation only: chore(spec), which releases nothing on its own.
+        self.assertEqual(summary.splitlines()[0], f"chore(spec): sync API spec {DATE}")
+        self.assertTrue(summary.endswith(f"BEGIN_COMMIT_OVERRIDE\nchore(spec): sync API spec {DATE}\nEND_COMMIT_OVERRIDE\n"))
         self.assertEqual(
             self.commit.read_text("utf-8"),
             f"chore(spec): sync API spec {DATE}\n\nGenerated by .github/workflows/spec-sync.yml from the upstream OpenAPI documents.\n",
