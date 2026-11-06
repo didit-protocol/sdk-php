@@ -463,8 +463,10 @@ class _Sync:
         for key in sorted(set(self.new_ops) - set(self.old_ops)):
             naming = self.new_naming(key)
             if naming is None:
+                self.report.observable = True
                 self.report.added.append(f"`{key}`: no SDK naming yet, add it to `openapi/overlay.json` or upstream")
             elif ident(naming):
+                self.report.observable = True
                 self.report.added.append(f"`{key}`: `{ident(naming)}()`")
             else:
                 self.report.added.append(f"`{key}`: not exposed by the server SDKs")
@@ -472,15 +474,23 @@ class _Sync:
             old, new = self.old_docs[n], self.new_docs[n]
             if self.old_bytes[n] == self.new_bytes[n]:
                 continue
+            if n not in GENERATED:
+                self.hand_written_operations(n)
             for change in diff.changed_operations(old, new, UPSTREAM[n][3]):
-                naming = ident(self.new_naming(change.key))
+                if n in GENERATED:
+                    naming = ident(self.new_naming(change.key))
+                else:
+                    naming = ident(diff.operations(new, UPSTREAM[n][3])[change.key][0].get("x-didit-sdk"))
                 label = f"`{change.key}`" + (f" (`{naming}`)" if naming else "")
                 line = f"{label}: {', '.join(change.parts)}" + (" (documentation only)" if change.docs_only else "")
                 details = [f"breaking: {b}" for b in change.breaking] + change.notes
                 self.report.changed.append(line + "".join(f"\n  - {d}" for d in details[:20]))
                 if naming:
-                    self.report.breaking.extend(f"`{naming}()` (`{change.key}`): {b}" for b in change.breaking)
-            prefix = "" if n == "verification.json" else "account: "
+                    self.report.observable = self.report.observable or not change.docs_only
+                    self.report.breaking.extend(
+                        Breaking(change.key, b.field, b.kind, f"`{naming}()` (`{change.key}`): {b}") for b in change.breaking
+                    )
+            prefix = "" if n == "verification.json" else f"{UPSTREAM[n][2]}: "
             sc = diff.schema_changes(old, new)
             for name in sc.added:
                 self.report.schemas.append(f"added `{prefix}{name}`")
@@ -488,6 +498,34 @@ class _Sync:
                 self.report.schemas.append(f"removed `{prefix}{name}`")
             for name, docs_only in sc.changed:
                 self.report.schemas.append(f"changed `{prefix}{name}`" + (" (documentation only)" if docs_only else ""))
+
+    def hand_written_operations(self, n: str) -> None:
+        """Added, removed and renamed operations of a document whose module is
+        hand-written (authentication.json, DESIGN 10): nothing is generated or
+        deprecated, and the contract test fails until the module follows."""
+        follow = "update `src/Authentication` and `tests/Contract/AuthenticationContractTest.php` in this pull request"
+        old_ops = diff.operations(self.old_docs[n], UPSTREAM[n][3])
+        new_ops = diff.operations(self.new_docs[n], UPSTREAM[n][3])
+        for key in sorted(set(new_ops) - set(old_ops)):
+            name = ident(new_ops[key][0].get("x-didit-sdk"))
+            if name:
+                self.report.observable = True
+            self.report.added.append(f"`{key}`: `{name}()`, {follow}" if name else f"`{key}`: not exposed by the server SDKs")
+        for key in sorted(set(old_ops) - set(new_ops)):
+            name = ident(old_ops[key][0].get("x-didit-sdk"))
+            if name is None:
+                self.report.removed.append(f"`{key}`: not exposed by the server SDKs")
+                continue
+            self.report.removed.append(f"`{key}` (`{name}`): {follow}")
+            self.report.breaking.append(Breaking(key, "", "removed", f"`{key}` was removed upstream: `{name}()` is removed with it"))
+        for key in sorted(set(old_ops) & set(new_ops)):
+            old, new = old_ops[key][0].get("x-didit-sdk"), new_ops[key][0].get("x-didit-sdk")
+            if normalize_naming(old) == normalize_naming(new):
+                continue
+            self.report.observable = True
+            self.report.naming.append(f"`{key}`: `x-didit-sdk` changed from `{_compact(old)}` to `{_compact(new)}`, {follow}")
+            for name in sorted(_methods(old) - _methods(new)):
+                self.report.breaking.append(Breaking(key, "", "renamed", f"`{key}`: `{name}()` is no longer an SDK method upstream"))
 
     # output ----------------------------------------------------------------
 
@@ -518,6 +556,18 @@ class _Sync:
 
 def _compact(raw: Any) -> str:
     return json.dumps(normalize_naming(raw), separators=(",", ":"))
+
+
+def _methods(raw: Any) -> set[str]:
+    """``resource.method`` of a server operation and of each of its ``variants``."""
+    name = ident(raw)
+    if name is None:
+        return set()
+    variants = raw.get("variants")
+    methods = {name}
+    if isinstance(variants, list):
+        methods |= {f"{raw['resource']}.{v['method']}" for v in variants if isinstance(v, dict) and isinstance(v.get("method"), str)}
+    return methods
 
 
 def sync(root: Path, fetched: dict[str, bytes], date: str, fetched_at: str) -> Result:
