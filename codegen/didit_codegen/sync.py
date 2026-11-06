@@ -731,11 +731,17 @@ def _bullets(found: re.Match[str] | None) -> list[str]:
     return [line[2:] for line in found.group(0).splitlines() if line.startswith("- ")] if found else []
 
 
+_INCOMPLETE = "The description had no such list before the sync of "
+
+
 def _breaking_so_far(body: str, summary: str, date: str) -> str:
     """"Breaking changes" of ``body`` with those of this sync's ``summary`` added."""
     earlier = BREAKING_SECTION.search(body)
     texts = list(dict.fromkeys(_bullets(earlier) + _bullets(BREAKING_SECTION.search(summary))))
-    note = "" if earlier else f"The description had no such list before the sync of {date}: changes of earlier syncs on this branch are missing."
+    if earlier is None:
+        note = f"{_INCOMPLETE}{date}: changes of earlier syncs on this branch are missing."
+    else:
+        note = next((line for line in earlier.group(0).splitlines() if line.startswith(_INCOMPLETE)), "")
     section = "\n".join(_breaking_lines(texts, note)) + "\n\n"
     if earlier is None:
         return section + body
@@ -747,9 +753,10 @@ def _later_sync(body: str, line: str) -> str:
     found = LATER_SECTION.search(body)
     if found is not None:
         return body[: found.start()] + found.group(0).rstrip("\n") + "\n" + line + "\n\n" + body[found.end():]
-    headings = [m.start() for m in RELEASE_HEADING.finditer(body)]
     block = OVERRIDE.search(body)
-    at = headings[-1] if headings else (block.start() if block else len(body))
+    end = block.start() if block else len(body)
+    headings = [m.start() for m in RELEASE_HEADING.finditer(body, 0, end)]
+    at = headings[-1] if headings else end
     return body[:at] + "## Later syncs\n\n" + line + "\n\n" + body[at:]
 
 
