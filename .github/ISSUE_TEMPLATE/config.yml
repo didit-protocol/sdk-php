@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/didit-protocol/sdk-php/security/advisories/new
+    about: Report security issues privately, never in a public issue.
+  - name: Didit support
+    url: https://docs.didit.me
+    about: Questions about the Didit API, your account or a verification go to the docs or support@didit.me.

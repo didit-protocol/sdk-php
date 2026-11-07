@@ -1,0 +1,26 @@
+{
+ "verification.json": {
+  "url": "https://docs.didit.me/openapi-25.json",
+  "sha256": "b5828c37c81f63a636dcbfcfdf575402ad745b5a2eaed2e899767bc4809bdf07",
+  "fetched_at": "2026-11-07T12:36:04Z"
+ },
+ "account.json": {
+  "url": "https://docs.didit.me/openapi-auth.json",
+  "sha256": "ef403603543b119fed4300d08e15b8ec0a13de9fabdfdc02866f61f817d2a1f0",
+  "fetched_at": "2026-11-05T16:15:51Z"
+ },
+ "webhook-vectors.json": {
+  "generator": "product-automations scripts/server-sdks/make_vectors.py (seeded 2026-10-17)",
+  "source": "service-didit-verification@9773c66e0a src/sessions/utils/webhooks.py"
+ },
+ "authentication.json": {
+  "url": "https://docs.didit.me/openapi-authentication.json",
+  "sha256": "3987984647bfcaa4b5462c8d60cd3c53894bf7585a38109e0cc813292b2416fe",
+  "fetched_at": "2026-11-06T11:11:57Z"
+ },
+ "breaking-vectors.json": {
+  "source": "didit-protocol/sdk-python@3c361f6e873673ed8a55ad7ea000176e6880f8d3 openapi/breaking-vectors.json",
+  "generator": "didit-protocol/sdk-python codegen/breaking_vectors.py",
+  "sha256": "5c9a66000f9743f9b8fa67562a390903bc78860cb5355f8e3421901fa5798026"
+ }
+}
