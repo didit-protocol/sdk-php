@@ -17,5 +17,10 @@
   "url": "https://docs.didit.me/openapi-authentication.json",
   "sha256": "3987984647bfcaa4b5462c8d60cd3c53894bf7585a38109e0cc813292b2416fe",
   "fetched_at": "2026-11-06T11:11:57Z"
+ },
+ "breaking-vectors.json": {
+  "source": "didit-protocol/sdk-python@3c361f6e873673ed8a55ad7ea000176e6880f8d3 openapi/breaking-vectors.json",
+  "generator": "didit-protocol/sdk-python codegen/breaking_vectors.py",
+  "sha256": "5c9a66000f9743f9b8fa67562a390903bc78860cb5355f8e3421901fa5798026"
  }
 }
