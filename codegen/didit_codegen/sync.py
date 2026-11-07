@@ -43,6 +43,7 @@ DEPRECATED_DESCRIPTION = (
 NAMING_KEYS = ("resource", "method", "auth", "server", "scope")
 MAX_ITEMS = 100
 # GitHub holds 65536 characters in a pull request description.
+MAX_DESCRIPTION = 65536
 MAX_SUMMARY = 60000
 # The override block leaves at least this much of the description to the summary;
 # a longer one stays out of the description, and the sync commit carries every line.
@@ -391,7 +392,7 @@ class _Sync:
                 continue
             if name in idents:
                 self.report.removed.append(f"`{key}` (`{name}`): moved to `{idents[name]}`, the method keeps its name")
-                self.moved_operation(key, idents[name], name)
+                self.moved_operation(key, idents[name], name, self.old_ops[key], self.new_ops[idents[name]])
                 continue
             self.deprecate(key, naming, "removed")
             self.report.removed.append(f"`{key}` (`{name}`): kept as a deprecated method for one minor version")
@@ -400,11 +401,11 @@ class _Sync:
             ))
             self.report.deprecations.append(f"`{name}()` deprecated: `{key}` was removed upstream on {self.date}")
 
-    def moved_operation(self, old_key: str, new_key: str, name: str) -> None:
+    def moved_operation(self, old_key: str, new_key: str, name: str, old: tuple[str, Any], new: tuple[str, Any]) -> None:
         """A method whose operation moved to another path keeps its name; what it
-        sends and receives now is compared, and its changes count under the new path (DESIGN 3.1)."""
-        old_doc, a = self.old_ops[old_key]
-        new_doc, b = self.new_ops[new_key]
+        sends and receives now is compared, and its changes count under the new path (DESIGN 3.1).
+        ``old`` and ``new`` are ``(document name, (operation, path item))``."""
+        (old_doc, a), (new_doc, b) = old, new
         change = diff.compare_operation(self.old_docs[old_doc], self.new_docs[new_doc], new_key, a, b)
         if change is None or change.docs_only:
             self.report.changed.append(f"`{name}` moved from `{old_key}` to `{new_key}`: same parameters, request body and responses")
@@ -539,6 +540,7 @@ class _Sync:
         follow = "update `src/Authentication` and `tests/Contract/AuthenticationContractTest.php` in this pull request"
         old_ops = diff.operations(self.old_docs[n], UPSTREAM[n][3])
         new_ops = diff.operations(self.new_docs[n], UPSTREAM[n][3])
+        idents = {name: key for key, (op, _) in new_ops.items() if (name := ident(op.get("x-didit-sdk")))}
         for key in sorted(set(new_ops) - set(old_ops)):
             self.report.observable = True
             name = ident(new_ops[key][0].get("x-didit-sdk"))
@@ -549,6 +551,11 @@ class _Sync:
             if name is None:
                 self.report.removed.append(f"`{key}`: not exposed by the server SDKs")
                 continue
+            if name in idents:
+                # The module keeps the method, which now calls the new path.
+                self.report.removed.append(f"`{key}` (`{name}`): moved to `{idents[name]}`, {follow}")
+                self.moved_operation(key, idents[name], name, (n, old_ops[key]), (n, new_ops[idents[name]]))
+                continue
             self.report.removed.append(f"`{key}` (`{name}`): {follow}")
             self.report.breaking.append(_operation_removed(key, f"`{key}` was removed upstream: `{name}()` is removed with it"))
         for key in sorted(set(old_ops) & set(new_ops)):
@@ -557,8 +564,10 @@ class _Sync:
                 continue
             self.report.observable = True
             self.report.naming.append(f"`{key}`: `x-didit-sdk` changed from `{_compact(old)}` to `{_compact(new)}`, {follow}")
+            # The module has exactly the document's methods (DESIGN 11) and keeps no
+            # deprecated alias, so a method that is no longer in it goes: counted (DESIGN 3.1).
             for name in sorted(_methods(old) - _methods(new)):
-                self.report.naming.append(f"`{key}`: `{name}()` is no longer an SDK method upstream, {follow}")
+                self.report.breaking.append(_operation_removed(key, f"`{key}`: `{name}()` is no longer an SDK method upstream"))
 
     # output ----------------------------------------------------------------
 
@@ -608,21 +617,22 @@ def sync(root: Path, fetched: dict[str, bytes], date: str, fetched_at: str) -> R
     return _Sync(root, fetched, date, fetched_at).run()
 
 
-def classify(before: dict[str, Any], after: dict[str, Any]) -> tuple[str, list[str]]:
-    """What the sync makes of ``verification.json`` changing from ``before`` to
-    ``after`` (complete documents whose operations carry their own ``x-didit-sdk``):
-    the commit type, ``feat(spec)`` or ``chore(spec)``, and the counted breaking
-    changes as openapi/breaking-vectors.json spells them, distinct and sorted."""
+def classify(before: dict[str, Any], after: dict[str, Any], document: str = "verification.json") -> tuple[str, list[str]]:
+    """What the sync makes of ``document`` changing from ``before`` to ``after``
+    (complete documents whose operations carry their own ``x-didit-sdk``): the
+    commit type, ``feat(spec)`` or ``chore(spec)``, and the counted breaking
+    changes as openapi/breaking-vectors.json spells them, distinct and sorted
+    (their operations prefixed outside verification.json, as ``Breaking.operation``)."""
     with tempfile.TemporaryDirectory() as tmp:
         root = Path(tmp)
         (root / "openapi").mkdir()
         (root / "src").mkdir()
         (root / "src" / "Version.php").write_text("<?php\n\nfinal class Version\n{\n    public const VERSION = '1.0.0';\n}\n", "utf-8")
         for name in UPSTREAM:
-            (root / "openapi" / name).write_bytes(json.dumps(before).encode() if name == "verification.json" else EMPTY_DOCUMENT)
+            (root / "openapi" / name).write_bytes(json.dumps(before).encode() if name == document else EMPTY_DOCUMENT)
         (root / "openapi" / "overlay.json").write_text(json.dumps({"operations": {}}), "utf-8")
         (root / "openapi" / "SOURCE.json").write_text("{}", "utf-8")
-        fetched = {name: json.dumps(after).encode() if name == "verification.json" else EMPTY_DOCUMENT for name in UPSTREAM}
+        fetched = {name: json.dumps(after).encode() if name == document else EMPTY_DOCUMENT for name in UPSTREAM}
         report = sync(root, fetched, "2026-01-01", "2026-01-01T00:00:00Z").report
     return f"{report.type}(spec)", sorted({b.line for b in report.breaking})
 
@@ -750,34 +760,43 @@ def continue_pull_request(previous_title: str, previous_body: str, summary: str)
     block = f"BEGIN_COMMIT_OVERRIDE\n{first}\n\n{nested}\nEND_COMMIT_OVERRIDE" if nested else f"BEGIN_COMMIT_OVERRIDE\n{first}\nEND_COMMIT_OVERRIDE"
 
     what = RELEASES.get(kind, "")
-    note = "The breaking changes and release lines of this sync were added to the description."
-    if found is None or dropped or len(block) > MAX_OVERRIDE:
-        # The release lines go in the commit messages, which release-please reads without a block.
-        note = "The breaking changes of this sync were added to the description. " + TOO_LONG
-        if previous is not None:
-            body = previous_body[: previous.start()] + TOO_LONG + previous_body[previous.end():]
-        elif dropped:
-            body = previous_body
+
+    def describe(fits: bool) -> tuple[str, str]:
+        """The description, with the block when ``fits``, and the comment's note."""
+        note = "The breaking changes and release lines of this sync were added to the description."
+        if not fits:
+            # The release lines go in the commit messages, which release-please reads without a block.
+            note = "The breaking changes of this sync were added to the description. " + TOO_LONG
+            if previous is not None:
+                body = previous_body[: previous.start()] + TOO_LONG + previous_body[previous.end():]
+            elif dropped:
+                body = previous_body
+            else:
+                body = previous_body.rstrip("\n") + "\n\n## Release\n\n" + what + "\n\n" + TOO_LONG + "\n"
+            for text in (_BLOCK + "\n", _CONTINUED + "\n"):
+                body = body.replace(text, "")
+        elif previous is None:
+            note += (
+                " The description had no `BEGIN_COMMIT_OVERRIDE` block, so the earlier syncs on this branch count as `feat(spec)`;"
+                " change its first line to `chore(spec)` when they only changed documentation."
+            )
+            release = "\n".join(part for part in (what, _CONTINUED) if part)
+            body = previous_body.rstrip("\n") + "\n\n## Release\n\n" + release + "\n\n" + block + "\n"
         else:
-            body = previous_body.rstrip("\n") + "\n\n## Release\n\n" + what + "\n\n" + TOO_LONG + "\n"
-        for text in (_BLOCK + "\n", _CONTINUED + "\n"):
-            body = body.replace(text, "")
-    elif previous is None:
-        note += (
-            " The description had no `BEGIN_COMMIT_OVERRIDE` block, so the earlier syncs on this branch count as `feat(spec)`;"
-            " change its first line to `chore(spec)` when they only changed documentation."
-        )
-        release = "\n".join(part for part in (what, _CONTINUED) if part)
-        body = previous_body.rstrip("\n") + "\n\n## Release\n\n" + release + "\n\n" + block + "\n"
-    else:
-        body = previous_body[: previous.start()] + block + previous_body[previous.end():]
-    if what:
-        for text in RELEASES.values():
-            body = body.replace(text, what)
-    body = _breaking_so_far(body, summary, this["date"])
-    body = _later_sync(body, f"- {this['date']} (`{this['type']}(spec)`): its operation and schema changes are in the comment it added.")
+            body = previous_body[: previous.start()] + block + previous_body[previous.end():]
+        if what:
+            for text in RELEASES.values():
+                body = body.replace(text, what)
+        body = _breaking_so_far(body, summary, this["date"])
+        body = _later_sync(body, f"- {this['date']} (`{this['type']}(spec)`): its operation and schema changes are in the comment it added.")
+        return body, note
+
+    fits = found is not None and not dropped and len(block) <= MAX_OVERRIDE
+    body, note = describe(fits)
+    if fits and len(body) > MAX_DESCRIPTION:
+        body, note = describe(False)  # the whole description must fit, not only the block
     comment = summary.partition("\n")[2].lstrip("\n").split("\n## Release\n", 1)[0].rstrip("\n")
-    return title, body, f"{comment}\n\n{note}\n"
+    return title, _fit(body), f"{comment}\n\n{note}\n"
 
 
 def _bullets(found: re.Match[str] | None) -> list[str]:
@@ -785,6 +804,13 @@ def _bullets(found: re.Match[str] | None) -> list[str]:
 
 
 _INCOMPLETE = "The description had no such list before the sync of "
+_CUT = "The list is cut to fit the pull request description"
+CUT = f"{_CUT}; the messages of the sync commits, which Release Please reads, hold every breaking change."
+
+
+def _notes(section: re.Match[str]) -> list[str]:
+    """The lines of a "Breaking changes" section that say the list is incomplete."""
+    return [line for line in section.group(0).splitlines() if line.startswith((_INCOMPLETE, _CUT))]
 
 
 def _breaking_so_far(body: str, summary: str, date: str) -> str:
@@ -794,11 +820,27 @@ def _breaking_so_far(body: str, summary: str, date: str) -> str:
     if earlier is None:
         note = f"{_INCOMPLETE}{date}: changes of earlier syncs on this branch are missing."
     else:
-        note = next((line for line in earlier.group(0).splitlines() if line.startswith(_INCOMPLETE)), "")
+        note = "\n".join(_notes(earlier))
     section = "\n".join(_breaking_lines(texts, note)) + "\n\n"
     if earlier is None:
         return section + body
     return body[: earlier.start()] + section + body[earlier.end():]
+
+
+def _fit(body: str) -> str:
+    """``body`` within GitHub's limit: once the block is gone, only "Breaking changes"
+    grows, so its last entries make room for a line saying the list is cut."""
+    found = BREAKING_SECTION.search(body)
+    if len(body) <= MAX_DESCRIPTION or found is None:
+        return body
+    texts = _bullets(found)
+    note = "\n".join([line for line in _notes(found) if not line.startswith(_CUT)] + [CUT])
+    room = MAX_DESCRIPTION - (len(body) - len(found.group(0)))
+    size = len("\n".join(_breaking_lines(texts, note)) + "\n\n")
+    while len(texts) > 1 and size > room:
+        size -= len(texts.pop()) + 3  # "- ", the text and its newline
+    section = "\n".join(_breaking_lines(texts, note)) + "\n\n"
+    return body[: found.start()] + section + body[found.end():]
 
 
 def _later_sync(body: str, line: str) -> str:

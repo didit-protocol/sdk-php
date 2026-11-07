@@ -16,7 +16,8 @@ from pathlib import Path
 from helpers import REPO
 import sync_pull_request
 from didit_codegen.sync import (
-    API_CHANGE_TYPE, API_CHANGES_SECTION, RELEASES, TOO_LONG, Breaking, Report, Result, continue_pull_request, render, sync,
+    API_CHANGE_TYPE, API_CHANGES_SECTION, CUT, MAX_DESCRIPTION, RELEASES, TOO_LONG, Breaking, Report, Result, continue_pull_request,
+    render, sync,
 )
 
 FIXTURES = REPO / "codegen" / "tests" / "fixtures" / "spec-sync"
@@ -252,6 +253,34 @@ class NoCapTest(unittest.TestCase):
         self.assertNotIn("BEGIN_COMMIT_OVERRIDE", body2)
         self.assertEqual(body2.count(TOO_LONG), 1)
         self.assertIn("\n- `x.b()`: `b` can now be null\n", _breaking(body2))
+
+    def test_a_later_sync_that_makes_the_description_too_long_drops_the_block(self) -> None:
+        # Each block fits on its own; the description with both syncs' lines does not.
+        fields = _many(210)
+        previous = _summary("2026-11-05", breaking=fields[:180]).partition("\n")[2]
+        self.assertIn("BEGIN_COMMIT_OVERRIDE", previous)
+        title, body, comment = continue_pull_request("feat(spec): sync API spec 2026-11-05", previous, _summary("2026-11-06", breaking=fields[180:]))
+        self.assertEqual(title, "feat(spec): sync API spec 2026-11-06")
+        self.assertLessEqual(len(body), MAX_DESCRIPTION)
+        self.assertNotIn("BEGIN_COMMIT_OVERRIDE", body)
+        self.assertEqual(body.count(TOO_LONG), 1)
+        self.assertIn(TOO_LONG, comment)
+        self.assertEqual(len([line for line in _breaking(body).splitlines() if line.startswith("- ")]), 210)
+        self.assertNotIn(CUT, body)
+
+    def test_a_description_that_still_does_not_fit_cuts_the_list(self) -> None:
+        previous = _summary("2026-11-05", breaking=_many(600)).partition("\n")[2]
+        others = tuple(f"other_{n:04}_" + "y" * 40 for n in range(600))
+        title, body, _ = continue_pull_request("feat(spec): sync API spec 2026-11-05", previous, _summary("2026-11-06", breaking=others))
+        self.assertLessEqual(len(body), MAX_DESCRIPTION)
+        self.assertNotIn("BEGIN_COMMIT_OVERRIDE", body)
+        self.assertEqual((body.count(TOO_LONG), _breaking(body).count(CUT)), (1, 1))
+        self.assertIn("## Later syncs\n\n- 2026-11-06 (`feat(spec)`)", body)
+        # A later sync keeps saying so, once, and stays within the limit.
+        _, body2, _ = continue_pull_request(title, body, _summary("2026-11-07", breaking=("b",)))
+        self.assertLessEqual(len(body2), MAX_DESCRIPTION)
+        self.assertEqual((body2.count(TOO_LONG), _breaking(body2).count(CUT)), (1, 1))
+        self.assertIn("- 2026-11-07 (`feat(spec)`)", body2)
 
 
 class ContinuePullRequestTest(unittest.TestCase):
