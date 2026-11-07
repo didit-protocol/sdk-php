@@ -607,6 +607,25 @@ def sync(root: Path, fetched: dict[str, bytes], date: str, fetched_at: str) -> R
     return _Sync(root, fetched, date, fetched_at).run()
 
 
+def classify(before: dict[str, Any], after: dict[str, Any]) -> tuple[str, list[str]]:
+    """What the sync makes of ``verification.json`` changing from ``before`` to
+    ``after`` (complete documents whose operations carry their own ``x-didit-sdk``):
+    the commit type, ``feat(spec)`` or ``chore(spec)``, and the counted breaking
+    changes as openapi/breaking-vectors.json spells them, distinct and sorted."""
+    with tempfile.TemporaryDirectory() as tmp:
+        root = Path(tmp)
+        (root / "openapi").mkdir()
+        (root / "src").mkdir()
+        (root / "src" / "Version.php").write_text("<?php\n\nfinal class Version\n{\n    public const VERSION = '1.0.0';\n}\n", "utf-8")
+        for name in UPSTREAM:
+            (root / "openapi" / name).write_bytes(json.dumps(before).encode() if name == "verification.json" else EMPTY_DOCUMENT)
+        (root / "openapi" / "overlay.json").write_text(json.dumps({"operations": {}}), "utf-8")
+        (root / "openapi" / "SOURCE.json").write_text("{}", "utf-8")
+        fetched = {name: json.dumps(after).encode() if name == "verification.json" else EMPTY_DOCUMENT for name in UPSTREAM}
+        report = sync(root, fetched, "2026-01-01", "2026-01-01T00:00:00Z").report
+    return f"{report.type}(spec)", sorted({b.line for b in report.breaking})
+
+
 # Summary ----------------------------------------------------------------------------
 
 
@@ -645,18 +664,26 @@ def _breaking_lines(texts: list[str], note: str = "") -> list[str]:
     return lines + (["", note] if note else [])
 
 
+_BLOCK = (
+    "Release Please reads the block below instead of the commits, so the type survives a squash merge with the title; keep it when you edit this description.\n"
+    'Merge with "Squash and merge": after a merge commit the release notes repeat each line for the merge commit and for every commit of this pull request.'
+)
+# Every counted change reaches the release notes, with no cap (DESIGN 3.1): when
+# the lines do not fit a description, the commit messages carry them.
+TOO_LONG = (
+    f'The lines for "{API_CHANGES_SECTION}" do not fit a pull request description, so it has no override block and Release Please reads the squashed commit instead. '
+    'Merge with "Squash and merge" and keep the commit messages GitHub proposes: each sync commit holds every line of its sync, each as its own nested commit.'
+)
+
+
 def release_section(r: Report) -> str:
     """How the sync releases (docs/DESIGN.md section 13), ending with the block
-    release-please reads instead of the commits of the pull request."""
-    return "\n".join([
-        "## Release",
-        "",
-        RELEASES[r.type],
-        "Release Please reads the block below instead of the commits, so the type survives a squash merge with the title; keep it when you edit this description.",
-        'Merge with "Squash and merge": after a merge commit the release notes repeat each line for the merge commit and for every commit of this pull request.',
-        "",
-        r.override,
-    ]) + "\n"
+    release-please reads instead of the commits of the pull request, or, when the
+    block does not fit, with where release-please finds the lines instead."""
+    block = r.override
+    if len(block) > MAX_OVERRIDE:
+        return "\n".join(["## Release", "", RELEASES[r.type], TOO_LONG]) + "\n"
+    return "\n".join(["## Release", "", RELEASES[r.type], _BLOCK, "", block]) + "\n"
 
 
 OVERRIDE = re.compile(r"BEGIN_COMMIT_OVERRIDE\n(.*?)\nEND_COMMIT_OVERRIDE", re.S)
@@ -675,17 +702,9 @@ def _nested(lines: list[str]) -> str:
 
 
 def override_block(lines: list[str]) -> str:
-    """``lines[0]`` is the sync's own commit; the rest become nested commits."""
-    head, rest = lines[0], list(lines[1:])
-    shown: list[str] = []
-    size = 0
-    for line in rest:
-        if size + len(line) > MAX_OVERRIDE:
-            shown.append(f"{API_CHANGE_TYPE}(spec): {len(rest) - len(shown)} more, listed in the spec sync pull request")
-            break
-        shown.append(line)
-        size += len(line) + 40
-    body = f"{head}\n\n{_nested(shown)}" if shown else head
+    """``lines[0]`` is the sync's own commit; every other line becomes a nested commit."""
+    head, rest = lines[0], lines[1:]
+    body = f"{head}\n\n{_nested(rest)}" if rest else head
     return f"BEGIN_COMMIT_OVERRIDE\n{body}\nEND_COMMIT_OVERRIDE"
 
 
@@ -699,18 +718,18 @@ def continue_pull_request(previous_title: str, previous_body: str, summary: str)
     "Later syncs" points to."""
     previous_body = previous_body.replace("\r\n", "\n")
     found = OVERRIDE.search(summary)
-    if found is None:
-        raise ValueError("the summary has no BEGIN_COMMIT_OVERRIDE block")
-    head, _, rest = found.group(1).partition("\n")
+    # Without a block this sync's lines did not fit a description (TOO_LONG): its commit carries them.
+    head, _, rest = found.group(1).partition("\n") if found else (summary.partition("\n")[0], "", "")
     this = SYNC_HEADER.match(head)
     if this is None:
-        raise ValueError(f"unexpected first line of the override block: {head!r}")
+        raise ValueError(f"unexpected first line of the {'override block' if found else 'summary'}: {head!r}")
     lines = [m.group(1).strip() for m in NESTED.finditer(rest)]
 
     previous = OVERRIDE.search(previous_body)
+    dropped = TOO_LONG in previous_body  # an earlier sync on the branch did not fit either
     old_head, _, old_rest = previous.group(1).partition("\n") if previous else ("", "", "")
     earlier = SYNC_HEADER.match(old_head) or SYNC_HEADER.match(previous_title.strip())
-    if previous is None:
+    if previous is None and not dropped:
         earlier_type = "feat"  # nobody recorded what the earlier syncs changed: release at least a minor
     else:
         earlier_type = earlier["type"] if earlier else this["type"]
@@ -731,7 +750,18 @@ def continue_pull_request(previous_title: str, previous_body: str, summary: str)
 
     what = RELEASES.get(kind, "")
     note = "The breaking changes and release lines of this sync were added to the description."
-    if previous is None:
+    if found is None or dropped or len(block) > MAX_OVERRIDE:
+        # The release lines go in the commit messages, which release-please reads without a block.
+        note = "The breaking changes of this sync were added to the description. " + TOO_LONG
+        if previous is not None:
+            body = previous_body[: previous.start()] + TOO_LONG + previous_body[previous.end():]
+        elif dropped:
+            body = previous_body
+        else:
+            body = previous_body.rstrip("\n") + "\n\n## Release\n\n" + what + "\n\n" + TOO_LONG + "\n"
+        for text in (_BLOCK + "\n", _CONTINUED + "\n"):
+            body = body.replace(text, "")
+    elif previous is None:
         note += (
             " The description had no `BEGIN_COMMIT_OVERRIDE` block, so the earlier syncs on this branch count as `feat(spec)`;"
             " change its first line to `chore(spec)` when they only changed documentation."
