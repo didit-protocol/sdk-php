@@ -91,6 +91,8 @@ jobs:
     needs: verify
     runs-on: ubuntu-latest
     environment: packagist
+    outputs:
+      tag_name: ${{ steps.release.outputs.release_created == 'true' && steps.release.outputs.tag_name || '' }}
     permissions:
       contents: write
       pull-requests: write
@@ -140,3 +142,25 @@ jobs:
           curl -sSf -X POST -H 'Content-Type: application/json' \
             "https://packagist.org/api/update-package?username=${PACKAGIST_USERNAME}&apiToken=${PACKAGIST_TOKEN}" \
             -d '{"repository":{"url":"https://github.com/didit-protocol/sdk-php"}}'
+
+  # The release is done only when the registry serves it (docs/DESIGN.md section 13); this job
+  # fails loudly when it does not. It runs nothing from the release and holds no credentials.
+  registry:
+    name: Packagist serves the release
+    needs: publish
+    if: needs.publish.outputs.tag_name != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    env:
+      TAG: ${{ needs.publish.outputs.tag_name }}
+    steps:
+      - name: Check out the scripts
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false
+          sparse-checkout: .github/scripts
+      - name: Wait until Packagist serves the version
+        run: bash .github/scripts/wait-for-registry.sh packagist didit-protocol/sdk-php "$TAG" 30
