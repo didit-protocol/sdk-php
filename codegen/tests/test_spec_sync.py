@@ -420,6 +420,18 @@ class SpecSyncTest(unittest.TestCase):
         self.assertIn(f"- {line}", summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0])
         self.assertIn(f"api(spec): {line}", summary.split("BEGIN_COMMIT_OVERRIDE", 1)[1])
 
+    def test_authentication_operation_that_stops_being_a_server_operation(self) -> None:
+        def withdraw(doc: dict[str, Any]) -> None:
+            doc["paths"]["/step-up/{step_up_id}/"]["get"]["x-didit-sdk"].update(auth="device_token", server=False)
+        self.upstream_authentication(withdraw)
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        summary = self.summary.read_text("utf-8")
+        self.assertEqual(summary.splitlines()[0], f"feat(spec): sync API spec {DATE}")
+        line = "`authentication GET /step-up/{step_up_id}/`: `authentication.retrieve_step_up()` is no longer an SDK method upstream"
+        self.assertIn(f"- {line}", summary.split("## Breaking changes", 1)[1].split("\n## ", 1)[0])
+        self.assertIn(f"api(spec): {line}", summary.split("BEGIN_COMMIT_OVERRIDE", 1)[1])
+
     def test_a_change_to_one_grant_and_an_untyped_field_reach_the_release_notes(self) -> None:
         # The refresh grant is the second variant of the token request; `status` loses its type.
         def require_scope(doc: dict[str, Any]) -> None:

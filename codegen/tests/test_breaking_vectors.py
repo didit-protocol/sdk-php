@@ -27,6 +27,9 @@ RULES = {
     "Success statuses": "- Success statuses:",
     "Release notes": "- Every counted change reaches the release notes",
 }
+# The Authentication module is hand-written and has exactly the document's methods
+# (DESIGN 10 and 11): no deprecated alias keeps a renamed method's old name, so it goes.
+HAND_WRITTEN = {"renamed-method-is-listed": ["GET /things/{id}/: operation removed"]}
 
 
 class BreakingVectorsTest(unittest.TestCase):
@@ -57,6 +60,13 @@ class BreakingVectorsTest(unittest.TestCase):
             with self.subTest(case=case["name"]):
                 expect = case["expect"]
                 self.assertEqual(classify(case["before"], case["after"]), (expect["type"], expect["breaking"]))
+
+    def test_every_case_in_the_authentication_document(self) -> None:
+        for case in VECTORS["cases"]:
+            with self.subTest(case=case["name"]):
+                expect = case["expect"]
+                breaking = sorted(f"authentication {line}" for line in HAND_WRITTEN.get(case["name"], expect["breaking"]))
+                self.assertEqual(classify(case["before"], case["after"], "authentication.json"), (expect["type"], breaking))
 
 
 if __name__ == "__main__":
