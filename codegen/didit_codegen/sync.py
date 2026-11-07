@@ -797,6 +797,13 @@ def _bullets(found: re.Match[str] | None) -> list[str]:
 
 
 _INCOMPLETE = "The description had no such list before the sync of "
+_CUT = "The list is cut to fit the pull request description"
+CUT = f"{_CUT}; the messages of the sync commits, which Release Please reads, hold every breaking change."
+
+
+def _notes(section: re.Match[str]) -> list[str]:
+    """The lines of a "Breaking changes" section that say the list is incomplete."""
+    return [line for line in section.group(0).splitlines() if line.startswith((_INCOMPLETE, _CUT))]
 
 
 def _breaking_so_far(body: str, summary: str, date: str) -> str:
@@ -806,11 +813,27 @@ def _breaking_so_far(body: str, summary: str, date: str) -> str:
     if earlier is None:
         note = f"{_INCOMPLETE}{date}: changes of earlier syncs on this branch are missing."
     else:
-        note = next((line for line in earlier.group(0).splitlines() if line.startswith(_INCOMPLETE)), "")
+        note = "\n".join(_notes(earlier))
     section = "\n".join(_breaking_lines(texts, note)) + "\n\n"
     if earlier is None:
         return section + body
     return body[: earlier.start()] + section + body[earlier.end():]
+
+
+def _fit(body: str) -> str:
+    """``body`` within GitHub's limit: once the block is gone, only "Breaking changes"
+    grows, so its last entries make room for a line saying the list is cut."""
+    found = BREAKING_SECTION.search(body)
+    if len(body) <= MAX_DESCRIPTION or found is None:
+        return body
+    texts = _bullets(found)
+    note = "\n".join([line for line in _notes(found) if not line.startswith(_CUT)] + [CUT])
+    room = MAX_DESCRIPTION - (len(body) - len(found.group(0)))
+    size = len("\n".join(_breaking_lines(texts, note)) + "\n\n")
+    while len(texts) > 1 and size > room:
+        size -= len(texts.pop()) + 3  # "- ", the text and its newline
+    section = "\n".join(_breaking_lines(texts, note)) + "\n\n"
+    return body[: found.start()] + section + body[found.end():]
 
 
 def _later_sync(body: str, line: str) -> str:
