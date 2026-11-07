@@ -22,6 +22,12 @@ final class SessionDecisionPoaVerificationsDocumentMetadataOverlayManipulation e
     public readonly ?bool $analyzed;
 
     /**
+     * Present and true only when the file could not be checked in full. What was checked keeps its
+     * findings where it can, and the document raises the unproven text replacement warning.
+     */
+    public readonly ?bool $analysisIncomplete;
+
+    /**
      * Forensic signals that fired, such as duplicate_font_subset or glyph_fragmentation.
      *
      * @var list<string>|null
@@ -43,6 +49,7 @@ final class SessionDecisionPoaVerificationsDocumentMetadataOverlayManipulation e
         parent::__construct($data);
         $this->detected = Hydrate::bool($data['detected'] ?? null);
         $this->analyzed = Hydrate::bool($data['analyzed'] ?? null);
+        $this->analysisIncomplete = Hydrate::bool($data['analysis_incomplete'] ?? null);
         $this->signals = Hydrate::list($data['signals'] ?? null, Hydrate::string(...));
         $this->manipulatedRegions = Hydrate::list($data['manipulated_regions'] ?? null, static fn (mixed $v) => Hydrate::model($v, SessionDecisionPoaVerificationsDocumentMetadataOverlayManipulationManipulatedRegions::class));
     }
