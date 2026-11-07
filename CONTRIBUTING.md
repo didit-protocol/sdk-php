@@ -14,6 +14,7 @@ python3 --version         # 3.10 or newer, for the generator (standard library o
 | Path | What | Edited by hand |
 |---|---|---|
 | `openapi/verification.json`, `openapi/account.json`, `openapi/authentication.json`, `openapi/webhook-vectors.json` | Upstream copies | Never (spec sync only) |
+| `openapi/breaking-vectors.json` | The breaking-change rules of DESIGN.md section 3.1 as cases, generated in sdk-python; `codegen/tests/test_breaking_vectors.py` runs every case | Never: copy it byte for byte from sdk-python and update its SHA-256 in `openapi/SOURCE.json` |
 | `openapi/overlay.json` | SDK naming (`x-didit-sdk`) for operations that do not carry it upstream yet | Yes |
 | `openapi/deprecated-operations.json` | Operations removed upstream, renamed, or no longer server operations, kept as deprecated methods for one minor version | Spec sync only |
 | `codegen/` | The generator (Python) and its tests | Yes |
@@ -44,6 +45,7 @@ A new server operation without SDK naming fails the generator with a message tha
 The type follows DESIGN.md section 13: `feat(spec)` when callers can observe the change (a minor release), `chore(spec)` when only documentation changed (no release on its own), and never `!` or a `BREAKING CHANGE:` footer, because an API change is never a major version.
 The description opens with "Breaking changes", every change that can break typed code, and ends with a `BEGIN_COMMIT_OVERRIDE` block: Release Please reads it instead of the commits, so the type and one `api(spec)` line per breaking change (the release notes section "API changes that can break typed code") survive a squash merge with the title.
 Keep that block when you edit the description, and merge with "Squash and merge": after a merge commit the release notes repeat each line for the merge commit and for every commit of the pull request.
+The release notes get every breaking change, with no cap: when the lines do not fit a description, it says so and has no block, and Release Please reads the squashed commit, whose sync commit messages hold every line; keep the commit messages GitHub proposes when you squash.
 A later sync on top of your commits adds its breaking changes to "Breaking changes" and its lines to the block, keeps `feat(spec)` once any sync on the branch needs it, and lists its other changes in a comment.
 `openapi/authentication.json` describes the hand-written `src/Authentication` module, which is never generated: when a sync adds, removes or renames one of its operations, `tests/Contract/AuthenticationContractTest.php` fails until you update the module and that test in the same pull request.
 
