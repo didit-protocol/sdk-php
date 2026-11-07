@@ -1,0 +1,632 @@
+"""Compares two versions of an upstream document, operation by operation
+(docs/DESIGN.md section 3.1): added, removed and changed operations, changed
+component schemas, and the changes that can break typed code.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any
+
+from . import model, naming
+from .spec import HTTP_METHODS, Document
+
+SCHEMA_REF = "#/components/schemas/"
+
+# Keys that only document; a change limited to them is "documentation only".
+# Extension keys (`x-...`) document too: the generator reads none of them
+# inside an operation's parameters, request body or responses.
+DOC_KEYS = frozenset({"description", "summary", "title", "example", "examples", "externalDocs", "x-codeSamples"})
+# Keys whose value maps names (properties, media types, statuses) to objects.
+NAME_MAPS = frozenset({"properties", "content", "responses", "headers", "schemas", "parameters", "patternProperties"})
+
+
+def _doc_key(key: str) -> bool:
+    return key in DOC_KEYS or key.startswith("x-")
+
+
+@dataclass(frozen=True)
+class Break:
+    """A change that can break typed code (docs/DESIGN.md section 3.1).
+
+    ``where`` is ``response 200``, ``request body`` or ``query parameter `x```;
+    ``field`` is the path below it (``a.b[].c``, empty for the whole schema or
+    parameter); ``kind`` is ``now-null``, ``<old>-><new>`` (type changed: a
+    coarse type such as ``string->object`` or ``string->any``, or the component schemas the
+    generator names the type after, such as ``SessionDecision->SessionDecisionV2``),
+    ``removed``, ``enum-removed:<value>``, ``now-required``, ``new-required``,
+    ``content-type:<old>-><new>`` or ``content-type-removed:<type>``.
+    """
+
+    where: str
+    field: str
+    kind: str
+
+    def __str__(self) -> str:
+        at = _at(self.where, self.field)
+        kind = self.kind
+        if kind == "now-null":
+            return f"{at}: can now be null"
+        if kind == "removed":
+            return f"{at}: field removed" if self.field else f"{at}: removed"
+        if kind == "now-required":
+            return f"{at}: now required"
+        if kind == "new-required":
+            return f"{at}: new required field" if self.field else f"{at}: new required parameter"
+        if kind.startswith("enum-removed:"):
+            return f"{at}: enum value `{kind.split(':', 1)[1]}` removed"
+        if kind.startswith("content-type-removed:"):
+            return f"{at}: content type `{kind.split(':', 1)[1]}` removed"
+        if kind.startswith("content-type:"):
+            old, new = kind.split(":", 1)[1].split("->", 1)
+            return f"{at}: content type changed from {old} to {new}"
+        old, new = kind.split("->", 1)
+        return f"{at}: type changed from {old} to {new}"
+
+
+@dataclass
+class OpChange:
+    key: str
+    parts: list[str]  # "parameters", "request body", "response 200"
+    docs_only: bool
+    breaking: list[Break] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
+
+
+@dataclass
+class SchemaChanges:
+    added: list[str] = field(default_factory=list)
+    removed: list[str] = field(default_factory=list)
+    changed: list[tuple[str, bool]] = field(default_factory=list)  # (name, documentation only)
+
+
+def operations(doc: Document, prefix: str) -> dict[str, tuple[dict[str, Any], dict[str, Any]]]:
+    """``{"POST /v3/session/": (operation, path item)}``, keyed like ``spec.load``."""
+    out: dict[str, tuple[dict[str, Any], dict[str, Any]]] = {}
+    for path, item in doc.data.get("paths", {}).items():
+        item = doc.deref(item)
+        if not isinstance(item, dict):
+            continue
+        for method in HTTP_METHODS:
+            if isinstance(item.get(method), dict):
+                out[f"{prefix}{method.upper()} {path}"] = (item[method], item)
+    return out
+
+
+def merged_parameters(doc: Document, op: dict[str, Any], item: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Path-item and operation parameters by ``"<in> <name>"``; the operation wins."""
+    out: dict[str, dict[str, Any]] = {}
+    for raw in list(item.get("parameters", [])) + list(op.get("parameters", [])):
+        p = doc.deref(raw)
+        if isinstance(p, dict) and "in" in p and "name" in p:
+            out[f"{p['in']} {p['name']}"] = p
+    return out
+
+
+def _parts(doc: Document, op: dict[str, Any], item: dict[str, Any]) -> dict[str, Any]:
+    parts: dict[str, Any] = {"parameters": merged_parameters(doc, op, item), "request body": op.get("requestBody")}
+    for status, response in sorted(op.get("responses", {}).items()):
+        if str(status).startswith("2"):
+            parts[f"response {status}"] = response
+    return parts
+
+
+class Comparer:
+    """Deep equality of two spec fragments after resolving ``$ref`` values."""
+
+    def __init__(self, old: Document, new: Document, ignore_docs: bool = False) -> None:
+        self.old = old
+        self.new = new
+        self.ignore = DOC_KEYS if ignore_docs else frozenset()
+        self._memo: dict[tuple[Any, Any], bool] = {}
+        self._active: set[tuple[Any, Any]] = set()
+        self._named: dict[tuple[bool, str], bool] = {}
+
+    def type_name(self, doc: Document, ref: Any) -> str | None:
+        """The component ``ref`` points to when the generator names a public type
+        after it (an object or enum, also as array items or map values), else None."""
+        if not isinstance(ref, str) or not ref.startswith(SCHEMA_REF):
+            return None
+        key = (doc is self.new, ref)
+        if key not in self._named:
+            self._named[key] = names_type(doc, ref)
+        return ref[len(SCHEMA_REF):] if self._named[key] else None
+
+    def renamed(self, ref_a: Any, ref_b: Any) -> bool:
+        """Whether the generated type changes name: a field now uses a differently
+        named component, or an inline schema became a named component or the other
+        way round. Its content can be identical, but typed code names the type."""
+        if ref_a == ref_b:
+            return False
+        a, b = self.type_name(self.old, ref_a), self.type_name(self.new, ref_b)
+        if a is None or b is None:
+            return a != b
+        return naming.class_name(a) != naming.class_name(b)
+
+    def equal(self, a: Any, b: Any, names: bool = False) -> bool:
+        if isinstance(a, dict) and isinstance(b, dict):
+            if not names and ("$ref" in a or "$ref" in b):
+                return self._refs(a, b)
+            keys = set(a) | set(b)
+            if not names and self.ignore:
+                keys = {k for k in keys if not _doc_key(k)}
+            for k in keys:
+                if k not in a or k not in b:
+                    return False
+                if not self.equal(a[k], b[k], not names and k in NAME_MAPS):
+                    return False
+            return True
+        if isinstance(a, list) and isinstance(b, list):
+            return len(a) == len(b) and all(self.equal(x, y) for x, y in zip(a, b))
+        return type(a) is type(b) and a == b
+
+    def _refs(self, a: dict[str, Any], b: dict[str, Any]) -> bool:
+        key = (a.get("$ref"), b.get("$ref"))
+        if self.renamed(*key):
+            return False
+        pure = set(a) <= {"$ref"} and set(b) <= {"$ref"}
+        if pure and key in self._memo:
+            return self._memo[key]
+        if key in self._active:
+            return True  # a recursive schema: equal unless something else differs
+        self._active.add(key)
+        try:
+            result = self.equal(_expand(self.old, a), _expand(self.new, b))
+        finally:
+            self._active.discard(key)
+        if pure:
+            self._memo[key] = result
+        return result
+
+
+def _expand(doc: Document, node: dict[str, Any]) -> Any:
+    """The target of a ``$ref`` with the sibling keys applied on top."""
+    if "$ref" not in node:
+        return node
+    target = doc.deref(node)
+    siblings = {k: v for k, v in node.items() if k != "$ref"}
+    if isinstance(target, dict) and siblings:
+        return {**target, **siblings}
+    return target
+
+
+def names_type(doc: Document, ref: str) -> bool:
+    """Whether the generator emits a type named after the component ``ref``,
+    asked of the generator itself: a string alias or an array of another
+    component names nothing, so renaming it changes no code."""
+    origin = f"{doc.name}:{ref}"
+    reg = model.Registry()
+    reg.convert(doc, {"$ref": ref}, "", "response", origin)
+    own = (origin + ".", origin + "[]", origin + "{}")
+    return any(t.origin == origin or t.origin.startswith(own) for t in (*reg.models.values(), *reg.enums.values()))
+
+
+def strip_docs(node: Any, names: bool = False) -> Any:
+    """``node`` without documentation keys, for shallow comparisons."""
+    if isinstance(node, dict):
+        return {
+            k: strip_docs(v, not names and k in NAME_MAPS)
+            for k, v in node.items()
+            if names or not _doc_key(k)
+        }
+    if isinstance(node, list):
+        return [strip_docs(v) for v in node]
+    return node
+
+
+# Breaking-change details ----------------------------------------------------
+
+
+def _is_null(doc: Document, s: Any) -> bool:
+    """``{"type": "null"}``, the null variant of a ``oneOf``/``anyOf`` (OpenAPI 3.1)."""
+    s = doc.deref(s)
+    return isinstance(s, dict) and s.get("type") == "null"
+
+
+def _variants(doc: Document, s: dict[str, Any]) -> list[Any] | None:
+    """The ``oneOf``/``anyOf`` variants of ``s`` other than ``null``, or None."""
+    variants = s.get("oneOf") or s.get("anyOf")
+    if not isinstance(variants, list) or not variants:
+        return None
+    return [v for v in variants if not _is_null(doc, v)]
+
+
+def nullable(doc: Document, s: Any, _refs: frozenset[str] = frozenset()) -> bool:
+    """Whether ``s`` accepts null: ``nullable: true`` (OpenAPI 3.0), a ``null``
+    type or variant (3.1), here or through ``$ref`` and a one-part ``allOf``,
+    as the generator reads it."""
+    if not isinstance(s, dict):
+        return False
+    typ = s.get("type")
+    if s.get("nullable") is True or typ == "null" or (isinstance(typ, list) and "null" in typ):
+        return True
+    variants = s.get("oneOf") or s.get("anyOf")
+    if isinstance(variants, list) and any(_is_null(doc, v) or nullable(doc, v, _refs) for v in variants):
+        return True
+    all_of = s.get("allOf")
+    if isinstance(all_of, list) and len(all_of) == 1:
+        return nullable(doc, all_of[0], _refs)
+    ref = s.get("$ref")
+    if isinstance(ref, str) and ref not in _refs:
+        return nullable(doc, doc.resolve(ref), _refs | {ref})
+    return False
+
+
+def _kind(doc: Document, s: Any) -> str:
+    """A coarse type name; an empty string means any type."""
+    if not isinstance(s, dict):
+        return ""
+    variants = _variants(doc, s)
+    if variants:
+        kinds = sorted({_kind(doc, flatten(doc, v)) or "any" for v in variants})
+        return "|".join(kinds)
+    typ = s.get("type")
+    if isinstance(typ, list):
+        typ = next((t for t in typ if t != "null"), None)
+    if typ is None and isinstance(s.get("enum"), list):
+        # An enum without a type is typed by its values, as the generator reads it.
+        values = [v for v in s["enum"] if v is not None]
+        if values and all(isinstance(v, str) for v in values):
+            typ = "string"
+        elif values and all(isinstance(v, int) and not isinstance(v, bool) for v in values):
+            typ = "integer"
+    if typ == "string":
+        fmt = s.get("format")
+        return f"string({fmt})" if fmt in ("date-time", "binary") else "string"
+    if typ == "object" or s.get("properties"):
+        if not s.get("properties") and isinstance(s.get("additionalProperties"), dict) and s["additionalProperties"]:
+            return "map"
+        return "object"
+    if typ in ("integer", "number", "boolean", "array"):
+        return str(typ)
+    return ""
+
+
+def _objectish(s: Any) -> bool:
+    return isinstance(s, dict) and (bool(s.get("properties")) or s.get("type") == "object")
+
+
+def flatten(doc: Document, s: Any) -> Any:
+    """Resolves ``s`` and merges ``allOf`` parts, and ``oneOf``/``anyOf`` object variants."""
+    s = doc.deref(s)
+    if not isinstance(s, dict):
+        return s
+    all_of = s.get("allOf")
+    if isinstance(all_of, list) and all_of:
+        parts = [flatten(doc, p) for p in all_of]
+        merged = {k: v for k, v in s.items() if k != "allOf"}
+        if len(parts) == 1 and not _objectish(parts[0]):
+            return {**parts[0], **merged}
+        props: dict[str, Any] = {}
+        required: list[str] = []
+        for p in parts:
+            if isinstance(p, dict):
+                props.update(p.get("properties", {}))
+                required.extend(p.get("required", []))
+        merged.update({"type": "object", "properties": props, "required": required})
+        return merged
+    variants = _variants(doc, s)
+    if variants and len(variants) == 1:
+        rest = {k: v for k, v in s.items() if k not in ("oneOf", "anyOf")}
+        part = flatten(doc, variants[0])
+        return {**part, **rest} if isinstance(part, dict) else part
+    if variants:
+        flat = [flatten(doc, v) for v in variants]
+        if all(_objectish(v) for v in flat):
+            props = {}
+            for v in flat:
+                for name, prop in v.get("properties", {}).items():
+                    props.setdefault(name, prop)
+            required_sets = [set(v.get("required", [])) for v in flat]
+            required = sorted(set.intersection(*required_sets)) if required_sets else []
+            rest = {k: v for k, v in s.items() if k not in ("oneOf", "anyOf")}
+            return {**rest, "type": "object", "properties": props, "required": required}
+    return s
+
+
+def _object_variants(doc: Document, s: Any, _refs: frozenset[str] = frozenset()) -> list[Any] | None:
+    """The variants of the ``oneOf``/``anyOf`` of more than one object that ``s``
+    is, here or through ``$ref``, a one-part ``allOf`` or one variant and ``null``."""
+    if not isinstance(s, dict):
+        return None
+    ref = s.get("$ref")
+    if isinstance(ref, str):
+        return None if ref in _refs else _object_variants(doc, doc.resolve(ref), _refs | {ref})
+    all_of = s.get("allOf")
+    if isinstance(all_of, list) and len(all_of) == 1:
+        return _object_variants(doc, all_of[0], _refs)
+    variants = _variants(doc, s)
+    if not variants:
+        return None
+    if len(variants) == 1:
+        return _object_variants(doc, variants[0], _refs)
+    return variants if all(_objectish(flatten(doc, v)) for v in variants) else None
+
+
+def _pair_variants(old: list[Any], new: list[Any]) -> tuple[list[tuple[Any, Any]], bool]:
+    """Matches the variants of two object unions: the same component first, the
+    others in order. The flag says whether every variant has its pair; when the
+    number of variants changed only the same components are paired."""
+    refs = [v.get("$ref") if isinstance(v, dict) else None for v in new]
+    matched: dict[int, int] = {}
+    for i, v in enumerate(old):
+        ref = v.get("$ref") if isinstance(v, dict) else None
+        if ref is not None and ref in refs and refs.index(ref) not in matched.values():
+            matched[i] = refs.index(ref)
+    if len(old) != len(new):
+        return [(old[i], new[j]) for i, j in matched.items()], False
+    rest = iter(j for j in range(len(new)) if j not in matched.values())
+    return [(v, new[matched[i]] if i in matched else new[next(rest)]) for i, v in enumerate(old)], True
+
+
+def _at(label: str, path: str) -> str:
+    return f"{label} `{path}`" if path else label
+
+
+def _ref(doc: Document, s: Any) -> Any:
+    """The ``$ref`` the generator names the type of ``s`` after, also through a
+    one-part ``allOf`` or a ``oneOf``/``anyOf`` of one variant and ``null``."""
+    if not isinstance(s, dict):
+        return None
+    if "$ref" in s:
+        return s["$ref"]
+    all_of = s.get("allOf")
+    if isinstance(all_of, list) and len(all_of) == 1:
+        return _ref(doc, all_of[0])
+    variants = _variants(doc, s)
+    if variants is not None and len(variants) == 1:
+        return _ref(doc, variants[0])
+    return None
+
+
+class Details:
+    """Collects the changes that can break typed code and notable additions
+    between two operations (docs/DESIGN.md section 3.1)."""
+
+    def __init__(self, old: Document, new: Document, same: Comparer | None = None) -> None:
+        self.old = old
+        self.new = new
+        # Prunes unchanged subtrees; shared across operations for its memo.
+        self.same = same if same is not None else Comparer(old, new, ignore_docs=True)
+        self.breaking: list[Break] = []
+        self.notes: list[str] = []
+        self._active: set[tuple[Any, ...]] = set()
+
+    def schema(self, a: Any, b: Any, label: str, path: str, mode: str, named: bool = True) -> None:
+        """``mode`` is ``request`` or ``response``. A schema shared by several
+        fields is compared at each of them; only recursion stops the walk.
+        ``named`` is False for the variants of an object union: the generator
+        merges them into one type, so their component names name nothing."""
+        ra = a.get("$ref") if isinstance(a, dict) else None
+        rb = b.get("$ref") if isinstance(b, dict) else None
+        key = (ra, rb, mode)
+        if (ra or rb) and key in self._active:
+            return
+        if self.same.equal(a, b):
+            return
+        if ra or rb:
+            self._active.add(key)
+        try:
+            self._schema(a, b, label, path, mode, named)
+        finally:
+            if ra or rb:
+                self._active.discard(key)
+
+    def _schema(self, raw_a: Any, raw_b: Any, label: str, path: str, mode: str, named: bool) -> None:
+        a = flatten(self.old, raw_a)
+        b = flatten(self.new, raw_b)
+        ka, kb = _kind(self.old, a), _kind(self.new, b)
+        if ka != kb:
+            # No type at all is a type too: the generator reads it as any value.
+            self.breaking.append(Break(label, path, f"{ka or 'any'}->{kb or 'any'}"))
+            return
+        if named:
+            self._type_name(raw_a, raw_b, label, path)
+        if nullable(self.new, raw_b) and not nullable(self.old, raw_a):
+            self.breaking.append(Break(label, path, "now-null"))
+        va, vb = _object_variants(self.old, raw_a), _object_variants(self.new, raw_b)
+        if va is not None and vb is not None:
+            # Variant by variant: merged, a change to a field of one variant hides
+            # behind the same field of another and behind the shared required list.
+            pairs, every = _pair_variants(va, vb)
+            for x, y in pairs:
+                self.schema(x, y, label, path, mode, named=False)
+            if every:
+                return
+        if not isinstance(a, dict) or not isinstance(b, dict):
+            return
+        self._enum(a, b, label, path)
+        if a.get("properties") or b.get("properties"):
+            self._properties(a, b, label, path, mode)
+        if ka == "array":
+            self.schema(a.get("items", {}), b.get("items", {}), label, path + "[]", mode)
+        ap_a, ap_b = a.get("additionalProperties"), b.get("additionalProperties")
+        if isinstance(ap_a, dict) and isinstance(ap_b, dict):
+            self.schema(ap_a, ap_b, label, path + "{}", mode)
+
+    def _type_name(self, raw_a: Any, raw_b: Any, label: str, path: str) -> None:
+        ref_a, ref_b = _ref(self.old, raw_a), _ref(self.new, raw_b)
+        if not self.same.renamed(ref_a, ref_b):
+            return
+        a, b = self.same.type_name(self.old, ref_a), self.same.type_name(self.new, ref_b)
+        if a and b:
+            self.breaking.append(Break(label, path, f"{a}->{b}"))
+        elif b:
+            self.notes.append(f"{_at(label, path)}: now the type `{b}`")
+        elif a:
+            self.notes.append(f"{_at(label, path)}: no longer the type `{a}`")
+
+    def _enum(self, a: dict[str, Any], b: dict[str, Any], label: str, path: str) -> None:
+        va, vb = a.get("enum"), b.get("enum")
+        if not isinstance(va, list) or not isinstance(vb, list):
+            return
+        for v in va:
+            if v not in vb and v is not None:
+                self.breaking.append(Break(label, path, f"enum-removed:{v}"))
+        added = [f"`{v}`" for v in vb if v not in va and v is not None]
+        if added:
+            self.notes.append(f"{_at(label, path)}: enum value {', '.join(added)} added")
+
+    def _properties(self, a: dict[str, Any], b: dict[str, Any], label: str, path: str, mode: str) -> None:
+        pa, pb = a.get("properties", {}), b.get("properties", {})
+        req_a, req_b = set(a.get("required", [])), set(b.get("required", []))
+        hidden = "readOnly" if mode == "request" else "writeOnly"
+        for name, prop in pa.items():
+            child = f"{path}.{name}" if path else name
+            if self._flag(self.old, prop, hidden):
+                continue
+            if name not in pb or self._flag(self.new, pb[name], hidden):
+                self.breaking.append(Break(label, child, "removed"))
+                continue
+            if mode == "request" and name in req_b and name not in req_a:
+                self.breaking.append(Break(label, child, "now-required"))
+            self.schema(prop, pb[name], label, child, mode)
+        for name, prop in pb.items():
+            if name in pa or self._flag(self.new, prop, hidden):
+                continue
+            child = f"{path}.{name}" if path else name
+            if mode == "request" and name in req_b:
+                self.breaking.append(Break(label, child, "new-required"))
+            else:
+                self.notes.append(f"{_at(label, child)}: field added")
+
+    @staticmethod
+    def _flag(doc: Document, prop: Any, flag: str) -> bool:
+        if isinstance(prop, dict) and prop.get(flag):
+            return True
+        target = doc.deref(prop)
+        return isinstance(target, dict) and bool(target.get(flag))
+
+    def parameters(self, pa: dict[str, dict[str, Any]], pb: dict[str, dict[str, Any]]) -> None:
+        for key, p in pa.items():
+            label = f"{p['in']} parameter `{p['name']}`"
+            q = pb.get(key)
+            if q is None:
+                self.breaking.append(Break(label, "", "removed"))
+                continue
+            if q.get("required") and not p.get("required"):
+                self.breaking.append(Break(label, "", "now-required"))
+            self.schema(p.get("schema", {}), q.get("schema", {}), label, "", "request")
+        for key, q in pb.items():
+            if key in pa:
+                continue
+            label = f"{q['in']} parameter `{q['name']}`"
+            if q.get("required"):
+                self.breaking.append(Break(label, "", "new-required"))
+            else:
+                self.notes.append(f"{label}: added")
+
+    def request_body(self, ra: Any, rb: Any) -> None:
+        ra = self.old.deref(ra) if ra else None
+        rb = self.new.deref(rb) if rb else None
+        if ra is None and rb is None:
+            return
+        if rb is None:
+            self.breaking.append(Break("request body", "", "removed"))
+            return
+        cb = rb.get("content") or {}
+        if ra is None:
+            required = sorted({r for m in cb.values() for r in flatten(self.new, m.get("schema", {})).get("required", [])})
+            if rb.get("required") and required:
+                self.breaking.extend(Break("request body", r, "new-required") for r in required)
+            else:
+                self.notes.append("request body: added")
+            return
+        ca = ra.get("content") or {}
+        for ct in ca:
+            if ct not in cb:
+                self.breaking.append(Break("request body", "", f"content-type-removed:{ct}"))
+        for ct in cb:
+            if ct not in ca:
+                self.notes.append(f"request body: content type `{ct}` added")
+        for ct in ca:
+            if ct in cb:
+                self.schema(ca[ct].get("schema", {}), cb[ct].get("schema", {}), "request body", "", "request")
+
+    def responses(self, oa: dict[str, Any], ob: dict[str, Any]) -> None:
+        sa = {s: self.old.deref(r) for s, r in oa.get("responses", {}).items() if str(s).startswith("2")}
+        sb = {s: self.new.deref(r) for s, r in ob.get("responses", {}).items() if str(s).startswith("2")}
+        pairs = [(s, s) for s in sa if s in sb]
+        if not pairs and len(sa) == 1 and len(sb) == 1:
+            pairs = [(next(iter(sa)), next(iter(sb)))]
+            self.notes.append(f"success status changed from {pairs[0][0]} to {pairs[0][1]}")
+        else:
+            for s in sa:
+                if s not in sb:
+                    self.notes.append(f"response {s}: removed")
+            for s in sb:
+                if s not in sa:
+                    self.notes.append(f"response {s}: added")
+        for s1, s2 in pairs:
+            ca = sa[s1].get("content") or {} if isinstance(sa[s1], dict) else {}
+            cb = sb[s2].get("content") or {} if isinstance(sb[s2], dict) else {}
+            main_a = _main_type(ca)
+            main_b = _main_type(cb)
+            if main_a != main_b:
+                self.breaking.append(Break(f"response {s2}", "", f"content-type:{main_a or 'none'}->{main_b or 'none'}"))
+            elif main_a is not None:
+                self.schema(ca[main_a].get("schema", {}), cb[main_b].get("schema", {}), f"response {s2}", "", "response")
+
+
+def _main_type(content: dict[str, Any]) -> str | None:
+    if "application/json" in content:
+        return "application/json"
+    return next(iter(content), None)
+
+
+# Documents ----------------------------------------------------------------------
+
+
+def changed_operations(old: Document, new: Document, prefix: str) -> list[OpChange]:
+    """Operations present in both versions whose parameters, request body or 2xx responses differ."""
+    exact = Comparer(old, new)
+    structural = Comparer(old, new, ignore_docs=True)
+    old_ops, new_ops = operations(old, prefix), operations(new, prefix)
+    out: list[OpChange] = []
+    for key in sorted(set(old_ops) & set(new_ops)):
+        (oa, ia), (ob, ib) = old_ops[key], new_ops[key]
+        pa, pb = _parts(old, oa, ia), _parts(new, ob, ib)
+        names = list(dict.fromkeys(list(pa) + list(pb)))
+        differing = [n for n in names if not exact.equal(pa.get(n), pb.get(n), n == "parameters")]
+        if not differing:
+            continue
+        docs_only = all(structural.equal(pa.get(n), pb.get(n), n == "parameters") for n in differing)
+        change = OpChange(key, differing, docs_only)
+        if not docs_only:
+            d = Details(old, new, structural)
+            d.parameters(pa["parameters"], pb["parameters"])
+            d.request_body(oa.get("requestBody"), ob.get("requestBody"))
+            d.responses(oa, ob)
+            change.breaking = merge_statuses(d.breaking)
+            change.notes = list(dict.fromkeys(d.notes))
+        out.append(change)
+    return out
+
+
+def merge_statuses(breaks: list[Break]) -> list[Break]:
+    """One entry per field and kind: the same change in several success
+    responses (``response 200`` and ``response 202``) reads ``response 200, 202``."""
+    merged: dict[tuple[str, str, bool], list[str]] = {}
+    for b in breaks:
+        statuses = merged.setdefault((b.field, b.kind, b.where.startswith("response ")), [])
+        if b.where not in statuses:
+            statuses.append(b.where)
+    out = []
+    for (path, kind, response), wheres in merged.items():
+        if response:
+            out.append(Break("response " + ", ".join(w.removeprefix("response ") for w in wheres), path, kind))
+        else:
+            out.extend(Break(w, path, kind) for w in wheres)
+    return out
+
+
+def schema_changes(old: Document, new: Document) -> SchemaChanges:
+    a = old.data.get("components", {}).get("schemas", {})
+    b = new.data.get("components", {}).get("schemas", {})
+    out = SchemaChanges()
+    out.added = sorted(n for n in b if n not in a)
+    out.removed = sorted(n for n in a if n not in b)
+    for name in sorted(set(a) & set(b)):
+        if a[name] != b[name]:
+            out.changed.append((name, strip_docs(a[name]) == strip_docs(b[name])))
+    return out
