@@ -43,6 +43,7 @@ DEPRECATED_DESCRIPTION = (
 NAMING_KEYS = ("resource", "method", "auth", "server", "scope")
 MAX_ITEMS = 100
 # GitHub holds 65536 characters in a pull request description.
+MAX_DESCRIPTION = 65536
 MAX_SUMMARY = 60000
 # The override block leaves at least this much of the description to the summary;
 # a longer one stays out of the description, and the sync commit carries every line.
@@ -557,8 +558,10 @@ class _Sync:
                 continue
             self.report.observable = True
             self.report.naming.append(f"`{key}`: `x-didit-sdk` changed from `{_compact(old)}` to `{_compact(new)}`, {follow}")
+            # The module has exactly the document's methods (DESIGN 11) and keeps no
+            # deprecated alias, so a method that is no longer in it goes: counted (DESIGN 3.1).
             for name in sorted(_methods(old) - _methods(new)):
-                self.report.naming.append(f"`{key}`: `{name}()` is no longer an SDK method upstream, {follow}")
+                self.report.breaking.append(_operation_removed(key, f"`{key}`: `{name}()` is no longer an SDK method upstream"))
 
     # output ----------------------------------------------------------------
 
@@ -750,34 +753,43 @@ def continue_pull_request(previous_title: str, previous_body: str, summary: str)
     block = f"BEGIN_COMMIT_OVERRIDE\n{first}\n\n{nested}\nEND_COMMIT_OVERRIDE" if nested else f"BEGIN_COMMIT_OVERRIDE\n{first}\nEND_COMMIT_OVERRIDE"
 
     what = RELEASES.get(kind, "")
-    note = "The breaking changes and release lines of this sync were added to the description."
-    if found is None or dropped or len(block) > MAX_OVERRIDE:
-        # The release lines go in the commit messages, which release-please reads without a block.
-        note = "The breaking changes of this sync were added to the description. " + TOO_LONG
-        if previous is not None:
-            body = previous_body[: previous.start()] + TOO_LONG + previous_body[previous.end():]
-        elif dropped:
-            body = previous_body
+
+    def describe(fits: bool) -> tuple[str, str]:
+        """The description, with the block when ``fits``, and the comment's note."""
+        note = "The breaking changes and release lines of this sync were added to the description."
+        if not fits:
+            # The release lines go in the commit messages, which release-please reads without a block.
+            note = "The breaking changes of this sync were added to the description. " + TOO_LONG
+            if previous is not None:
+                body = previous_body[: previous.start()] + TOO_LONG + previous_body[previous.end():]
+            elif dropped:
+                body = previous_body
+            else:
+                body = previous_body.rstrip("\n") + "\n\n## Release\n\n" + what + "\n\n" + TOO_LONG + "\n"
+            for text in (_BLOCK + "\n", _CONTINUED + "\n"):
+                body = body.replace(text, "")
+        elif previous is None:
+            note += (
+                " The description had no `BEGIN_COMMIT_OVERRIDE` block, so the earlier syncs on this branch count as `feat(spec)`;"
+                " change its first line to `chore(spec)` when they only changed documentation."
+            )
+            release = "\n".join(part for part in (what, _CONTINUED) if part)
+            body = previous_body.rstrip("\n") + "\n\n## Release\n\n" + release + "\n\n" + block + "\n"
         else:
-            body = previous_body.rstrip("\n") + "\n\n## Release\n\n" + what + "\n\n" + TOO_LONG + "\n"
-        for text in (_BLOCK + "\n", _CONTINUED + "\n"):
-            body = body.replace(text, "")
-    elif previous is None:
-        note += (
-            " The description had no `BEGIN_COMMIT_OVERRIDE` block, so the earlier syncs on this branch count as `feat(spec)`;"
-            " change its first line to `chore(spec)` when they only changed documentation."
-        )
-        release = "\n".join(part for part in (what, _CONTINUED) if part)
-        body = previous_body.rstrip("\n") + "\n\n## Release\n\n" + release + "\n\n" + block + "\n"
-    else:
-        body = previous_body[: previous.start()] + block + previous_body[previous.end():]
-    if what:
-        for text in RELEASES.values():
-            body = body.replace(text, what)
-    body = _breaking_so_far(body, summary, this["date"])
-    body = _later_sync(body, f"- {this['date']} (`{this['type']}(spec)`): its operation and schema changes are in the comment it added.")
+            body = previous_body[: previous.start()] + block + previous_body[previous.end():]
+        if what:
+            for text in RELEASES.values():
+                body = body.replace(text, what)
+        body = _breaking_so_far(body, summary, this["date"])
+        body = _later_sync(body, f"- {this['date']} (`{this['type']}(spec)`): its operation and schema changes are in the comment it added.")
+        return body, note
+
+    fits = found is not None and not dropped and len(block) <= MAX_OVERRIDE
+    body, note = describe(fits)
+    if fits and len(body) > MAX_DESCRIPTION:
+        body, note = describe(False)  # the whole description must fit, not only the block
     comment = summary.partition("\n")[2].lstrip("\n").split("\n## Release\n", 1)[0].rstrip("\n")
-    return title, body, f"{comment}\n\n{note}\n"
+    return title, _fit(body), f"{comment}\n\n{note}\n"
 
 
 def _bullets(found: re.Match[str] | None) -> list[str]:
