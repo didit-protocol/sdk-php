@@ -515,7 +515,7 @@ class Details:
         elif nullable(old, a) and not nullable(new, b):
             self._note(where, path, "no longer accepts null" if request else "can no longer be null")
         if named:
-            self._type_name(raw_a, raw_b, where, path)
+            self._renamed_type(raw_a, raw_b, where, path)
         a, b = _single(old, a), _single(new, b)
         ka, kb = _kinds(old, a), _kinds(new, b)
         ta, tb = _type_name(a, ka), _type_name(b, kb)
@@ -525,9 +525,9 @@ class Details:
             # The variants still pair, also when an untyped variant made the union `any`;
             # the type change already says that some went away.
             if (ka or _variants(old, a)) and (kb or _variants(new, b)):
-                self._variants(a, b, where, path, request, retyped=True)
+                self._union(a, b, where, path, request, retyped=True)
             return
-        self._enum(a, b, where, path)
+        self._enum_values(a, b, where, path)
         pa, req_a = _fields(a)
         pb, req_b = _fields(b)
         # A union's fields are those of its variants, compared below.
@@ -537,9 +537,9 @@ class Details:
             sa, sb = a.get(key), b.get(key)
             if isinstance(sa, dict) or isinstance(sb, dict):
                 self.schema(_dict(sa), _dict(sb), where, path + suffix, request)
-        self._variants(a, b, where, path, request, retyped=False)
+        self._union(a, b, where, path, request, retyped=False)
 
-    def _type_name(self, raw_a: Any, raw_b: Any, where: str, path: str) -> None:
+    def _renamed_type(self, raw_a: Any, raw_b: Any, where: str, path: str) -> None:
         """A field that now uses a differently named component renames its generated
         type: listed, not counted (DESIGN 3.1 does not list it)."""
         ref_a, ref_b = _ref(self.old, raw_a), _ref(self.new, raw_b)
@@ -553,7 +553,7 @@ class Details:
         elif a:
             self._note(where, path, f"no longer the type `{a}`")
 
-    def _enum(self, a: dict[str, Any], b: dict[str, Any], where: str, path: str) -> None:
+    def _enum_values(self, a: dict[str, Any], b: dict[str, Any], where: str, path: str) -> None:
         va, vb = _enum(a), _enum(b)
         if va is not None and vb is not None:
             for v in va:
@@ -593,7 +593,7 @@ class Details:
                     self._count(where, child, "no longer required")
             self.schema(pa[name], pb[name], where, child, request)
 
-    def _variants(self, a: dict[str, Any], b: dict[str, Any], where: str, path: str, request: bool, retyped: bool) -> None:
+    def _union(self, a: dict[str, Any], b: dict[str, Any], where: str, path: str, request: bool, retyped: bool) -> None:
         """Compares two unions variant by variant; a plain schema is a union of one,
         so that ``[X, null]`` against X loses no variant and X against ``[X', Y]``
         compares X with X'. A variant added or removed never hides a change inside
@@ -683,9 +683,9 @@ class Details:
             self._count("request body", "", "body now required")
         elif was and not now:
             self._note("request body", "", "no longer required")
-        self._content(_content(self.old, ra), _content(self.new, rb), "request body", True)
+        self._bodies(_content(self.old, ra), _content(self.new, rb), "request body", True)
 
-    def _content(self, old: dict[str, Any], new: dict[str, Any], where: str, request: bool) -> None:
+    def _bodies(self, old: dict[str, Any], new: dict[str, Any], where: str, request: bool) -> None:
         """A body per media type; when none is shared, the first against the first,
         so that a body that changes media type, appears or disappears is compared too."""
         if old and new and set(old) != set(new):
@@ -712,7 +712,7 @@ class Details:
             compared = {s for s, _ in pairs}
             self._statuses(sa, sb, [s for s in sa if s not in compared], [s for s in sb if s not in compared])
         for s1, s2 in pairs:
-            self._content(sa[s1], sb[s2], "response", False)
+            self._bodies(sa[s1], sb[s2], "response", False)
 
     def _statuses(self, old: dict[str, dict[str, Any]], new: dict[str, dict[str, Any]], removed: list[str], added: list[str]) -> None:
         """The statuses only one version has, or whose body appeared or disappeared:

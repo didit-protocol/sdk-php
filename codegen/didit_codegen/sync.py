@@ -515,13 +515,14 @@ class _Sync:
                     before, naming = (ident(ops[key][0].get("x-didit-sdk")) for ops in (old_upstream, new_upstream))
                 # Only a method that calls the operation before and after counts its changes;
                 # those of an operation with `server: false` are listed (DESIGN 3.1).
-                counted = change.breaking if before and naming else []
+                counted = bool(before and naming)
                 label = f"`{key}`" + (f" (`{naming}`)" if naming else "")
                 line = f"{label}: {', '.join(change.parts)}" + (" (documentation only)" if change.docs_only else "")
-                details = [f"breaking: {b}" for b in counted] + [f"listed: {b}" for b in change.breaking if not counted] + change.notes
+                details = [f"{'breaking' if counted else 'listed'}: {b}" for b in change.breaking] + change.notes
                 self.report.changed.append(line + "".join(f"\n  - {d}" for d in details[:20]))
                 self.report.observable = self.report.observable or not change.docs_only
-                self.report.breaking.extend(Breaking(key, b.line(key), f"`{naming}()` (`{key}`): {b}") for b in counted)
+                if counted:
+                    self.report.breaking.extend(Breaking(key, b.line(key), f"`{naming}()` (`{key}`): {b}") for b in change.breaking)
             prefix = "" if n == "verification.json" else f"{UPSTREAM[n][2]}: "
             sc = diff.schema_changes(old, new)
             for name in sc.added:
