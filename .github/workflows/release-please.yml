@@ -1,0 +1,30 @@
+name: Release Please
+
+# Opens and updates the release pull request from conventional commits.
+# It never creates a tag or a GitHub release (skip-github-release): Packagist
+# publishes every tag it sees, so the vX.Y.Z tag is created only by
+# publish.yml, after the tests pass. Merging the release pull request leaves it labelled
+# "autorelease: pending" until then, and no new release pull request opens in
+# the meantime. It runs while the repository variable RELEASES_ENABLED is
+# "true" (set since the 1.0.0 release on 2026-10-29).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  release-please:
+    if: vars.RELEASES_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+          skip-github-release: true
