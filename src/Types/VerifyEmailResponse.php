@@ -36,6 +36,24 @@ final class VerifyEmailResponse extends BaseModel
     public readonly ?ApplicationCredentialsSummary $application;
 
     /**
+     * Present and `true` when the account already has an authenticator app or a passkey. The response then
+     * carries `temp_token` instead of tokens and application keys.
+     */
+    public readonly ?bool $field2faRequired;
+
+    /**
+     * Short-lived token for the second-factor step, sent only with `2fa_required`. It is not an access
+     * token.
+     */
+    public readonly ?string $tempToken;
+
+    /** With `2fa_required`: whether the account has an authenticator app. */
+    public readonly ?bool $hasAuthenticator;
+
+    /** With `2fa_required`: whether the account has a passkey. */
+    public readonly ?bool $hasPasskeys;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -46,5 +64,9 @@ final class VerifyEmailResponse extends BaseModel
         $this->expiresIn = Hydrate::int($data['expires_in'] ?? null);
         $this->organization = Hydrate::model($data['organization'] ?? null, OrganizationSummary::class);
         $this->application = Hydrate::model($data['application'] ?? null, ApplicationCredentialsSummary::class);
+        $this->field2faRequired = Hydrate::bool($data['2fa_required'] ?? null);
+        $this->tempToken = Hydrate::string($data['temp_token'] ?? null);
+        $this->hasAuthenticator = Hydrate::bool($data['has_authenticator'] ?? null);
+        $this->hasPasskeys = Hydrate::bool($data['has_passkeys'] ?? null);
     }
 }
