@@ -39,6 +39,13 @@ final class BillingRetrieveBalanceResponse extends BaseModel
     public readonly ?string $autoRefillThreshold;
 
     /**
+     * Whether agents can top up this organization with its saved card. Off by default; a person signed in
+     * to the console turns on "Connected AI agents can top up with your saved card" in Billing > Payment
+     * methods.
+     */
+    public readonly ?AgentTopUpSettings $agentTopUp;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -48,5 +55,6 @@ final class BillingRetrieveBalanceResponse extends BaseModel
         $this->autoRefillEnabled = Hydrate::bool($data['auto_refill_enabled'] ?? null);
         $this->autoRefillAmount = Hydrate::string($data['auto_refill_amount'] ?? null);
         $this->autoRefillThreshold = Hydrate::string($data['auto_refill_threshold'] ?? null);
+        $this->agentTopUp = Hydrate::model($data['agent_top_up'] ?? null, AgentTopUpSettings::class);
     }
 }

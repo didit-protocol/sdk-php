@@ -43,10 +43,9 @@ final class Billing extends BaseResource
     /**
      * Top up credits.
      *
-     * Add credits via a hosted Stripe Checkout session (**\$50 to \$20,000** per top-up). Top-ups are
-     * available on the Free, Growth and Scale plans, added at face value with no discount or bonus, and
-     * last 12 months; Enterprise annual contracts cannot top up. Redirect the customer to the returned
-     * `checkout_session_url`.
+     * Add credits to the organization's balance (**\$50 to \$20,000** per top-up). Top-ups are available
+     * on the Free, Growth and Scale plans, added at face value with no discount or bonus, and last 12
+     * months; Enterprise annual contracts cannot top up.
      *
      * `POST /v3/billing/top-up/`
      *
@@ -55,14 +54,20 @@ final class Billing extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function topUp(array $params, ?RequestOptions $options = null): Types\BillingTopUpResponse
-    {
+    public function topUp(
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\BillingTopUpResponse200|Types\BillingTopUpCharge {
         $response = $this->requester->request(new Operation(
             method: 'POST',
             path: '/v3/billing/top-up/',
+            headers: ['idempotency_key' => 'Idempotency-Key'],
             bodyTypes: ['json'],
         ), [], $params, $options);
 
-        return Types\BillingTopUpResponse::fromResponse($response);
+        return match ($response->status) {
+            201 => Types\BillingTopUpCharge::fromResponse($response),
+            default => Types\BillingTopUpResponse200::fromResponse($response),
+        };
     }
 }

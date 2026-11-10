@@ -53,7 +53,10 @@ final class RegulatoryReports extends BaseResource
      *
      * Create a draft FIU report for the case: DRAFT status, auto-populated from the optional template plus
      * the case's subject, linked transactions, and narrative. Validate then finalize to produce the goAML
-     * XML and PDF.
+     * XML and PDF. FFR (Confirmed Name Match Report, formerly the Funds Freeze Report) and PNMR (Partial
+     * Name Match Report) are activity reports: they report the case's subject, not transactions, so a
+     * draft links no transactions by default and the narrative, reason and action are written from the
+     * sanctions matches on the case's AML screenings.
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/regulatory-reports/`
      *
