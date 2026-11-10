@@ -33,9 +33,10 @@ final class ApplicationCredentialsSummary extends BaseModel
 
     /**
      * Where the application's verification data is stored and processed, chosen when the application is
-     * created. `eu` is the European Union (Ireland), the default. `au` (Australia, Sydney) and `mx`
-     * (Mexico) are coming soon: a request that names them answers 400 `This data location is not available
-     * yet.` An organization's Sandbox application is always in the European Union.
+     * created. `eu` is the European Union (Ireland), the default. `au` (Australia, Sydney), `mx` (Mexico)
+     * and `ae` (United Arab Emirates) are coming soon: a request that names them answers 400 `This data
+     * location is not available yet.` An organization's Sandbox application is always in the European
+     * Union.
      *
      * Known values: {@see ApplicationDataLocation}.
      */
