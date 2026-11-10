@@ -21,10 +21,13 @@ final class SessionDecisionPhoneVerificationsLifecycle extends BaseModel
     public readonly ?\DateTimeImmutable $timestamp;
 
     /**
-     * Event-specific payload. Send events carry `status`, `reason`, `channel`, `actual_channel`; delivery
-     * events carry `channel`, `status`; code-check events carry `code_tried`, `status`; final status
-     * events carry `reason`, or `null` when there is no reason to report (e.g.
-     * `PHONE_VERIFICATION_APPROVED`).
+     * Event-specific payload. Send events carry `status`, `reason`, `channel`, `actual_channel`, `attempt`
+     * (the send's 0-based index, matching the order of the send events) and `delivery_status`
+     * (`delivered`, `undeliverable`, or `unknown` once no report can still arrive; absent while one can);
+     * delivery events carry `channel`, `status`, `attempt` and, on `PHONE_DELIVERY_UNDELIVERABLE`,
+     * `reason` (`expired`, `rejected`, `unreachable`, `blocked` or `unknown` for a message;
+     * `unreachable_number`, `no_answer`, `busy` or `undeliverable` for a call, always a fixed word, never
+     * a provider status or error code...
      */
     public readonly ?SessionDecisionPhoneVerificationsLifecycleDetails $details;
 
