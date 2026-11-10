@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Didit\Tests\Generated;
 
 use Didit\Tests\Support\GeneratedTestCase;
+use Didit\Types;
 
 /**
  * Generated tests for the `billing` resource.
@@ -17,7 +18,7 @@ final class BillingTest extends GeneratedTestCase
 {
     public function testRetrieveBalance(): void
     {
-        $this->queueJson(200, '{"balance":"1234.5600","auto_refill_enabled":true,"auto_refill_amount":"500.00","auto_refill_threshold":"100.00"}');
+        $this->queueJson(200, '{"balance":"1234.5600","auto_refill_enabled":true,"auto_refill_amount":"500.00","auto_refill_threshold":"100.00","agent_top_up":{"enabled":true}}');
 
         $result = $this->client->billing->retrieveBalance();
 
@@ -29,7 +30,7 @@ final class BillingTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"balance":"1234.5600","auto_refill_enabled":true,"auto_refill_amount":"500.00","auto_refill_threshold":"100.00"}'), $result->toArray());
+        self::assertSame($this->decoded('{"balance":"1234.5600","auto_refill_enabled":true,"auto_refill_amount":"500.00","auto_refill_threshold":"100.00","agent_top_up":{"enabled":true}}'), $result->toArray());
         self::assertSame('1234.5600', $result->balance);
     }
 
@@ -41,6 +42,8 @@ final class BillingTest extends GeneratedTestCase
             'amount_in_dollars' => 1.5,
             'success_url' => 'https://example.com/callback',
             'cancel_url' => 'https://example.com/callback',
+            'payment_method' => 'checkout',
+            'idempotency_key' => 'idempotency_key-value',
         ]);
 
         $request = $this->lastRequest();
@@ -49,8 +52,10 @@ final class BillingTest extends GeneratedTestCase
         self::assertSame('/v3/billing/top-up/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"amount_in_dollars":1.5,"success_url":"https://example.com/callback","cancel_url":"https://example.com/callback"}', $this->canonicalBody($request));
+        self::assertSame('{"amount_in_dollars":1.5,"success_url":"https://example.com/callback","cancel_url":"https://example.com/callback","payment_method":"checkout"}', $this->canonicalBody($request));
+        self::assertInstanceOf(Types\BillingTopUpResponse200::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"checkout_session_id":"cs_test_a1B2c3D4e5F6g7H8i9J0","checkout_session_url":"https://checkout.example.com/c/pay/cs_test_a1B2c3D4e5F6g7H8i9J0"}'), $result->toArray());
         self::assertSame('cs_test_a1B2c3D4e5F6g7H8i9J0', $result->checkoutSessionId);

@@ -29,6 +29,10 @@ final class CasesRegulatoryReportsCreateParamsReportType
 
     public const TFR = 'TFR';
 
+    public const FFR = 'FFR';
+
+    public const PNMR = 'PNMR';
+
     private function __construct()
     {
     }

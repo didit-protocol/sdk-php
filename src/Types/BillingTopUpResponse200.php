@@ -10,9 +10,9 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * BillingTopUpResponse.
+ * BillingTopUpResponse200.
  */
-final class BillingTopUpResponse extends BaseModel
+final class BillingTopUpResponse200 extends BaseModel
 {
     /**
      * Hosted checkout session identifier (e.g. `cs_test_a1B2c3...`). Useful for server-side

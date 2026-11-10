@@ -123,6 +123,7 @@ namespace Didit;
  *     amount_in_dollars: float|int,
  *     success_url?: string,
  *     cancel_url?: string,
+ *     payment_method?: string,
  * }
  * @phpstan-type BiometricTemplatesBatchDeleteParams array{
  *     template_uuids?: list<string>,

@@ -29,7 +29,10 @@ final class RegulatoryReportDetail extends BaseModel
     /** The `report_type_display` field. */
     public readonly ?string $reportTypeDisplay;
 
-    /** goAML report code derived from report_type, e.g. STR, CTR, BCR. */
+    /**
+     * goAML report code derived from report_type and jurisdiction, e.g. STR, CTR, BCR, FFR, PNMR. For
+     * jurisdiction AE, the UAE FIU's codes: STR, SAR, CNMRA for FFR and PNMRA for PNMR.
+     */
     public readonly ?string $reportCode;
 
     /** The `report_number` field. */
