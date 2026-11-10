@@ -21,9 +21,11 @@ final class PhoneVerificationCheckResponsePhoneLifecycle extends BaseModel
     public readonly ?\DateTimeImmutable $timestamp;
 
     /**
-     * Event-specific payload. Send events: `{status, reason, channel, actual_channel}` (`actual_channel`
-     * is filled once delivery is confirmed). Delivery events: `{channel, status}`. Code-entry events:
-     * `{code_tried, status}`. Final-status events: `null`, or `{reason}` when declined or in review.
+     * Event-specific payload. Send events: `{status, reason, channel, actual_channel, attempt,
+     * delivery_status}`, `actual_channel` is filled once delivery is confirmed, `attempt` is the 0-based
+     * index of the send (the order of the send events), and `delivery_status` is `delivered`,
+     * `undeliverable` or `unknown` (no report arrived before the verification ended); it is absent while a
+     * report can still arrive.
      *
      * @var array<string, mixed>|null
      */

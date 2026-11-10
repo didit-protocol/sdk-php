@@ -10,17 +10,26 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Event-specific payload. Send events carry `status`, `reason`, `channel`, `actual_channel`; delivery
- * events carry `channel`, `status`; code-check events carry `code_tried`, `status`; final status
- * events carry `reason`, or `null` when there is no reason to report (e.g.
- * `PHONE_VERIFICATION_APPROVED`).
+ * Event-specific payload. Send events carry `status`, `reason`, `channel`, `actual_channel`, `attempt`
+ * (the send's 0-based index, matching the order of the send events) and `delivery_status`
+ * (`delivered`, `undeliverable`, or `unknown` once no report can still arrive; absent while one can);
+ * delivery events carry `channel`, `status`, `attempt` and, on `PHONE_DELIVERY_UNDELIVERABLE`,
+ * `reason` (`expired`, `rejected`, `unreachable`, `blocked` or `unknown` for a message;
+ * `unreachable_number`, `no_answer`, `busy` or `undeliverable` for a call, always a fixed word, never
+ * a provider status or error code...
  */
 final class SessionDecisionPhoneVerificationsLifecycleDetails extends BaseModel
 {
     /** The `status` field. */
     public readonly ?string $status;
 
-    /** The `reason` field. */
+    /**
+     * Send events: why the send was blocked (`invalid_phone_number`, `repeated_attempts`, `suspicious`,
+     * `spam`, `unknown`), `null` otherwise. Delivery events on `PHONE_DELIVERY_UNDELIVERABLE`: `expired`,
+     * `rejected`, `unreachable`, `blocked` or `unknown` for a message, and `unreachable_number`,
+     * `no_answer`, `busy` or `undeliverable` for a call, a fixed customer-safe word, never the provider's
+     * status or error code.
+     */
     public readonly ?string $reason;
 
     /** The `channel` field. */
@@ -28,6 +37,20 @@ final class SessionDecisionPhoneVerificationsLifecycleDetails extends BaseModel
 
     /** The `actual_channel` field. */
     public readonly ?string $actualChannel;
+
+    /**
+     * Send events and delivery events: the 0-based index of the send attempt the event belongs to, in the
+     * order of the send events.
+     */
+    public readonly ?int $attempt;
+
+    /**
+     * Send events: how the send ended. `unknown` once no delivery report can still arrive (the
+     * verification finished without one); absent while one can.
+     *
+     * Known values: {@see SessionDecisionPhoneVerificationsLifecycleDetailsDeliveryStatus}.
+     */
+    public readonly ?string $deliveryStatus;
 
     /** The `code_tried` field. */
     public readonly ?string $codeTried;
@@ -42,6 +65,8 @@ final class SessionDecisionPhoneVerificationsLifecycleDetails extends BaseModel
         $this->reason = Hydrate::string($data['reason'] ?? null);
         $this->channel = Hydrate::string($data['channel'] ?? null);
         $this->actualChannel = Hydrate::string($data['actual_channel'] ?? null);
+        $this->attempt = Hydrate::int($data['attempt'] ?? null);
+        $this->deliveryStatus = Hydrate::string($data['delivery_status'] ?? null);
         $this->codeTried = Hydrate::string($data['code_tried'] ?? null);
     }
 }
