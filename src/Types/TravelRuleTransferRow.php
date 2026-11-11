@@ -99,6 +99,19 @@ final class TravelRuleTransferRow extends BaseModel
     public readonly ?string $matchedTransactionId;
 
     /**
+     * The sandbox scenario that answered this transfer, only when `rail` is `TEST_VASP` (for example
+     * `accept`, `decline` or `name_mismatch`). `null` for every other transfer, including a live one.
+     */
+    public readonly ?string $scenario;
+
+    /**
+     * How many webhook delivery attempts Didit recorded for this transfer's transaction, across every
+     * event type. Each retry and each manual resend is a separate attempt and counts. Scoped to the
+     * calling application; deleted transactions are not counted.
+     */
+    public readonly ?int $webhooksCount;
+
+    /**
      * When the transfer expires if it is still waiting on its counterparty. Set on every transfer you
      * create with `POST /v3/transactions/` that needs an exchange, outbound or inbound. Null below the
      * threshold, on a Lightning payment the Travel Rule does not apply to, and on inbound transfers Didit
@@ -136,6 +149,8 @@ final class TravelRuleTransferRow extends BaseModel
         $this->originatorWalletType = Hydrate::string($data['originator_wallet_type'] ?? null);
         $this->beneficiaryWalletType = Hydrate::string($data['beneficiary_wallet_type'] ?? null);
         $this->matchedTransactionId = Hydrate::string($data['matched_transaction_id'] ?? null);
+        $this->scenario = Hydrate::string($data['scenario'] ?? null);
+        $this->webhooksCount = Hydrate::int($data['webhooks_count'] ?? null);
         $this->deadlineAt = Hydrate::dateTime($data['deadline_at'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
     }

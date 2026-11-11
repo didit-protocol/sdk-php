@@ -84,6 +84,7 @@ namespace Didit;
  *     privacy_url?: string,
  *     description?: string,
  *     data_location?: string,
+ *     initiate_login_uri?: string,
  * }
  * @phpstan-type ApplicationUpdateRequest array{
  *     name?: string,
@@ -93,6 +94,7 @@ namespace Didit;
  *     privacy_url?: string,
  *     description?: string,
  *     data_location?: string,
+ *     initiate_login_uri?: string,
  * }
  * @phpstan-type BankAccountCheckHolder array{
  *     full_name?: string,
@@ -2630,6 +2632,7 @@ namespace Didit;
  *     legal_name?: string,
  *     lei?: string,
  *     jurisdiction?: string,
+ *     vasp_jurisdiction?: string,
  *     name_matching_strictness?: string,
  *     confirmation_timeout_hours?: int,
  *     timeout_outcome?: string,

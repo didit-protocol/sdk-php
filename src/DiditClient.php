@@ -28,6 +28,8 @@ final class DiditClient extends BaseClient
 
     public readonly Resources\Sessions $sessions;
 
+    public readonly Resources\Sandbox $sandbox;
+
     public readonly Resources\IdVerification $idVerification;
 
     public readonly Resources\FaceMatch $faceMatch;
@@ -110,6 +112,7 @@ final class DiditClient extends BaseClient
         $this->ip = new Resources\Ip($this->requester);
         $this->phone = new Resources\Phone($this->requester);
         $this->sessions = new Resources\Sessions($this->requester);
+        $this->sandbox = new Resources\Sandbox($this->requester);
         $this->idVerification = new Resources\IdVerification($this->requester);
         $this->faceMatch = new Resources\FaceMatch($this->requester);
         $this->ageEstimation = new Resources\AgeEstimation($this->requester);
