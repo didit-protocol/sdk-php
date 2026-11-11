@@ -2155,6 +2155,8 @@ namespace Didit;
  *     email_address?: string,
  *     email_language?: string,
  *     email_preview_token?: string,
+ *     link_to_session_id?: string,
+ *     link_reason?: string,
  * }
  * @phpstan-type SessionsUpdateStatusParamsNodesToResubmit array{
  *     node_id: string,
@@ -2652,6 +2654,7 @@ namespace Didit;
  *     sunrise_policy?: string,
  *     non_responsive_policy?: string,
  *     disabled_networks?: list<string>,
+ *     licence?: string,
  * }
  * @phpstan-type TravelRuleTestVaspInboundRequest array{
  *     beneficiary_wallet_address: string,
@@ -2735,6 +2738,7 @@ namespace Didit;
  * }
  * @phpstan-type TravelRuleWorkspaceClaimRequest array{
  *     vasp_id: string,
+ *     licence?: string,
  * }
  * @phpstan-type TravelRuleWorkspaceDomainConfirmRequest array{
  *     code: string,
@@ -2854,6 +2858,8 @@ namespace Didit;
  *     pep_counterparty?: bool|null,
  *     dominant_risk_category: string|null,
  *     risk_factors?: list<WalletScreeningResultRiskFactors>,
+ *     fallback_from_provider?: string|null,
+ *     fallback_reason?: string|null,
  *     raw_response?: array<string, mixed>,
  *     report_signature: string,
  * }

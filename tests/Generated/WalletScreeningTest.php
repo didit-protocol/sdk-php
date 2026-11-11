@@ -97,6 +97,8 @@ final class WalletScreeningTest extends GeneratedTestCase
             'risk_factors' => [
                 [],
             ],
+            'fallback_from_provider' => 'fallback_from_provider-value',
+            'fallback_reason' => 'fallback_reason-value',
             'raw_response' => [
                 'key' => 'value',
             ],
@@ -111,7 +113,7 @@ final class WalletScreeningTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/pdf, application/json', $request->getHeaderLine('Accept'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"provider":"provider-value","screening_type":"WALLET_SCREENING","risk_score":1,"severity":"UNKNOWN","status":"SCREENED","summary":"summary-value","wallet_address":"wallet_address-value","transaction_hash":"transaction_hash-value","blockchain":"blockchain-value","block_timestamp":"block_timestamp-value","total_value_usd":1.5,"fee_usd":1.5,"sender_rows":[{"key":"value"}],"receiver_rows":[{"key":"value"}],"transaction_flows":[{"key":"value"}],"transaction_flows_status":"transaction_flows_status-value","transaction_flows_error":"transaction_flows_error-value","source_of_funds":[{}],"destination_of_funds":[{}],"counterparty_connections":[{}],"network_nodes":[{"key":"value"}],"network_edges":[{"key":"value"}],"sanctions_hit":true,"pep_counterparty":true,"dominant_risk_category":"dominant_risk_category-value","risk_factors":[{}],"raw_response":{"key":"value"},"report_signature":"report_signature-value"}', $this->canonicalBody($request));
+        self::assertSame('{"provider":"provider-value","screening_type":"WALLET_SCREENING","risk_score":1,"severity":"UNKNOWN","status":"SCREENED","summary":"summary-value","wallet_address":"wallet_address-value","transaction_hash":"transaction_hash-value","blockchain":"blockchain-value","block_timestamp":"block_timestamp-value","total_value_usd":1.5,"fee_usd":1.5,"sender_rows":[{"key":"value"}],"receiver_rows":[{"key":"value"}],"transaction_flows":[{"key":"value"}],"transaction_flows_status":"transaction_flows_status-value","transaction_flows_error":"transaction_flows_error-value","source_of_funds":[{}],"destination_of_funds":[{}],"counterparty_connections":[{}],"network_nodes":[{"key":"value"}],"network_edges":[{"key":"value"}],"sanctions_hit":true,"pep_counterparty":true,"dominant_risk_category":"dominant_risk_category-value","risk_factors":[{}],"fallback_from_provider":"fallback_from_provider-value","fallback_reason":"fallback_reason-value","raw_response":{"key":"value"},"report_signature":"report_signature-value"}', $this->canonicalBody($request));
         self::assertSame('binary-content', $result->contents());
         self::assertSame('application/pdf', $result->contentType());
     }

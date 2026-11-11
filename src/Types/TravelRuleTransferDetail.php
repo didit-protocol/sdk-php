@@ -152,6 +152,22 @@ final class TravelRuleTransferDetail extends BaseModel
     public readonly ?TravelRuleChainDetails $chainDetails;
 
     /**
+     * Null when required is true. Otherwise below_threshold, the recorded chain exemption (for example
+     * LIGHTNING_NO_PAYEE_IDENTIFIER, LIGHTNING_BOLT12_BLINDED_PAYEE or LIGHTNING_LNURL_NAMES_NO_PAYEE), or
+     * unknown for legacy transfers without a recorded reason.
+     */
+    public readonly ?string $notRequiredReason;
+
+    /**
+     * not_required when the transfer is not required; otherwise confirmed or not_confirmed follows
+     * ownership_confirmed. With no verdict, requested means an active outbound ownership widget matches
+     * this transfer and subject; otherwise not_requested. A request is not completed proof.
+     *
+     * Known values: {@see TravelRuleTransferDetailProofState}.
+     */
+    public readonly ?string $proofState;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -181,5 +197,7 @@ final class TravelRuleTransferDetail extends BaseModel
         $this->reason = Hydrate::string($data['reason'] ?? null);
         $this->nextActions = Hydrate::list($data['next_actions'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleNextAction::class));
         $this->chainDetails = Hydrate::model($data['chain_details'] ?? null, TravelRuleChainDetails::class);
+        $this->notRequiredReason = Hydrate::string($data['not_required_reason'] ?? null);
+        $this->proofState = Hydrate::string($data['proof_state'] ?? null);
     }
 }

@@ -14,7 +14,12 @@ use Didit\Core\Hydrate;
  */
 final class WalletScreeningResult extends BaseModel
 {
-    /** Provider that performed the screening (e.g. `merklescience`, `crystal`). */
+    /**
+     * Provider that performed the screening (e.g. `merklescience`, `crystal`). When the provider you
+     * connected in the Marketplace rejected or failed the screening and that connection's fallback to
+     * Didit is on, this names Didit's managed screening, not the provider you connected, and
+     * `fallback_from_provider` names the provider that failed.
+     */
     public readonly ?string $provider;
 
     /**
@@ -186,6 +191,22 @@ final class WalletScreeningResult extends BaseModel
     public readonly ?array $riskFactors;
 
     /**
+     * Set when the provider you connected in the Marketplace rejected or failed this screening and it ran
+     * on Didit's managed provider instead, because that connection's **Fall back to Didit** setting is on:
+     * the key of the provider that failed (`crystal`, `chainalysis`, `elliptic` or `trmlabs`). The
+     * screening is billed at the managed rate and the failed call is not billed. `null` on every other
+     * screening.
+     */
+    public readonly ?string $fallbackFromProvider;
+
+    /**
+     * Why the provider you connected failed, when `fallback_from_provider` is set, for example `Your
+     * Crystal account has reached its call limit. Raise the limit with Crystal to screen with it again.`
+     * `null` on every other screening.
+     */
+    public readonly ?string $fallbackReason;
+
+    /**
      * The provider's own payload. Its shape is provider-specific and can change without notice: read the
      * normalised fields instead of parsing it.
      *
@@ -234,6 +255,8 @@ final class WalletScreeningResult extends BaseModel
         $this->pepCounterparty = Hydrate::bool($data['pep_counterparty'] ?? null);
         $this->dominantRiskCategory = Hydrate::string($data['dominant_risk_category'] ?? null);
         $this->riskFactors = Hydrate::list($data['risk_factors'] ?? null, static fn (mixed $v) => Hydrate::model($v, WalletScreeningResultRiskFactors::class));
+        $this->fallbackFromProvider = Hydrate::string($data['fallback_from_provider'] ?? null);
+        $this->fallbackReason = Hydrate::string($data['fallback_reason'] ?? null);
         $this->rawResponse = Hydrate::assoc($data['raw_response'] ?? null);
         $this->reportSignature = Hydrate::string($data['report_signature'] ?? null);
     }

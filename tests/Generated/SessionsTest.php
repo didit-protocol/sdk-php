@@ -172,6 +172,8 @@ final class SessionsTest extends GeneratedTestCase
             'email_address' => 'user@example.com',
             'email_language' => 'email_language-value',
             'email_preview_token' => 'email_preview_token-value',
+            'link_to_session_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
+            'link_reason' => 'link_reason-value',
         ]);
 
         $request = $this->lastRequest();
@@ -181,7 +183,7 @@ final class SessionsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"new_status":"Approved","comment":"comment-value","nodes_to_resubmit":[{"node_id":"node_id-value","feature":"OCR"}],"send_email":true,"email_address":"user@example.com","email_language":"email_language-value","email_preview_token":"email_preview_token-value"}', $this->canonicalBody($request));
+        self::assertSame('{"new_status":"Approved","comment":"comment-value","nodes_to_resubmit":[{"node_id":"node_id-value","feature":"OCR"}],"send_email":true,"email_address":"user@example.com","email_language":"email_language-value","email_preview_token":"email_preview_token-value","link_to_session_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","link_reason":"link_reason-value"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"session_id":"3472fb7c-8f7c-4d1a-9cf4-cf3d74ce1a60"}'), $result->toArray());
         self::assertSame('3472fb7c-8f7c-4d1a-9cf4-cf3d74ce1a60', $result->sessionId);

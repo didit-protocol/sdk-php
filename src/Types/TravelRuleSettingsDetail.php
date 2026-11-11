@@ -221,6 +221,9 @@ final class TravelRuleSettingsDetail extends BaseModel
      */
     public readonly ?TravelRuleSettingsDetailDiditNetwork $diditNetwork;
 
+    /** VASP licence or registration reference. Empty when not supplied. */
+    public readonly ?string $licence;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -255,5 +258,6 @@ final class TravelRuleSettingsDetail extends BaseModel
         $this->disabledNetworks = Hydrate::list($data['disabled_networks'] ?? null, Hydrate::string(...));
         $this->networks = Hydrate::model($data['networks'] ?? null, TravelRuleSettingsDetailNetworks::class);
         $this->diditNetwork = Hydrate::model($data['didit_network'] ?? null, TravelRuleSettingsDetailDiditNetwork::class);
+        $this->licence = Hydrate::string($data['licence'] ?? null);
     }
 }
