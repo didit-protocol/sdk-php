@@ -23,6 +23,27 @@ final class SignatureResultDocuments extends BaseModel
     /** The `title` field. */
     public readonly ?string $title;
 
+    /**
+     * Language of the document version selected for this signing attempt, not necessarily the requested
+     * interface language. A complete translation matching the signer language (or session language when
+     * unset) is selected; otherwise the original is used. Null when the selected version has no language
+     * set. Frozen when the attempt starts; once signed, this is the language actually signed.
+     */
+    public readonly ?string $language;
+
+    /**
+     * UUID of the source document revision copied into this signing attempt, including when a translated
+     * variant is selected. Distinct from id, which identifies the signer's document copy. Frozen when the
+     * attempt starts.
+     */
+    public readonly ?string $sourceRevision;
+
+    /**
+     * UUID of the selected translated variant, or null when the original document is selected. Frozen with
+     * the document copy when the attempt starts; later language or translation changes do not replace it.
+     */
+    public readonly ?string $translationId;
+
     /** The `file_name` field. */
     public readonly ?string $fileName;
 
@@ -102,6 +123,9 @@ final class SignatureResultDocuments extends BaseModel
         $this->id = Hydrate::string($data['id'] ?? null);
         $this->uuid = Hydrate::string($data['uuid'] ?? null);
         $this->title = Hydrate::string($data['title'] ?? null);
+        $this->language = Hydrate::string($data['language'] ?? null);
+        $this->sourceRevision = Hydrate::string($data['source_revision'] ?? null);
+        $this->translationId = Hydrate::string($data['translation_id'] ?? null);
         $this->fileName = Hydrate::string($data['file_name'] ?? null);
         $this->pages = Hydrate::int($data['pages'] ?? null);
         $this->sizeBytes = Hydrate::int($data['size_bytes'] ?? null);

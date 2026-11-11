@@ -2301,6 +2301,7 @@ namespace Didit;
  *     evaluation_mode?: string,
  *     scope?: TransactionRuleScope,
  *     period_days?: int,
+ *     rule_id?: string,
  * }
  * @phpstan-type TransactionRuleCondition array{
  *     field: string,
@@ -2520,6 +2521,10 @@ namespace Didit;
  *     bundle?: string,
  *     search?: string,
  *     ordering?: string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type TransactionsTravelRuleListDeliveriesParams array{
  *     limit?: int,
  *     offset?: int,
  * }

@@ -21,6 +21,10 @@ final class CustomerMessagingPurposeEnum
 
     public const REVIEW_IN_PROGRESS = 'review_in_progress';
 
+    public const SOURCE_OF_FUNDS = 'source_of_funds';
+
+    public const PURPOSE_OF_PAYMENT = 'purpose_of_payment';
+
     private function __construct()
     {
     }
