@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Didit\Core;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+
 /**
  * Redacts secrets from a parsed JSON value, never from raw text (docs/DESIGN.md section 10).
  *
@@ -24,6 +27,35 @@ final class StructuredRedaction
 
     private function __construct()
     {
+    }
+
+    /**
+     * The whole response, sanitized once: the status code kept, the status text redacted, each header whose name contains
+     * a secret dropped, the other values redacted, and the body redacted by {@see self::body()}. The length headers are
+     * made to match the new body. Every error of a call whose answer may echo secrets is built from this response only.
+     *
+     * @param list<string> $secrets
+     */
+    public static function response(ResponseInterface $response, #[\SensitiveParameter] array $secrets, StreamFactoryInterface $streams): ResponseInterface
+    {
+        $stream = $response->getBody();
+        if ($stream->isSeekable()) {
+            $stream->rewind();
+        }
+        $body = $streams->createStream(self::body($stream->getContents(), $secrets));
+        $clean = $response
+            ->withStatus($response->getStatusCode(), self::text($response->getReasonPhrase(), $secrets))
+            ->withBody($body);
+        foreach ($response->getHeaders() as $name => $values) {
+            $clean = self::REDACTED === self::text((string) $name, $secrets)
+                ? $clean->withoutHeader((string) $name)
+                : $clean->withHeader((string) $name, array_map(static fn (string $value): string => self::text($value, $secrets), $values));
+        }
+
+        return $clean
+            ->withoutHeader('Content-Encoding')
+            ->withoutHeader('Transfer-Encoding')
+            ->withHeader('Content-Length', (string) $body->getSize());
     }
 
     /**

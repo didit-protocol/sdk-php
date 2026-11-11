@@ -346,6 +346,33 @@ final class AgentConsentTest extends TestCase
         self::assertStringNotContainsString($credential, $e->response->reasonPhrase());
     }
 
+    public function testAHeaderNamedAfterASecretIsDropped(): void
+    {
+        $credential = 'credential-string-0123456789';
+        $e = $this->consentError(
+            ['id' => $credential],
+            new Response(400, ['Content-Type' => 'application/json', 'X-' . $credential => $credential, 'X-Keep' => 'fine'], '{"error":"invalid_grant"}'),
+        );
+
+        self::assertSame(['fine'], $e->headers['x-keep'] ?? null);
+        self::assertStringNotContainsString($credential, json_encode($e->headers, \JSON_THROW_ON_ERROR));
+        self::assertStringNotContainsString($credential, json_encode($e->response->psrResponse->getHeaders(), \JSON_THROW_ON_ERROR));
+    }
+
+    public function testAMalformed2xxBodyKeepsTheRequestIdRedacted(): void
+    {
+        $credential = 'credential-string-0123456789';
+        $this->issuer->http->on('POST', self::CONSENT_URL, new Response(200, ['X-Request-Id' => 'req-' . $credential], 'not json ' . $credential));
+
+        try {
+            $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', ['id' => $credential]);
+            self::fail('Expected a DiditException.');
+        } catch (\Didit\Exception\DiditException $e) {
+            self::assertStringNotContainsString($credential, $e->getMessage());
+            self::assertStringContainsString('[redacted]', $e->getMessage());
+        }
+    }
+
     public function testATransportFailureKeepsNoUnderlyingTextOrException(): void
     {
         $credential = 'cred"ential\\string-0123456789';
