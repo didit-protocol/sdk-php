@@ -57,7 +57,7 @@ class ApiStatusException extends DiditException
             default => self::class,
         };
 
-        return new $class(self::redact(self::buildMessage($response), $redact), $keep ?? $response);
+        return new $class(self::redact(self::buildMessage($response, $redact), $redact), $keep ?? $response);
     }
 
     /**
@@ -66,22 +66,30 @@ class ApiStatusException extends DiditException
     private static function redact(string $message, #[\SensitiveParameter] array $secrets): string
     {
         foreach ($secrets as $secret) {
-            if ('' !== $secret) {
-                $message = str_replace($secret, '[redacted]', $message);
+            if ('' === $secret) {
+                continue;
+            }
+            $message = str_replace($secret, '[redacted]', $message);
+            $escaped = substr(json_encode($secret, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE) ?: '""', 1, -1);
+            if ('' !== $escaped) {
+                $message = str_replace($escaped, '[redacted]', $message);
             }
         }
 
         return $message;
     }
 
-    private static function buildMessage(RawResponse $response): string
+    /**
+     * @param list<string> $redact
+     */
+    private static function buildMessage(RawResponse $response, #[\SensitiveParameter] array $redact): string
     {
         $message = \sprintf('HTTP %d', $response->status);
         $reason = $response->reasonPhrase();
         if ('' !== $reason) {
             $message .= ' ' . $reason;
         }
-        $detail = self::detail($response->parsedBody());
+        $detail = self::detail($response->parsedBody(), $redact);
         if (null !== $detail) {
             $message .= ': ' . $detail;
         }
@@ -92,20 +100,25 @@ class ApiStatusException extends DiditException
         return $message;
     }
 
-    private static function detail(mixed $body): ?string
+    /**
+     * Secrets are removed before the length cap, so a truncated prefix of one never survives.
+     *
+     * @param list<string> $redact
+     */
+    private static function detail(mixed $body, #[\SensitiveParameter] array $redact): ?string
     {
         if (\is_array($body)) {
             foreach (['detail', 'error', 'message', 'error_description'] as $key) {
                 if (isset($body[$key]) && \is_string($body[$key]) && '' !== $body[$key]) {
-                    return self::truncate($body[$key]);
+                    return self::truncate(self::redact($body[$key], $redact));
                 }
             }
             $encoded = json_encode($body, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE);
 
-            return false === $encoded ? null : self::truncate($encoded);
+            return false === $encoded ? null : self::truncate(self::redact($encoded, $redact));
         }
         if (\is_string($body) && '' !== trim($body)) {
-            return self::truncate(trim($body));
+            return self::truncate(self::redact(trim($body), $redact));
         }
 
         return null;
