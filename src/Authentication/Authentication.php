@@ -364,6 +364,66 @@ final class Authentication
     }
 
     /**
+     * Approves or denies a pending agent request (`POST agents/consent/`), with
+     * the access token of the signed-in person.
+     *
+     * Returns the approval (`code`, `redirectUri`, `state`) or the denial
+     * (`status` `denied`): see {@see AgentConsentResult::isApproved()}. When
+     * the application requires humans only, approval needs a fresh passkey
+     * `$assertion`: get the options with {@see self::createAgentApprovalOptions()},
+     * let the browser run WebAuthn and pass its JSON-serialised result
+     * (binary fields as base64url) within 300 seconds. A denial needs none.
+     * Neither answer holds an access or refresh token. The call is never
+     * retried, and the challenge and assertion never reach an exception message.
+     *
+     * @param string $challenge the pending agent request secret; never log it
+     * @param string $decision `approve` or `deny`
+     * @param array<string, mixed>|null $assertion JSON-serialised result of `navigator.credentials.get()`
+     * @param list<string>|null $scopes narrows the requested scopes (`read`, `act`); omitted means all requested
+     *
+     * @throws ApiStatusException a missing assertion is `PermissionDeniedException` (`passkey_required`),
+     *                            an expired, reused or invalid one `BadRequestException` (`invalid_grant`)
+     * @throws ApiConnectionException
+     */
+    public function submitAgentConsent(string $accessToken, string $challenge, string $decision, ?array $assertion = null, ?array $scopes = null): AgentConsentResult
+    {
+        $body = ['challenge' => $challenge, 'decision' => $decision];
+        if (null !== $assertion) {
+            $body['assertion'] = $assertion;
+        }
+        if (null !== $scopes) {
+            $body['scopes'] = $scopes;
+        }
+
+        $response = $this->send('POST', $this->issuer . '/agents/consent/', accessToken: $accessToken, json: $body);
+        $this->jsonObject($response);
+
+        return AgentConsentResult::fromResponse($response);
+    }
+
+    /**
+     * Gets the WebAuthn request options for the person approving an agent
+     * request (`POST agents/consent/passkey/`), with their access token.
+     *
+     * Binds the pending request to the signed-in person. A person without an
+     * enrolled passkey gets `BadRequestException` (`passkey_required`).
+     * Both agent consent calls need a session created within the last five
+     * minutes, otherwise `PermissionDeniedException` (`reauthentication_required`).
+     * The call is never retried and the challenge never reaches an exception message.
+     *
+     * @param string $challenge the pending agent request secret (not the WebAuthn challenge); never log it
+     *
+     * @throws ApiStatusException|ApiConnectionException
+     */
+    public function createAgentApprovalOptions(string $accessToken, string $challenge): AgentApprovalOptions
+    {
+        $response = $this->send('POST', $this->issuer . '/agents/consent/passkey/', accessToken: $accessToken, json: ['challenge' => $challenge]);
+        $this->jsonObject($response);
+
+        return AgentApprovalOptions::fromResponse($response);
+    }
+
+    /**
      * @return array<string, mixed> the verified claims
      */
     private function verify(string $token, string $expectedType, ?string $audience): array
@@ -721,7 +781,7 @@ final class Authentication
 
     /**
      * @param array<string, string>|null $form form-encoded body
-     * @param array<string, string>|null $json JSON body
+     * @param array<string, mixed>|null $json JSON body
      */
     private function send(string $method, string $url, ?string $accessToken = null, ?array $form = null, ?array $json = null): RawResponse
     {
@@ -746,11 +806,25 @@ final class Authentication
         $response = new RawResponse($this->transport->send($request, $this->timeout), $method, (string) parse_url($url, \PHP_URL_PATH));
         if ($response->status < 200 || $response->status > 299) {
             // Tokens and codes never reach an exception message, even when echoed back.
-            $redact = array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null], 'is_string'));
+            $redact = array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null, $json['challenge'] ?? null, self::assertionSignature($json)], 'is_string'));
             throw ApiStatusException::create($response, $redact);
         }
 
         return $response;
+    }
+
+    /**
+     * The signature of a passkey assertion in a JSON body, so it is redacted like a token.
+     *
+     * @param array<string, mixed>|null $json
+     */
+    private static function assertionSignature(?array $json): ?string
+    {
+        $assertion = $json['assertion'] ?? null;
+        $response = \is_array($assertion) ? ($assertion['response'] ?? null) : null;
+        $signature = \is_array($response) ? ($response['signature'] ?? null) : null;
+
+        return \is_string($signature) && '' !== $signature ? $signature : null;
     }
 
     /**
