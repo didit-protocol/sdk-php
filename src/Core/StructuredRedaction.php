@@ -46,15 +46,17 @@ final class StructuredRedaction
     }
 
     /**
-     * The secrets of a JSON request value: every string of at least 16 characters, object keys and values at any depth,
-     * read from the exact JSON the request carries (encoded with `$flags`, then decoded back), so whatever objects the
-     * caller nested in it (`stdClass`, `JsonSerializable`) the set equals what goes over the wire.
+     * The secrets of a consent request: every string of at least 16 characters of its `assertion`, object keys and values
+     * at any depth, read from the exact JSON bytes that were sent (never from a second serialization of the caller's
+     * objects).
      *
      * @return list<string>
      */
-    public static function wireStrings(mixed $value, int $flags): array
+    public static function assertionStrings(string $sentJson): array
     {
-        return self::walk(json_decode(json_encode($value, $flags | \JSON_THROW_ON_ERROR), false, 512, \JSON_THROW_ON_ERROR));
+        $sent = json_decode($sentJson, false, 512, \JSON_THROW_ON_ERROR);
+
+        return $sent instanceof \stdClass && property_exists($sent, 'assertion') ? self::walk($sent->assertion) : [];
     }
 
     /**

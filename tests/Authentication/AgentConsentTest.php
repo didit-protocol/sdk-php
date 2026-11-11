@@ -281,6 +281,31 @@ final class AgentConsentTest extends TestCase
         self::assertStringNotContainsString($nested, self::shown($e));
     }
 
+    public function testSecretsComeFromTheBytesSentNotASecondSerialization(): void
+    {
+        $sent = 'credential-string-actually-sent-0123';
+        $statefulExtension = new class($sent) implements \JsonSerializable {
+            private int $calls = 0;
+
+            public function __construct(private readonly string $sent)
+            {
+            }
+
+            public function jsonSerialize(): mixed
+            {
+                if (++$this->calls > 1) {
+                    throw new \RuntimeException('serialized twice');
+                }
+
+                return ['credProps' => ['value' => $this->sent]];
+            }
+        };
+        $e = $this->consentError(['id' => 'short', 'clientExtensionResults' => $statefulExtension], TestIssuer::json(400, ['error' => 'invalid_grant', 'echo' => $sent]));
+
+        self::assertSame(['error' => 'invalid_grant', 'echo' => '[redacted]'], $e->body);
+        self::assertStringNotContainsString($sent, self::shown($e));
+    }
+
     public function testErrorCodesAndShortAssertionStringsStayReadable(): void
     {
         $long = 'Y3JlZGVudGlhbC1pZC0xMjM0NTY3ODkw';

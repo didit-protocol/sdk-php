@@ -815,14 +815,17 @@ final class Authentication
         if (null !== $accessToken) {
             $request = $request->withHeader('Authorization', 'Bearer ' . $accessToken);
         }
+        $encoded = null;
         if (null !== $form) {
             $request = $request
                 ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
                 ->withBody($this->streamFactory()->createStream(http_build_query($form, '', '&')));
         } elseif (null !== $json) {
+            // Encoded once: these exact bytes are sent, and the secrets of an error are read from them.
+            $encoded = json_encode($json, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES);
             $request = $request
                 ->withHeader('Content-Type', 'application/json')
-                ->withBody($this->streamFactory()->createStream(json_encode($json, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES)));
+                ->withBody($this->streamFactory()->createStream($encoded));
         }
 
         $this->transport ??= new HttpTransport($this->httpClient);
@@ -831,7 +834,7 @@ final class Authentication
             if (isset($json['challenge'])) {
                 // An agent consent call: the issuer may echo the challenge or the assertion, so the error is
                 // built from the redacted response, never from its raw text.
-                $secrets = array_values(array_filter([$accessToken, $json['challenge'], ...StructuredRedaction::wireStrings($json['assertion'] ?? null, \JSON_UNESCAPED_SLASHES)], 'is_string'));
+                $secrets = array_values(array_filter([$accessToken, $json['challenge'], ...StructuredRedaction::assertionStrings($encoded ?? '{}')], 'is_string'));
                 $redacted = $this->streamFactory()->createStream(StructuredRedaction::body($response->body(), $secrets));
                 throw ApiStatusException::create(new RawResponse($response->psrResponse->withBody($redacted), $method, (string) parse_url($url, \PHP_URL_PATH)));
             }
