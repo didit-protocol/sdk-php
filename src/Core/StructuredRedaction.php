@@ -18,6 +18,9 @@ final class StructuredRedaction
 {
     public const REDACTED = '[redacted]';
 
+    /** Shorter assertion strings (`id`, `type`, `public-key`) are not secrets: matching them would erase codes such as `invalid_grant`. */
+    private const MIN_SECRET_LENGTH = 16;
+
     private function __construct()
     {
     }
@@ -43,14 +46,14 @@ final class StructuredRedaction
     }
 
     /**
-     * Every non-empty string of a nested value, object keys included (list positions are not strings).
+     * Every string of at least 16 characters of a nested value, object keys included (list positions are not strings).
      *
      * @return list<string>
      */
     public static function strings(mixed $value): array
     {
         if (\is_string($value)) {
-            return '' === $value ? [] : [$value];
+            return \strlen($value) >= self::MIN_SECRET_LENGTH ? [$value] : [];
         }
         if (!\is_array($value)) {
             return [];
