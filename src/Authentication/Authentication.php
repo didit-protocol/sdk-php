@@ -831,7 +831,7 @@ final class Authentication
             if (isset($json['challenge'])) {
                 // An agent consent call: the issuer may echo the challenge or the assertion, so the error is
                 // built from the redacted response, never from its raw text.
-                $secrets = array_values(array_filter([$accessToken, $json['challenge'], ...StructuredRedaction::strings($json['assertion'] ?? null)], 'is_string'));
+                $secrets = array_values(array_filter([$accessToken, $json['challenge'], ...StructuredRedaction::wireStrings($json['assertion'] ?? null, \JSON_UNESCAPED_SLASHES)], 'is_string'));
                 $redacted = $this->streamFactory()->createStream(StructuredRedaction::body($response->body(), $secrets));
                 throw ApiStatusException::create(new RawResponse($response->psrResponse->withBody($redacted), $method, (string) parse_url($url, \PHP_URL_PATH)));
             }

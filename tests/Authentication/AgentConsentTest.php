@@ -271,6 +271,16 @@ final class AgentConsentTest extends TestCase
         }
     }
 
+    public function testAStringInsideANestedObjectIsRedacted(): void
+    {
+        $nested = 'nested-credential-string-0123456789';
+        $extension = json_decode('{"credProps":{"deep":[{"value":"' . $nested . '"}]}}');
+        $e = $this->consentError(['id' => 'short', 'clientExtensionResults' => $extension], TestIssuer::json(400, ['error' => 'invalid_grant', 'echo' => $nested]));
+
+        self::assertSame(['error' => 'invalid_grant', 'echo' => '[redacted]'], $e->body);
+        self::assertStringNotContainsString($nested, self::shown($e));
+    }
+
     public function testErrorCodesAndShortAssertionStringsStayReadable(): void
     {
         $long = 'Y3JlZGVudGlhbC1pZC0xMjM0NTY3ODkw';

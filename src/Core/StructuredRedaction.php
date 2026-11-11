@@ -46,25 +46,35 @@ final class StructuredRedaction
     }
 
     /**
-     * Every string of at least 16 characters of a nested value, object keys included (list positions are not strings).
+     * The secrets of a JSON request value: every string of at least 16 characters, object keys and values at any depth,
+     * read from the exact JSON the request carries (encoded with `$flags`, then decoded back), so whatever objects the
+     * caller nested in it (`stdClass`, `JsonSerializable`) the set equals what goes over the wire.
      *
      * @return list<string>
      */
-    public static function strings(mixed $value): array
+    public static function wireStrings(mixed $value, int $flags): array
+    {
+        return self::walk(json_decode(json_encode($value, $flags | \JSON_THROW_ON_ERROR), false, 512, \JSON_THROW_ON_ERROR));
+    }
+
+    /**
+     * @return list<string>
+     */
+    private static function walk(mixed $value): array
     {
         if (\is_string($value)) {
             return \strlen($value) >= self::MIN_SECRET_LENGTH ? [$value] : [];
         }
-        if (!\is_array($value)) {
-            return [];
-        }
         $found = [];
-        $isList = array_is_list($value);
-        foreach ($value as $key => $item) {
-            if (!$isList) {
-                array_push($found, ...self::strings((string) $key));
+        if (\is_array($value)) {
+            foreach ($value as $item) {
+                array_push($found, ...self::walk($item));
             }
-            array_push($found, ...self::strings($item));
+        } elseif ($value instanceof \stdClass) {
+            foreach (get_object_vars($value) as $key => $item) {
+                array_push($found, ...self::walk((string) $key));
+                array_push($found, ...self::walk($item));
+            }
         }
 
         return $found;
