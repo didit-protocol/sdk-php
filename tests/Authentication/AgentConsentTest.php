@@ -373,6 +373,13 @@ final class AgentConsentTest extends TestCase
         }
     }
 
+    public function testAVeryDeeplyNestedBodyBecomesRedacted(): void
+    {
+        $e = $this->consentError(['id' => 'short'], new Response(400, ['Content-Type' => 'application/json'], str_repeat('[', 10000) . str_repeat(']', 10000)));
+
+        self::assertSame('[redacted]', $e->body);
+    }
+
     public function testATransportFailureKeepsNoUnderlyingTextOrException(): void
     {
         $credential = 'cred"ential\\string-0123456789';
