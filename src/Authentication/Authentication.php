@@ -851,15 +851,20 @@ final class Authentication
         if (null !== $failure) {
             throw $failure;
         }
-        if (null !== $consentSecrets) {
-            // Sanitized once, on receipt: every error of this call, on any status, is built from this response only.
-            $psrResponse = StructuredRedaction::response($psrResponse, $consentSecrets, $this->streamFactory());
-        }
         $response = new RawResponse($psrResponse, $method, (string) parse_url($url, \PHP_URL_PATH));
-        if ($response->status < 200 || $response->status > 299) {
-            if (null !== $consentSecrets) {
-                throw ApiStatusException::create($response);
+        if (null !== $consentSecrets) {
+            // A successful response reaches the caller unchanged; every error of this call is built from a
+            // sanitized copy only.
+            $ok = $response->status >= 200 && $response->status <= 299;
+            if (!$ok || null === Hydrate::assoc($response->parsedBody())) {
+                $sanitized = new RawResponse(StructuredRedaction::response($psrResponse, $consentSecrets, $this->streamFactory()), $method, (string) parse_url($url, \PHP_URL_PATH));
+                if (!$ok) {
+                    throw ApiStatusException::create($sanitized);
+                }
+                $this->jsonObject($sanitized); // throws: the sanitized copy is not a JSON object
             }
+        }
+        if ($response->status < 200 || $response->status > 299) {
             // Tokens and codes never reach an exception message, even when echoed back.
             throw ApiStatusException::create($response, array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null], 'is_string')));
         }

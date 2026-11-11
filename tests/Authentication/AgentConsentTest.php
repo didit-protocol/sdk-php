@@ -380,6 +380,27 @@ final class AgentConsentTest extends TestCase
         self::assertSame('[redacted]', $e->body);
     }
 
+    public function testASuccessfulApprovalOptionsResponseReachesTheCallerUnchanged(): void
+    {
+        $this->issuer->http->on('POST', self::OPTIONS_URL, TestIssuer::json(200, ['options' => ['challenge' => self::CHALLENGE, 'rpId' => 'acme.auth.didit.me']]));
+
+        $options = $this->issuer->auth()->createAgentApprovalOptions(self::ACCESS_TOKEN, self::CHALLENGE);
+
+        self::assertSame(self::CHALLENGE, $options->options?->challenge);
+    }
+
+    public function testAHeaderNameIsMatchedCaseInsensitively(): void
+    {
+        $credential = 'CredentialString-AbCdEf0123456789';
+        $e = $this->consentError(
+            ['id' => $credential],
+            new Response(400, ['Content-Type' => 'application/json', 'X-Echo-' . $credential => 'v', 'X-Keep' => 'fine'], '{"error":"invalid_grant"}'),
+        );
+
+        self::assertSame(['fine'], $e->headers['x-keep'] ?? null);
+        self::assertStringNotContainsString('credentialstring', strtolower(json_encode($e->headers, \JSON_THROW_ON_ERROR)));
+    }
+
     public function testATransportFailureKeepsNoUnderlyingTextOrException(): void
     {
         $credential = 'cred"ential\\string-0123456789';

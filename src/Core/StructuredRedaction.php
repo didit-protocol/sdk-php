@@ -47,7 +47,7 @@ final class StructuredRedaction
             ->withStatus($response->getStatusCode(), self::text($response->getReasonPhrase(), $secrets))
             ->withBody($body);
         foreach ($response->getHeaders() as $name => $values) {
-            $clean = self::REDACTED === self::text((string) $name, $secrets)
+            $clean = self::nameHasSecret((string) $name, $secrets)
                 ? $clean->withoutHeader((string) $name)
                 : $clean->withHeader((string) $name, array_map(static fn (string $value): string => self::text($value, $secrets), $values));
         }
@@ -154,6 +154,23 @@ final class StructuredRedaction
         }
 
         return $value;
+    }
+
+    /**
+     * Header names are case-insensitive: compare the case-folded name with each case-folded secret.
+     *
+     * @param list<string> $secrets
+     */
+    private static function nameHasSecret(string $name, array $secrets): bool
+    {
+        $folded = strtolower($name);
+        foreach ($secrets as $secret) {
+            if ('' !== $secret && str_contains($folded, strtolower($secret))) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
