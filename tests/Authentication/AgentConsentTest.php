@@ -8,6 +8,7 @@ use Didit\Exception\ApiStatusException;
 use Didit\Exception\BadRequestException;
 use Didit\Exception\PermissionDeniedException;
 use Didit\Tests\Authentication\Support\TestIssuer;
+use GuzzleHttp\Psr7\Response;
 use PHPUnit\Framework\TestCase;
 
 final class AgentConsentTest extends TestCase
@@ -140,7 +141,7 @@ final class AgentConsentTest extends TestCase
             $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', ['response' => ['signature' => 'c2ln']]);
             self::fail('Expected a BadRequestException.');
         } catch (BadRequestException $e) {
-            self::assertSame('HTTP 400 Bad Request: invalid_grant: [redacted] [redacted] was used', $e->getMessage());
+            self::assertSame('HTTP 400 Bad Request: [redacted]', $e->getMessage());
             self::assertStringNotContainsString(self::CHALLENGE, $e->getMessage());
         }
     }
@@ -153,7 +154,7 @@ final class AgentConsentTest extends TestCase
             $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', ['id' => 'TOPID', 'rawId' => 'RAWID', 'clientExtensionResults' => ['x' => ['y' => 'EXT']], 'response' => ['clientDataJSON' => 'CDJ', 'signature' => 'c2ln']]);
             self::fail('Expected a BadRequestException.');
         } catch (BadRequestException $e) {
-            self::assertSame('HTTP 400 Bad Request: bad [redacted] [redacted] [redacted] [redacted]', $e->getMessage());
+            self::assertSame('HTTP 400 Bad Request: [redacted]', $e->getMessage());
             self::assertSame(400, $e->status);
             self::assertStringNotContainsString('TOPID', $e->response->body());
             self::assertStringNotContainsString('c2ln', $e->response->body());
@@ -170,7 +171,7 @@ final class AgentConsentTest extends TestCase
             $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', ['response' => ['clientDataJSON' => $secret]]);
             self::fail('Expected a BadRequestException.');
         } catch (BadRequestException $e) {
-            self::assertSame('HTTP 400 Bad Request: echo [redacted] end', $e->getMessage());
+            self::assertSame('HTTP 400 Bad Request: [redacted]', $e->getMessage());
             self::assertStringNotContainsString(substr($secret, 0, 16), $e->getMessage());
             self::assertStringNotContainsString(substr($secret, 0, 16), $e->response->body());
             self::assertStringNotContainsString(substr($secret, 0, 16), json_encode($e->body, \JSON_THROW_ON_ERROR));
@@ -185,11 +186,87 @@ final class AgentConsentTest extends TestCase
             $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', ['id' => 'abc', 'rawId' => 'abcdef', 'response' => ['signature' => '']]);
             self::fail('Expected a BadRequestException.');
         } catch (BadRequestException $e) {
-            self::assertSame('HTTP 400 Bad Request: echo [redacted] and [redacted] end', $e->getMessage());
+            self::assertSame('HTTP 400 Bad Request: [redacted]', $e->getMessage());
             foreach ([$e->getMessage(), $e->response->body(), json_encode($e->body, \JSON_THROW_ON_ERROR)] as $text) {
                 self::assertStringNotContainsString('abc', $text);
                 self::assertStringNotContainsString('def', $text);
             }
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $assertion
+     */
+    private function consentError(array $assertion, Response $reply): BadRequestException
+    {
+        $this->issuer->http->on('POST', self::CONSENT_URL, $reply);
+
+        try {
+            $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', $assertion);
+        } catch (BadRequestException $e) {
+            return $e;
+        }
+        self::fail('Expected a BadRequestException.');
+    }
+
+    private static function shown(ApiStatusException $e): string
+    {
+        return $e->getMessage() . "\n" . $e->response->body() . "\n" . json_encode($e->body, \JSON_THROW_ON_ERROR);
+    }
+
+    public function testASecretInsideALongerStringRedactsTheWholeString(): void
+    {
+        $e = $this->consentError(['id' => 'SECRET'], TestIssuer::json(400, ['detail' => 'bad assertion xyzSECRETxyz', 'keep' => 'fine']));
+
+        self::assertSame(['detail' => '[redacted]', 'keep' => 'fine'], $e->body);
+        self::assertSame('HTTP 400 Bad Request: [redacted]', $e->getMessage());
+    }
+
+    public function testASecretUsedAsAnObjectKeyIsRedactedAndCollidingKeysAreNumbered(): void
+    {
+        $e = $this->consentError(['id' => 'SECRET'], TestIssuer::json(400, ['detail' => 'no', 'echo-SECRET-1' => 'a', 'echo-SECRET-2' => 'b']));
+
+        self::assertSame(['detail' => 'no', '[redacted]' => 'a', '[redacted]2' => 'b'], $e->body);
+        self::assertStringNotContainsString('SECRET', self::shown($e));
+    }
+
+    public function testOtherJsonEscapeSpellingsAreRedacted(): void
+    {
+        $secret = "a/b+\u{e9}";
+        $e = $this->consentError(['id' => $secret], new Response(400, ['Content-Type' => 'application/json'], '{"detail":"x","echo":"a\\/b+\\u00E9"}'));
+
+        self::assertSame(['detail' => 'x', 'echo' => '[redacted]'], $e->body);
+        self::assertStringNotContainsString('a/b', self::shown($e));
+        self::assertStringNotContainsString('00E9', self::shown($e));
+    }
+
+    public function testANonJsonBodyIsReplacedByRedactedEverywhere(): void
+    {
+        $html = '<html>Bad gateway ' . self::CHALLENGE . '</html>';
+        $e = $this->consentError(['id' => 'x'], new Response(400, ['Content-Type' => 'text/html'], $html));
+
+        self::assertSame('[redacted]', $e->body);
+        self::assertSame('[redacted]', $e->response->body());
+        self::assertStringNotContainsString(self::CHALLENGE, self::shown($e));
+    }
+
+    public function testASecretPastTheDetailCapIsRedactedInAnyBody(): void
+    {
+        $e = $this->consentError(['id' => 'x'], new Response(400, ['Content-Type' => 'text/plain'], str_repeat('x', 600) . self::CHALLENGE));
+
+        self::assertSame('[redacted]', $e->body);
+        self::assertStringNotContainsString(self::CHALLENGE, self::shown($e));
+    }
+
+    public function testTheOptionsCallRedactsTheParsedBodyToo(): void
+    {
+        $this->issuer->http->on('POST', self::OPTIONS_URL, TestIssuer::json(400, ['detail' => 'bad ' . self::CHALLENGE]));
+
+        try {
+            $this->issuer->auth()->createAgentApprovalOptions(self::ACCESS_TOKEN, self::CHALLENGE);
+            self::fail('Expected a BadRequestException.');
+        } catch (BadRequestException $e) {
+            self::assertSame(['detail' => '[redacted]'], $e->body);
         }
     }
 

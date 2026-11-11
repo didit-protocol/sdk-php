@@ -8,6 +8,7 @@ use Didit\Core\HttpTransport;
 use Didit\Core\Hydrate;
 use Didit\Core\NoContent;
 use Didit\Core\RawResponse;
+use Didit\Core\StructuredRedaction;
 use Didit\Exception\ApiConnectionException;
 use Didit\Exception\ApiStatusException;
 use Didit\Exception\ConfigurationException;
@@ -827,49 +828,18 @@ final class Authentication
         $this->transport ??= new HttpTransport($this->httpClient);
         $response = new RawResponse($this->transport->send($request, $this->timeout), $method, (string) parse_url($url, \PHP_URL_PATH));
         if ($response->status < 200 || $response->status > 299) {
+            if (isset($json['challenge'])) {
+                // An agent consent call: the issuer may echo the challenge or the assertion, so the error is
+                // built from the redacted response, never from its raw text.
+                $secrets = array_values(array_filter([$accessToken, $json['challenge'], ...StructuredRedaction::strings($json['assertion'] ?? null)], 'is_string'));
+                $redacted = $this->streamFactory()->createStream(StructuredRedaction::body($response->body(), $secrets));
+                throw ApiStatusException::create(new RawResponse($response->psrResponse->withBody($redacted), $method, (string) parse_url($url, \PHP_URL_PATH)));
+            }
             // Tokens and codes never reach an exception message, even when echoed back.
-            $redact = array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null, $json['challenge'] ?? null, ...self::strings($json['assertion'] ?? null)], 'is_string'));
-            // An agent consent call keeps the response with every secret removed: the issuer may echo the challenge or the assertion.
-            $keep = isset($json['challenge'])
-                ? new RawResponse($response->psrResponse->withBody($this->streamFactory()->createStream(self::withoutSecrets($response->body(), $redact))), $method, (string) parse_url($url, \PHP_URL_PATH))
-                : null;
-            throw ApiStatusException::create($response, $redact, $keep);
+            throw ApiStatusException::create($response, array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null], 'is_string')));
         }
 
         return $response;
-    }
-
-    /**
-     * The text with every secret removed, also in its JSON-escaped form.
-     *
-     * @param list<string> $secrets
-     */
-    private static function withoutSecrets(string $text, #[\SensitiveParameter] array $secrets): string
-    {
-        $text = ApiStatusException::redact($text, $secrets);
-
-        return $text;
-    }
-
-    /**
-     * Every non-empty string in a nested value, so none of an assertion can reach an error.
-     *
-     * @return list<string>
-     */
-    private static function strings(mixed $value): array
-    {
-        if (\is_string($value)) {
-            return '' === $value ? [] : [$value];
-        }
-        if (!\is_array($value)) {
-            return [];
-        }
-        $found = [];
-        foreach ($value as $item) {
-            array_push($found, ...self::strings($item));
-        }
-
-        return $found;
     }
 
     /**
