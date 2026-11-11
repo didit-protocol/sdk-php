@@ -860,6 +860,24 @@ final class Authentication
         if (null !== $failure) {
             throw $failure;
         }
+        if (null !== $consentSecrets) {
+            // Read the body once, here: a stream that fails or cannot be decoded is a connection error with a fixed
+            // message and no previous exception.
+            $contents = null;
+            try {
+                $stream = $psrResponse->getBody();
+                if ($stream->isSeekable()) {
+                    $stream->rewind();
+                }
+                $contents = $stream->getContents();
+            } catch (\Throwable) {
+                $contents = null;
+            }
+            if (null === $contents) {
+                throw new ApiConnectionException('Connection error: agent consent request (response body could not be read)');
+            }
+            $psrResponse = $psrResponse->withBody($this->streamFactory()->createStream($contents));
+        }
         $response = new RawResponse($psrResponse, $method, (string) parse_url($url, \PHP_URL_PATH));
         if (null !== $consentSecrets) {
             // A successful response reaches the caller unchanged; every error of this call is built from a

@@ -420,6 +420,92 @@ final class AgentConsentTest extends TestCase
         }
     }
 
+    public function testABodyThatFailsMidReadIsAFixedMessageConnectionError(): void
+    {
+        $broken = new class implements \Psr\Http\Message\StreamInterface {
+            public function __toString(): string
+            {
+                return '';
+            }
+
+            public function close(): void
+            {
+            }
+
+            public function detach()
+            {
+                return null;
+            }
+
+            public function getSize(): ?int
+            {
+                return null;
+            }
+
+            public function tell(): int
+            {
+                return 0;
+            }
+
+            public function eof(): bool
+            {
+                return false;
+            }
+
+            public function isSeekable(): bool
+            {
+                return false;
+            }
+
+            public function seek(int $offset, int $whence = \SEEK_SET): void
+            {
+            }
+
+            public function rewind(): void
+            {
+            }
+
+            public function isWritable(): bool
+            {
+                return false;
+            }
+
+            public function write(string $string): int
+            {
+                return 0;
+            }
+
+            public function isReadable(): bool
+            {
+                return true;
+            }
+
+            public function read(int $length): string
+            {
+                throw new \RuntimeException('credential-string-0123456789 broken stream');
+            }
+
+            public function getContents(): string
+            {
+                throw new \RuntimeException('credential-string-0123456789 broken stream');
+            }
+
+            public function getMetadata(?string $key = null)
+            {
+                return null;
+            }
+        };
+        $this->issuer->http->on('POST', self::CONSENT_URL, new Response(200, ['Content-Type' => 'application/json'], $broken));
+
+        try {
+            $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', ['id' => 'x']);
+            self::fail('Expected an ApiConnectionException.');
+        } catch (\Didit\Exception\ApiConnectionException $e) {
+            self::assertNull($e->getPrevious());
+            self::assertStringNotContainsString('credential-string', (string) $e);
+        }
+    }
+
     public function testATransportFailureKeepsNoUnderlyingTextOrException(): void
     {
         $credential = 'cred"ential\\string-0123456789';
