@@ -823,7 +823,16 @@ final class Authentication
                 ->withBody($this->streamFactory()->createStream(http_build_query($form, '', '&')));
         } elseif (null !== $json) {
             // Encoded once: these exact bytes are sent, and the secrets of an error are read from them.
-            $encoded = json_encode($json, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES);
+            try {
+                $encoded = json_encode($json, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES);
+            } catch (\Throwable) {
+                if (!isset($json['challenge'])) {
+                    throw new DiditException('Could not encode the request.');
+                }
+                // A consent request: a nested serializer may put the challenge or a credential in its message,
+                // so the error has a fixed message and no previous exception.
+                throw new DiditException('Could not encode the agent consent request.');
+            }
             $request = $request
                 ->withHeader('Content-Type', 'application/json')
                 ->withBody($this->streamFactory()->createStream($encoded));

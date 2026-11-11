@@ -401,6 +401,25 @@ final class AgentConsentTest extends TestCase
         self::assertStringNotContainsString('credentialstring', strtolower(json_encode($e->headers, \JSON_THROW_ON_ERROR)));
     }
 
+    public function testASerializerThatThrowsGivesAFixedMessageError(): void
+    {
+        $bad = new class implements \JsonSerializable {
+            public function jsonSerialize(): mixed
+            {
+                throw new \RuntimeException('credential-string-0123456789 pending-agent-request-secret');
+            }
+        };
+
+        try {
+            $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', ['id' => 'x', 'clientExtensionResults' => $bad]);
+            self::fail('Expected a DiditException.');
+        } catch (\Didit\Exception\DiditException $e) {
+            self::assertSame('Could not encode the agent consent request.', $e->getMessage());
+            self::assertNull($e->getPrevious());
+            self::assertStringNotContainsString('credential-string', (string) $e);
+        }
+    }
+
     public function testATransportFailureKeepsNoUnderlyingTextOrException(): void
     {
         $credential = 'cred"ential\\string-0123456789';
