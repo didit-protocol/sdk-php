@@ -17,7 +17,7 @@ final class AccountTest extends GeneratedTestCase
 {
     public function testRegister(): void
     {
-        $this->queueJson(201, '{"message":"Registration successful. Check your email for the verification code.","email":"you@yourdomain.com"}');
+        $this->queueJson(200, '{"message":"A new verification code has been sent to your email.","email":"you@yourdomain.com"}');
 
         $result = $this->client->account->register([
             'email' => 'user@example.com',
@@ -33,14 +33,14 @@ final class AccountTest extends GeneratedTestCase
         self::assertSame('', $request->getHeaderLine('Authorization'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"email":"user@example.com","password":"password-value"}', $this->canonicalBody($request));
-        self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"message":"Registration successful. Check your email for the verification code.","email":"you@yourdomain.com"}'), $result->toArray());
-        self::assertSame('Registration successful. Check your email for the verification code.', $result->message);
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"message":"A new verification code has been sent to your email.","email":"you@yourdomain.com"}'), $result->toArray());
+        self::assertSame('A new verification code has been sent to your email.', $result->message);
     }
 
     public function testVerifyEmail(): void
     {
-        $this->queueJson(200, '{"access_token":"sample-access-token","refresh_token":"sample-refresh-token","expires_in":86400,"organization":{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer"},"application":{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"developer","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","data_location":"eu"}}');
+        $this->queueJson(200, '{"access_token":"sample-access-token","refresh_token":"sample-refresh-token","expires_in":86400,"organization":{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer"},"application":{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"developer","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","data_location":"eu","mode":"live"},"sandbox_application":{"uuid":"c3d4e5f6-7890-12cd-efgh-333333333333","name":"developer (Sandbox)","client_id":"T0MJZHTpXOvHNMItwFu0eR","api_key":"sample-api-key","data_location":"eu","mode":"sandbox"}}');
 
         $result = $this->client->account->verifyEmail([
             'email' => 'user@example.com',
@@ -57,7 +57,7 @@ final class AccountTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"email":"user@example.com","code":"code-value"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"access_token":"sample-access-token","refresh_token":"sample-refresh-token","expires_in":86400,"organization":{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer"},"application":{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"developer","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","data_location":"eu"}}'), $result->toArray());
+        self::assertSame($this->decoded('{"access_token":"sample-access-token","refresh_token":"sample-refresh-token","expires_in":86400,"organization":{"uuid":"a1b2c3d4-5678-90ab-cdef-111111111111","name":"developer"},"application":{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"developer","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","data_location":"eu","mode":"live"},"sandbox_application":{"uuid":"c3d4e5f6-7890-12cd-efgh-333333333333","name":"developer (Sandbox)","client_id":"T0MJZHTpXOvHNMItwFu0eR","api_key":"sample-api-key","data_location":"eu","mode":"sandbox"}}'), $result->toArray());
         self::assertSame('sample-access-token', $result->accessToken);
     }
 

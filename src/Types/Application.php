@@ -78,6 +78,16 @@ final class Application extends BaseModel
     public readonly ?array $products;
 
     /**
+     * The application's environment. A `live` application bills every verification session and check
+     * created with its key. A `sandbox` application mocks every check and is never billed, so it is where
+     * you test (each sandbox application can create 500 test sessions every 24 hours). Read this field to
+     * pick the application: never infer the environment from the name.
+     *
+     * Known values: {@see ApplicationMode}.
+     */
+    public readonly ?string $mode;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -95,5 +105,6 @@ final class Application extends BaseModel
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
         $this->dataLocation = Hydrate::string($data['data_location'] ?? null);
         $this->products = Hydrate::list($data['products'] ?? null, static fn (mixed $v) => Hydrate::model($v, ApplicationProduct::class));
+        $this->mode = Hydrate::string($data['mode'] ?? null);
     }
 }

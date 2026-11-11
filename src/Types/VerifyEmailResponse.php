@@ -30,10 +30,17 @@ final class VerifyEmailResponse extends BaseModel
     public readonly ?OrganizationSummary $organization;
 
     /**
-     * Minimal application shape returned inline by `POST /programmatic/verify-email/`. Persist the
-     * `api_key` immediately.
+     * The organization's live application (`mode: live`): the credentials a production integration ships
+     * with. Every check created with its key is billed from the organization's balance.
      */
     public readonly ?ApplicationCredentialsSummary $application;
+
+    /**
+     * The organization's sandbox application (`mode: sandbox`). Use its `api_key` to build and test the
+     * integration for free: every check is mocked and never billed. Switch to the live `application` key
+     * to go live.
+     */
+    public readonly ?ApplicationCredentialsSummary $sandboxApplication;
 
     /**
      * Present and `true` when the account already has an authenticator app or a passkey. The response then
@@ -64,6 +71,7 @@ final class VerifyEmailResponse extends BaseModel
         $this->expiresIn = Hydrate::int($data['expires_in'] ?? null);
         $this->organization = Hydrate::model($data['organization'] ?? null, OrganizationSummary::class);
         $this->application = Hydrate::model($data['application'] ?? null, ApplicationCredentialsSummary::class);
+        $this->sandboxApplication = Hydrate::model($data['sandbox_application'] ?? null, ApplicationCredentialsSummary::class);
         $this->field2faRequired = Hydrate::bool($data['2fa_required'] ?? null);
         $this->tempToken = Hydrate::string($data['temp_token'] ?? null);
         $this->hasAuthenticator = Hydrate::bool($data['has_authenticator'] ?? null);
