@@ -70,7 +70,7 @@ class ApiStatusException extends DiditException
                 continue;
             }
             $message = str_replace($secret, '[redacted]', $message);
-            $escaped = substr(json_encode($secret, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_INVALID_UTF8_SUBSTITUTE), 1, -1);
+            $escaped = substr(json_encode($secret, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_INVALID_UTF8_SUBSTITUTE | \JSON_THROW_ON_ERROR), 1, -1);
             if ('' !== $escaped) {
                 $message = str_replace($escaped, '[redacted]', $message);
             }
