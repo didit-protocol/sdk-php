@@ -40,8 +40,9 @@ class ApiStatusException extends DiditException
      * Builds the exception that matches the response status.
      *
      * @param list<string> $redact credentials removed from the message should the server echo them
+     * @param RawResponse|null $keep the response the exception keeps instead of $response (one without a body, for calls whose answer may echo secrets)
      */
-    public static function create(RawResponse $response, #[\SensitiveParameter] array $redact = []): self
+    public static function create(RawResponse $response, #[\SensitiveParameter] array $redact = [], ?RawResponse $keep = null): self
     {
         $status = $response->status;
         $class = match (true) {
@@ -56,7 +57,7 @@ class ApiStatusException extends DiditException
             default => self::class,
         };
 
-        return new $class(self::redact(self::buildMessage($response), $redact), $response);
+        return new $class(self::redact(self::buildMessage($response), $redact), $keep ?? $response);
     }
 
     /**

@@ -828,25 +828,54 @@ final class Authentication
         $response = new RawResponse($this->transport->send($request, $this->timeout), $method, (string) parse_url($url, \PHP_URL_PATH));
         if ($response->status < 200 || $response->status > 299) {
             // Tokens and codes never reach an exception message, even when echoed back.
-            $redact = array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null, $json['challenge'] ?? null, self::assertionSignature($json)], 'is_string'));
-            throw ApiStatusException::create($response, $redact);
+            $redact = array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null, $json['challenge'] ?? null, ...self::strings($json['assertion'] ?? null)], 'is_string'));
+            // An agent consent call keeps the response with every secret removed: the issuer may echo the challenge or the assertion.
+            $keep = isset($json['challenge'])
+                ? new RawResponse($response->psrResponse->withBody($this->streamFactory()->createStream(self::withoutSecrets($response->body(), $redact))), $method, (string) parse_url($url, \PHP_URL_PATH))
+                : null;
+            throw ApiStatusException::create($response, $redact, $keep);
         }
 
         return $response;
     }
 
     /**
-     * The signature of a passkey assertion in a JSON body, so it is redacted like a token.
+     * The text with every secret removed, also in its JSON-escaped form.
      *
-     * @param array<string, mixed>|null $json
+     * @param list<string> $secrets
      */
-    private static function assertionSignature(?array $json): ?string
+    private static function withoutSecrets(string $text, #[\SensitiveParameter] array $secrets): string
     {
-        $assertion = $json['assertion'] ?? null;
-        $response = \is_array($assertion) ? ($assertion['response'] ?? null) : null;
-        $signature = \is_array($response) ? ($response['signature'] ?? null) : null;
+        foreach ($secrets as $secret) {
+            foreach ([$secret, substr(json_encode($secret, \JSON_UNESCAPED_SLASHES) ?? '""', 1, -1)] as $form) {
+                if ('' !== $form) {
+                    $text = str_replace($form, '[redacted]', $text);
+                }
+            }
+        }
 
-        return \is_string($signature) && '' !== $signature ? $signature : null;
+        return $text;
+    }
+
+    /**
+     * Every non-empty string in a nested value, so none of an assertion can reach an error.
+     *
+     * @return list<string>
+     */
+    private static function strings(mixed $value): array
+    {
+        if (\is_string($value)) {
+            return '' === $value ? [] : [$value];
+        }
+        if (!\is_array($value)) {
+            return [];
+        }
+        $found = [];
+        foreach ($value as $item) {
+            array_push($found, ...self::strings($item));
+        }
+
+        return $found;
     }
 
     /**
