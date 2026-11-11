@@ -316,6 +316,54 @@ final class AgentConsentTest extends TestCase
         self::assertStringNotContainsString('credential-str', $e->response->body());
     }
 
+    public function testAnEmptyBodyBecomesRedacted(): void
+    {
+        $e = $this->consentError(['id' => 'short'], new Response(400, [], ''));
+
+        self::assertSame('[redacted]', $e->body);
+        self::assertSame('[redacted]', $e->response->body());
+    }
+
+    public function testASafeKeyNamedRedactedAfterASecretKeyKeepsItsName(): void
+    {
+        $secret = 'SECRET-0123456789abcdef';
+        $e = $this->consentError(['id' => $secret], new Response(400, ['Content-Type' => 'application/json'], '{"a-' . $secret . '":"x","[redacted]":"safe"}'));
+
+        self::assertSame(['[redacted]2' => 'x', '[redacted]' => 'safe'], $e->body);
+    }
+
+    public function testTheReasonPhraseRequestIdAndHeadersNeverEchoASecret(): void
+    {
+        $credential = 'credential-string-0123456789';
+        $e = $this->consentError(
+            ['id' => $credential],
+            new Response(400, ['Content-Type' => 'application/json', 'X-Request-Id' => 'req-' . $credential, 'X-Echo' => $credential], '{"error":"invalid_grant"}', '1.1', 'bad ' . $credential),
+        );
+
+        self::assertStringNotContainsString($credential, $e->getMessage());
+        self::assertSame('[redacted]', $e->requestId);
+        self::assertStringNotContainsString($credential, json_encode($e->headers, \JSON_THROW_ON_ERROR));
+        self::assertStringNotContainsString($credential, $e->response->reasonPhrase());
+    }
+
+    public function testATransportFailureKeepsNoUnderlyingTextOrException(): void
+    {
+        $credential = 'cred"ential\\string-0123456789';
+        $this->issuer->http->on('POST', self::CONSENT_URL, static function (\Psr\Http\Message\RequestInterface $request): never {
+            throw new class('write failed: ' . $request->getBody()) extends \RuntimeException implements \Psr\Http\Client\ClientExceptionInterface {
+            };
+        });
+
+        try {
+            $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', ['id' => $credential]);
+            self::fail('Expected an ApiConnectionException.');
+        } catch (\Didit\Exception\ApiConnectionException $e) {
+            self::assertNull($e->getPrevious());
+            self::assertStringNotContainsString('ential', (string) $e);
+            self::assertStringNotContainsString('write failed', (string) $e);
+        }
+    }
+
     public function testErrorCodesAndShortAssertionStringsStayReadable(): void
     {
         $long = 'Y3JlZGVudGlhbC1pZC0xMjM0NTY3ODkw';

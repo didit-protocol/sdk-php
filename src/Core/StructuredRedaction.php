@@ -28,14 +28,15 @@ final class StructuredRedaction
 
     /**
      * The body to keep: the redacted JSON when it parses, `[redacted]` when it does not
-     * (an HTML error page, a body cut at the size limit), the empty string when it is empty.
+     * (an HTML error page, a body cut at the size limit), `[redacted]` when it is empty.
      *
      * @param list<string> $secrets
      */
     public static function body(string $raw, #[\SensitiveParameter] array $secrets): string
     {
         if ('' === trim($raw)) {
-            return '';
+            // An empty body is not JSON.
+            return self::REDACTED;
         }
         try {
             $value = json_decode($raw, false, 512, \JSON_THROW_ON_ERROR | \JSON_BIGINT_AS_STRING);
@@ -95,11 +96,24 @@ final class StructuredRedaction
             return array_map(static fn (mixed $item): mixed => self::value($item, $secrets), $value);
         }
         if ($value instanceof \stdClass) {
+            $props = get_object_vars($value);
+            // Reserve every safe key name first, so a placeholder never takes one.
+            $taken = [];
+            foreach (array_keys($props) as $key) {
+                if (self::text((string) $key, $secrets) === (string) $key) {
+                    $taken[(string) $key] = true;
+                }
+            }
             $result = [];
-            foreach (get_object_vars($value) as $key => $item) {
-                $name = self::text((string) $key, $secrets);
-                for ($number = 2; \array_key_exists($name, $result); ++$number) {
-                    $name = self::REDACTED . $number;
+            $next = 1;
+            foreach ($props as $key => $item) {
+                $name = (string) $key;
+                if (self::text($name, $secrets) !== $name) {
+                    do {
+                        $name = 1 === $next ? self::REDACTED : self::REDACTED . $next;
+                        ++$next;
+                    } while (isset($taken[$name]));
+                    $taken[$name] = true;
                 }
                 $result[$name] = self::value($item, $secrets);
             }
@@ -113,7 +127,7 @@ final class StructuredRedaction
     /**
      * @param list<string> $secrets
      */
-    private static function text(string $text, array $secrets): string
+    public static function text(string $text, array $secrets): string
     {
         foreach ($secrets as $secret) {
             if ('' !== $secret && str_contains($text, $secret)) {

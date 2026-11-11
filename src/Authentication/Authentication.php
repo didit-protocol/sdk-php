@@ -11,6 +11,7 @@ use Didit\Core\RawResponse;
 use Didit\Core\StructuredRedaction;
 use Didit\Exception\ApiConnectionException;
 use Didit\Exception\ApiStatusException;
+use Didit\Exception\ApiTimeoutException;
 use Didit\Exception\ConfigurationException;
 use Didit\Exception\DiditException;
 use Didit\Version;
@@ -829,7 +830,24 @@ final class Authentication
         }
 
         $this->transport ??= new HttpTransport($this->httpClient);
-        $response = new RawResponse($this->transport->send($request, $this->timeout), $method, (string) parse_url($url, \PHP_URL_PATH));
+        $failure = null;
+        try {
+            $psrResponse = $this->transport->send($request, $this->timeout);
+        } catch (\Throwable $e) {
+            if (!isset($json['challenge'])) {
+                throw $e;
+            }
+            // An agent consent call: a transport may quote the serialized request in its message, in a spelling no
+            // match finds, so the error keeps its type and none of the underlying text or exception.
+            $mayHaveReached = !$e instanceof ApiConnectionException || $e->mayHaveReachedServer;
+            $failure = $e instanceof ApiTimeoutException
+                ? new ApiTimeoutException('Request timed out: agent consent request (details withheld)', $mayHaveReached)
+                : new ApiConnectionException('Connection error: agent consent request (details withheld)', $mayHaveReached);
+        }
+        if (null !== $failure) {
+            throw $failure;
+        }
+        $response = new RawResponse($psrResponse, $method, (string) parse_url($url, \PHP_URL_PATH));
         if ($response->status < 200 || $response->status > 299) {
             if (isset($json['challenge'])) {
                 // An agent consent call: the issuer may echo the challenge or the assertion, so the error is
@@ -837,10 +855,15 @@ final class Authentication
                 $secrets = array_values(array_filter([$accessToken, $json['challenge'], ...StructuredRedaction::assertionStrings($encoded ?? '{}')], 'is_string'));
                 $redacted = $this->streamFactory()->createStream(StructuredRedaction::body($response->body(), $secrets));
                 $kept = $response->psrResponse
+                    ->withStatus($response->status, StructuredRedaction::text($response->reasonPhrase(), $secrets))
                     ->withBody($redacted)
                     ->withoutHeader('Content-Encoding')
                     ->withoutHeader('Transfer-Encoding')
                     ->withHeader('Content-Length', (string) $redacted->getSize());
+                // Header values are issuer-controlled too (a request id, an echo): one that contains a secret is replaced whole.
+                foreach ($kept->getHeaders() as $name => $values) {
+                    $kept = $kept->withHeader($name, array_map(static fn (string $value): string => StructuredRedaction::text($value, $secrets), $values));
+                }
                 throw ApiStatusException::create(new RawResponse($kept, $method, (string) parse_url($url, \PHP_URL_PATH)));
             }
             // Tokens and codes never reach an exception message, even when echoed back.
