@@ -19,6 +19,7 @@ final class StructuredRedaction
     public const REDACTED = '[redacted]';
 
     /** Shorter assertion strings (`id`, `type`, `public-key`) are not secrets: matching them would erase codes such as `invalid_grant`. */
+    // Sensitive values are 16+ chars: user handles are 16-byte ids (22 base64url), credential ids 16+ bytes.
     private const MIN_SECRET_LENGTH = 16;
 
     private function __construct()
