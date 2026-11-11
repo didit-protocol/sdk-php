@@ -233,6 +233,15 @@ namespace Didit;
  *     tags?: list<string>,
  *     note?: string|null,
  * }
+ * @phpstan-type CaseBlueprintAiDraftRequest array{
+ *     prompt: string,
+ * }
+ * @phpstan-type CaseBlueprintStage array{
+ *     key?: string,
+ *     label: string,
+ *     sla_hours?: int|null,
+ *     worked_by?: string|null,
+ * }
  * @phpstan-type CaseCollaborationCaseNoteCreateRequest array{
  *     comment: string,
  *     reply_to?: string|null,
@@ -252,6 +261,7 @@ namespace Didit;
  *     verifications?: CaseContentConfigVerifications,
  *     reporting?: CaseContentConfigReporting,
  *     financial?: CaseContentConfigFinancial,
+ *     stages?: CaseContentConfigStages,
  * }
  * @phpstan-type CaseContentConfigAmlControl array{
  *     enabled?: bool,
@@ -284,6 +294,9 @@ namespace Didit;
  * @phpstan-type CaseContentConfigReporting array{
  *     enabled?: bool,
  *     fiu_reports?: bool,
+ * }
+ * @phpstan-type CaseContentConfigStages array{
+ *     items?: list<CaseBlueprintStage>,
  * }
  * @phpstan-type CaseContentConfigVerifications array{
  *     enabled?: bool,
@@ -390,6 +403,7 @@ namespace Didit;
  *     is_active?: bool,
  *     default_deadline_hours?: int|null,
  *     publish?: bool,
+ *     applies_to?: list<string>,
  * }
  * @phpstan-type CasesBlueprintsInstallPresetsParams array{
  *     preset_keys?: list<string>|null,
@@ -418,6 +432,7 @@ namespace Didit;
  *     is_active?: bool,
  *     default_deadline_hours?: int|null,
  *     expected_version?: int,
+ *     applies_to?: list<string>,
  * }
  * @phpstan-type CasesBulkAssignParams array{
  *     case_uuids: list<string>,
@@ -441,7 +456,7 @@ namespace Didit;
  *     due_at?: \DateTimeInterface|string|null,
  *     tags?: list<string>,
  *     subject?: CasesCreateParamsSubject,
- *     links?: list<array<string, mixed>>,
+ *     links?: list<CasesLinksCreateParams>,
  *     assigned_to?: string|null,
  *     review_duplicates?: bool,
  *     separate_incident_reason?: string,

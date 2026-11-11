@@ -25,7 +25,8 @@ final class CaseLink extends BaseModel
 
     /**
      * session_id/session_number/status for session and business_session links; uuid/txn_id/status for
-     * transaction links.
+     * transaction links. Network links return only {"uuid": "<network-uuid>"}, without network member
+     * details.
      *
      * @var array<string, mixed>|null
      */

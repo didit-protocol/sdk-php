@@ -24,8 +24,8 @@ final class CasesBlueprintsListPresetsResponseResults extends BaseModel
     public readonly ?string $description;
 
     /**
-     * The six togglable sections that drive which tabs and fields appear on the case page. Unknown
-     * sections or keys are rejected.
+     * Case content sections and optional review stages. Unknown sections or keys are rejected. Cases
+     * retain the policy snapshot accepted when opened; later blueprint edits do not rewrite it.
      */
     public readonly ?CaseContentConfig $contentConfig;
 

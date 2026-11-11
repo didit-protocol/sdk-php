@@ -17,6 +17,8 @@ final class CaseDuplicateEntityTypeEnum
 
     public const TRANSACTION = 'transaction';
 
+    public const NETWORK = 'network';
+
     private function __construct()
     {
     }

@@ -57,6 +57,21 @@ final class CaseBlueprintListItem extends BaseModel
     public readonly ?int $defaultDeadlineHours;
 
     /**
+     * Case types this blueprint describes. Optional on create and update; new blueprints default to an
+     * empty list. Stored in the accepted case policy snapshot.
+     *
+     * @var list<string>|null
+     */
+    public readonly ?array $appliesTo;
+
+    /**
+     * Configured stages, or the default stages when none are configured.
+     *
+     * @var list<CaseBlueprintStage>|null
+     */
+    public readonly ?array $stages;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -76,5 +91,7 @@ final class CaseBlueprintListItem extends BaseModel
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
         $this->version = Hydrate::int($data['version'] ?? null);
         $this->defaultDeadlineHours = Hydrate::int($data['default_deadline_hours'] ?? null);
+        $this->appliesTo = Hydrate::list($data['applies_to'] ?? null, Hydrate::string(...));
+        $this->stages = Hydrate::list($data['stages'] ?? null, static fn (mixed $v) => Hydrate::model($v, CaseBlueprintStage::class));
     }
 }
