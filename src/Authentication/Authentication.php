@@ -846,13 +846,7 @@ final class Authentication
      */
     private static function withoutSecrets(string $text, #[\SensitiveParameter] array $secrets): string
     {
-        foreach ($secrets as $secret) {
-            foreach ([$secret, substr(json_encode($secret, \JSON_UNESCAPED_SLASHES | \JSON_THROW_ON_ERROR), 1, -1)] as $form) {
-                if ('' !== $form) {
-                    $text = str_replace($form, '[redacted]', $text);
-                }
-            }
-        }
+        $text = ApiStatusException::redact($text, $secrets);
 
         return $text;
     }

@@ -177,6 +177,22 @@ final class AgentConsentTest extends TestCase
         }
     }
 
+    public function testAnAssertionValueThatPrefixesAnotherLeavesNoPartOfEitherInTheMessageOrBody(): void
+    {
+        $this->issuer->http->on('POST', self::CONSENT_URL, TestIssuer::json(400, ['error' => 'echo abcdef and abc end']));
+
+        try {
+            $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', ['id' => 'abc', 'rawId' => 'abcdef', 'response' => ['signature' => '']]);
+            self::fail('Expected a BadRequestException.');
+        } catch (BadRequestException $e) {
+            self::assertSame('HTTP 400 Bad Request: echo [redacted] and [redacted] end', $e->getMessage());
+            foreach ([$e->getMessage(), $e->response->body(), json_encode($e->body, \JSON_THROW_ON_ERROR)] as $text) {
+                self::assertStringNotContainsString('abc', $text);
+                self::assertStringNotContainsString('def', $text);
+            }
+        }
+    }
+
     public function testPasskeyRequiredIsPermissionDenied(): void
     {
         $this->issuer->http->on('POST', self::CONSENT_URL, TestIssuer::json(403, ['detail' => 'passkey_required']));

@@ -61,19 +61,32 @@ class ApiStatusException extends DiditException
     }
 
     /**
+     * The text with every secret removed, in raw and JSON-escaped form.
+     * Longest form first, so a secret that is a prefix of another cannot leave part of the longer one behind.
+     *
+     * @internal
+     *
      * @param list<string> $secrets
      */
-    private static function redact(string $message, #[\SensitiveParameter] array $secrets): string
+    public static function redact(string $message, #[\SensitiveParameter] array $secrets): string
     {
+        $forms = [];
         foreach ($secrets as $secret) {
             if ('' === $secret) {
                 continue;
             }
-            $message = str_replace($secret, '[redacted]', $message);
-            $escaped = substr(json_encode($secret, \JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_INVALID_UTF8_SUBSTITUTE | \JSON_THROW_ON_ERROR), 1, -1);
-            if ('' !== $escaped) {
-                $message = str_replace($escaped, '[redacted]', $message);
+            $forms[$secret] = true;
+            foreach ([\JSON_UNESCAPED_SLASHES | \JSON_UNESCAPED_UNICODE | \JSON_INVALID_UTF8_SUBSTITUTE, \JSON_UNESCAPED_SLASHES | \JSON_INVALID_UTF8_SUBSTITUTE] as $flags) {
+                $escaped = substr(json_encode($secret, $flags | \JSON_THROW_ON_ERROR), 1, -1);
+                if ('' !== $escaped) {
+                    $forms[$escaped] = true;
+                }
             }
+        }
+        $forms = array_map('strval', array_keys($forms));
+        usort($forms, static fn (string $a, string $b): int => \strlen($b) <=> \strlen($a));
+        foreach ($forms as $form) {
+            $message = str_replace($form, '[redacted]', $message);
         }
 
         return $message;
