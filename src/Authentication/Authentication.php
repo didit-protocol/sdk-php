@@ -411,7 +411,7 @@ final class Authentication
             $body['scopes'] = $scopes;
         }
         if (null !== $organizationIds) {
-            $body['organization_ids'] = array_values($organizationIds);
+            $body['organization_ids'] = $organizationIds;
         }
         if (null !== $lifetime) {
             $body['lifetime'] = $lifetime;
