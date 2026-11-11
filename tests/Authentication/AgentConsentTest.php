@@ -306,6 +306,16 @@ final class AgentConsentTest extends TestCase
         self::assertStringNotContainsString($sent, self::shown($e));
     }
 
+    public function testTheErrorResponseCarriesTheRedactedBody(): void
+    {
+        $secret = 'credential-string-0123456789';
+        $e = $this->consentError(['id' => $secret], TestIssuer::json(400, ['error' => 'invalid_grant', 'echo' => 'x ' . $secret], ['Content-Length' => '999']));
+
+        self::assertSame('{"error":"invalid_grant","echo":"[redacted]"}', $e->response->body());
+        self::assertSame((string) \strlen($e->response->body()), $e->response->header('Content-Length'));
+        self::assertStringNotContainsString('credential-str', $e->response->body());
+    }
+
     public function testErrorCodesAndShortAssertionStringsStayReadable(): void
     {
         $long = 'Y3JlZGVudGlhbC1pZC0xMjM0NTY3ODkw';

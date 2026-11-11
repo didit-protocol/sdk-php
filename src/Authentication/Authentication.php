@@ -836,7 +836,12 @@ final class Authentication
                 // built from the redacted response, never from its raw text.
                 $secrets = array_values(array_filter([$accessToken, $json['challenge'], ...StructuredRedaction::assertionStrings($encoded ?? '{}')], 'is_string'));
                 $redacted = $this->streamFactory()->createStream(StructuredRedaction::body($response->body(), $secrets));
-                throw ApiStatusException::create(new RawResponse($response->psrResponse->withBody($redacted), $method, (string) parse_url($url, \PHP_URL_PATH)));
+                $kept = $response->psrResponse
+                    ->withBody($redacted)
+                    ->withoutHeader('Content-Encoding')
+                    ->withoutHeader('Transfer-Encoding')
+                    ->withHeader('Content-Length', (string) $redacted->getSize());
+                throw ApiStatusException::create(new RawResponse($kept, $method, (string) parse_url($url, \PHP_URL_PATH)));
             }
             // Tokens and codes never reach an exception message, even when echoed back.
             throw ApiStatusException::create($response, array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null], 'is_string')));
