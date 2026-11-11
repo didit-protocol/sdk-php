@@ -279,7 +279,7 @@ try {
 - `refresh($refreshToken)`: refresh tokens are single-use and reusing one revokes the session, so serialise refreshes for one session.
 - `getSession($accessToken)` sees a revocation immediately (offline verification only when the token expires, within 5 minutes); `revokeSession($accessToken)` signs the user out.
 - Step-up before sensitive actions: `createStepUp($accessToken, StepUp::ACTION_PAYOUT, '900.00', 'EUR', $returnTo)`, then `retrieveStepUp($accessToken, $id)`; act only when `isApproved()`.
-- Agent access consent: `submitAgentConsent($accessToken, $challenge, 'approve', $assertion)` approves or denies (`'deny'`, no assertion) a pending agent request and returns the code, redirect URI and state or the denial (`isApproved()`, `isDenied()`); `createAgentApprovalOptions($accessToken, $challenge)` returns the WebAuthn options the browser needs for the assertion. Never log the challenge or the assertion.
+- Agent access consent: `submitAgentConsent($accessToken, $challenge, 'approve', $assertion, organizationIds: $uuids, lifetime: 604800)` (the last two are optional; the lifetime is 86400, 604800 or 2592000 seconds) approves or denies (`'deny'`, no assertion) a pending agent request and returns the code, redirect URI and state or the denial (`isApproved()`, `isDenied()`); `createAgentApprovalOptions($accessToken, $challenge)` returns the WebAuthn options the browser needs for the assertion. Never log the challenge or the assertion.
 
 Authentication is in early access and reaches production in the 2026-11-01 Didit release.
 

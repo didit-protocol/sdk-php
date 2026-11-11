@@ -380,19 +380,41 @@ final class Authentication
      * @param string $decision `approve` or `deny`
      * @param array<string, mixed>|null $assertion JSON-serialised result of `navigator.credentials.get()`
      * @param list<string>|null $scopes narrows the requested scopes (`read`, `act`); omitted means all requested
+     * @param list<string>|null $organizationIds UUIDs of organizations the person belongs to (at most 100); omitted means none
+     * @param int|null $lifetime grant lifetime in seconds: 86400, 604800 or 2592000, limited by the application policy; omitted means the policy lifetime
      *
      * @throws ApiStatusException a missing assertion is `PermissionDeniedException` (`passkey_required`),
      *                            an expired, reused or invalid one `BadRequestException` (`invalid_grant`)
      * @throws ApiConnectionException
+     * @throws \InvalidArgumentException when `$organizationIds` or `$lifetime` breaks the documented limits
      */
-    public function submitAgentConsent(string $accessToken, string $challenge, string $decision, ?array $assertion = null, ?array $scopes = null): AgentConsentResult
+    public function submitAgentConsent(string $accessToken, string $challenge, string $decision, ?array $assertion = null, ?array $scopes = null, ?array $organizationIds = null, ?int $lifetime = null): AgentConsentResult
     {
+        if (null !== $organizationIds) {
+            if (\count($organizationIds) > 100) {
+                throw new \InvalidArgumentException('At most 100 organization IDs can be sent.');
+            }
+            foreach ($organizationIds as $organizationId) {
+                if (1 !== preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/Di', $organizationId)) {
+                    throw new \InvalidArgumentException('Every organization ID must be a UUID.');
+                }
+            }
+        }
+        if (null !== $lifetime && !\in_array($lifetime, [86400, 604800, 2592000], true)) {
+            throw new \InvalidArgumentException('The lifetime must be 86400, 604800 or 2592000 seconds.');
+        }
         $body = ['challenge' => $challenge, 'decision' => $decision];
         if (null !== $assertion) {
             $body['assertion'] = $assertion;
         }
         if (null !== $scopes) {
             $body['scopes'] = $scopes;
+        }
+        if (null !== $organizationIds) {
+            $body['organization_ids'] = array_values($organizationIds);
+        }
+        if (null !== $lifetime) {
+            $body['lifetime'] = $lifetime;
         }
 
         $response = $this->send('POST', $this->issuer . '/agents/consent/', accessToken: $accessToken, json: $body);

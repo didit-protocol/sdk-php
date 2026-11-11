@@ -58,6 +58,37 @@ final class AgentConsentTest extends TestCase
         self::assertSame(200, $result->rawResponse()?->status);
     }
 
+    public function testApproveSendsOrganizationIdsAndLifetime(): void
+    {
+        $this->issuer->http->on('POST', self::CONSENT_URL, TestIssuer::json(200, ['code' => 'c', 'redirect_uri' => 'https://agent.example/callback', 'state' => 's']));
+        $id = '94efc2c3-ca84-42fe-900b-6fb61669a7a1';
+
+        $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', organizationIds: [$id], lifetime: 604800);
+
+        self::assertSame(
+            ['challenge' => self::CHALLENGE, 'decision' => 'approve', 'organization_ids' => [$id], 'lifetime' => 604800],
+            json_decode((string) $this->issuer->http->last()->getBody(), true),
+        );
+    }
+
+    public function testInvalidOrganizationIdsAndLifetimeAreRejectedBeforeSending(): void
+    {
+        $auth = $this->issuer->auth();
+        $cases = [
+            ['organizationIds' => ['not-a-uuid'], 'lifetime' => null],
+            ['organizationIds' => array_fill(0, 101, '94efc2c3-ca84-42fe-900b-6fb61669a7a1'), 'lifetime' => null],
+            ['organizationIds' => null, 'lifetime' => 3600],
+        ];
+        foreach ($cases as $case) {
+            try {
+                $auth->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', organizationIds: $case['organizationIds'], lifetime: $case['lifetime']);
+                self::fail('Expected an InvalidArgumentException.');
+            } catch (\InvalidArgumentException) {
+                self::assertSame(0, $this->issuer->http->count('POST', self::CONSENT_URL));
+            }
+        }
+    }
+
     public function testDenyNeedsNoAssertionAndParsesTheDenial(): void
     {
         $this->issuer->http->on('POST', self::CONSENT_URL, TestIssuer::json(200, ['status' => 'denied']));
