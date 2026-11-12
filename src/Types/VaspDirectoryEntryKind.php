@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * directory for an entry of the shared directory; didit for a member of the Didit network.
+ * directory for a shared or application-private directory entry; didit for a Didit network member.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

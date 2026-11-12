@@ -182,6 +182,22 @@ final class TravelRuleTransferDetail extends BaseModel
     public readonly ?string $proofState;
 
     /**
+     * Recorded cancellation reason, empty when unspecified.
+     *
+     * Known values: {@see TravelRuleTransferDetailCancelReason}.
+     */
+    public readonly ?string $cancelReason;
+
+    /** Recorded cancellation actor, or an empty string when none is recorded. */
+    public readonly ?string $cancelledBy;
+
+    /** Saved team notification preference. Initially false. */
+    public readonly ?bool $notifyOnAnswer;
+
+    /** Explicit user-choice state, or null when counterparty_choice=user was not requested. */
+    public readonly ?TravelRuleUserChoice $userChoice;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -215,5 +231,9 @@ final class TravelRuleTransferDetail extends BaseModel
         $this->deliveriesTruncated = Hydrate::bool($data['deliveries_truncated'] ?? null);
         $this->notRequiredReason = Hydrate::string($data['not_required_reason'] ?? null);
         $this->proofState = Hydrate::string($data['proof_state'] ?? null);
+        $this->cancelReason = Hydrate::string($data['cancel_reason'] ?? null);
+        $this->cancelledBy = Hydrate::string($data['cancelled_by'] ?? null);
+        $this->notifyOnAnswer = Hydrate::bool($data['notify_on_answer'] ?? null);
+        $this->userChoice = Hydrate::model($data['user_choice'] ?? null, TravelRuleUserChoice::class);
     }
 }

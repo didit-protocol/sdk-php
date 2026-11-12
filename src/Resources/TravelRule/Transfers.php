@@ -44,7 +44,7 @@ final class Transfers extends BaseResource
         return $this->requester->requestPage(new Operation(
             method: 'GET',
             path: '/v3/travel-rule/transfers/',
-            query: ['direction' => 'direction', 'status' => 'status', 'rail' => 'rail', 'kind' => 'kind', 'currency' => 'currency', 'start_date' => 'start_date', 'end_date' => 'end_date', 'counterparty' => 'counterparty', 'limit' => 'limit', 'offset' => 'offset'],
+            query: ['search' => 'search', 'direction' => 'direction', 'status' => 'status', 'rail' => 'rail', 'kind' => 'kind', 'currency' => 'currency', 'start_date' => 'start_date', 'end_date' => 'end_date', 'counterparty' => 'counterparty', 'limit' => 'limit', 'offset' => 'offset'],
         ), [], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\TravelRuleTransferRow::class));
     }
 }

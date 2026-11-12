@@ -21,6 +21,7 @@ final class TransfersTest extends GeneratedTestCase
         $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"id":"5b0f6c2e-2a4d-4f0e-9a41-0c3f9a7e1d22","transaction_id":"a3c1e8f4-7b62-4d1a-8e0b-2f9d6c4b7a10","txn_id":"wd-2026-10-19-0042","txn_date":"2026-10-19T08:41:12Z","kind":"withdrawal","direction":"OUTBOUND","status":"AWAITING_COUNTERPARTY","rail":"TRP","asset":"ETH","amount":"1.25","originator_vasp":"Origin CASP SL","beneficiary_vasp":"Example Counterparty VASP","originator_wallet":"0x77ccff0cc624a53cd8b8d8703ced826710211ec7","beneficiary_wallet":"0xede2d7e4f5b097e6391ab6bbcf2f47a53f4778cb","originator_memo":"","beneficiary_memo":"","originator_wallet_type":"vasp","beneficiary_wallet_type":"vasp","matched_transaction_id":null,"scenario":null,"webhooks_count":3,"deadline_at":"2026-10-21T08:41:13Z","created_at":"2026-10-19T08:41:13Z"}]}');
 
         $result = $this->client->travelRule->transfers->list([
+            'search' => 'search-value',
             'direction' => 'direction-value',
             'status' => 'status-value',
             'rail' => 'rail-value',
@@ -38,6 +39,7 @@ final class TransfersTest extends GeneratedTestCase
         self::assertSame('verification.didit.me', $request->getUri()->getHost());
         self::assertSame('/v3/travel-rule/transfers/', $request->getUri()->getPath());
         self::assertSame([
+            'search' => 'search-value',
             'direction' => 'direction-value',
             'status' => 'status-value',
             'rail' => 'rail-value',

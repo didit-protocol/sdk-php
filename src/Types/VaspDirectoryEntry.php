@@ -23,7 +23,7 @@ final class VaspDirectoryEntry extends BaseModel
     public readonly ?string $id;
 
     /**
-     * directory for an entry of the shared directory; didit for a member of the Didit network.
+     * directory for a shared or application-private directory entry; didit for a Didit network member.
      *
      * Known values: {@see VaspDirectoryEntryKind}.
      */
@@ -192,6 +192,15 @@ final class VaspDirectoryEntry extends BaseModel
     public readonly ?array $questionnaires;
 
     /**
+     * directory for a shared directory entry, added_by_you for your application-private entry, or
+     * didit_network for a directory entry linked to a Didit customer. Separate kind=didit member results
+     * may omit this field; use kind to identify them.
+     *
+     * Known values: {@see VaspDirectoryEntrySource}.
+     */
+    public readonly ?string $source;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -223,5 +232,6 @@ final class VaspDirectoryEntry extends BaseModel
         $this->decision = Hydrate::model($data['decision'] ?? null, TravelRuleCounterpartyDecision::class);
         $this->entityScreening = Hydrate::model($data['entity_screening'] ?? null, TravelRuleCounterpartyScreening::class);
         $this->questionnaires = Hydrate::list($data['questionnaires'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleCounterpartyQuestionnaire::class));
+        $this->source = Hydrate::string($data['source'] ?? null);
     }
 }

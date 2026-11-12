@@ -24,11 +24,12 @@ use Didit\Types;
  * @phpstan-import-type TravelRuleOwnershipConfirmRequest from Params
  * @phpstan-import-type TravelRuleTestVaspInboundRequest from Params
  * @phpstan-import-type TravelRuleTransferPatchRequest from Params
+ * @phpstan-import-type TravelRuleUserLinkRequest from Params
  */
 final class TravelRule extends BaseResource
 {
     /**
-     * Finish, cancel, resend, or update the originator wallet of a Travel Rule transfer.
+     * Update a Travel Rule transfer.
      *
      * Provide `payment_txn_id` to report the on-chain hash and move an outbound COMPLETED transfer to
      * FINISHED (its INTERNAL-rail counterpart also moves to FINISHED), `{"action": "cancel"}` to cancel a
@@ -200,5 +201,37 @@ final class TravelRule extends BaseResource
             path: '/v3/transactions/{transaction_id}/travel-rule/deliveries/',
             query: ['limit' => 'limit', 'offset' => 'offset'],
         ), ['transaction_id' => $transactionId], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\TravelRuleDeliveryLogEntry::class));
+    }
+
+    /**
+     * Create or email a Travel Rule end-user link.
+     *
+     * Issue a new link and revoke previous open links for this transfer. Requires write access to
+     * transactions and an outbound transfer in AWAITING_COUNTERPARTY, COUNTERPARTY_VASP_NOT_FOUND,
+     * COUNTERPARTY_VASP_NOT_REACHABLE, UNCONFIRMED_OWNERSHIP or ON_HOLD. channel=email uses the end user's
+     * Didit-record email and verification-session language when available. A send failure returns the link
+     * with emailed_to empty; email_available reports address availability, not delivery. See [User
+     * links](/management-api/travel-rule/create-user-link).
+     *
+     * `POST /v3/transactions/{transaction_id}/travel-rule/user-link/`
+     *
+     * @param string $transactionId didit-stable transaction UUID that owns the transfer
+     * @param TravelRuleUserLinkRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function createUserLink(
+        string $transactionId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleUserLinkResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/transactions/{transaction_id}/travel-rule/user-link/',
+            bodyTypes: ['json'],
+        ), ['transaction_id' => $transactionId], $params, $options);
+
+        return Types\TravelRuleUserLinkResponse::fromResponse($response);
     }
 }
