@@ -10,6 +10,7 @@ use Didit\Core\BaseResource;
 use Didit\Core\Hydrate;
 use Didit\Core\ListResponse;
 use Didit\Core\Operation;
+use Didit\Core\Page;
 use Didit\Exception\DiditException;
 use Didit\Params;
 use Didit\RequestOptions;
@@ -18,6 +19,7 @@ use Didit\Types;
 /**
  * The `transactions.travel_rule` resource.
  *
+ * @phpstan-import-type TransactionsTravelRuleListDeliveriesParams from Params
  * @phpstan-import-type TravelRuleMessageCreateRequest from Params
  * @phpstan-import-type TravelRuleOwnershipConfirmRequest from Params
  * @phpstan-import-type TravelRuleTestVaspInboundRequest from Params
@@ -172,5 +174,31 @@ final class TravelRule extends BaseResource
         ), [], $params, $options);
 
         return Types\TravelRuleTestVaspInboundResponse::fromResponse($response);
+    }
+
+    /**
+     * List Travel Rule delivery history.
+     *
+     * Read the complete delivery history for a transaction, oldest first. Requires transaction read
+     * permission. Unlike the newest 100 entries embedded in detail, this endpoint paginates the full
+     * history. See [delivery history](/management-api/travel-rule/list-deliveries).
+     *
+     * `GET /v3/transactions/{transaction_id}/travel-rule/deliveries/`
+     *
+     * @param string $transactionId didit-stable transaction UUID that owns the transfer
+     * @param TransactionsTravelRuleListDeliveriesParams $params
+     *
+     * @return Page<Types\TravelRuleDeliveryLogEntry>
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listDeliveries(string $transactionId, array $params = [], ?RequestOptions $options = null): Page
+    {
+        return $this->requester->requestPage(new Operation(
+            method: 'GET',
+            path: '/v3/transactions/{transaction_id}/travel-rule/deliveries/',
+            query: ['limit' => 'limit', 'offset' => 'offset'],
+        ), ['transaction_id' => $transactionId], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\TravelRuleDeliveryLogEntry::class));
     }
 }

@@ -56,6 +56,7 @@ final class ApplicationsTest extends GeneratedTestCase
             'privacy_url' => 'privacy_url-value',
             'description' => 'description-value',
             'data_location' => 'eu',
+            'initiate_login_uri' => 'initiate_login_uri-value',
         ]);
 
         $request = $this->lastRequest();
@@ -66,7 +67,7 @@ final class ApplicationsTest extends GeneratedTestCase
         self::assertSame('Bearer ' . self::ACCOUNT_TOKEN, $request->getHeaderLine('Authorization'));
         self::assertSame('', $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"name":"name-value","website_url":"website_url-value","redirect_uris":["redirect_uris-value"],"terms_url":"terms_url-value","privacy_url":"privacy_url-value","description":"description-value","data_location":"eu"}', $this->canonicalBody($request));
+        self::assertSame('{"name":"name-value","website_url":"website_url-value","redirect_uris":["redirect_uris-value"],"terms_url":"terms_url-value","privacy_url":"privacy_url-value","description":"description-value","data_location":"eu","initiate_login_uri":"initiate_login_uri-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"Acme Customer App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://acme.example","redirect_uris":["https://acme.example/callback"],"terms_url":"https://acme.example/terms","privacy_url":"https://acme.example/privacy","description":null,"created_at":"2025-06-01T10:00:00Z","data_location":"eu","products":[{"product":"identity","status":"enabled","modules":{"user_verification":true,"business_verification":true,"case_management":true}},{"product":"transactions","status":"disabled","modules":{"travel_rule":true,"case_management":true}},{"product":"authentication","status":"disabled","modules":{}}]}'), $result->toArray());
         self::assertSame('b2c3d4e5-6789-01bc-defg-222222222222', $result->uuid);
@@ -105,6 +106,7 @@ final class ApplicationsTest extends GeneratedTestCase
             'privacy_url' => 'privacy_url-value',
             'description' => 'description-value',
             'data_location' => 'eu',
+            'initiate_login_uri' => 'initiate_login_uri-value',
         ]);
 
         $request = $this->lastRequest();
@@ -115,7 +117,7 @@ final class ApplicationsTest extends GeneratedTestCase
         self::assertSame('Bearer ' . self::ACCOUNT_TOKEN, $request->getHeaderLine('Authorization'));
         self::assertSame('', $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"name":"name-value","website_url":"website_url-value","redirect_uris":["redirect_uris-value"],"terms_url":"terms_url-value","privacy_url":"privacy_url-value","description":"description-value","data_location":"eu"}', $this->canonicalBody($request));
+        self::assertSame('{"name":"name-value","website_url":"website_url-value","redirect_uris":["redirect_uris-value"],"terms_url":"terms_url-value","privacy_url":"privacy_url-value","description":"description-value","data_location":"eu","initiate_login_uri":"initiate_login_uri-value"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"b2c3d4e5-6789-01bc-defg-222222222222","name":"Acme Production App","client_id":"S9LIYGSoWNuGMLHsvEt9dQ","api_key":"sample-api-key","website_url":"https://app.acme.example","redirect_uris":["https://acme.example/callback"],"terms_url":"https://acme.example/terms","privacy_url":"https://acme.example/privacy","description":null,"created_at":"2025-06-01T10:00:00Z","data_location":"eu","products":[{"product":"identity","status":"enabled","modules":{"user_verification":true,"business_verification":true,"case_management":true}},{"product":"transactions","status":"disabled","modules":{"travel_rule":true,"case_management":true}},{"product":"authentication","status":"disabled","modules":{}}]}'), $result->toArray());
         self::assertSame('b2c3d4e5-6789-01bc-defg-222222222222', $result->uuid);

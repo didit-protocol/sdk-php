@@ -140,6 +140,9 @@ final class Investigator extends BaseResource
      * Takes another action with a category and a reason. Also overrides a decision the Investigator took
      * on its own while it still stands. Restricted keys need the `decisions` scope (write); transaction
      * alerts also need `transactions` (write). Escalating a verification or transaction opens a case.
+     * Automated transaction decisions can be overridden only while the original decision still stands. The
+     * original decision remains unchanged, the override is recorded separately, and an immediate policy
+     * question is raised for its recorded situations with the original policy action.
      *
      * `POST /v3/investigator/runs/{run_id}/override/`
      *

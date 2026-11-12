@@ -10,11 +10,8 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * A transaction's Travel Rule transfer, as `GET /v3/transactions/{transaction_id}/`, the `201` of
- * `POST /v3/transactions/` and each row of `GET /v3/transactions/` return it. `direction`, `rail`,
- * `counterparty_vasp`, `delivery`, `discovery`, `reason` and `next_actions` have the same shape as on
- * `PATCH /v3/transactions/{transaction_id}/travel-rule/`, so one read of a transaction says why its
- * transfer is stuck and what moves it on.
+ * Travel Rule transfer on transaction detail and creation responses. Includes latest delivery and
+ * bounded delivery history. Transaction lists omit the history fields.
  */
 final class TransactionTravelRule extends BaseModel
 {
@@ -142,6 +139,36 @@ final class TransactionTravelRule extends BaseModel
     public readonly ?TravelRuleChainDetails $chainDetails;
 
     /**
+     * Newest 100 delivery entries, presented oldest first (creation time, then identifier). Empty when no
+     * messages exist. Use the paginated delivery endpoint for complete history.
+     *
+     * @var list<TravelRuleDeliveryLogEntry>|null
+     */
+    public readonly ?array $deliveries;
+
+    /**
+     * True when older entries were omitted from deliveries. Follow GET
+     * /v3/transactions/{transaction_id}/travel-rule/deliveries/ for the complete history.
+     */
+    public readonly ?bool $deliveriesTruncated;
+
+    /**
+     * Null when required is true. Otherwise below_threshold, the recorded chain exemption (for example
+     * LIGHTNING_NO_PAYEE_IDENTIFIER, LIGHTNING_BOLT12_BLINDED_PAYEE or LIGHTNING_LNURL_NAMES_NO_PAYEE), or
+     * unknown for legacy transfers without a recorded reason.
+     */
+    public readonly ?string $notRequiredReason;
+
+    /**
+     * not_required when the transfer is not required; otherwise confirmed or not_confirmed follows
+     * ownership_confirmed. With no verdict, requested means an active outbound ownership widget matches
+     * this transfer and subject; otherwise not_requested. A request is not completed proof.
+     *
+     * Known values: {@see TransactionTravelRuleProofState}.
+     */
+    public readonly ?string $proofState;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -168,5 +195,9 @@ final class TransactionTravelRule extends BaseModel
         $this->reason = Hydrate::string($data['reason'] ?? null);
         $this->nextActions = Hydrate::list($data['next_actions'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleNextAction::class));
         $this->chainDetails = Hydrate::model($data['chain_details'] ?? null, TravelRuleChainDetails::class);
+        $this->deliveries = Hydrate::list($data['deliveries'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleDeliveryLogEntry::class));
+        $this->deliveriesTruncated = Hydrate::bool($data['deliveries_truncated'] ?? null);
+        $this->notRequiredReason = Hydrate::string($data['not_required_reason'] ?? null);
+        $this->proofState = Hydrate::string($data['proof_state'] ?? null);
     }
 }

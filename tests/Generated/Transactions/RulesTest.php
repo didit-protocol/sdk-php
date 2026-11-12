@@ -199,7 +199,7 @@ final class RulesTest extends GeneratedTestCase
 
     public function testBacktest(): void
     {
-        $this->queueJson(200, '{"evaluated":4820,"matched":12,"affected_entities":4,"period_days":90}');
+        $this->queueJson(200, '{"evaluated":4820,"matched":12,"affected_entities":4,"period_days":90,"truncated":false,"overlapping_rules":[],"overlapping_rules_truncated":false}');
 
         $result = $this->client->transactions->rules->backtest([
             'conditions' => [
@@ -226,6 +226,7 @@ final class RulesTest extends GeneratedTestCase
                 ],
             ],
             'period_days' => 1,
+            'rule_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
         ]);
 
         $request = $this->lastRequest();
@@ -235,9 +236,9 @@ final class RulesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"conditions":[{"field":"field-value","operator":"eq"}],"aggregation":[{"value":1.5}],"evaluation_mode":"ALL","scope":{"transaction_types":["transaction_types-value"],"directions":["INBOUND"],"action_types":["action_types-value"]},"period_days":1}', $this->canonicalBody($request));
+        self::assertSame('{"conditions":[{"field":"field-value","operator":"eq"}],"aggregation":[{"value":1.5}],"evaluation_mode":"ALL","scope":{"transaction_types":["transaction_types-value"],"directions":["INBOUND"],"action_types":["action_types-value"]},"period_days":1,"rule_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"evaluated":4820,"matched":12,"affected_entities":4,"period_days":90}'), $result->toArray());
+        self::assertSame($this->decoded('{"evaluated":4820,"matched":12,"affected_entities":4,"period_days":90,"truncated":false,"overlapping_rules":[],"overlapping_rules_truncated":false}'), $result->toArray());
         self::assertSame(4820, $result->evaluated);
     }
 

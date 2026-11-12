@@ -26,6 +26,25 @@ final class TransactionRuleBacktestResult extends BaseModel
     /** The `period_days` field. */
     public readonly ?int $periodDays;
 
+    /** True only when additional transactions in the requested period were omitted by the replay cap. */
+    public readonly ?bool $truncated;
+
+    /**
+     * Active rules matching the candidate hits, excluding rule_id. Empty when none matched within the
+     * comparison bounds.
+     *
+     * @var list<TransactionRuleOverlap>|null
+     */
+    public readonly ?array $overlappingRules;
+
+    /**
+     * True when the overlap comparison is partial: more than 50 eligible active rules, more than 1000
+     * rule/transaction comparisons, or a truncated replay with candidate hits and eligible rules. False
+     * when there are no candidate hits or no eligible rules, even if truncated is true. Counts are not
+     * exhaustive when true.
+     */
+    public readonly ?bool $overlappingRulesTruncated;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -36,5 +55,8 @@ final class TransactionRuleBacktestResult extends BaseModel
         $this->matched = Hydrate::int($data['matched'] ?? null);
         $this->affectedEntities = Hydrate::int($data['affected_entities'] ?? null);
         $this->periodDays = Hydrate::int($data['period_days'] ?? null);
+        $this->truncated = Hydrate::bool($data['truncated'] ?? null);
+        $this->overlappingRules = Hydrate::list($data['overlapping_rules'] ?? null, static fn (mixed $v) => Hydrate::model($v, TransactionRuleOverlap::class));
+        $this->overlappingRulesTruncated = Hydrate::bool($data['overlapping_rules_truncated'] ?? null);
     }
 }

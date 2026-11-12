@@ -35,6 +35,17 @@ final class TravelRuleWorkspaceClaim extends BaseModel
     /** The `vasp_name` field. */
     public readonly ?string $vaspName;
 
+    /** Licence submitted with the claim. Empty when not supplied. */
+    public readonly ?string $licence;
+
+    /**
+     * Structured rejection reason. Empty when none was recorded; a new claim or approval clears it. Read
+     * review_note for the explanation.
+     *
+     * Known values: {@see TravelRuleWorkspaceClaimRejectionReason}.
+     */
+    public readonly ?string $rejectionReason;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -48,5 +59,7 @@ final class TravelRuleWorkspaceClaim extends BaseModel
         $this->reviewNote = Hydrate::string($data['review_note'] ?? null);
         $this->vaspId = Hydrate::string($data['vasp_id'] ?? null);
         $this->vaspName = Hydrate::string($data['vasp_name'] ?? null);
+        $this->licence = Hydrate::string($data['licence'] ?? null);
+        $this->rejectionReason = Hydrate::string($data['rejection_reason'] ?? null);
     }
 }

@@ -40,6 +40,8 @@ final class AuthenticationContractTest extends TestCase
         'revoke_session' => 'revokeSession',
         'create_step_up' => 'createStepUp',
         'retrieve_step_up' => 'retrieveStepUp',
+        'submit_agent_consent' => 'submitAgentConsent',
+        'create_agent_approval_options' => 'createAgentApprovalOptions',
     ];
 
     /** Public methods that never call the issuer: construction, PKCE and offline token verification. */
@@ -102,6 +104,8 @@ final class AuthenticationContractTest extends TestCase
             'revoke_session' => $auth->revokeSession('test-access-token'),
             'create_step_up' => $auth->createStepUp('test-access-token', StepUp::ACTION_PAYOUT, '900.00', 'EUR'),
             'retrieve_step_up' => $auth->retrieveStepUp('test-access-token', 'step-up-1'),
+            'submit_agent_consent' => $auth->submitAgentConsent('test-access-token', 'test-challenge', 'deny'),
+            'create_agent_approval_options' => $auth->createAgentApprovalOptions('test-access-token', 'test-challenge'),
             default => self::fail("{$method}: add the method to the module, to METHODS and to call()"),
         };
     }
@@ -206,11 +210,35 @@ final class AuthenticationContractTest extends TestCase
             }
             $examples = $media['examples'] ?? null;
             $example = \is_array($examples) && [] !== $examples ? self::at(reset($examples), 'value') : ($media['example'] ?? null);
+            $example ??= self::schemaExample($media['schema'] ?? null);
             self::assertNotNull($example, "response {$status} has an example");
 
             return ['status' => (int) $status, 'body' => json_encode($example, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES)];
         }
         self::fail('an operation without a success response');
+    }
+
+    /**
+     * The example of a response schema that has none of its own at the media
+     * level: the schema's `example`, or that of its first `oneOf` branch, after
+     * following `$ref`.
+     */
+    private static function schemaExample(mixed $schema): mixed
+    {
+        for ($depth = 0; $depth < 8 && \is_array($schema); ++$depth) {
+            $ref = $schema['$ref'] ?? null;
+            if (\is_string($ref)) {
+                $schema = self::at(self::document(), ...explode('/', substr($ref, \strlen('#/'))));
+
+                continue;
+            }
+            if (\array_key_exists('example', $schema)) {
+                return $schema['example'];
+            }
+            $schema = self::at($schema, 'oneOf', 0);
+        }
+
+        return null;
     }
 
     private static function pattern(string $path): string

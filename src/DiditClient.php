@@ -102,6 +102,8 @@ final class DiditClient extends BaseClient
 
     public readonly Resources\AddressValidation $addressValidation;
 
+    public readonly Resources\Sandbox $sandbox;
+
     public readonly Resources\Account $account;
 
     protected function initResources(): void
@@ -147,6 +149,7 @@ final class DiditClient extends BaseClient
         $this->pricing = new Resources\Pricing($this->requester);
         $this->investigator = new Resources\Investigator($this->requester);
         $this->addressValidation = new Resources\AddressValidation($this->requester);
+        $this->sandbox = new Resources\Sandbox($this->requester);
         $this->account = new Resources\Account($this->requester);
     }
 }

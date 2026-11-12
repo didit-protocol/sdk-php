@@ -63,10 +63,10 @@ final class CaseBlueprintDetail extends BaseModel
     public readonly ?string $fourEyesCheckerBlueprintName;
 
     /**
-     * The six togglable sections that drive which tabs and fields appear on the case page. Unknown
-     * sections or keys are rejected.
+     * Case content sections and optional review stages. Unknown sections or keys are rejected. Cases
+     * retain the policy snapshot accepted when opened; later blueprint edits do not rewrite it.
      */
-    public readonly ?CaseBlueprintDetailContentConfig $contentConfig;
+    public readonly ?CaseContentConfig $contentConfig;
 
     /**
      * Connectors currently routing new cases into this blueprint.
@@ -92,6 +92,21 @@ final class CaseBlueprintDetail extends BaseModel
     public readonly ?int $defaultDeadlineHours;
 
     /**
+     * Case types this blueprint describes. Optional on create and update; new blueprints default to an
+     * empty list. Stored in the accepted case policy snapshot.
+     *
+     * @var list<string>|null
+     */
+    public readonly ?array $appliesTo;
+
+    /**
+     * Configured stages, or the default stages when none are configured.
+     *
+     * @var list<CaseBlueprintStage>|null
+     */
+    public readonly ?array $stages;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -113,11 +128,13 @@ final class CaseBlueprintDetail extends BaseModel
         $this->escalationBlueprintName = Hydrate::string($data['escalation_blueprint_name'] ?? null);
         $this->fourEyesCheckerBlueprint = Hydrate::string($data['four_eyes_checker_blueprint'] ?? null);
         $this->fourEyesCheckerBlueprintName = Hydrate::string($data['four_eyes_checker_blueprint_name'] ?? null);
-        $this->contentConfig = Hydrate::model($data['content_config'] ?? null, CaseBlueprintDetailContentConfig::class);
+        $this->contentConfig = Hydrate::model($data['content_config'] ?? null, CaseContentConfig::class);
         $this->creationSources = Hydrate::list($data['creation_sources'] ?? null, static fn (mixed $v) => Hydrate::model($v, CaseBlueprintDetailCreationSources::class));
         $this->receivesEscalationFrom = Hydrate::list($data['receives_escalation_from'] ?? null, static fn (mixed $v) => Hydrate::model($v, CaseBlueprintDetailReceivesEscalationFrom::class));
         $this->updatedAt = Hydrate::dateTime($data['updated_at'] ?? null);
         $this->version = Hydrate::int($data['version'] ?? null);
         $this->defaultDeadlineHours = Hydrate::int($data['default_deadline_hours'] ?? null);
+        $this->appliesTo = Hydrate::list($data['applies_to'] ?? null, Hydrate::string(...));
+        $this->stages = Hydrate::list($data['stages'] ?? null, static fn (mixed $v) => Hydrate::model($v, CaseBlueprintStage::class));
     }
 }

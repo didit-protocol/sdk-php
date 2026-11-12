@@ -13,7 +13,7 @@ title = "didit sdk-php"
 [extend]
 useDefault = true
 
-[allowlist]
+[[allowlists]]
 description = "Upstream OpenAPI copies and synthetic webhook test secrets"
 paths = [
   '''^openapi/verification\.json$''',
@@ -25,4 +25,16 @@ paths = [
 regexTarget = "match"
 regexes = [
   '''whsec_test_[A-Za-z0-9_]+''',
+]
+
+# Synthetic consent-redaction test value: this one value, in this one test file, for this one rule.
+[[allowlists]]
+description = "Synthetic agent consent redaction test value"
+condition = "AND"
+targetRules = ["generic-api-key"]
+paths = [
+  '''^tests/Authentication/AgentConsentTest\.php$''',
+]
+regexes = [
+  '''^SECRET\-0123456789abcdef$''',
 ]

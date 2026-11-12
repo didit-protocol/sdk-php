@@ -84,6 +84,7 @@ namespace Didit;
  *     privacy_url?: string,
  *     description?: string,
  *     data_location?: string,
+ *     initiate_login_uri?: string,
  * }
  * @phpstan-type ApplicationUpdateRequest array{
  *     name?: string,
@@ -93,6 +94,7 @@ namespace Didit;
  *     privacy_url?: string,
  *     description?: string,
  *     data_location?: string,
+ *     initiate_login_uri?: string,
  * }
  * @phpstan-type BankAccountCheckHolder array{
  *     full_name?: string,
@@ -231,6 +233,15 @@ namespace Didit;
  *     tags?: list<string>,
  *     note?: string|null,
  * }
+ * @phpstan-type CaseBlueprintAiDraftRequest array{
+ *     prompt: string,
+ * }
+ * @phpstan-type CaseBlueprintStage array{
+ *     key?: string,
+ *     label: string,
+ *     sla_hours?: int|null,
+ *     worked_by?: string|null,
+ * }
  * @phpstan-type CaseCollaborationCaseNoteCreateRequest array{
  *     comment: string,
  *     reply_to?: string|null,
@@ -250,6 +261,7 @@ namespace Didit;
  *     verifications?: CaseContentConfigVerifications,
  *     reporting?: CaseContentConfigReporting,
  *     financial?: CaseContentConfigFinancial,
+ *     stages?: CaseContentConfigStages,
  * }
  * @phpstan-type CaseContentConfigAmlControl array{
  *     enabled?: bool,
@@ -282,6 +294,9 @@ namespace Didit;
  * @phpstan-type CaseContentConfigReporting array{
  *     enabled?: bool,
  *     fiu_reports?: bool,
+ * }
+ * @phpstan-type CaseContentConfigStages array{
+ *     items?: list<CaseBlueprintStage>,
  * }
  * @phpstan-type CaseContentConfigVerifications array{
  *     enabled?: bool,
@@ -388,6 +403,7 @@ namespace Didit;
  *     is_active?: bool,
  *     default_deadline_hours?: int|null,
  *     publish?: bool,
+ *     applies_to?: list<string>,
  * }
  * @phpstan-type CasesBlueprintsInstallPresetsParams array{
  *     preset_keys?: list<string>|null,
@@ -416,6 +432,7 @@ namespace Didit;
  *     is_active?: bool,
  *     default_deadline_hours?: int|null,
  *     expected_version?: int,
+ *     applies_to?: list<string>,
  * }
  * @phpstan-type CasesBulkAssignParams array{
  *     case_uuids: list<string>,
@@ -439,7 +456,7 @@ namespace Didit;
  *     due_at?: \DateTimeInterface|string|null,
  *     tags?: list<string>,
  *     subject?: CasesCreateParamsSubject,
- *     links?: list<array<string, mixed>>,
+ *     links?: list<CasesLinksCreateParams>,
  *     assigned_to?: string|null,
  *     review_duplicates?: bool,
  *     separate_incident_reason?: string,
@@ -2153,6 +2170,8 @@ namespace Didit;
  *     email_address?: string,
  *     email_language?: string,
  *     email_preview_token?: string,
+ *     link_to_session_id?: string,
+ *     link_reason?: string,
  * }
  * @phpstan-type SessionsUpdateStatusParamsNodesToResubmit array{
  *     node_id: string,
@@ -2297,6 +2316,7 @@ namespace Didit;
  *     evaluation_mode?: string,
  *     scope?: TransactionRuleScope,
  *     period_days?: int,
+ *     rule_id?: string,
  * }
  * @phpstan-type TransactionRuleCondition array{
  *     field: string,
@@ -2519,6 +2539,10 @@ namespace Didit;
  *     limit?: int,
  *     offset?: int,
  * }
+ * @phpstan-type TransactionsTravelRuleListDeliveriesParams array{
+ *     limit?: int,
+ *     offset?: int,
+ * }
  * @phpstan-type TravelRuleCounterpartyContactCreate array{
  *     counterparty: string,
  *     email: string,
@@ -2630,6 +2654,7 @@ namespace Didit;
  *     legal_name?: string,
  *     lei?: string,
  *     jurisdiction?: string,
+ *     vasp_jurisdiction?: string,
  *     name_matching_strictness?: string,
  *     confirmation_timeout_hours?: int,
  *     timeout_outcome?: string,
@@ -2649,6 +2674,7 @@ namespace Didit;
  *     sunrise_policy?: string,
  *     non_responsive_policy?: string,
  *     disabled_networks?: list<string>,
+ *     licence?: string,
  * }
  * @phpstan-type TravelRuleTestVaspInboundRequest array{
  *     beneficiary_wallet_address: string,
@@ -2732,6 +2758,7 @@ namespace Didit;
  * }
  * @phpstan-type TravelRuleWorkspaceClaimRequest array{
  *     vasp_id: string,
+ *     licence?: string,
  * }
  * @phpstan-type TravelRuleWorkspaceDomainConfirmRequest array{
  *     code: string,
@@ -2851,6 +2878,8 @@ namespace Didit;
  *     pep_counterparty?: bool|null,
  *     dominant_risk_category: string|null,
  *     risk_factors?: list<WalletScreeningResultRiskFactors>,
+ *     fallback_from_provider?: string|null,
+ *     fallback_reason?: string|null,
  *     raw_response?: array<string, mixed>,
  *     report_signature: string,
  * }

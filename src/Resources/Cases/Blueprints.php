@@ -19,6 +19,7 @@ use Didit\Types;
 /**
  * The `cases.blueprints` resource.
  *
+ * @phpstan-import-type CaseBlueprintAiDraftRequest from Params
  * @phpstan-import-type CasePublicationPolicyDraftPreconditionRequest from Params
  * @phpstan-import-type CasePublicationPolicyDraftWriteRequest from Params
  * @phpstan-import-type CasesBlueprintsCreateParams from Params
@@ -59,7 +60,9 @@ final class Blueprints extends BaseResource
      * Create a case blueprint: general settings (assignment, escalation, transfer, 4-eyes pairing) plus
      * content_config, the six sections that drive the case page. Set publish=false to create an
      * unpublished draft; Publish creates its first live version. Discarding a never-published draft
-     * deletes it.
+     * deletes it. applies_to accepts the six case-type values. content_config.stages.items[].worked_by is
+     * an optional active review-team UUID from this application. These settings are preserved in case
+     * policy snapshots; later edits do not change existing snapshots.
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/`
      *
@@ -75,7 +78,7 @@ final class Blueprints extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/blueprints/',
             applicationScope: true,
             bodyTypes: ['json'],
-            jsonHints: ['content_config' => ['o', ['checklist' => ['o', ['items' => ['l', ['o']]]], 'aml_control' => ['o'], 'identity' => ['o'], 'verifications' => ['o'], 'reporting' => ['o'], 'financial' => ['o']]]],
+            jsonHints: ['content_config' => ['o', ['checklist' => ['o', ['items' => ['l', ['o']]]], 'aml_control' => ['o'], 'identity' => ['o'], 'verifications' => ['o'], 'reporting' => ['o'], 'financial' => ['o'], 'stages' => ['o', ['items' => ['l', ['o']]]]]]],
         ), [], $params, $options);
 
         return Types\CaseBlueprintDetail::fromResponse($response);
@@ -108,7 +111,10 @@ final class Blueprints extends BaseResource
     /**
      * Update blueprint.
      *
-     * Partially update a blueprint's general settings or content_config.
+     * Partially update a blueprint's general settings or content_config. applies_to accepts the six
+     * case-type values. content_config.stages.items[].worked_by is an optional active review-team UUID
+     * from this application. These settings are preserved in case policy snapshots; later edits do not
+     * change existing snapshots.
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/`
      *
@@ -128,7 +134,7 @@ final class Blueprints extends BaseResource
             path: '/v3/organization/{organization_id}/application/{application_id}/cases/blueprints/{blueprint_uuid}/',
             applicationScope: true,
             bodyTypes: ['json'],
-            jsonHints: ['content_config' => ['o', ['checklist' => ['o', ['items' => ['l', ['o']]]], 'aml_control' => ['o'], 'identity' => ['o'], 'verifications' => ['o'], 'reporting' => ['o'], 'financial' => ['o']]]],
+            jsonHints: ['content_config' => ['o', ['checklist' => ['o', ['items' => ['l', ['o']]]], 'aml_control' => ['o'], 'identity' => ['o'], 'verifications' => ['o'], 'reporting' => ['o'], 'financial' => ['o'], 'stages' => ['o', ['items' => ['l', ['o']]]]]]],
         ), ['blueprint_uuid' => $blueprintUuid], $params, $options);
 
         return Types\CaseBlueprintDetail::fromResponse($response);
@@ -328,5 +334,33 @@ final class Blueprints extends BaseResource
             applicationScope: true,
             query: ['ordering' => 'ordering', 'limit' => 'limit', 'offset' => 'offset'],
         ), ['blueprint_uuid' => $blueprintUuid], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\CasePublicationPolicyRevision::class));
+    }
+
+    /**
+     * Draft case blueprint with AI.
+     *
+     * Generate an unsaved blueprint proposal. Requires write:cases. Returns a draft object, not a
+     * blueprint UUID; no blueprint or saved policy draft is created. Review the proposal, choose assignees
+     * and any teams, approvals or routing, then create or update a blueprint separately. Invalid generated
+     * content or generation failure returns 503. See [blueprint AI
+     * drafts](/management-api/case-blueprints/ai-draft).
+     *
+     * `POST /v3/organization/{organization_id}/application/{application_id}/cases/blueprints/ai-draft/`
+     *
+     * @param CaseBlueprintAiDraftRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function aiDraft(array $params, ?RequestOptions $options = null): Types\CaseBlueprintAiDraftResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/organization/{organization_id}/application/{application_id}/cases/blueprints/ai-draft/',
+            applicationScope: true,
+            bodyTypes: ['json'],
+        ), [], $params, $options);
+
+        return Types\CaseBlueprintAiDraftResponse::fromResponse($response);
     }
 }

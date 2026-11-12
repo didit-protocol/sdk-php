@@ -10,8 +10,8 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * The six togglable sections that drive which tabs and fields appear on the case page. Unknown
- * sections or keys are rejected.
+ * Case content sections and optional review stages. Unknown sections or keys are rejected. Cases
+ * retain the policy snapshot accepted when opened; later blueprint edits do not rewrite it.
  */
 final class CaseContentConfig extends BaseModel
 {
@@ -34,6 +34,12 @@ final class CaseContentConfig extends BaseModel
     public readonly ?CaseContentConfigFinancial $financial;
 
     /**
+     * Ordered review stages. Omitted or empty items use the default Triage, Evidence review and Decision
+     * stages.
+     */
+    public readonly ?CaseContentConfigStages $stages;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -45,5 +51,6 @@ final class CaseContentConfig extends BaseModel
         $this->verifications = Hydrate::model($data['verifications'] ?? null, CaseContentConfigVerifications::class);
         $this->reporting = Hydrate::model($data['reporting'] ?? null, CaseContentConfigReporting::class);
         $this->financial = Hydrate::model($data['financial'] ?? null, CaseContentConfigFinancial::class);
+        $this->stages = Hydrate::model($data['stages'] ?? null, CaseContentConfigStages::class);
     }
 }

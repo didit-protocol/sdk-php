@@ -8,8 +8,10 @@ use Didit\Core\HttpTransport;
 use Didit\Core\Hydrate;
 use Didit\Core\NoContent;
 use Didit\Core\RawResponse;
+use Didit\Core\StructuredRedaction;
 use Didit\Exception\ApiConnectionException;
 use Didit\Exception\ApiStatusException;
+use Didit\Exception\ApiTimeoutException;
 use Didit\Exception\ConfigurationException;
 use Didit\Exception\DiditException;
 use Didit\Version;
@@ -361,6 +363,88 @@ final class Authentication
         $this->jsonObject($response);
 
         return StepUp::fromResponse($response);
+    }
+
+    /**
+     * Approves or denies a pending agent request (`POST agents/consent/`), with
+     * the access token of the signed-in person.
+     *
+     * Returns the approval (`code`, `redirectUri`, `state`) or the denial
+     * (`status` `denied`): see {@see AgentConsentResult::isApproved()}. When
+     * the application requires humans only, approval needs a fresh passkey
+     * `$assertion`: get the options with {@see self::createAgentApprovalOptions()},
+     * let the browser run WebAuthn and pass its JSON-serialised result
+     * (binary fields as base64url) within 300 seconds. A denial needs none.
+     * Neither answer holds an access or refresh token. The call is never
+     * retried, and the challenge and assertion never reach an exception message.
+     *
+     * @param string $challenge the pending agent request secret; never log it
+     * @param string $decision `approve` or `deny`
+     * @param array<string, mixed>|null $assertion JSON-serialised result of `navigator.credentials.get()`
+     * @param list<string>|null $scopes narrows the requested scopes (`read`, `act`); omitted means all requested
+     * @param list<string>|null $organizationIds UUIDs of organizations the person belongs to (at most 100); omitted means none
+     * @param int|null $lifetime grant lifetime in seconds: 86400, 604800 or 2592000, limited by the application policy; omitted means the policy lifetime
+     *
+     * @throws ApiStatusException a missing assertion is `PermissionDeniedException` (`passkey_required`),
+     *                            an expired, reused or invalid one `BadRequestException` (`invalid_grant`)
+     * @throws ApiConnectionException
+     * @throws \InvalidArgumentException when `$organizationIds` or `$lifetime` breaks the documented limits
+     */
+    public function submitAgentConsent(string $accessToken, string $challenge, string $decision, ?array $assertion = null, ?array $scopes = null, ?array $organizationIds = null, ?int $lifetime = null): AgentConsentResult
+    {
+        if (null !== $organizationIds) {
+            if (\count($organizationIds) > 100) {
+                throw new \InvalidArgumentException('At most 100 organization IDs can be sent.');
+            }
+            foreach ($organizationIds as $organizationId) {
+                if (1 !== preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/Di', $organizationId)) {
+                    throw new \InvalidArgumentException('Every organization ID must be a UUID.');
+                }
+            }
+        }
+        if (null !== $lifetime && !\in_array($lifetime, [86400, 604800, 2592000], true)) {
+            throw new \InvalidArgumentException('The lifetime must be 86400, 604800 or 2592000 seconds.');
+        }
+        $body = ['challenge' => $challenge, 'decision' => $decision];
+        if (null !== $assertion) {
+            $body['assertion'] = $assertion;
+        }
+        if (null !== $scopes) {
+            $body['scopes'] = $scopes;
+        }
+        if (null !== $organizationIds) {
+            $body['organization_ids'] = $organizationIds;
+        }
+        if (null !== $lifetime) {
+            $body['lifetime'] = $lifetime;
+        }
+
+        $response = $this->send('POST', $this->issuer . '/agents/consent/', accessToken: $accessToken, json: $body);
+        $this->jsonObject($response);
+
+        return AgentConsentResult::fromResponse($response);
+    }
+
+    /**
+     * Gets the WebAuthn request options for the person approving an agent
+     * request (`POST agents/consent/passkey/`), with their access token.
+     *
+     * Binds the pending request to the signed-in person. A person without an
+     * enrolled passkey gets `BadRequestException` (`passkey_required`).
+     * Both agent consent calls need a session created within the last five
+     * minutes, otherwise `PermissionDeniedException` (`reauthentication_required`).
+     * The call is never retried and the challenge never reaches an exception message.
+     *
+     * @param string $challenge the pending agent request secret (not the WebAuthn challenge); never log it
+     *
+     * @throws ApiStatusException|ApiConnectionException
+     */
+    public function createAgentApprovalOptions(string $accessToken, string $challenge): AgentApprovalOptions
+    {
+        $response = $this->send('POST', $this->issuer . '/agents/consent/passkey/', accessToken: $accessToken, json: ['challenge' => $challenge]);
+        $this->jsonObject($response);
+
+        return AgentApprovalOptions::fromResponse($response);
     }
 
     /**
@@ -721,7 +805,7 @@ final class Authentication
 
     /**
      * @param array<string, string>|null $form form-encoded body
-     * @param array<string, string>|null $json JSON body
+     * @param array<string, mixed>|null $json JSON body
      */
     private function send(string $method, string $url, ?string $accessToken = null, ?array $form = null, ?array $json = null): RawResponse
     {
@@ -732,22 +816,84 @@ final class Authentication
         if (null !== $accessToken) {
             $request = $request->withHeader('Authorization', 'Bearer ' . $accessToken);
         }
+        $encoded = null;
         if (null !== $form) {
             $request = $request
                 ->withHeader('Content-Type', 'application/x-www-form-urlencoded')
                 ->withBody($this->streamFactory()->createStream(http_build_query($form, '', '&')));
         } elseif (null !== $json) {
+            // Encoded once: these exact bytes are sent, and the secrets of an error are read from them.
+            try {
+                $encoded = json_encode($json, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES);
+            } catch (\Throwable) {
+                if (!isset($json['challenge'])) {
+                    throw new DiditException('Could not encode the request.');
+                }
+                // A consent request: a nested serializer may put the challenge or a credential in its message,
+                // so the error has a fixed message and no previous exception.
+                throw new DiditException('Could not encode the agent consent request.');
+            }
             $request = $request
                 ->withHeader('Content-Type', 'application/json')
-                ->withBody($this->streamFactory()->createStream(json_encode($json, \JSON_THROW_ON_ERROR | \JSON_UNESCAPED_SLASHES)));
+                ->withBody($this->streamFactory()->createStream($encoded));
         }
 
+        // An agent consent call: the issuer may echo the challenge or the assertion anywhere in its answer.
+        $consentSecrets = isset($json['challenge'])
+            ? array_values(array_filter([$accessToken, $json['challenge'], ...StructuredRedaction::assertionStrings($encoded ?? '{}')], 'is_string'))
+            : null;
         $this->transport ??= new HttpTransport($this->httpClient);
-        $response = new RawResponse($this->transport->send($request, $this->timeout), $method, (string) parse_url($url, \PHP_URL_PATH));
+        $failure = null;
+        try {
+            $psrResponse = $this->transport->send($request, $this->timeout);
+        } catch (\Throwable $e) {
+            if (null === $consentSecrets) {
+                throw $e;
+            }
+            // A transport may quote the serialized request in its message, in a spelling no
+            // match finds, so the error keeps its type and none of the underlying text or exception.
+            $mayHaveReached = !$e instanceof ApiConnectionException || $e->mayHaveReachedServer;
+            $failure = $e instanceof ApiTimeoutException
+                ? new ApiTimeoutException('Request timed out: agent consent request (details withheld)', $mayHaveReached)
+                : new ApiConnectionException('Connection error: agent consent request (details withheld)', $mayHaveReached);
+        }
+        if (null !== $failure) {
+            throw $failure;
+        }
+        if (null !== $consentSecrets) {
+            // Read the body once, here: a stream that fails or cannot be decoded is a connection error with a fixed
+            // message and no previous exception.
+            $contents = null;
+            try {
+                $stream = $psrResponse->getBody();
+                if ($stream->isSeekable()) {
+                    $stream->rewind();
+                }
+                $contents = $stream->getContents();
+            } catch (\Throwable) {
+                $contents = null;
+            }
+            if (null === $contents) {
+                throw new ApiConnectionException('Connection error: agent consent request (response body could not be read)');
+            }
+            $psrResponse = $psrResponse->withBody($this->streamFactory()->createStream($contents));
+        }
+        $response = new RawResponse($psrResponse, $method, (string) parse_url($url, \PHP_URL_PATH));
+        if (null !== $consentSecrets) {
+            // A successful response reaches the caller unchanged; every error of this call is built from a
+            // sanitized copy only.
+            $ok = $response->status >= 200 && $response->status <= 299;
+            if (!$ok || null === Hydrate::assoc($response->parsedBody())) {
+                $sanitized = new RawResponse(StructuredRedaction::response($psrResponse, $consentSecrets, $this->streamFactory()), $method, (string) parse_url($url, \PHP_URL_PATH));
+                if (!$ok) {
+                    throw ApiStatusException::create($sanitized);
+                }
+                $this->jsonObject($sanitized); // throws: the sanitized copy is not a JSON object
+            }
+        }
         if ($response->status < 200 || $response->status > 299) {
             // Tokens and codes never reach an exception message, even when echoed back.
-            $redact = array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null], 'is_string'));
-            throw ApiStatusException::create($response, $redact);
+            throw ApiStatusException::create($response, array_values(array_filter([$accessToken, $form['refresh_token'] ?? null, $form['code'] ?? null, $form['code_verifier'] ?? null], 'is_string')));
         }
 
         return $response;

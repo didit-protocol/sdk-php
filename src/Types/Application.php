@@ -88,6 +88,16 @@ final class Application extends BaseModel
     public readonly ?string $mode;
 
     /**
+     * Application sign-in URL for an admin-sent sign-in link. Optional; an empty string disables sending.
+     * A nonempty value must use HTTPS and the exact hostname of website_url (subdomains must match), with
+     * no userinfo, query, fragment or whitespace and no port other than 443. The server also revalidates
+     * the saved URI when website_url changes; update or clear initiate_login_uri in the same PATCH if
+     * needed. The hosted handoff adds iss and login_hint, but creates no session or tokens. See
+     * /authentication/sign-in-methods#admin-sent-sign-in-link.
+     */
+    public readonly ?string $initiateLoginUri;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -106,5 +116,6 @@ final class Application extends BaseModel
         $this->dataLocation = Hydrate::string($data['data_location'] ?? null);
         $this->products = Hydrate::list($data['products'] ?? null, static fn (mixed $v) => Hydrate::model($v, ApplicationProduct::class));
         $this->mode = Hydrate::string($data['mode'] ?? null);
+        $this->initiateLoginUri = Hydrate::string($data['initiate_login_uri'] ?? null);
     }
 }

@@ -30,7 +30,9 @@ final class Applications extends BaseResource
      * List the organization's applications, 50 per page by default. Use this to discover `app_id` values
      * when recovering credentials from a new machine, then call `GET
      * /organizations/me/{org_id}/applications/{app_id}/` for the API key. Requires an owner or admin
-     * Bearer token.
+     * Bearer token. An MCP token (a "Log in with Didit" grant, `token_use` `mcp`) also needs the
+     * `didit:management` scope, which carries the `applications` resource; a grant limited to
+     * `didit:verification` is refused with 403 before any application is listed.
      *
      * `GET /organizations/me/{org_id}/applications/`
      *
@@ -85,7 +87,9 @@ final class Applications extends BaseResource
      * Get Application Credentials.
      *
      * Read one application's full record including `client_id` and `api_key`. Use this to recover a lost
-     * `api_key`.
+     * `api_key`. An MCP token (a "Log in with Didit" grant, `token_use` `mcp`) also needs the
+     * `didit:management` scope, which carries the `applications` resource; a grant limited to
+     * `didit:verification` is refused with 403 before the application is read.
      *
      * `GET /organizations/me/{org_id}/applications/{app_id}/`
      *

@@ -54,6 +54,18 @@ final class TravelRuleWorkspace extends BaseModel
     public readonly ?TravelRuleSettingsDetail $settings;
 
     /**
+     * Own-account outbound quote, or null when a flat Travel Rule quote is unavailable. Does not enable
+     * billing.
+     */
+    public readonly ?TravelRuleWorkspaceOutboundPrice $outboundPrice;
+
+    /**
+     * Current profile licence for a granted claim, otherwise the submitted claim licence. Empty when not
+     * supplied.
+     */
+    public readonly ?string $licence;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -69,5 +81,7 @@ final class TravelRuleWorkspace extends BaseModel
         $this->billingEnabledAt = Hydrate::dateTime($data['billing_enabled_at'] ?? null);
         $this->diditNetwork = Hydrate::assoc($data['didit_network'] ?? null);
         $this->settings = Hydrate::model($data['settings'] ?? null, TravelRuleSettingsDetail::class);
+        $this->outboundPrice = Hydrate::model($data['outbound_price'] ?? null, TravelRuleWorkspaceOutboundPrice::class);
+        $this->licence = Hydrate::string($data['licence'] ?? null);
     }
 }

@@ -7,6 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
+ * Type of record to attach. A network must be visible and contain the selected case subject.
+ *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
 final class CasesLinksCreateParamsEntityType
@@ -16,6 +18,8 @@ final class CasesLinksCreateParamsEntityType
     public const BUSINESS_SESSION = 'business_session';
 
     public const TRANSACTION = 'transaction';
+
+    public const NETWORK = 'network';
 
     private function __construct()
     {
