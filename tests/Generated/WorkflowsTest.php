@@ -56,6 +56,7 @@ final class WorkflowsTest extends GeneratedTestCase
             ],
             'is_white_label_enabled' => true,
             'is_desktop_allowed' => true,
+            'is_session_reference_enabled' => true,
             'max_retry_attempts' => 1,
             'retry_window_days' => 1,
             'face_liveness_max_attempts' => 1,
@@ -70,7 +71,7 @@ final class WorkflowsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"workflow_label":"workflow_label-value","is_default":true,"status":"draft","features":[{"feature":"OCR"}],"is_white_label_enabled":true,"is_desktop_allowed":true,"max_retry_attempts":1,"retry_window_days":1,"face_liveness_max_attempts":1,"face_match_max_attempts":1,"session_expiration_time":1}', $this->canonicalBody($request));
+        self::assertSame('{"workflow_label":"workflow_label-value","is_default":true,"status":"draft","features":[{"feature":"OCR"}],"is_white_label_enabled":true,"is_desktop_allowed":true,"is_session_reference_enabled":true,"max_retry_attempts":1,"retry_window_days":1,"face_liveness_max_attempts":1,"face_match_max_attempts":1,"session_expiration_time":1}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"c3d4e5f6-7890-12cd-ef34-333333333333","workflow_id":"c3d4e5f6-7890-12cd-ef34-333333333333","workflow_label":"Standard KYC","workflow_type":null,"is_default":false,"is_archived":false,"total_price":0.15,"min_price":0.15,"max_price":0.15,"features":"OCR + LIVENESS + FACE_MATCH","is_simple_workflow":false,"is_editable":false,"workflow_url":"https://verify.didit.me/u/w9TkPOx8RWG3UAz5ZRQGVQ","workflow_graph":{"start_node":"ocr","nodes":"... one node per feature plus a final status node ..."},"max_retry_attempts":3,"retry_window_days":7,"session_expiration_time":604800,"version":1,"status":"published","published_at":"2026-05-17T10:30:00Z","created_at":"2026-05-17T10:30:00Z","updated_at":"2026-05-17T10:30:00Z"}'), $result->toArray());
         self::assertSame('c3d4e5f6-7890-12cd-ef34-333333333333', $result->uuid);
@@ -109,6 +110,7 @@ final class WorkflowsTest extends GeneratedTestCase
             ],
             'is_white_label_enabled' => true,
             'is_desktop_allowed' => true,
+            'is_session_reference_enabled' => true,
             'max_retry_attempts' => 1,
             'retry_window_days' => 1,
             'face_liveness_max_attempts' => 1,
@@ -123,7 +125,7 @@ final class WorkflowsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"workflow_label":"workflow_label-value","is_default":true,"status":"draft","features":[{"feature":"OCR"}],"is_white_label_enabled":true,"is_desktop_allowed":true,"max_retry_attempts":1,"retry_window_days":1,"face_liveness_max_attempts":1,"face_match_max_attempts":1,"session_expiration_time":1}', $this->canonicalBody($request));
+        self::assertSame('{"workflow_label":"workflow_label-value","is_default":true,"status":"draft","features":[{"feature":"OCR"}],"is_white_label_enabled":true,"is_desktop_allowed":true,"is_session_reference_enabled":true,"max_retry_attempts":1,"retry_window_days":1,"face_liveness_max_attempts":1,"face_match_max_attempts":1,"session_expiration_time":1}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","workflow_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","workflow_label":"workflow_label-value","workflow_type":"kyc","is_default":true,"is_archived":true,"version":1,"status":"draft","published_at":"2026-01-15T10:30:00Z","is_simple_workflow":true,"is_editable":true,"workflow_url":"https://example.com/callback","workflow_graph":{"key":"value"},"features":"features-value","total_price":1.5,"min_price":1.5,"max_price":1.5,"special_add_on_prices":{"key":"value"},"max_retry_attempts":1,"retry_window_days":1,"session_expiration_time":1,"questionnaire":{"key":"value"},"kyb_role_settings":[{"key":"value"}],"created_at":"2026-01-15T10:30:00Z","updated_at":"2026-01-15T10:30:00Z","signature_availability":{"simple":true,"aes":true,"qes":true},"is_bank_verification_enabled":true,"bank_verification_config":{"key":"value"},"is_geolocation_enabled":true,"geolocation_config":{"key":"value"}}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
