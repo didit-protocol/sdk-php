@@ -520,6 +520,17 @@ final class AgentConsentTest extends TestCase
         }
     }
 
+    public function testAnUnencodableApprovalOptionsChallengeGivesAFixedMessageError(): void
+    {
+        try {
+            $this->issuer->auth()->createAgentApprovalOptions(self::ACCESS_TOKEN, "bad-\xff-challenge");
+            self::fail('Expected a DiditException.');
+        } catch (\Didit\Exception\DiditException $e) {
+            self::assertSame('Could not encode the agent consent request.', $e->getMessage());
+            self::assertNull($e->getPrevious());
+        }
+    }
+
     public function testATransportFailureKeepsNoUnderlyingTextOrException(): void
     {
         $credential = 'cred"ential\\string-0123456789';
