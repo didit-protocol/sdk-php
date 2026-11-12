@@ -506,6 +506,20 @@ final class AgentConsentTest extends TestCase
         }
     }
 
+    public function testAMalformed2xxKeepsNoPreviousException(): void
+    {
+        $credential = 'credential-string-0123456789';
+        $this->issuer->http->on('POST', self::CONSENT_URL, new Response(200, ['Content-Type' => 'application/json'], '{not json ' . $credential));
+
+        try {
+            $this->issuer->auth()->submitAgentConsent(self::ACCESS_TOKEN, self::CHALLENGE, 'approve', ['id' => $credential]);
+            self::fail('Expected a DiditException.');
+        } catch (\Didit\Exception\DiditException $e) {
+            self::assertNull($e->getPrevious());
+            self::assertStringNotContainsString($credential, (string) $e);
+        }
+    }
+
     public function testATransportFailureKeepsNoUnderlyingTextOrException(): void
     {
         $credential = 'cred"ential\\string-0123456789';
