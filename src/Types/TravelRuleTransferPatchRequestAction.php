@@ -27,6 +27,8 @@ final class TravelRuleTransferPatchRequestAction
 
     public const BENEFICIARY_VASP = 'beneficiary_vasp';
 
+    public const ADD_VASP_HINT = 'add_vasp_hint';
+
     private function __construct()
     {
     }

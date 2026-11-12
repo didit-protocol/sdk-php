@@ -25,6 +25,7 @@ use Didit\Types;
  * @phpstan-import-type TravelRuleInboundRequest from Params
  * @phpstan-import-type TravelRuleListVaspsParams from Params
  * @phpstan-import-type TravelRuleSettingsUpdate from Params
+ * @phpstan-import-type TravelRuleVaspCreateRequest from Params
  * @phpstan-import-type TravelRuleWidgetSessionCreate from Params
  */
 final class TravelRule extends BaseResource
@@ -132,7 +133,7 @@ final class TravelRule extends BaseResource
      * its own curation, plus the members of the Didit network. Each row carries the routes your
      * application has to it today. Your own application's profile is never listed. Rows also carry the
      * shared due-diligence assessment and your application's own decision, entity screening and
-     * questionnaires.
+     * questionnaires. Includes entries your application added privately.
      *
      * `GET /v3/travel-rule/vasps/`
      *
@@ -150,6 +151,31 @@ final class TravelRule extends BaseResource
             path: '/v3/travel-rule/vasps/',
             query: ['search' => 'search', 'network' => 'network', 'jurisdiction' => 'jurisdiction', 'reachable' => 'reachable', 'kind' => 'kind', 'risk' => 'risk', 'responsiveness' => 'responsiveness', 'limit' => 'limit', 'offset' => 'offset'],
         ), [], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\VaspDirectoryEntry::class));
+    }
+
+    /**
+     * Create a private VASP directory entry.
+     *
+     * Add a VASP privately to your application and optionally invite it. Requires write access to
+     * transactions. The response uses source=added_by_you. A matching visible name or LEI returns 409 with
+     * the existing vasp_id. See [Search the directory](/management-api/travel-rule/search-vasps).
+     *
+     * `POST /v3/travel-rule/vasps/`
+     *
+     * @param TravelRuleVaspCreateRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function createVasp(array $params, ?RequestOptions $options = null): Types\VaspDirectoryEntry
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/travel-rule/vasps/',
+            bodyTypes: ['json'],
+        ), [], $params, $options);
+
+        return Types\VaspDirectoryEntry::fromResponse($response);
     }
 
     /**

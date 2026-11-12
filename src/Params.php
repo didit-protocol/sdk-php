@@ -2498,6 +2498,7 @@ namespace Didit;
  *     originator?: array<string, mixed>,
  *     beneficiary?: array<string, mixed>,
  *     ivms101?: array<string, mixed>,
+ *     counterparty_choice?: string,
  * }
  * @phpstan-type TransactionsCreateSdkTokenParams array{
  *     vendor_data: string,
@@ -2691,8 +2692,15 @@ namespace Didit;
  *     wallet_address?: string,
  *     memo?: string,
  *     beneficiary_vasp?: string,
+ *     reason?: string,
+ *     notify_on_answer?: bool,
+ *     name?: string,
+ *     lei?: string,
+ *     country?: string,
+ *     vasp_name?: string,
  * }
  * @phpstan-type TravelRuleTransfersListParams array{
+ *     search?: string,
  *     direction?: string,
  *     status?: string,
  *     rail?: string,
@@ -2716,6 +2724,9 @@ namespace Didit;
  *     limit?: int,
  *     offset?: int,
  * }
+ * @phpstan-type TravelRuleUserLinkRequest array{
+ *     channel?: string,
+ * }
  * @phpstan-type TravelRuleUtxo array{
  *     inputs?: list<TravelRuleUtxoEntry>,
  *     outputs: list<TravelRuleUtxoEntry>,
@@ -2725,6 +2736,13 @@ namespace Didit;
  *     amount?: string|null,
  *     txid?: string,
  *     vout?: int|null,
+ * }
+ * @phpstan-type TravelRuleVaspCreateRequest array{
+ *     name: string,
+ *     email: string,
+ *     lei?: string,
+ *     jurisdiction?: string,
+ *     invite?: bool,
  * }
  * @phpstan-type TravelRuleWalletAddressesBulkImportParams array{
  *     entries?: list<WalletAddressImportRow>,

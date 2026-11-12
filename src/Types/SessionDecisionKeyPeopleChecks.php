@@ -33,6 +33,15 @@ final class SessionDecisionKeyPeopleChecks extends BaseModel
     /** Aggregate UBO KYC progress, or null when no UBOs have linked KYC sessions. */
     public readonly ?SessionDecisionKeyPeopleChecksUboKycSummary $uboKycSummary;
 
+    /**
+     * The company's own declaration that it is listed on a stock exchange, or owned by a listed company,
+     * made on the Key People screen instead of naming a beneficial owner. Present in every
+     * `key_people_checks` entry unless the workflow's Returned data settings leave it out, and `null`
+     * unless the company made the declaration, which it can only do where the workflow allows it
+     * (`kyb_key_people_allow_listed_company_declaration`).
+     */
+    public readonly ?SessionDecisionKeyPeopleChecksListedCompanyDeclaration $listedCompanyDeclaration;
+
     /** @var list<array<string, mixed>>|null */
     public readonly ?array $warnings;
 
@@ -47,6 +56,7 @@ final class SessionDecisionKeyPeopleChecks extends BaseModel
         $this->registry = Hydrate::model($data['registry'] ?? null, SessionDecisionKeyPeopleChecksRegistry::class);
         $this->submitted = Hydrate::model($data['submitted'] ?? null, SessionDecisionKeyPeopleChecksSubmitted::class);
         $this->uboKycSummary = Hydrate::model($data['ubo_kyc_summary'] ?? null, SessionDecisionKeyPeopleChecksUboKycSummary::class);
+        $this->listedCompanyDeclaration = Hydrate::model($data['listed_company_declaration'] ?? null, SessionDecisionKeyPeopleChecksListedCompanyDeclaration::class);
         $this->warnings = Hydrate::list($data['warnings'] ?? null, Hydrate::assoc(...));
     }
 }

@@ -154,6 +154,9 @@ final class TransactionListTravelRule extends BaseModel
      */
     public readonly ?string $proofState;
 
+    /** Explicit user-choice state, or null when counterparty_choice=user was not requested. */
+    public readonly ?TravelRuleUserChoice $userChoice;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -183,5 +186,6 @@ final class TransactionListTravelRule extends BaseModel
         $this->chainDetails = Hydrate::model($data['chain_details'] ?? null, TravelRuleChainDetails::class);
         $this->notRequiredReason = Hydrate::string($data['not_required_reason'] ?? null);
         $this->proofState = Hydrate::string($data['proof_state'] ?? null);
+        $this->userChoice = Hydrate::model($data['user_choice'] ?? null, TravelRuleUserChoice::class);
     }
 }
