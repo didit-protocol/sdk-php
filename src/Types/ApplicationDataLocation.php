@@ -8,10 +8,10 @@ namespace Didit\Types;
 
 /**
  * Where the application's verification data is stored and processed, chosen when the application is
- * created. `eu` is the European Union (Ireland), the default. `au` (Australia, Sydney), `mx` (Mexico)
- * and `ae` (United Arab Emirates) are coming soon: a request that names them answers 400 `This data
- * location is not available yet.` An organization's Sandbox application is always in the European
- * Union.
+ * created. `eu` is the European Union (Ireland), the default. `au` (Australia, Sydney), `mx` (Mexico),
+ * `ae` (United Arab Emirates) and `us` (United States, N. Virginia) are coming soon: a request that
+ * names them answers 400 `This data location is not available yet.` An organization's Sandbox
+ * application is always in the European Union.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -24,6 +24,8 @@ final class ApplicationDataLocation
     public const MX = 'mx';
 
     public const AE = 'ae';
+
+    public const US = 'us';
 
     private function __construct()
     {
