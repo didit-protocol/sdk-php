@@ -33,6 +33,15 @@ final class BankAccountCheckResponse extends BaseModel
      */
     public readonly ?string $holderName;
 
+    /**
+     * The 0 to 100 similarity between the holder name you sent and the name on the account: the score
+     * `result` was decided on, so you can apply your own threshold. `result` stays authoritative and is
+     * decided with the default thresholds, a `match` from 85 and a `close_match` from 70 up to 84; they
+     * are the workflow settings `bank_name_match_threshold` and `bank_partial_match_floor` in a
+     * verification session. A name with nothing in common scores `0`.
+     */
+    public readonly ?int $nameMatchScore;
+
     /** The account, masked to its last 4 characters. */
     public readonly ?string $account;
 
@@ -51,6 +60,7 @@ final class BankAccountCheckResponse extends BaseModel
         $this->requestId = Hydrate::string($data['request_id'] ?? null);
         $this->result = Hydrate::string($data['result'] ?? null);
         $this->holderName = Hydrate::string($data['holder_name'] ?? null);
+        $this->nameMatchScore = Hydrate::int($data['name_match_score'] ?? null);
         $this->account = Hydrate::string($data['account'] ?? null);
         $this->vendorData = Hydrate::string($data['vendor_data'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);

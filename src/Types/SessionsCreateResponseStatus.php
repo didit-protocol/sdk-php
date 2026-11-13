@@ -7,9 +7,9 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Current status of the session. Newly created sessions return `Not Started`. If a non-finished
- * session already existed for the same `vendor_data` on the workflow's latest published version, the
- * returned status reflects that existing session.
+ * Current status of the session. Newly created sessions return `Not Started`. For a User Verification
+ * workflow, if a non-finished session already existed for the same `vendor_data` on the workflow's
+ * latest published version, the returned status reflects that existing session.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

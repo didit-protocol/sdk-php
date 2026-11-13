@@ -1858,6 +1858,7 @@ namespace Didit;
  *     callback_method?: string,
  *     metadata?: mixed,
  *     tags?: list<string>,
+ *     session_expiration_time?: int,
  *     language?: string,
  *     contact_details?: SessionsCreateParamsContactDetails,
  *     expected_details?: SessionsCreateParamsExpectedDetails,

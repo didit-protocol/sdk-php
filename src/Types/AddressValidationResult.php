@@ -47,6 +47,23 @@ final class AddressValidationResult extends BaseModel
     public readonly ?float $longitude;
 
     /**
+     * The kind of delivery point the address is, for United States and Canadian addresses: `street`,
+     * `po_box` (a PO box or lock box), `high_rise` (a high-rise or business complex), `rural_route`,
+     * `general_delivery`, `firm` (a firm or company address) or `building`. `null` for addresses in other
+     * countries, when the address has no type on record, and when `status` is `unavailable`.
+     *
+     * Known values: {@see AddressValidationResultAddressType}.
+     */
+    public readonly ?string $addressType;
+
+    /**
+     * `true` when the address is a residence, `false` when it is a business. `null` when this is unknown,
+     * when it is not available for the address's country, and when `status` is `unavailable`. Available
+     * for addresses in the United States, Great Britain, the Netherlands and Ireland.
+     */
+    public readonly ?bool $isResidential;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -58,5 +75,7 @@ final class AddressValidationResult extends BaseModel
         $this->formattedAddress = Hydrate::string($data['formatted_address'] ?? null);
         $this->latitude = Hydrate::float($data['latitude'] ?? null);
         $this->longitude = Hydrate::float($data['longitude'] ?? null);
+        $this->addressType = Hydrate::string($data['address_type'] ?? null);
+        $this->isResidential = Hydrate::bool($data['is_residential'] ?? null);
     }
 }

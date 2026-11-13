@@ -63,9 +63,15 @@ final class SessionsCreateResponse extends BaseModel
     public readonly ?array $tags;
 
     /**
-     * Current status of the session. Newly created sessions return `Not Started`. If a non-finished
-     * session already existed for the same `vendor_data` on the workflow's latest published version, the
-     * returned status reflects that existing session.
+     * When the session's link stops being valid: the start of its current validity window (its creation,
+     * or the last reset by `session_expiration_time`) plus the lifetime in force.
+     */
+    public readonly ?\DateTimeImmutable $expiresAt;
+
+    /**
+     * Current status of the session. Newly created sessions return `Not Started`. For a User Verification
+     * workflow, if a non-finished session already existed for the same `vendor_data` on the workflow's
+     * latest published version, the returned status reflects that existing session.
      *
      * Known values: {@see SessionsCreateResponseStatus}.
      */
@@ -108,6 +114,7 @@ final class SessionsCreateResponse extends BaseModel
         $this->vendorData = Hydrate::string($data['vendor_data'] ?? null);
         $this->metadata = Hydrate::mixed($data['metadata'] ?? null);
         $this->tags = Hydrate::list($data['tags'] ?? null, Hydrate::string(...));
+        $this->expiresAt = Hydrate::dateTime($data['expires_at'] ?? null);
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->callback = Hydrate::string($data['callback'] ?? null);
         $this->workflowId = Hydrate::string($data['workflow_id'] ?? null);

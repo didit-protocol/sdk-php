@@ -17,7 +17,7 @@ final class AddressValidationTest extends GeneratedTestCase
 {
     public function testValidate(): void
     {
-        $this->queueJson(200, '{"request_id":"6f7d2c1e-1c5a-4a1e-9b8f-2a1f0f4b9c3d","address_validation":{"status":"verified","verification_level":"premise","address":{"address_line_1":"1600 Amphitheatre Pkwy","address_line_2":null,"city":"Mountain View","region":"CA","postal_code":"94043-1351","country":"US"},"formatted_address":"1600 Amphitheatre Pkwy, Mountain View CA 94043-1351","latitude":37.422022,"longitude":-122.08429},"created_at":"2026-10-27T11:20:00.000000+00:00"}');
+        $this->queueJson(200, '{"request_id":"6f7d2c1e-1c5a-4a1e-9b8f-2a1f0f4b9c3d","address_validation":{"status":"verified","verification_level":"premise","address":{"address_line_1":"1600 Amphitheatre Pkwy","address_line_2":null,"city":"Mountain View","region":"CA","postal_code":"94043-1351","country":"US"},"formatted_address":"1600 Amphitheatre Pkwy, Mountain View CA 94043-1351","latitude":37.422022,"longitude":-122.08429,"address_type":"street","is_residential":false},"created_at":"2026-10-27T11:20:00.000000+00:00"}');
 
         $result = $this->client->addressValidation->validate([
             'address' => 'address-value',
@@ -38,7 +38,7 @@ final class AddressValidationTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"address":"address-value","address_line_1":"address_line_1-value","address_line_2":"address_line_2-value","city":"city-value","region":"region-value","postal_code":"postal_code-value","country":"country-value"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"request_id":"6f7d2c1e-1c5a-4a1e-9b8f-2a1f0f4b9c3d","address_validation":{"status":"verified","verification_level":"premise","address":{"address_line_1":"1600 Amphitheatre Pkwy","address_line_2":null,"city":"Mountain View","region":"CA","postal_code":"94043-1351","country":"US"},"formatted_address":"1600 Amphitheatre Pkwy, Mountain View CA 94043-1351","latitude":37.422022,"longitude":-122.08429},"created_at":"2026-10-27T11:20:00.000000+00:00"}'), $result->toArray());
+        self::assertSame($this->decoded('{"request_id":"6f7d2c1e-1c5a-4a1e-9b8f-2a1f0f4b9c3d","address_validation":{"status":"verified","verification_level":"premise","address":{"address_line_1":"1600 Amphitheatre Pkwy","address_line_2":null,"city":"Mountain View","region":"CA","postal_code":"94043-1351","country":"US"},"formatted_address":"1600 Amphitheatre Pkwy, Mountain View CA 94043-1351","latitude":37.422022,"longitude":-122.08429,"address_type":"street","is_residential":false},"created_at":"2026-10-27T11:20:00.000000+00:00"}'), $result->toArray());
         self::assertSame('6f7d2c1e-1c5a-4a1e-9b8f-2a1f0f4b9c3d', $result->requestId);
     }
 }
