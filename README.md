@@ -160,6 +160,20 @@ Failed requests are retried up to `maxRetries` times (default 2) with exponentia
 `POST` and `PATCH` are never retried once the request may have reached the server (a 5xx or a read timeout); they are retried only when the connection failed before sending, or on 429.
 `timeout` (default 60 s) applies to each attempt and is set natively on Guzzle and Symfony HttpClient 6.2 or later; with another PSR-18 client (or an older Symfony HttpClient), configure the timeout on that client.
 
+### Idempotency
+
+Pass `idempotencyKey` in `RequestOptions` to make a write safe to repeat: the key is sent as the `Idempotency-Key` header on `POST`, `PUT`, `PATCH` and `DELETE`, and Didit returns the first response instead of running the request again.
+
+```php
+$didit->sessions->create(
+    ['workflow_id' => $workflowId],
+    new RequestOptions(idempotencyKey: 'order-123'),
+);
+```
+
+The key is 1 to 255 characters, chosen by you and passed again when you repeat the same operation; it is a per-request option, not a client option.
+With a key, POST and PATCH are retried like GET.
+
 ## Pagination
 
 List operations return a `Page` with `count`, `next`, `previous` and `results`.
