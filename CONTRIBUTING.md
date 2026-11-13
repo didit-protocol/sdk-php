@@ -63,7 +63,7 @@ A change to hand-written core behaviour that DESIGN.md describes (client options
 1.0.0 was released on 2026-10-29. Merging the release pull request is the release approval (Alex, 2026-10-29); nobody tags or publishes by hand.
 
 1. Release Please (`.github/workflows/release-please.yml`) keeps a release pull request open with the next version and changelog. It runs only when the repository variable `RELEASES_ENABLED` is `true`, and it never creates tags: Packagist publishes every tag it sees.
-2. Merging that pull request creates no tag yet. The merged pull request stays labelled `autorelease: pending`, and no new release pull request opens until it is tagged.
+2. Merging that pull request creates no tag yet. The merged pull request stays labelled `autorelease: pending`, and no new release pull request opens until it is tagged. Release Please reads the commits since the GitHub release of the version in `.release-please-manifest.json`, so its workflow first waits for that release (up to 15 minutes) and does not run without it: a run that started with the merge would otherwise read the whole history and could open a release pull request for an old version.
 3. `.github/workflows/publish.yml` (also gated on `RELEASES_ENABLED`) checks that `Didit\Version::VERSION` equals the release manifest, runs the tests and PHPStan on the merge commit, then, in the `packagist` environment (it holds the Packagist secrets; no reviewers), creates the `vX.Y.Z` tag and the GitHub release, attest the build provenance of a source archive (GitHub artifact attestations), attach it to the release and ask Packagist to update. If the checks fail, nothing is tagged: fix `main` or run Publish again from the Actions tab.
 
 ### One-time registry setup (done for 1.0.0 on 2026-10-29)
