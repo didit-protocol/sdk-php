@@ -11,6 +11,14 @@ namespace Didit;
  * ```php
  * $didit->sessions->list([], new RequestOptions(timeout: 5, maxRetries: 0));
  * ```
+ *
+ * `idempotencyKey` exists only here, never on the client: the key (1 to 255
+ * characters) is sent as the `Idempotency-Key` header on POST, PUT, PATCH and
+ * DELETE, and a POST or PATCH that carries it is retried like a GET.
+ *
+ * ```php
+ * $didit->sessions->create(['workflow_id' => $id], new RequestOptions(idempotencyKey: 'order-1042'));
+ * ```
  */
 final class RequestOptions
 {
@@ -31,6 +39,7 @@ final class RequestOptions
         public readonly ?string $accountBaseUrl = null,
         #[\SensitiveParameter]
         public readonly ?string $accountToken = null,
+        public readonly ?string $idempotencyKey = null,
     ) {
     }
 
