@@ -7,6 +7,16 @@ name: Release Please
 # "autorelease: pending" until then, and no new release pull request opens in
 # the meantime. It runs while the repository variable RELEASES_ENABLED is
 # "true" (set since the 1.0.0 release on 2026-10-29).
+#
+# Release Please finds the commits to release by the GitHub release of the
+# version in .release-please-manifest.json. Right after a release pull request
+# merges, that release does not exist yet (publish.yml creates it about a minute
+# later), and this workflow starts at the same moment as publish.yml. A run in
+# that window reads the whole history instead, including the old commits that
+# pinned 1.0.0 and 1.0.1, and opens a wrong release pull request when publish.yml
+# tags before it finishes (2026-11-12: "release 1.0.1" opened and merged itself
+# right after 2.8.0). So this workflow first waits for that release, and does
+# not run Release Please without it.
 
 on:
   push:
@@ -22,8 +32,29 @@ jobs:
   release-please:
     if: vars.RELEASES_ENABLED == 'true'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
+      - name: Wait for the GitHub release of the version in the release manifest
+        id: released
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # 90 rounds of 10 seconds: publish.yml needs about a minute to test and tag.
+          for _ in $(seq 1 90); do
+            version="$(gh api "repos/${GITHUB_REPOSITORY}/contents/.release-please-manifest.json?ref=main" \
+              -H 'Accept: application/vnd.github.raw+json' | jq -r '.["."] // ""' || true)"
+            if [ -n "$version" ] && gh api "repos/${GITHUB_REPOSITORY}/releases/tags/v${version}" --silent 2> /dev/null; then
+              echo "The release v${version} exists."
+              echo "ready=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::warning::No GitHub release v${version:-?} after 15 minutes: publish.yml has not tagged the merged release (see its run). Release Please did not run; it runs on the next push to main, or start this workflow by hand once the release exists."
+          echo "ready=false" >> "$GITHUB_OUTPUT"
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
+        if: steps.released.outputs.ready == 'true'
         with:
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
