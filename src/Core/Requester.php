@@ -309,9 +309,10 @@ final class Requester
 
     private static function validateIdempotencyKey(string $key): void
     {
-        // 1 to 255 printable ASCII characters (space to "~"): the key travels as an HTTP header value.
-        if (1 !== preg_match('/\A[ -~]{1,255}\z/', $key)) {
-            throw new ConfigurationException('The idempotency key must be a string of 1 to 255 printable ASCII characters.');
+        // 1 to 255 printable ASCII characters (space to "~") that neither start nor end with a space: the key
+        // travels as an HTTP header value that the server trims.
+        if (1 !== preg_match('/\A(?:[!-~]|[!-~][ -~]{0,253}[!-~])\z/', $key)) {
+            throw new ConfigurationException('The idempotency key must be a string of 1 to 255 printable ASCII characters that neither start nor end with a space.');
         }
     }
 

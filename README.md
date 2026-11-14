@@ -171,7 +171,7 @@ $didit->sessions->create(
 );
 ```
 
-The key is 1 to 255 characters, chosen by you and passed again when you repeat the same operation; it is a per-request option, not a client option.
+The key is 1 to 255 printable ASCII characters (not starting or ending with a space), chosen by you and passed again when you repeat the same operation; it is a per-request option, not a client option.
 With a key, POST and PATCH are retried like GET.
 
 ## Pagination
