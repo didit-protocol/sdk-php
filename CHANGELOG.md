@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.13.2](https://github.com/didit-protocol/sdk-php/compare/v2.13.1...v2.13.2) (2026-11-14)
+
+
+### Bug Fixes
+
+* an idempotency key neither starts nor ends with a space ([#72](https://github.com/didit-protocol/sdk-php/issues/72)) ([4de3a08](https://github.com/didit-protocol/sdk-php/commit/4de3a0856f0338ddf5e6ff70ca6e4140e418be2d))
+
 ## [2.13.1](https://github.com/didit-protocol/sdk-php/compare/v2.13.0...v2.13.1) (2026-11-14)
 
 
