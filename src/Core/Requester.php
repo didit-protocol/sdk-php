@@ -22,6 +22,10 @@ use Psr\Log\LoggerInterface;
  */
 final class Requester
 {
+    private const IDEMPOTENCY_HEADER = 'Idempotency-Key';
+
+    private const IDEMPOTENCY_METHODS = ['POST', 'PUT', 'PATCH', 'DELETE'];
+
     private const IDEMPOTENT_METHODS = ['GET', 'HEAD', 'PUT', 'DELETE', 'OPTIONS'];
     private const INITIAL_BACKOFF = 0.5;
     private const MAX_BACKOFF = 8.0;
@@ -101,6 +105,8 @@ final class Requester
         foreach ($requestOptions->extraQuery ?? [] as $key => $value) {
             $query[$key] = $value;
         }
+
+        $this->applyIdempotencyKey($operation->method, $headers, $requestOptions);
 
         $bodyFactory = null;
         if ([] !== $operation->bodyTypes || [] !== $body) {
@@ -195,6 +201,7 @@ final class Requester
         $headers = $this->headers($operation, $options, $operationHeaders);
         $body = null === $bodyFactory ? null : $bodyFactory();
         $method = $operation->method;
+        $hasKey = isset($headers[self::IDEMPOTENCY_HEADER]);
 
         for ($attempt = 0;; ++$attempt) {
             $request = $this->buildRequest($method, $url, $headers, $body);
@@ -203,7 +210,7 @@ final class Requester
                 $psrResponse = $this->transport->send($request, $options->timeout);
             } catch (ApiConnectionException $e) {
                 $this->log($method, $path, null, $started, $attempt);
-                if ($attempt < $options->maxRetries && $this->shouldRetryConnection($method, $e)) {
+                if ($attempt < $options->maxRetries && $this->shouldRetryConnection($method, $e, $hasKey)) {
                     ($this->sleep)($this->backoff($attempt, null));
                     continue;
                 }
@@ -216,7 +223,7 @@ final class Requester
             if ($response->status >= 200 && $response->status < 300) {
                 return $response;
             }
-            if ($attempt < $options->maxRetries && $this->shouldRetryStatus($method, $response->status)) {
+            if ($attempt < $options->maxRetries && ($this->shouldRetryStatus($method, $response->status, $hasKey) || ($hasKey && self::isIdempotencyKeyInProgress($response)))) {
                 ($this->sleep)($this->backoff($attempt, $response->header('retry-after')));
                 continue;
             }
@@ -225,9 +232,9 @@ final class Requester
         }
     }
 
-    public function shouldRetryConnection(string $method, ApiConnectionException $e): bool
+    public function shouldRetryConnection(string $method, ApiConnectionException $e, bool $hasIdempotencyKey = false): bool
     {
-        if (\in_array($method, self::IDEMPOTENT_METHODS, true)) {
+        if ($hasIdempotencyKey || \in_array($method, self::IDEMPOTENT_METHODS, true)) {
             return true;
         }
 
@@ -235,16 +242,77 @@ final class Requester
         return !$e->mayHaveReachedServer;
     }
 
-    public function shouldRetryStatus(string $method, int $status): bool
+    public function shouldRetryStatus(string $method, int $status, bool $hasIdempotencyKey = false): bool
     {
         if (429 === $status) {
             return true;
         }
-        if (!\in_array($method, self::IDEMPOTENT_METHODS, true)) {
+        if (!$hasIdempotencyKey && !\in_array($method, self::IDEMPOTENT_METHODS, true)) {
             return false;
         }
 
         return 408 === $status || $status >= 500;
+    }
+
+    /**
+     * A 409 whose JSON `code` says the first request with this key is still running.
+     */
+    private static function isIdempotencyKeyInProgress(RawResponse $response): bool
+    {
+        if (409 !== $response->status) {
+            return false;
+        }
+        $body = $response->parsedBody();
+
+        return \is_array($body) && 'idempotency_key_in_progress' === ($body['code'] ?? null);
+    }
+
+    /**
+     * Computes the effective idempotency key and leaves it as the only
+     * `Idempotency-Key` entry of `$headers`, or none.
+     *
+     * Precedence, lowest first: a generated header parameter, a per-request raw
+     * header, the `idempotencyKey` option. A client-wide default header of that
+     * name is ignored (see `headers()`). Names are compared case-insensitively.
+     *
+     * @param array<string, string> $headers
+     */
+    private function applyIdempotencyKey(string $method, array &$headers, ?RequestOptions $requestOptions): void
+    {
+        $key = null;
+        foreach ([$headers, $requestOptions->headers ?? []] as $source) {
+            foreach ($source as $name => $value) {
+                if (self::isIdempotencyHeader("{$name}")) {
+                    $key = $value;
+                }
+            }
+        }
+        foreach ($headers as $name => $value) {
+            if (self::isIdempotencyHeader("{$name}")) {
+                unset($headers[$name]);
+            }
+        }
+        $key = $requestOptions->idempotencyKey ?? $key;
+        if (null === $key) {
+            return;
+        }
+        self::validateIdempotencyKey($key);
+        if (\in_array($method, self::IDEMPOTENCY_METHODS, true)) {
+            $headers[self::IDEMPOTENCY_HEADER] = $key;
+        }
+    }
+
+    private static function isIdempotencyHeader(string $name): bool
+    {
+        return 'idempotency-key' === strtolower($name);
+    }
+
+    private static function validateIdempotencyKey(string $key): void
+    {
+        // 1 to 255 characters (not bytes).
+        if (1 !== preg_match('/^.{1,255}$/su', $key)) {
+            throw new ConfigurationException('The idempotency key must be a string of 1 to 255 characters.');
+        }
     }
 
     /**
@@ -324,8 +392,8 @@ final class Requester
             'X-Didit-Client' => 'php/' . Version::VERSION,
         ];
         foreach ($options->defaultHeaders as $name => $value) {
-            // The SDK owns the credential headers.
-            if (!\in_array(strtolower($name), ['x-api-key', 'authorization'], true)) {
+            // The SDK owns the credential headers, and a client-wide idempotency key is never sent.
+            if (!\in_array(strtolower($name), ['x-api-key', 'authorization', 'idempotency-key'], true)) {
                 $headers[$name] = $value;
             }
         }
