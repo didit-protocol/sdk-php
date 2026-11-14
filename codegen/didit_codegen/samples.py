@@ -27,6 +27,9 @@ UUID = "3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"
 # their values, so no committed file carries a token-like string (the
 # repository's secret scan allowlists only openapi/).
 CREDENTIAL_KEY_RE = re.compile(r"(token|secret|secret_key|secret_shared_key|api_key|apikey|password|private_key)$", re.I)
+# Idempotency-style keys are uuid-formatted in the spec, and a uuid next to a ``*_key`` name trips the
+# generic-api-key rule of the repository's secret scan (spec sync of 2026-11-13), so they get a readable placeholder.
+OPAQUE_KEY_RE = re.compile(r"(request_key|idempotency_key)$", re.I)
 JWT_RE = re.compile(r"^eyJ[A-Za-z0-9_-]*\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]*$")
 
 
@@ -48,6 +51,8 @@ def scalar_sample(t: Scalar, wire: str, example: Any = None) -> Any:
     if t.php == "string":
         if isinstance(example, str):
             return example
+        if OPAQUE_KEY_RE.search(wire):
+            return "sample-" + wire.lower().replace("_", "-")
         return {
             "uuid": UUID,
             "date": "2026-01-15",
