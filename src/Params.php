@@ -640,6 +640,7 @@ namespace Didit;
  *     services?: list<string>,
  *     validation_type?: string,
  *     consent?: bool,
+ *     electoral_roll_only?: bool,
  *     identification_number?: string,
  *     first_name?: string,
  *     last_name?: string,

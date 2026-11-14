@@ -27,6 +27,7 @@ final class DatabaseValidationTest extends GeneratedTestCase
             ],
             'validation_type' => 'validation_type-value',
             'consent' => true,
+            'electoral_roll_only' => true,
             'identification_number' => 'identification_number-value',
             'first_name' => 'first_name-value',
             'last_name' => 'last_name-value',
@@ -134,6 +135,9 @@ final class DatabaseValidationTest extends GeneratedTestCase
                 'validation_type-value',
             ],
             'consent' => [
+                'true',
+            ],
+            'electoral_roll_only' => [
                 'true',
             ],
             'identification_number' => [
