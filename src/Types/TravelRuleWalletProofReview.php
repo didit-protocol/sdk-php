@@ -10,7 +10,8 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * TravelRuleWalletProofReview.
+ * Uploaded screenshot proof returned by the review queue and decision endpoint. Submitter attribution
+ * is independent of the current wallet holder.
  */
 final class TravelRuleWalletProofReview extends BaseModel
 {
@@ -29,7 +30,10 @@ final class TravelRuleWalletProofReview extends BaseModel
     /** Canonical chain identifier, e.g. ETH, BTC, SOL, TRX. */
     public readonly ?string $chain;
 
-    /** The `holder_name` field. */
+    /**
+     * Holder name from the submitting widget, never a reassigned holder. Empty when the submitting widget
+     * was deleted.
+     */
     public readonly ?string $holderName;
 
     /** Whether the address book entry is ownership-verified, by this proof or another one. */
@@ -47,15 +51,20 @@ final class TravelRuleWalletProofReview extends BaseModel
     /** The `content_type` field. */
     public readonly ?string $contentType;
 
-    /** Time-limited link to the uploaded screenshot. List the queue again for a fresh link. */
+    /**
+     * Authorized /v3/media/preview/ URL with an expiring signed source for this proof screenshot. Returns
+     * a recompressed preview, not the original upload or an arbitrary public URL. Null when no eligible
+     * screenshot exists. Read the proof again for a fresh link.
+     */
     public readonly ?string $screenshotUrl;
 
     /** How many files the end user uploaded for this proof. */
     public readonly ?int $attempts;
 
     /**
-     * REVIEW_REJECTED after a rejection, OWNERSHIP_CHANGED when the wallet changed holder or was deleted
-     * before a decision. Empty otherwise.
+     * Fixed failure code for this proof or its last attempt; empty when no documented failure applies.
+     * REVIEW_REJECTED identifies a rejected screenshot. History can also carry expiry, ownership-change or
+     * abandonment codes.
      *
      * Known values: {@see TravelRuleWalletProofFailureReason}.
      */
@@ -78,6 +87,27 @@ final class TravelRuleWalletProofReview extends BaseModel
 
     /** The `created_at` field. */
     public readonly ?\DateTimeImmutable $createdAt;
+
+    /** Application that owns the wallet and proof. */
+    public readonly ?string $applicationId;
+
+    /**
+     * User in this application matching the submitting widget vendor_data. Null when no matching current
+     * user exists, or the submitting widget was deleted. Never the reassigned wallet holder.
+     */
+    public readonly ?string $userId;
+
+    /**
+     * Holder identifier from the submitting widget, not the current wallet holder. Empty when the
+     * submitting widget was deleted.
+     */
+    public readonly ?string $holderVendorData;
+
+    /**
+     * Exact current wallet label, including an empty string when no label is set. Not a name inferred from
+     * the holder or address.
+     */
+    public readonly ?string $walletLabel;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -103,5 +133,9 @@ final class TravelRuleWalletProofReview extends BaseModel
         $this->decidedBy = Hydrate::string($data['decided_by'] ?? null);
         $this->reviewNote = Hydrate::string($data['review_note'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
+        $this->applicationId = Hydrate::string($data['application_id'] ?? null);
+        $this->userId = Hydrate::string($data['user_id'] ?? null);
+        $this->holderVendorData = Hydrate::string($data['holder_vendor_data'] ?? null);
+        $this->walletLabel = Hydrate::string($data['wallet_label'] ?? null);
     }
 }

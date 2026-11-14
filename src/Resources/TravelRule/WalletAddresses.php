@@ -80,7 +80,8 @@ final class WalletAddresses extends BaseResource
      *
      * Partial update of holder_name, holder_vendor_data, entity_type, and travel_address. Setting
      * travel_address attaches a TRP routing address to the entry; invalid values are rejected with 400.
-     * The response echoes only these four fields.
+     * The response returns the updated entry: its label, owner type, receiving travel address and
+     * ownership proof summary, with the writable fields.
      *
      * `PATCH /v3/travel-rule/wallet-addresses/{entry_uuid}/`
      *
@@ -93,14 +94,14 @@ final class WalletAddresses extends BaseResource
         string $entryUuid,
         array $params = [],
         ?RequestOptions $options = null,
-    ): Types\WalletAddressEntryUpdate {
+    ): Types\WalletAddressEntryUpdateResponse {
         $response = $this->requester->request(new Operation(
             method: 'PATCH',
             path: '/v3/travel-rule/wallet-addresses/{entry_uuid}/',
             bodyTypes: ['json'],
         ), ['entry_uuid' => $entryUuid], $params, $options);
 
-        return Types\WalletAddressEntryUpdate::fromResponse($response);
+        return Types\WalletAddressEntryUpdateResponse::fromResponse($response);
     }
 
     /**

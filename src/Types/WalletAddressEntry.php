@@ -76,6 +76,19 @@ final class WalletAddressEntry extends BaseModel
      */
     public readonly ?string $receivingTravelAddress;
 
+    /** The `ownership_proof` field. */
+    public readonly ?TravelRuleWalletOwnershipProof $ownershipProof;
+
+    /** Current wallet label, exactly as saved. */
+    public readonly ?string $label;
+
+    /**
+     * Wallet owner type.
+     *
+     * Known values: {@see WalletAddressEntryOwnerType}.
+     */
+    public readonly ?string $ownerType;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -94,5 +107,8 @@ final class WalletAddressEntry extends BaseModel
         $this->addressHash = Hydrate::string($data['address_hash'] ?? null);
         $this->memo = Hydrate::string($data['memo'] ?? null);
         $this->receivingTravelAddress = Hydrate::string($data['receiving_travel_address'] ?? null);
+        $this->ownershipProof = Hydrate::model($data['ownership_proof'] ?? null, TravelRuleWalletOwnershipProof::class);
+        $this->label = Hydrate::string($data['label'] ?? null);
+        $this->ownerType = Hydrate::string($data['owner_type'] ?? null);
     }
 }
