@@ -111,6 +111,10 @@ final class IdempotencyKeyTest extends TestCase
         yield 'empty' => [''];
         yield '256 characters' => [str_repeat('k', 256)];
         yield '256 multibyte characters' => [str_repeat("\u{e9}", 256)];
+        yield 'non-ASCII text' => ["\u{6ce8}\u{6587}-1"];
+        yield 'accented letter' => ["caf\u{e9}"];
+        yield 'a newline' => ["a\nb"];
+        yield 'a trailing newline' => ["key\n"];
     }
 
     #[DataProvider('invalidKeys')]
@@ -358,6 +362,8 @@ final class IdempotencyKeyTest extends TestCase
     {
         yield 'empty' => [''];
         yield '256 characters' => [str_repeat('k', 256)];
+        yield 'non-ASCII text' => ["\u{6ce8}\u{6587}-1"];
+        yield 'a newline' => ["a\nb"];
     }
 
     #[DataProvider('invalidKeysForParameterAndRawHeader')]

@@ -148,5 +148,49 @@ class MultiContentOneOfBodyTest(unittest.TestCase):
         self.assertIn("entries?: list<WalletAddressImportRow>,", source)
 
 
+class IdempotencyKeyHeaderTest(unittest.TestCase):
+    """The shared ``Idempotency-Key`` header is generated only where it was already published (DESIGN.md)."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        header = {"name": "Idempotency-Key", "in": "header", "required": False, "schema": {"type": "string"},
+                  "description": "Retry-safety key."}
+        trace = {"name": "X-Trace-Id", "in": "header", "required": False, "schema": {"type": "string"}}
+
+        def operation(summary: str, parameters: list) -> dict:
+            return {
+                "post": {
+                    "summary": summary,
+                    "parameters": parameters,
+                    "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"name": {"type": "string"}}}}}},
+                    "responses": ok({"type": "object", "properties": {"id": {"type": "string"}}}),
+                }
+            }
+
+        paths = {
+            "/v3/aml/": operation("Screen", [header]),
+            "/v3/things/": operation("Create a thing", [header, trace]),
+        }
+        overlay = {"POST /v3/aml/": naming("aml", "screen"), "POST /v3/things/": naming("things", "create")}
+        with tempfile.TemporaryDirectory() as tmp:
+            write_openapi(Path(tmp), document(paths), overlay)
+            s = spec.load(Path(tmp))
+        built = model.build(model.Registry(), s.server_operations)
+        cls.ops = {o.op.naming.resource: o for o in built}
+
+    def test_a_newly_covered_operation_gets_no_generated_idempotency_key(self) -> None:
+        wires = [p.wire for p in self.ops["things"].params if p.location == "header"]
+        self.assertEqual(wires, ["X-Trace-Id"])
+
+    def test_a_published_operation_keeps_the_argument_and_deprecates_it(self) -> None:
+        headers = [p for p in self.ops["aml"].params if p.location == "header"]
+        self.assertEqual([p.wire for p in headers], ["Idempotency-Key"])
+        self.assertIn("Deprecated", headers[0].description)
+        self.assertIn("idempotencyKey", headers[0].description)
+
+    def test_the_legacy_list_is_the_28_published_operations(self) -> None:
+        self.assertEqual(len(model.LEGACY_IDEMPOTENCY_KEY_ARGUMENT), 28)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -491,6 +491,12 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
     doc.append("")
     doc.append(f"`{o.http_method} {o.path}`")
     doc.append("")
+    if any(p.location == "header" and p.wire.lower() == "idempotency-key" for p in om.params):
+        doc += wrap(
+            "The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey: ...)` "
+            "instead. The option wins when both are set."
+        )
+        doc.append("")
     for pp in om.path_params:
         pdesc = annotation_text(first_sentence(pp.description))
         if pdesc:
