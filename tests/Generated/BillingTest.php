@@ -43,7 +43,7 @@ final class BillingTest extends GeneratedTestCase
             'success_url' => 'https://example.com/callback',
             'cancel_url' => 'https://example.com/callback',
             'payment_method' => 'checkout',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -52,7 +52,7 @@ final class BillingTest extends GeneratedTestCase
         self::assertSame('/v3/billing/top-up/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"amount_in_dollars":1.5,"success_url":"https://example.com/callback","cancel_url":"https://example.com/callback","payment_method":"checkout"}', $this->canonicalBody($request));
         self::assertInstanceOf(Types\BillingTopUpResponse200::class, $result);

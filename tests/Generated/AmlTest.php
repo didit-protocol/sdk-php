@@ -39,7 +39,7 @@ final class AmlTest extends GeneratedTestCase
                 'key' => 'value',
             ],
             'sandbox_scenario' => 'sandbox_scenario-value',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -48,7 +48,7 @@ final class AmlTest extends GeneratedTestCase
         self::assertSame('/v3/aml/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"full_name":"full_name-value","entity_type":"person","date_of_birth":"2026-01-15","nationality":"nationality-value","document_number":"document_number-value","aml_score_approve_threshold":1.5,"aml_score_review_threshold":1.5,"aml_name_weight":1,"aml_dob_weight":1,"aml_country_weight":1,"aml_match_score_threshold":1,"include_adverse_media":true,"include_ongoing_monitoring":true,"save_api_request":true,"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);

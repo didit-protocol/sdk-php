@@ -99,7 +99,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'DNK',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -108,7 +108,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/mitid/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"DNK","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -129,7 +129,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'SWE',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -138,7 +138,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/bankid-se/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"SWE","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -159,7 +159,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'NOR',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -168,7 +168,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/bankid-no/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"NOR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -189,7 +189,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'NOR',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -198,7 +198,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/vipps/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"NOR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -219,7 +219,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'NOR',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -228,7 +228,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/buypass/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"NOR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -249,7 +249,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'BEL',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -258,7 +258,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/itsme/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"BEL","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -279,7 +279,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'NLD',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -288,7 +288,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/idin/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"NLD","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -309,7 +309,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'FIN',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -318,7 +318,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/ftn/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"FIN","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -339,7 +339,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'DEU',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -348,7 +348,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/personalausweis/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"DEU","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -369,7 +369,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'SWE',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -378,7 +378,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/frejaid/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"SWE","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -399,7 +399,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'ARE',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -408,7 +408,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/uae-pass/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"ARE","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -429,7 +429,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'BRA',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -438,7 +438,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/govbr/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"BRA","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -459,7 +459,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'GBR',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -468,7 +468,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/oneid/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"GBR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -489,7 +489,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'GBR',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -498,7 +498,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/govuk-wallet/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"GBR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -518,7 +518,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'sandbox_scenario' => 'sandbox_scenario-value',
             'country' => 'EST',
             'personal_code' => 'personal_code-value',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -527,7 +527,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/smart-id/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"EST","personal_code":"personal_code-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -548,7 +548,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'EST',
             'personal_code' => 'personal_code-value',
             'phone_number' => 'phone_number-value',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -557,7 +557,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/mobile-id/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"EST","personal_code":"personal_code-value","phone_number":"phone_number-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -578,7 +578,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'EST',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -587,7 +587,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/idcard-ee/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"EST","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -608,7 +608,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'LVA',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -617,7 +617,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/eparaksts-mobile/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"LVA","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -638,7 +638,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'CZE',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -647,7 +647,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/bankid-cz/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"CZE","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -668,7 +668,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'CZE',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -677,7 +677,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/mojeid/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"CZE","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -698,7 +698,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'UKR',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -707,7 +707,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/diia/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"UKR","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -728,7 +728,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'FRA',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -737,7 +737,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/franceconnect/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"FRA","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -758,7 +758,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'ISL',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -767,7 +767,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/audkenni/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"ISL","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -789,7 +789,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'authorisation_server_id' => 'authorisation_server_id-value',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -798,7 +798,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/connectid/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"AUS","authorisation_server_id":"authorisation_server_id-value","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -819,7 +819,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'country' => 'AUT',
             'return_url' => 'https://example.com/callback',
             'device' => 'same_device',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -828,7 +828,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/eudi/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"AUT","return_url":"https://example.com/callback","device":"same_device"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
@@ -871,7 +871,7 @@ final class IdWalletsTest extends GeneratedTestCase
             'sandbox_scenario' => 'sandbox_scenario-value',
             'country' => 'USA',
             'origin' => 'origin-value',
-            'idempotency_key' => 'idempotency_key-value',
+            'idempotency_key' => 'sample-idempotency-key',
         ]);
 
         $request = $this->lastRequest();
@@ -880,7 +880,7 @@ final class IdWalletsTest extends GeneratedTestCase
         self::assertSame('/v3/id-verification/wallets/google-wallet/', $request->getUri()->getPath());
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('idempotency_key-value', $request->getHeaderLine('Idempotency-Key'));
+        self::assertSame('sample-idempotency-key', $request->getHeaderLine('Idempotency-Key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"vendor_data":"vendor_data-value","metadata":{"key":"value"},"sandbox_scenario":"sandbox_scenario-value","country":"USA","origin":"origin-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
