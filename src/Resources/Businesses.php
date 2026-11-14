@@ -208,7 +208,7 @@ final class Businesses extends BaseResource
      * Pre-create a [business](/entities/businesses) *without* a KYB session. All fields are optional, but
      * you should always send `vendor_data`, without it the record cannot be linked to sessions or
      * transactions. When provided, `vendor_data` must be unique among non-deleted businesses (exact match;
-     * conflicts return 400). Not idempotent.
+     * conflicts return 400). Not idempotent without an `Idempotency-Key`.
      *
      * `POST /v3/businesses/create/`
      *

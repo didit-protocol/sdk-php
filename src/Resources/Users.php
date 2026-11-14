@@ -234,7 +234,7 @@ final class Users extends BaseResource
      *
      * Create a [user](/entities/users) by `vendor_data`, before or without a verification session.
      * `vendor_data` must be unique among the application's users (a duplicate returns `400`). Not
-     * idempotent.
+     * idempotent without an `Idempotency-Key`.
      *
      * `POST /v3/users/create/`
      *

@@ -55,8 +55,8 @@ final class Workflows extends BaseResource
      *
      * Create a simple workflow. Send `features` in execution order (ordering rules apply); defaults to
      * `published` v1. The body accepts ONLY the fields listed in `SimpleWorkflowRequest`, any other key
-     * (including `workflow_type`) is rejected with a 400. Not idempotent, each call creates a new
-     * workflow. Maximum 50 workflows per application.
+     * (including `workflow_type`) is rejected with a 400. Without an `Idempotency-Key` each call creates a
+     * new workflow. Maximum 50 workflows per application.
      *
      * `POST /v3/workflows/`
      *

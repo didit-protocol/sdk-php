@@ -270,7 +270,8 @@ final class Sessions extends BaseResource
      * Redeem a share token to clone a verification session into your application.
      *
      * Redeem a share token to clone a KYC or KYB session into the calling application with a fresh
-     * `session_id`. Not idempotent, a token redeems once per receiver.
+     * `session_id`. Without an `Idempotency-Key` a token redeems once per receiver; repeat it with the
+     * same key to get the first response back.
      *
      * `POST /v3/session/import-shared/`
      *
