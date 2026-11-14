@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.13.0](https://github.com/didit-protocol/sdk-php/compare/v2.12.0...v2.13.0) (2026-11-14)
+
+
+### Features
+
+* per-request idempotency key ([#58](https://github.com/didit-protocol/sdk-php/issues/58)) ([56ead26](https://github.com/didit-protocol/sdk-php/commit/56ead263e49c55574db7fe7889d70e7c123600d7))
+
 ## [2.12.0](https://github.com/didit-protocol/sdk-php/compare/v2.11.0...v2.12.0) (2026-11-14)
 
 
