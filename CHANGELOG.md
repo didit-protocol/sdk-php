@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.13.1](https://github.com/didit-protocol/sdk-php/compare/v2.13.0...v2.13.1) (2026-11-14)
+
+
+### Bug Fixes
+
+* **codegen:** skip the Idempotency-Key header except on the 28 operations that published it; refuse a non-ASCII key ([#70](https://github.com/didit-protocol/sdk-php/issues/70)) ([eb66111](https://github.com/didit-protocol/sdk-php/commit/eb66111f48eacc40e9397d93a42d61e0c32b51c5))
+
 ## [2.13.0](https://github.com/didit-protocol/sdk-php/compare/v2.12.0...v2.13.0) (2026-11-14)
 
 
