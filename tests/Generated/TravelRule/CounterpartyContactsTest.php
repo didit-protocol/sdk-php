@@ -51,6 +51,9 @@ final class CounterpartyContactsTest extends GeneratedTestCase
             'counterparty' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
             'email' => 'user@example.com',
             'name' => 'name-value',
+            'role' => 'role-value',
+            'phone' => 'phone-value',
+            'receives_requests' => true,
         ]);
 
         $request = $this->lastRequest();
@@ -60,10 +63,35 @@ final class CounterpartyContactsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"counterparty":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","email":"user@example.com","name":"name-value"}', $this->canonicalBody($request));
+        self::assertSame('{"counterparty":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","email":"user@example.com","name":"name-value","role":"role-value","phone":"phone-value","receives_requests":true}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"uuid":"6c1f9b8e-2d4a-4f7e-8b3c-5a9d0e1f2a3b","counterparty":"0d6f3c2a-6a1e-4c55-9a39-1f2b0c7d8e91","counterparty_name":"Example Counterparty VASP","email":"compliance@counterparty.example","name":"Compliance desk","source":"application","scope":"application","created_by":"","verified_at":null,"is_invalid":false,"invalid_reason":"","invalid_detail":"","invalid_at":null,"created_at":"2026-10-19T09:00:00Z"}'), $result->toArray());
         self::assertSame('6c1f9b8e-2d4a-4f7e-8b3c-5a9d0e1f2a3b', $result->uuid);
+    }
+
+    public function testUpdate(): void
+    {
+        $this->queueJson(200, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","counterparty":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","counterparty_name":"counterparty_name-value","email":"user@example.com","name":"name-value","source":"staff","scope":"platform","created_by":"created_by-value","verified_at":"2026-01-15T10:30:00Z","is_invalid":true,"invalid_reason":"","invalid_detail":"invalid_detail-value","invalid_at":"2026-01-15T10:30:00Z","created_at":"2026-01-15T10:30:00Z","role":"role-value","phone":"phone-value","receives_requests":true}');
+
+        $result = $this->client->travelRule->counterpartyContacts->update('contactUuid-1', [
+            'name' => 'name-value',
+            'email' => 'user@example.com',
+            'role' => 'role-value',
+            'phone' => 'phone-value',
+            'receives_requests' => true,
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('PATCH', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/travel-rule/counterparty-contacts/contactUuid-1/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"name":"name-value","email":"user@example.com","role":"role-value","phone":"phone-value","receives_requests":true}', $this->canonicalBody($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","counterparty":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","counterparty_name":"counterparty_name-value","email":"user@example.com","name":"name-value","source":"staff","scope":"platform","created_by":"created_by-value","verified_at":"2026-01-15T10:30:00Z","is_invalid":true,"invalid_reason":"","invalid_detail":"invalid_detail-value","invalid_at":"2026-01-15T10:30:00Z","created_at":"2026-01-15T10:30:00Z","role":"role-value","phone":"phone-value","receives_requests":true}'), $result->toArray());
+        self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
     }
 
     public function testDelete(): void

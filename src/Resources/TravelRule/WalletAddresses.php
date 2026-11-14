@@ -21,6 +21,8 @@ use Didit\Types;
  *
  * @phpstan-import-type TravelRuleWalletAddressesBulkImportParams from Params
  * @phpstan-import-type TravelRuleWalletAddressesListParams from Params
+ * @phpstan-import-type TravelRuleWalletAddressesListTransfersParams from Params
+ * @phpstan-import-type TravelRuleWalletAddressesLookupParams from Params
  * @phpstan-import-type WalletAddressEntryCreate from Params
  * @phpstan-import-type WalletAddressEntryUpdate from Params
  */
@@ -150,5 +152,56 @@ final class WalletAddresses extends BaseResource
         ), [], $params, $options);
 
         return Types\WalletAddressImportReport::fromResponse($response);
+    }
+
+    /**
+     * Look up a wallet address.
+     *
+     * Checks one exact address, chain and memo against your own wallet address book and then against
+     * wallets proven by other Didit Travel Rule participants. It never screens the wallet, never sends a
+     * message and never returns holder data from another application. `directory_checked` is always
+     * `false`: the lookup does not search a public directory, so `none` means the wallet is neither in
+     * your book nor proven on Didit, not that it is unknown elsewhere.
+     *
+     * `GET /v3/travel-rule/wallet-addresses/lookup/`
+     *
+     * @param TravelRuleWalletAddressesLookupParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function lookup(array $params, ?RequestOptions $options = null): Types\TravelRuleWalletLookup
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/travel-rule/wallet-addresses/lookup/',
+            query: ['address' => 'address', 'chain' => 'chain', 'memo' => 'memo'],
+        ), [], $params, $options);
+
+        return Types\TravelRuleWalletLookup::fromResponse($response);
+    }
+
+    /**
+     * List the transfers that used a wallet address.
+     *
+     * Paginated list of your Travel Rule transfers whose originator or beneficiary wallet is this address
+     * book entry, newest first. The endpoint answers 404 once the entry is deleted.
+     *
+     * `GET /v3/travel-rule/wallet-addresses/{entry_uuid}/transfers/`
+     *
+     * @param TravelRuleWalletAddressesListTransfersParams $params
+     *
+     * @return Page<Types\TravelRuleWalletTransfer>
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listTransfers(string $entryUuid, array $params = [], ?RequestOptions $options = null): Page
+    {
+        return $this->requester->requestPage(new Operation(
+            method: 'GET',
+            path: '/v3/travel-rule/wallet-addresses/{entry_uuid}/transfers/',
+            query: ['limit' => 'limit', 'offset' => 'offset'],
+        ), ['entry_uuid' => $entryUuid], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\TravelRuleWalletTransfer::class));
     }
 }

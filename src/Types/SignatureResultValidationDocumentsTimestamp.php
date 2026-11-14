@@ -10,15 +10,15 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * The RFC 3161 timestamp in the signature, issued by Didit. `null` until signed, and always `null` for
- * a Simple signature.
+ * The RFC 3161 timestamp in the signature: issued by Didit for AES, by the qualified trust service
+ * provider for QES. `null` until signed, and always `null` for a Simple signature.
  */
 final class SignatureResultValidationDocumentsTimestamp extends BaseModel
 {
     /** The `time` field. */
     public readonly ?\DateTimeImmutable $time;
 
-    /** Always `false` for AES. */
+    /** `false` for AES; `true` for a valid QES time stamp. */
     public readonly ?bool $qualified;
 
     /** The `valid` field. */

@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `pdf` for a Simple signature, `pades` for Advanced (AES).
+ * `pdf` for a Simple signature, `pades` for Advanced (AES) and Qualified (QES).
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

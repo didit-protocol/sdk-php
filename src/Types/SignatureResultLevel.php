@@ -7,8 +7,9 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `simple` (default) or `aes`. `qes` (Qualified Electronic Signature, QES) is an add-on that is not
- * available yet.
+ * `simple` (default), `aes` or `qes` (Qualified electronic signature, QES, an add-on: a qualified
+ * trust service provider issues the signer a qualified certificate and signs after the signer enters
+ * the code it texts them).
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

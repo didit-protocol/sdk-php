@@ -8,6 +8,7 @@ namespace Didit\Resources;
 
 use Didit\Core\BaseResource;
 use Didit\Core\Hydrate;
+use Didit\Core\NoContent;
 use Didit\Core\Operation;
 use Didit\Core\Page;
 use Didit\Core\Requester;
@@ -19,12 +20,16 @@ use Didit\Types;
 /**
  * The `travel_rule` resource.
  *
+ * @phpstan-import-type TravelRuleAssignVaspParams from Params
  * @phpstan-import-type TravelRuleCounterpartyDecisionRequest from Params
  * @phpstan-import-type TravelRuleCounterpartyQuestionnaireRequest from Params
  * @phpstan-import-type TravelRuleCounterpartyScreeningRequest from Params
  * @phpstan-import-type TravelRuleInboundRequest from Params
+ * @phpstan-import-type TravelRuleListVaspDecisionHistoryParams from Params
  * @phpstan-import-type TravelRuleListVaspsParams from Params
+ * @phpstan-import-type TravelRuleReviewVaspScreeningHitParams from Params
  * @phpstan-import-type TravelRuleSettingsUpdate from Params
+ * @phpstan-import-type TravelRuleShareVaspDocumentsParams from Params
  * @phpstan-import-type TravelRuleVaspCreateRequest from Params
  * @phpstan-import-type TravelRuleWidgetSessionCreate from Params
  */
@@ -44,6 +49,8 @@ final class TravelRule extends BaseResource
 
     public readonly TravelRule\UnmatchedDeposits $unmatchedDeposits;
 
+    public readonly TravelRule\Documents $documents;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
@@ -54,6 +61,7 @@ final class TravelRule extends BaseResource
         $this->networks = new TravelRule\Networks($requester);
         $this->walletProofs = new TravelRule\WalletProofs($requester);
         $this->unmatchedDeposits = new TravelRule\UnmatchedDeposits($requester);
+        $this->documents = new TravelRule\Documents($requester);
     }
 
     /**
@@ -342,6 +350,36 @@ final class TravelRule extends BaseResource
     }
 
     /**
+     * Review a screening hit.
+     *
+     * Records your review of one possible match of a screening. The screening score and status are
+     * recomputed from the reviewed hits, but the counterparty's decision is never changed for you: decide
+     * it with `PUT /v3/travel-rule/vasps/{vasp_id}/decision/`. Repeating the same review changes nothing
+     * (`changed: false`). Needs the transactions write privilege.
+     *
+     * `PATCH /v3/travel-rule/vasps/{vasp_id}/screening/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     * @param TravelRuleReviewVaspScreeningHitParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function reviewVaspScreeningHit(
+        string $vaspId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleReviewVaspScreeningHitResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'PATCH',
+            path: '/v3/travel-rule/vasps/{vasp_id}/screening/',
+            bodyTypes: ['json'],
+        ), ['vasp_id' => $vaspId], $params, $options);
+
+        return Types\TravelRuleReviewVaspScreeningHitResponse::fromResponse($response);
+    }
+
+    /**
      * List due-diligence questionnaires with a VASP.
      *
      * Every due-diligence questionnaire your application sent the counterparty, newest first, with its
@@ -449,5 +487,182 @@ final class TravelRule extends BaseResource
         ), [], $params, $options);
 
         return Types\TravelRuleWidgetSessionResponse::fromResponse($response);
+    }
+
+    /**
+     * List the documents shared with a VASP.
+     *
+     * The documents currently shared with the counterparty.
+     *
+     * `GET /v3/travel-rule/vasps/{vasp_id}/shared-documents/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listVaspSharedDocuments(
+        string $vaspId,
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleListVaspSharedDocumentsResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/travel-rule/vasps/{vasp_id}/shared-documents/',
+        ), ['vasp_id' => $vaspId], [], $options);
+
+        return Types\TravelRuleListVaspSharedDocumentsResponse::fromResponse($response);
+    }
+
+    /**
+     * Share documents with a VASP.
+     *
+     * Emails the counterparty a private link to the selected documents. Sharing again replaces the earlier
+     * share: the earlier link stops working for good. Sharing exactly what is already shared with the same
+     * address changes nothing and answers `200` with `url: null`. Needs the transactions write privilege.
+     *
+     * `POST /v3/travel-rule/vasps/{vasp_id}/shared-documents/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     * @param TravelRuleShareVaspDocumentsParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function shareVaspDocuments(
+        string $vaspId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleDocumentShare {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/travel-rule/vasps/{vasp_id}/shared-documents/',
+            bodyTypes: ['json'],
+        ), ['vasp_id' => $vaspId], $params, $options);
+
+        return Types\TravelRuleDocumentShare::fromResponse($response);
+    }
+
+    /**
+     * Withdraw the documents shared with a VASP.
+     *
+     * Revokes every active link to your documents for this counterparty. Withdrawal is permanent: the
+     * links never work again, and sharing again creates a new link.
+     *
+     * `DELETE /v3/travel-rule/vasps/{vasp_id}/shared-documents/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function withdrawVaspDocuments(string $vaspId, ?RequestOptions $options = null): NoContent
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'DELETE',
+            path: '/v3/travel-rule/vasps/{vasp_id}/shared-documents/',
+        ), ['vasp_id' => $vaspId], [], $options);
+
+        return NoContent::fromResponse($response);
+    }
+
+    /**
+     * Withdraw a due-diligence request.
+     *
+     * Withdraws the request and erases the documents and answers collected with it. Its answer link stops
+     * working. Deletion is irreversible. Needs the transactions write privilege.
+     *
+     * `DELETE /v3/travel-rule/vasps/{vasp_id}/questionnaires/{questionnaire_id}/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function withdrawVaspQuestionnaire(
+        string $vaspId,
+        string $questionnaireId,
+        ?RequestOptions $options = null,
+    ): NoContent {
+        $response = $this->requester->request(new Operation(
+            method: 'DELETE',
+            path: '/v3/travel-rule/vasps/{vasp_id}/questionnaires/{questionnaire_id}/',
+        ), ['vasp_id' => $vaspId, 'questionnaire_id' => $questionnaireId], [], $options);
+
+        return NoContent::fromResponse($response);
+    }
+
+    /**
+     * List a VASP's decision history.
+     *
+     * Your application's own decision changes for the counterparty, newest first. Only changes made after
+     * this history existed are listed. Needs the transactions read privilege.
+     *
+     * `GET /v3/travel-rule/vasps/{vasp_id}/decision-history/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     * @param TravelRuleListVaspDecisionHistoryParams $params
+     *
+     * @return Page<Types\TravelRuleDecisionEvent>
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listVaspDecisionHistory(string $vaspId, array $params = [], ?RequestOptions $options = null): Page
+    {
+        return $this->requester->requestPage(new Operation(
+            method: 'GET',
+            path: '/v3/travel-rule/vasps/{vasp_id}/decision-history/',
+            query: ['limit' => 'limit', 'offset' => 'offset'],
+        ), ['vasp_id' => $vaspId], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\TravelRuleDecisionEvent::class));
+    }
+
+    /**
+     * List the members who can be assigned a VASP.
+     *
+     * The application members who can review Travel Rule counterparties. Use one `email` as
+     * `assignee_email` of `POST /v3/travel-rule/vasps/{vasp_id}/assign/`. Needs the transactions read
+     * privilege.
+     *
+     * `GET /v3/travel-rule/vasps/reviewers/`
+     *
+     * @throws DiditException
+     */
+    public function listVaspReviewers(?RequestOptions $options = null): Types\TravelRuleListVaspReviewersResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/travel-rule/vasps/reviewers/',
+        ), [], [], $options);
+
+        return Types\TravelRuleListVaspReviewersResponse::fromResponse($response);
+    }
+
+    /**
+     * Assign a VASP to a member.
+     *
+     * Assigns the counterparty to one application member, or unassigns it with `assignee_email: null`.
+     * Repeating the same assignment changes nothing (`changed: false`). The assignment is private to your
+     * application. Needs the transactions write privilege.
+     *
+     * `POST /v3/travel-rule/vasps/{vasp_id}/assign/`
+     *
+     * @param string $vaspId the id of a row of GET /v3/travel-rule/vasps/: a directory entry or a Didit network member
+     * @param TravelRuleAssignVaspParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function assignVasp(
+        string $vaspId,
+        array $params,
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleAssignVaspResponse {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/travel-rule/vasps/{vasp_id}/assign/',
+            bodyTypes: ['json'],
+        ), ['vasp_id' => $vaspId], $params, $options);
+
+        return Types\TravelRuleAssignVaspResponse::fromResponse($response);
     }
 }

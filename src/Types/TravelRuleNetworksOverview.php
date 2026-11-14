@@ -34,6 +34,9 @@ final class TravelRuleNetworksOverview extends BaseModel
      */
     public readonly ?TravelRuleNetworksOverviewNetworks $networks;
 
+    /** The verified account email of the signed-in member; null for API-key calls. */
+    public readonly ?string $notificationEmail;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -44,5 +47,6 @@ final class TravelRuleNetworksOverview extends BaseModel
         $this->questionnaire = Hydrate::model($data['questionnaire'] ?? null, TravelRuleNetworkQuestionnaire::class);
         $this->participants = Hydrate::list($data['participants'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleNetworkParticipant::class));
         $this->networks = Hydrate::model($data['networks'] ?? null, TravelRuleNetworksOverviewNetworks::class);
+        $this->notificationEmail = Hydrate::string($data['notification_email'] ?? null);
     }
 }

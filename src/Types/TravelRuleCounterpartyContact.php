@@ -66,6 +66,15 @@ final class TravelRuleCounterpartyContact extends BaseModel
     /** The `created_at` field. */
     public readonly ?\DateTimeImmutable $createdAt;
 
+    /** Optional. The contact's role. */
+    public readonly ?string $role;
+
+    /** Optional. The contact's phone number. */
+    public readonly ?string $phone;
+
+    /** Whether due-diligence requests and reminders go to this contact. */
+    public readonly ?bool $receivesRequests;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -86,5 +95,8 @@ final class TravelRuleCounterpartyContact extends BaseModel
         $this->invalidDetail = Hydrate::string($data['invalid_detail'] ?? null);
         $this->invalidAt = Hydrate::dateTime($data['invalid_at'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
+        $this->role = Hydrate::string($data['role'] ?? null);
+        $this->phone = Hydrate::string($data['phone'] ?? null);
+        $this->receivesRequests = Hydrate::bool($data['receives_requests'] ?? null);
     }
 }

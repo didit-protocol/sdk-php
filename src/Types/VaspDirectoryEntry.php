@@ -200,6 +200,9 @@ final class VaspDirectoryEntry extends BaseModel
      */
     public readonly ?string $source;
 
+    /** The member the VASP is assigned to, or null. The assignment is private to your application. */
+    public readonly ?TravelRuleVaspAssignee $assignee;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -233,5 +236,6 @@ final class VaspDirectoryEntry extends BaseModel
         $this->entityScreening = Hydrate::model($data['entity_screening'] ?? null, TravelRuleCounterpartyScreening::class);
         $this->questionnaires = Hydrate::list($data['questionnaires'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleCounterpartyQuestionnaire::class));
         $this->source = Hydrate::string($data['source'] ?? null);
+        $this->assignee = Hydrate::model($data['assignee'] ?? null, TravelRuleVaspAssignee::class);
     }
 }

@@ -32,7 +32,13 @@ final class SignatureResultValidationDocuments extends BaseModel
     /** The `revoked` field. */
     public readonly ?bool $revoked;
 
-    /** EU Trusted List check. For AES: `{"status": "not_applicable", "reason": "aes_not_qualified"}`. */
+    /**
+     * EU Trusted List check. AES: `{"status": "not_applicable", "reason": "aes_not_qualified"}`. QES:
+     * `{"status": "granted"}` when the certificate is a qualified certificate for electronic signatures
+     * issued under the qualified trust service provider's Trusted List entry, else `{"status":
+     * "not_granted", ...}`. A sandbox session's qualified level is sealed by Didit: `{"status":
+     * "not_applicable", "reason": "sandbox"}`.
+     */
     public readonly ?SignatureResultValidationDocumentsTrustedList $trustedList;
 
     /**
@@ -42,10 +48,26 @@ final class SignatureResultValidationDocuments extends BaseModel
     public readonly ?SignatureResultValidationDocumentsCertificate $certificate;
 
     /**
-     * The RFC 3161 timestamp in the signature, issued by Didit. `null` until signed, and always `null` for
-     * a Simple signature.
+     * The RFC 3161 timestamp in the signature: issued by Didit for AES, by the qualified trust service
+     * provider for QES. `null` until signed, and always `null` for a Simple signature.
      */
     public readonly ?SignatureResultValidationDocumentsTimestamp $timestamp;
+
+    /** QES: `true` only when every qualified check passed. `false` in the sandbox. */
+    public readonly ?bool $qualified;
+
+    /** QES: the PAdES profile of this document's signature. */
+    public readonly ?string $profile;
+
+    /**
+     * QES: the checks that did not pass (empty when `valid` is `true`): the PDF signature's integrity, its
+     * chain to the qualified trust anchors, revocation, coverage of the document, the qualified time
+     * stamp, the certificate's qualified statements, the verified signer named in it, and the signed file
+     * extending exactly what was sent for signature.
+     *
+     * @var list<string>|null
+     */
+    public readonly ?array $failedChecks;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -62,5 +84,8 @@ final class SignatureResultValidationDocuments extends BaseModel
         $this->trustedList = Hydrate::model($data['trusted_list'] ?? null, SignatureResultValidationDocumentsTrustedList::class);
         $this->certificate = Hydrate::model($data['certificate'] ?? null, SignatureResultValidationDocumentsCertificate::class);
         $this->timestamp = Hydrate::model($data['timestamp'] ?? null, SignatureResultValidationDocumentsTimestamp::class);
+        $this->qualified = Hydrate::bool($data['qualified'] ?? null);
+        $this->profile = Hydrate::string($data['profile'] ?? null);
+        $this->failedChecks = Hydrate::list($data['failed_checks'] ?? null, Hydrate::string(...));
     }
 }

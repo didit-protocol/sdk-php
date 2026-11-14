@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `null` for a Simple signature, which has no code.
+ * `null` for a Simple signature, which has no code. Always `sms` for a Qualified (QES) signature.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

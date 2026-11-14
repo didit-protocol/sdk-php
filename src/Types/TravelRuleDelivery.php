@@ -53,10 +53,10 @@ final class TravelRuleDelivery extends BaseModel
     public readonly ?int $attempts;
 
     /**
-     * The kind of failure the last attempt hit, `""` when none did: for example `email undeliverable`,
-     * `trp identity endpoint unreachable` or `trp transfer inquiry delivery failed`. It never carries the
-     * counterparty's own answer, which stays on the transfer's `timeline`. When GTR answers with an error,
-     * its own status code and message are included. Response bodies are never included.
+     * A short customer-safe reason for the last failure, `""` when there is none: `email undeliverable`,
+     * `trp identity endpoint unreachable`, `trp transfer inquiry delivery failed` or `The message could
+     * not be delivered.` It never carries the counterparty's own answer, which stays on the transfer's
+     * `timeline`, and never a response body.
      */
     public readonly ?string $lastError;
 
@@ -65,6 +65,22 @@ final class TravelRuleDelivery extends BaseModel
 
     /** When the other side took the message. */
     public readonly ?\DateTimeImmutable $deliveredAt;
+
+    /** When the delivery last changed. */
+    public readonly ?\DateTimeImmutable $updatedAt;
+
+    /**
+     * Why the last attempt failed, or null while the message has not failed. The message is a fixed
+     * customer-safe sentence: it never carries the counterparty's own text or a transport error.
+     */
+    public readonly ?TravelRuleDeliveryFailure $failure;
+
+    /**
+     * Readable name of the route that carried the message: `Email`, `TRP`, `Didit`, `Didit Test VASP`, the
+     * name of a network listed in the Marketplace, or `Network` for any other network. Null until a route
+     * is chosen.
+     */
+    public readonly ?string $route;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -79,5 +95,8 @@ final class TravelRuleDelivery extends BaseModel
         $this->lastError = Hydrate::string($data['last_error'] ?? null);
         $this->nextAttemptAt = Hydrate::dateTime($data['next_attempt_at'] ?? null);
         $this->deliveredAt = Hydrate::dateTime($data['delivered_at'] ?? null);
+        $this->updatedAt = Hydrate::dateTime($data['updated_at'] ?? null);
+        $this->failure = Hydrate::model($data['failure'] ?? null, TravelRuleDeliveryFailure::class);
+        $this->route = Hydrate::string($data['route'] ?? null);
     }
 }
