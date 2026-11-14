@@ -59,6 +59,15 @@ final class TravelRuleNetworkParticipant extends BaseModel
     public readonly ?array $history;
 
     /**
+     * Whether the signed-in member asked for an email when this participant's status changes. Always false
+     * for API-key calls, which cannot set the preference.
+     */
+    public readonly ?bool $notifyStatusChanges;
+
+    /** The verified account email the notifications go to; null when there is none. */
+    public readonly ?string $notificationEmail;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -75,5 +84,7 @@ final class TravelRuleNetworkParticipant extends BaseModel
         $this->suspendedAt = Hydrate::dateTime($data['suspended_at'] ?? null);
         $this->lastError = Hydrate::string($data['last_error'] ?? null);
         $this->history = Hydrate::list($data['history'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleNetworkParticipantHistory::class));
+        $this->notifyStatusChanges = Hydrate::bool($data['notify_status_changes'] ?? null);
+        $this->notificationEmail = Hydrate::string($data['notification_email'] ?? null);
     }
 }

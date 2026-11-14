@@ -27,6 +27,8 @@ final class TravelRuleDeliveryRail
 
     public const EMAIL = 'EMAIL';
 
+    public const TEST_VASP = 'TEST_VASP';
+
     public const EMPTY = '';
 
     private function __construct()

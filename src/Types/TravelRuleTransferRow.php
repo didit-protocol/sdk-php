@@ -10,8 +10,10 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * One Travel Rule transfer as the transfers list shows it: VASP names, wallets and memos only, never
- * the originator or beneficiary person data.
+ * One Travel Rule transfer as the transfers list shows it: VASP names, wallets, memos, the
+ * transaction's review decision, your own end user's name (masked exactly as the transaction detail
+ * masks it), the counterparty VASP's jurisdiction, the chain and the fiat amount. It never carries the
+ * counterparty's person data.
  */
 final class TravelRuleTransferRow extends BaseModel
 {
@@ -29,6 +31,22 @@ final class TravelRuleTransferRow extends BaseModel
 
     /** The `txn_date` field. */
     public readonly ?\DateTimeImmutable $txnDate;
+
+    /**
+     * The transaction's own review decision, which can differ from the transfer's `status`: a transfer may
+     * wait on its counterparty while its transaction is approved, or be stuck while its transaction is in
+     * review.
+     *
+     * Known values: {@see TravelRuleTransferRowReviewStatus}.
+     */
+    public readonly ?string $reviewStatus;
+
+    /**
+     * Your own end user (the transaction's applicant), exactly as the transaction detail stores it: masked
+     * with the first letter of each name part while the transfer's data is masked, and never the
+     * counterparty's person data. Empty when the transaction has no applicant party.
+     */
+    public readonly ?string $personName;
 
     /**
      * withdrawal: outbound. message: an inbound transfer a rail created from a counterparty's message (a
@@ -59,8 +77,24 @@ final class TravelRuleTransferRow extends BaseModel
     /** The transaction's currency. */
     public readonly ?string $asset;
 
+    /**
+     * The chain the transfer moved on, as a canonical code for example `ETH`, `BTC` or `SOL`; empty when
+     * the transfer names no chain.
+     */
+    public readonly ?string $chain;
+
     /** The amount as a plain decimal, for example "1.25". */
     public readonly ?string $amount;
+
+    /**
+     * The transfer's fiat value as a plain decimal, in `fiat_currency`: Didit's calculated conversion when
+     * it has one, otherwise the amount you supplied in your own default currency. Null when neither is
+     * known, for example on a sandbox transfer with no supplied conversion.
+     */
+    public readonly ?string $fiatAmount;
+
+    /** The currency `fiat_amount` is expressed in, or null. */
+    public readonly ?string $fiatCurrency;
 
     /**
      * Outbound: your VASP's legal name. Inbound: the counterparty's name, from its directory entry, the
@@ -71,6 +105,13 @@ final class TravelRuleTransferRow extends BaseModel
 
     /** Outbound: the counterparty's name, worked out the same way. Inbound: your VASP's legal name. */
     public readonly ?string $beneficiaryVasp;
+
+    /**
+     * The other VASP's jurisdiction, from its directory entry or, for a Didit network member, its profile
+     * or Travel Rule settings. Empty when the transfer names no VASP or the VASP has no jurisdiction on
+     * record.
+     */
+    public readonly ?string $counterpartyJurisdiction;
 
     /** The `originator_wallet` field. */
     public readonly ?string $originatorWallet;
@@ -133,15 +174,21 @@ final class TravelRuleTransferRow extends BaseModel
         $this->transactionId = Hydrate::string($data['transaction_id'] ?? null);
         $this->txnId = Hydrate::string($data['txn_id'] ?? null);
         $this->txnDate = Hydrate::dateTime($data['txn_date'] ?? null);
+        $this->reviewStatus = Hydrate::string($data['review_status'] ?? null);
+        $this->personName = Hydrate::string($data['person_name'] ?? null);
         $this->kind = Hydrate::string($data['kind'] ?? null);
         $this->direction = Hydrate::string($data['direction'] ?? null);
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->reason = Hydrate::string($data['reason'] ?? null);
         $this->rail = Hydrate::string($data['rail'] ?? null);
         $this->asset = Hydrate::string($data['asset'] ?? null);
+        $this->chain = Hydrate::string($data['chain'] ?? null);
         $this->amount = Hydrate::string($data['amount'] ?? null);
+        $this->fiatAmount = Hydrate::string($data['fiat_amount'] ?? null);
+        $this->fiatCurrency = Hydrate::string($data['fiat_currency'] ?? null);
         $this->originatorVasp = Hydrate::string($data['originator_vasp'] ?? null);
         $this->beneficiaryVasp = Hydrate::string($data['beneficiary_vasp'] ?? null);
+        $this->counterpartyJurisdiction = Hydrate::string($data['counterparty_jurisdiction'] ?? null);
         $this->originatorWallet = Hydrate::string($data['originator_wallet'] ?? null);
         $this->beneficiaryWallet = Hydrate::string($data['beneficiary_wallet'] ?? null);
         $this->originatorMemo = Hydrate::string($data['originator_memo'] ?? null);

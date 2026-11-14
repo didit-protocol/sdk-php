@@ -21,6 +21,7 @@ use Didit\Types;
  * The `webhooks.destinations` resource.
  *
  * @phpstan-import-type WebhooksDestinationsCreateParams from Params
+ * @phpstan-import-type WebhooksDestinationsListActivityParams from Params
  * @phpstan-import-type WebhooksDestinationsListDeliveriesParams from Params
  * @phpstan-import-type WebhooksDestinationsRetrieveAnalyticsParams from Params
  * @phpstan-import-type WebhooksDestinationsUpdateParams from Params
@@ -283,5 +284,34 @@ final class Destinations extends BaseResource
         ), ['destination_uuid' => $destinationUuid, 'delivery_uuid' => $deliveryUuid], [], $options);
 
         return Types\WebhookDestinationDeliveryDetail::fromResponse($response);
+    }
+
+    /**
+     * List webhook destination activity.
+     *
+     * Lists recorded failure alerts for one destination, newest first. Requires read:webhooks.
+     * Application/API-key credentials must belong to the application in the path; member Bearer tokens
+     * must have access to that application. These are failure alert events, not individual delivery
+     * attempts or outbound webhook event types. See
+     * [Webhooks](https://docs.didit.me/integration/webhooks#retry-policy).
+     *
+     * `GET /v3/organization/{organization_id}/application/{application_id}/webhook/destinations/{destination_uuid}/activity/`
+     *
+     * @param string $destinationUuid destination uuid
+     * @param WebhooksDestinationsListActivityParams $params
+     *
+     * @return Page<Types\WebhookDestinationActivity>
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function listActivity(string $destinationUuid, array $params = [], ?RequestOptions $options = null): Page
+    {
+        return $this->requester->requestPage(new Operation(
+            method: 'GET',
+            path: '/v3/organization/{organization_id}/application/{application_id}/webhook/destinations/{destination_uuid}/activity/',
+            applicationScope: true,
+            query: ['limit' => 'limit', 'offset' => 'offset'],
+        ), ['destination_uuid' => $destinationUuid], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\WebhookDestinationActivity::class));
     }
 }

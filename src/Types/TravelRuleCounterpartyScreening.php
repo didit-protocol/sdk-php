@@ -49,6 +49,26 @@ final class TravelRuleCounterpartyScreening extends BaseModel
     public readonly ?bool $flagged;
 
     /**
+     * What was screened: the company name only. People are never inferred from the due-diligence
+     * questionnaire.
+     *
+     * Known values: {@see TravelRuleCounterpartyScreeningScope}.
+     */
+    public readonly ?string $scope;
+
+    /** People screening is not run for counterparties. */
+    public readonly ?TravelRuleCounterpartyScreeningPeopleScreening $peopleScreening;
+
+    /**
+     * The possible matches. Returned by `GET` and `POST` on `/v3/travel-rule/vasps/{vasp_id}/screening/`
+     * and by the hit review, not in the screening summary of a VASP row. Source and list details are
+     * public; no screening supplier is named.
+     *
+     * @var list<TravelRuleCounterpartyScreeningHits>|null
+     */
+    public readonly ?array $hits;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -61,5 +81,8 @@ final class TravelRuleCounterpartyScreening extends BaseModel
         $this->screenedAt = Hydrate::dateTime($data['screened_at'] ?? null);
         $this->fresh = Hydrate::bool($data['fresh'] ?? null);
         $this->flagged = Hydrate::bool($data['flagged'] ?? null);
+        $this->scope = Hydrate::string($data['scope'] ?? null);
+        $this->peopleScreening = Hydrate::model($data['people_screening'] ?? null, TravelRuleCounterpartyScreeningPeopleScreening::class);
+        $this->hits = Hydrate::list($data['hits'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleCounterpartyScreeningHits::class));
     }
 }

@@ -119,7 +119,7 @@ final class NetworksTest extends GeneratedTestCase
 
     public function testRequestAccess(): void
     {
-        $this->queueJson(200, '{"network":"gtr","rail":"GTR","mode":"platform","status":"not_requested","participant_code":"participant_code-value","requested_at":"2026-01-15T10:30:00Z","submitted_at":"2026-01-15T10:30:00Z","activated_at":"2026-01-15T10:30:00Z","suspended_at":"2026-01-15T10:30:00Z","last_error":"last_error-value","history":[{"at":"2026-01-15T10:30:00Z","from":"from-value","to":"to-value","note":"note-value"}]}');
+        $this->queueJson(200, '{"network":"gtr","rail":"GTR","mode":"platform","status":"not_requested","participant_code":"participant_code-value","requested_at":"2026-01-15T10:30:00Z","submitted_at":"2026-01-15T10:30:00Z","activated_at":"2026-01-15T10:30:00Z","suspended_at":"2026-01-15T10:30:00Z","last_error":"last_error-value","history":[{"at":"2026-01-15T10:30:00Z","from":"from-value","to":"to-value","note":"note-value"}],"notify_status_changes":true,"notification_email":"notification_email-value"}');
 
         $result = $this->client->travelRule->networks->requestAccess('network-1');
 
@@ -131,7 +131,7 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"network":"gtr","rail":"GTR","mode":"platform","status":"not_requested","participant_code":"participant_code-value","requested_at":"2026-01-15T10:30:00Z","submitted_at":"2026-01-15T10:30:00Z","activated_at":"2026-01-15T10:30:00Z","suspended_at":"2026-01-15T10:30:00Z","last_error":"last_error-value","history":[{"at":"2026-01-15T10:30:00Z","from":"from-value","to":"to-value","note":"note-value"}]}'), $result->toArray());
+        self::assertSame($this->decoded('{"network":"gtr","rail":"GTR","mode":"platform","status":"not_requested","participant_code":"participant_code-value","requested_at":"2026-01-15T10:30:00Z","submitted_at":"2026-01-15T10:30:00Z","activated_at":"2026-01-15T10:30:00Z","suspended_at":"2026-01-15T10:30:00Z","last_error":"last_error-value","history":[{"at":"2026-01-15T10:30:00Z","from":"from-value","to":"to-value","note":"note-value"}],"notify_status_changes":true,"notification_email":"notification_email-value"}'), $result->toArray());
         self::assertSame('gtr', $result->network);
     }
 }

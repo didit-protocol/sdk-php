@@ -30,6 +30,9 @@ final class SignatureResultValidationDocumentsCertificate extends BaseModel
     /** The `valid_until` field. */
     public readonly ?\DateTimeImmutable $validUntil;
 
+    /** QES: which ETSI EN 319 412-5 statements the certificate carries. */
+    public readonly ?SignatureResultValidationDocumentsCertificateQualifiedStatements $qualifiedStatements;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -41,5 +44,6 @@ final class SignatureResultValidationDocumentsCertificate extends BaseModel
         $this->serial = Hydrate::string($data['serial'] ?? null);
         $this->validFrom = Hydrate::dateTime($data['valid_from'] ?? null);
         $this->validUntil = Hydrate::dateTime($data['valid_until'] ?? null);
+        $this->qualifiedStatements = Hydrate::model($data['qualified_statements'] ?? null, SignatureResultValidationDocumentsCertificateQualifiedStatements::class);
     }
 }

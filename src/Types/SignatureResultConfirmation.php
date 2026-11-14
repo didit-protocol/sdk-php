@@ -15,7 +15,16 @@ use Didit\Core\Hydrate;
 final class SignatureResultConfirmation extends BaseModel
 {
     /**
-     * `null` for a Simple signature, which has no code.
+     * Who sent the code: `didit`, or `qualified_provider` for a Qualified (QES) signature, whose code
+     * comes by SMS from the qualified trust service provider and authorizes the signer's qualified
+     * certificate. `null` for a Simple signature.
+     *
+     * Known values: {@see SignatureResultConfirmationSentBy}.
+     */
+    public readonly ?string $sentBy;
+
+    /**
+     * `null` for a Simple signature, which has no code. Always `sms` for a Qualified (QES) signature.
      *
      * Known values: {@see SignatureResultConfirmationChannel}.
      */
@@ -36,6 +45,7 @@ final class SignatureResultConfirmation extends BaseModel
     public function __construct(array $data)
     {
         parent::__construct($data);
+        $this->sentBy = Hydrate::string($data['sent_by'] ?? null);
         $this->channel = Hydrate::string($data['channel'] ?? null);
         $this->destination = Hydrate::string($data['destination'] ?? null);
         $this->confirmedAt = Hydrate::dateTime($data['confirmed_at'] ?? null);
