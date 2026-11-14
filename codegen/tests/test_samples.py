@@ -27,6 +27,16 @@ class ScrubCredentialsTest(unittest.TestCase):
             "name": "Jane",
         })
 
+    def test_idempotency_style_keys_get_placeholders(self) -> None:
+        # A uuid-valued ``request_key`` trips the generic-api-key secret rule (spec sync of 2026-11-13).
+        from didit_codegen.model import Scalar
+        from didit_codegen.samples import scalar_sample
+
+        uuid_string = Scalar("string", "uuid")
+        self.assertEqual(scalar_sample(uuid_string, "request_key"), "sample-request-key")
+        self.assertEqual(scalar_sample(uuid_string, "idempotency_key"), "sample-idempotency-key")
+        self.assertEqual(scalar_sample(uuid_string, "session_id"), "3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f")
+
     def test_jwts_are_replaced_anywhere(self) -> None:
         jwt = "eyJhbGciOiJFUzI1NiJ9.eyJzdWIiOiIxIn0.c2lnbmF0dXJl"
         self.assertEqual(scrub_credentials({"note": jwt}), {"note": "sample-jwt"})
