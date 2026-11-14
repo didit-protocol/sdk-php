@@ -418,6 +418,45 @@ class OpModel:
 
 SAFE_HEADER_SKIP = {"content-type", "accept", "x-api-key", "user-agent"}
 
+# The key is sent through the per-request ``RequestOptions::idempotencyKey`` option (docs/DESIGN.md), so the
+# ``Idempotency-Key`` header is not generated as an argument. These operations already exposed it as a generated
+# ``idempotency_key`` argument in published releases: removing it would break their callers in a minor release, so
+# they keep it (documented as deprecated, the option wins). Never add an operation here.
+IDEMPOTENCY_KEY = "idempotency-key"
+LEGACY_IDEMPOTENCY_KEY_ARGUMENT = frozenset({
+    "POST /v3/aml/",
+    "POST /v3/billing/top-up/",
+    "POST /v3/id-verification/wallets/audkenni/",
+    "POST /v3/id-verification/wallets/bankid-cz/",
+    "POST /v3/id-verification/wallets/bankid-no/",
+    "POST /v3/id-verification/wallets/bankid-se/",
+    "POST /v3/id-verification/wallets/buypass/",
+    "POST /v3/id-verification/wallets/connectid/",
+    "POST /v3/id-verification/wallets/diia/",
+    "POST /v3/id-verification/wallets/eparaksts-mobile/",
+    "POST /v3/id-verification/wallets/eudi/",
+    "POST /v3/id-verification/wallets/franceconnect/",
+    "POST /v3/id-verification/wallets/frejaid/",
+    "POST /v3/id-verification/wallets/ftn/",
+    "POST /v3/id-verification/wallets/google-wallet/",
+    "POST /v3/id-verification/wallets/govbr/",
+    "POST /v3/id-verification/wallets/govuk-wallet/",
+    "POST /v3/id-verification/wallets/idcard-ee/",
+    "POST /v3/id-verification/wallets/idin/",
+    "POST /v3/id-verification/wallets/itsme/",
+    "POST /v3/id-verification/wallets/mitid/",
+    "POST /v3/id-verification/wallets/mobile-id/",
+    "POST /v3/id-verification/wallets/mojeid/",
+    "POST /v3/id-verification/wallets/oneid/",
+    "POST /v3/id-verification/wallets/personalausweis/",
+    "POST /v3/id-verification/wallets/smart-id/",
+    "POST /v3/id-verification/wallets/uae-pass/",
+    "POST /v3/id-verification/wallets/vipps/",
+})
+IDEMPOTENCY_KEY_DEPRECATION = (
+    " Deprecated: pass `new RequestOptions(idempotencyKey: ...)` instead; the option wins when both are set."
+)
+
 
 def build_operation(reg: Registry, o: Operation) -> OpModel:
     prefix = naming.type_prefix(o.naming.resource, o.naming.method)
@@ -439,11 +478,16 @@ def build_operation(reg: Registry, o: Operation) -> OpModel:
         elif p["in"] == "header":
             if p["name"].lower() in SAFE_HEADER_SKIP:
                 continue
+            description = p.get("description", "")
+            if p["name"].lower() == IDEMPOTENCY_KEY:
+                if o.key not in LEGACY_IDEMPOTENCY_KEY_ARGUMENT:
+                    continue
+                description = description.rstrip() + IDEMPOTENCY_KEY_DEPRECATION
             key = naming.camel(p["name"])
             key = "_".join(w.lower() for w in p["name"].replace("_", "-").split("-") if w)
             # The SDK authenticates with the API key, so a credential header is never required.
             required = bool(p.get("required")) and p["name"].lower() != "authorization"
-            headers.append(Param(key, p["name"], "header", Scalar("string"), required, p.get("description", "")))
+            headers.append(Param(key, p["name"], "header", Scalar("string"), required, description))
     order = {name: i for i, name in enumerate(_placeholders(o.path))}
     path_params.sort(key=lambda pp: order.get(pp.wire, 0))
     missing = [n for n in _placeholders(o.path) if n not in {pp.wire for pp in path_params} and not (o.naming.scope == "application" and n in ("organization_id", "application_id"))]

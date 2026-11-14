@@ -159,6 +159,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/mitid/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartMitidParams $params
      *
      * @throws DiditException
@@ -190,6 +193,9 @@ final class IdWallets extends BaseResource
      * true) that never contacts the provider.
      *
      * `POST /v3/id-verification/wallets/bankid-se/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartBankidSeParams $params
      *
@@ -223,6 +229,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/bankid-no/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartBankidNoParams $params
      *
      * @throws DiditException
@@ -254,6 +263,9 @@ final class IdWallets extends BaseResource
      * contacts the provider.
      *
      * `POST /v3/id-verification/wallets/vipps/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartVippsParams $params
      *
@@ -287,6 +299,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/buypass/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartBuypassParams $params
      *
      * @throws DiditException
@@ -319,6 +334,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/itsme/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartItsmeParams $params
      *
      * @throws DiditException
@@ -350,6 +368,9 @@ final class IdWallets extends BaseResource
      * contacts the provider.
      *
      * `POST /v3/id-verification/wallets/idin/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartIdinParams $params
      *
@@ -384,6 +405,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/ftn/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartFtnParams $params
      *
      * @throws DiditException
@@ -415,6 +439,9 @@ final class IdWallets extends BaseResource
      * true) that never contacts the provider.
      *
      * `POST /v3/id-verification/wallets/personalausweis/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartPersonalausweisParams $params
      *
@@ -448,6 +475,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/frejaid/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartFrejaidParams $params
      *
      * @throws DiditException
@@ -479,6 +509,9 @@ final class IdWallets extends BaseResource
      * contacts the provider.
      *
      * `POST /v3/id-verification/wallets/uae-pass/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartUaePassParams $params
      *
@@ -512,6 +545,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/govbr/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartGovbrParams $params
      *
      * @throws DiditException
@@ -543,6 +579,9 @@ final class IdWallets extends BaseResource
      * contacts the provider.
      *
      * `POST /v3/id-verification/wallets/oneid/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartOneidParams $params
      *
@@ -576,6 +615,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/govuk-wallet/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartGovukWalletParams $params
      *
      * @throws DiditException
@@ -607,6 +649,9 @@ final class IdWallets extends BaseResource
      * applications get a deterministic simulation (simulated: true) that never contacts the provider.
      *
      * `POST /v3/id-verification/wallets/smart-id/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartSmartIdParams $params
      *
@@ -641,6 +686,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/mobile-id/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartMobileIdParams $params
      *
      * @throws DiditException
@@ -673,6 +721,9 @@ final class IdWallets extends BaseResource
      * provider.
      *
      * `POST /v3/id-verification/wallets/idcard-ee/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartIdcardEeParams $params
      *
@@ -707,6 +758,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/eparaksts-mobile/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartEparakstsMobileParams $params
      *
      * @throws DiditException
@@ -738,6 +792,9 @@ final class IdWallets extends BaseResource
      * contacts the provider.
      *
      * `POST /v3/id-verification/wallets/bankid-cz/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartBankidCzParams $params
      *
@@ -771,6 +828,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/mojeid/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartMojeidParams $params
      *
      * @throws DiditException
@@ -802,6 +862,9 @@ final class IdWallets extends BaseResource
      * true) that never contacts the provider.
      *
      * `POST /v3/id-verification/wallets/diia/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartDiiaParams $params
      *
@@ -835,6 +898,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/franceconnect/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartFranceconnectParams $params
      *
      * @throws DiditException
@@ -866,6 +932,9 @@ final class IdWallets extends BaseResource
      * true) that never contacts the provider.
      *
      * `POST /v3/id-verification/wallets/audkenni/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartAudkenniParams $params
      *
@@ -899,6 +968,9 @@ final class IdWallets extends BaseResource
      *
      * `POST /v3/id-verification/wallets/connectid/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param IdWalletsStartConnectidParams $params
      *
      * @throws DiditException
@@ -930,6 +1002,9 @@ final class IdWallets extends BaseResource
      * /v3/id-verification/wallets/verifications/{request_id}/ or from the webhook, never from the URL.
      *
      * `POST /v3/id-verification/wallets/eudi/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartEudiParams $params
      *
@@ -993,6 +1068,9 @@ final class IdWallets extends BaseResource
      * signed for your application, usable only from origin.
      *
      * `POST /v3/id-verification/wallets/google-wallet/`
+     *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
      *
      * @param IdWalletsStartGoogleWalletParams $params
      *

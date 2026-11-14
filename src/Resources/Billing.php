@@ -49,6 +49,9 @@ final class Billing extends BaseResource
      *
      * `POST /v3/billing/top-up/`
      *
+     * The `idempotency_key` entry of `$params` is deprecated: pass `new RequestOptions(idempotencyKey:
+     * ...)` instead. The option wins when both are set.
+     *
      * @param BillingTopUpParams $params
      *
      * @throws DiditException
