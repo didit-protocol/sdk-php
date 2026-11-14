@@ -198,6 +198,13 @@ final class TravelRuleTransferDetail extends BaseModel
     public readonly ?TravelRuleUserChoice $userChoice;
 
     /**
+     * Latest application- and subject-scoped request if it matches this transfer counterparty wallet and
+     * chain; otherwise null. A standalone request is not attached to a transfer. Request status and proof
+     * verdict are separate from the saved transfer decision.
+     */
+    public readonly ?TravelRuleTransferProofRequest $proofRequest;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -235,5 +242,6 @@ final class TravelRuleTransferDetail extends BaseModel
         $this->cancelledBy = Hydrate::string($data['cancelled_by'] ?? null);
         $this->notifyOnAnswer = Hydrate::bool($data['notify_on_answer'] ?? null);
         $this->userChoice = Hydrate::model($data['user_choice'] ?? null, TravelRuleUserChoice::class);
+        $this->proofRequest = Hydrate::model($data['proof_request'] ?? null, TravelRuleTransferProofRequest::class);
     }
 }

@@ -19,7 +19,7 @@ final class WalletAddressesTest extends GeneratedTestCase
 {
     public function testList(): void
     {
-        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value"}]}');
+        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value","ownership_proof":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":"","latest_attempt":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":""},"network_eligible":true,"reuse_status":"NOT_LINKED"},"label":"label-value","owner_type":"customer"}]}');
 
         $result = $this->client->travelRule->walletAddresses->list([
             'limit' => 1,
@@ -39,12 +39,12 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\WalletAddressEntry::class, $result->results);
         self::assertFalse($result->hasNextPage());
-        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value"}]}'), $result->toArray());
+        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value","ownership_proof":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":"","latest_attempt":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":""},"network_eligible":true,"reuse_status":"NOT_LINKED"},"label":"label-value","owner_type":"customer"}]}'), $result->toArray());
     }
 
     public function testCreate(): void
     {
-        $this->queueJson(201, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value"}');
+        $this->queueJson(201, '{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value","ownership_proof":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":"","latest_attempt":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":""},"network_eligible":true,"reuse_status":"NOT_LINKED"},"label":"label-value","owner_type":"customer"}');
 
         $result = $this->client->travelRule->walletAddresses->create([
             'address' => 'address-value',
@@ -66,13 +66,13 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","self_declared":true,"travel_address":"travel_address-value","memo":"memo-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value"}'), $result->toArray());
+        self::assertSame($this->decoded('{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","address":"address-value","chain":"chain-value","holder_vendor_data":"holder_vendor_data-value","holder_name":"holder_name-value","entity_type":"entity_type-value","is_ownership_verified":true,"created_at":"2026-01-15T10:30:00Z","travel_address":"travel_address-value","address_hash":"address_hash-value","memo":"memo-value","receiving_travel_address":"receiving_travel_address-value","ownership_proof":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":"","latest_attempt":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":""},"network_eligible":true,"reuse_status":"NOT_LINKED"},"label":"label-value","owner_type":"customer"}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->uuid);
     }
 
     public function testUpdate(): void
     {
-        $this->queueJson(200, '{"holder_name":"holder_name-value","holder_vendor_data":"holder_vendor_data-value","entity_type":"entity_type-value","travel_address":"travel_address-value"}');
+        $this->queueJson(200, '{"holder_name":"holder_name-value","holder_vendor_data":"holder_vendor_data-value","entity_type":"entity_type-value","travel_address":"travel_address-value","receiving_travel_address":"receiving_travel_address-value","label":"label-value","owner_type":"customer","ownership_proof":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":"","latest_attempt":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":""},"network_eligible":true,"reuse_status":"NOT_LINKED"}}');
 
         $result = $this->client->travelRule->walletAddresses->update('entryUuid-1', [
             'holder_name' => 'holder_name-value',
@@ -90,7 +90,7 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"holder_name":"holder_name-value","holder_vendor_data":"holder_vendor_data-value","entity_type":"entity_type-value","travel_address":"travel_address-value"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"holder_name":"holder_name-value","holder_vendor_data":"holder_vendor_data-value","entity_type":"entity_type-value","travel_address":"travel_address-value"}'), $result->toArray());
+        self::assertSame($this->decoded('{"holder_name":"holder_name-value","holder_vendor_data":"holder_vendor_data-value","entity_type":"entity_type-value","travel_address":"travel_address-value","receiving_travel_address":"receiving_travel_address-value","label":"label-value","owner_type":"customer","ownership_proof":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":"","latest_attempt":{"proof_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","method":"MESSAGE_SIGNING","status":"PENDING","failure_reason":""},"network_eligible":true,"reuse_status":"NOT_LINKED"}}'), $result->toArray());
         self::assertSame('holder_name-value', $result->holderName);
     }
 

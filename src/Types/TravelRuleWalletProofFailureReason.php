@@ -23,6 +23,8 @@ final class TravelRuleWalletProofFailureReason
 
     public const SIGNATURE_UNSUPPORTED_SCHEME = 'SIGNATURE_UNSUPPORTED_SCHEME';
 
+    public const SIGNATURE_LOOKUP_FAILED = 'SIGNATURE_LOOKUP_FAILED';
+
     public const DEPOSIT_NOT_FOUND = 'DEPOSIT_NOT_FOUND';
 
     public const DEPOSIT_UNCONFIRMED = 'DEPOSIT_UNCONFIRMED';
