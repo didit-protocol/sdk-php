@@ -58,7 +58,7 @@ final class TravelRuleNetworkState extends BaseModel
      */
     public readonly ?bool $connected;
 
-    /** This application's own participant on the network, or null when it has none. */
+    /** The `participant` field. */
     public readonly ?TravelRuleNetworkParticipantSummary $participant;
 
     /** Directory VASPs reachable on this network. */
@@ -66,6 +66,16 @@ final class TravelRuleNetworkState extends BaseModel
 
     /** This application's transfers carried on this network in the last 30 days. */
     public readonly ?int $routed30d;
+
+    /**
+     * `error` when this network's row could not be loaded; the other networks are unaffected.
+     *
+     * Known values: {@see TravelRuleNetworkStateLoadStatus}.
+     */
+    public readonly ?string $loadStatus;
+
+    /** Present only when `load_status` is `error`. */
+    public readonly ?TravelRuleNetworkStateLoadError $loadError;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -82,5 +92,7 @@ final class TravelRuleNetworkState extends BaseModel
         $this->participant = Hydrate::model($data['participant'] ?? null, TravelRuleNetworkParticipantSummary::class);
         $this->vaspsReachable = Hydrate::int($data['vasps_reachable'] ?? null);
         $this->routed30d = Hydrate::int($data['routed_30d'] ?? null);
+        $this->loadStatus = Hydrate::string($data['load_status'] ?? null);
+        $this->loadError = Hydrate::model($data['load_error'] ?? null, TravelRuleNetworkStateLoadError::class);
     }
 }

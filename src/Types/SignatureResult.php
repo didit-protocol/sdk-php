@@ -36,21 +36,25 @@ final class SignatureResult extends BaseModel
     public readonly ?string $verdict;
 
     /**
-     * `simple` (default) or `aes`. `qes` (Qualified Electronic Signature, QES) is an add-on that is not
-     * available yet.
+     * `simple` (default), `aes` or `qes` (Qualified electronic signature, QES, an add-on: a qualified
+     * trust service provider issues the signer a qualified certificate and signs after the signer enters
+     * the code it texts them).
      *
      * Known values: {@see SignatureResultLevel}.
      */
     public readonly ?string $level;
 
     /**
-     * `pdf` for a Simple signature, `pades` for Advanced (AES).
+     * `pdf` for a Simple signature, `pades` for Advanced (AES) and Qualified (QES).
      *
      * Known values: {@see SignatureResultFormat}.
      */
     public readonly ?string $format;
 
-    /** `PAdES-B-LT` once an Advanced (AES) signature is signed, otherwise null. */
+    /**
+     * The PAdES profile of the signed documents: `PAdES-B-LT` once an Advanced (AES) or Qualified (QES)
+     * signature is signed, otherwise null.
+     */
     public readonly ?string $profile;
 
     /** The `signer` field. */

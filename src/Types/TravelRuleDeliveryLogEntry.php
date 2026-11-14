@@ -55,6 +55,28 @@ final class TravelRuleDeliveryLogEntry extends BaseModel
      */
     public readonly ?array $detailLines;
 
+    /** Attempts made so far for this message. */
+    public readonly ?int $attempts;
+
+    /** When the delivery last changed. */
+    public readonly ?\DateTimeImmutable $updatedAt;
+
+    /** When the next attempt runs while the message is `QUEUED` or `RETRYING`. */
+    public readonly ?\DateTimeImmutable $nextAttemptAt;
+
+    /**
+     * Why the last attempt failed, or null while the message has not failed. The message is a fixed
+     * customer-safe sentence: it never carries the counterparty's own text or a transport error.
+     */
+    public readonly ?TravelRuleDeliveryLogEntryFailure $failure;
+
+    /**
+     * Readable name of the route that carried the message: `Email`, `TRP`, `Didit`, `Didit Test VASP`, the
+     * name of a network listed in the Marketplace, or `Network` for any other network. Null until a route
+     * is chosen.
+     */
+    public readonly ?string $route;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -68,5 +90,10 @@ final class TravelRuleDeliveryLogEntry extends BaseModel
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
         $this->deliveredAt = Hydrate::dateTime($data['delivered_at'] ?? null);
         $this->detailLines = Hydrate::list($data['detail_lines'] ?? null, Hydrate::string(...));
+        $this->attempts = Hydrate::int($data['attempts'] ?? null);
+        $this->updatedAt = Hydrate::dateTime($data['updated_at'] ?? null);
+        $this->nextAttemptAt = Hydrate::dateTime($data['next_attempt_at'] ?? null);
+        $this->failure = Hydrate::model($data['failure'] ?? null, TravelRuleDeliveryLogEntryFailure::class);
+        $this->route = Hydrate::string($data['route'] ?? null);
     }
 }

@@ -21,6 +21,7 @@ use Didit\Types;
  *
  * @phpstan-import-type TravelRuleCounterpartyContactCreate from Params
  * @phpstan-import-type TravelRuleCounterpartyContactsListParams from Params
+ * @phpstan-import-type TravelRuleCounterpartyContactsUpdateParams from Params
  */
 final class CounterpartyContacts extends BaseResource
 {
@@ -70,6 +71,33 @@ final class CounterpartyContacts extends BaseResource
             path: '/v3/travel-rule/counterparty-contacts/',
             bodyTypes: ['json'],
         ), [], $params, $options);
+
+        return Types\TravelRuleCounterpartyContact::fromResponse($response);
+    }
+
+    /**
+     * Edit a counterparty contact.
+     *
+     * Edits one of your application's own contacts. Changing the email address clears its verification and
+     * invalid state. Platform contacts cannot be edited.
+     *
+     * `PATCH /v3/travel-rule/counterparty-contacts/{contact_uuid}/`
+     *
+     * @param TravelRuleCounterpartyContactsUpdateParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function update(
+        string $contactUuid,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\TravelRuleCounterpartyContact {
+        $response = $this->requester->request(new Operation(
+            method: 'PATCH',
+            path: '/v3/travel-rule/counterparty-contacts/{contact_uuid}/',
+            bodyTypes: ['json'],
+        ), ['contact_uuid' => $contactUuid], $params, $options);
 
         return Types\TravelRuleCounterpartyContact::fromResponse($response);
     }

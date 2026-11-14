@@ -140,4 +140,55 @@ final class WalletAddressesTest extends GeneratedTestCase
         self::assertSame($this->decoded('{"total":3,"created":2,"existing":1,"duplicate":0,"failed":0,"rows":[{"row":1,"status":"existing","entry_id":"11111111-2222-3333-4444-555555555555","errors":{},"duplicate_of_row":null},{"row":2,"status":"created","entry_id":"22222222-3333-4444-5555-666666666666","errors":{},"duplicate_of_row":null},{"row":3,"status":"created","entry_id":"33333333-4444-5555-6666-777777777777","errors":{},"duplicate_of_row":null}]}'), $result->toArray());
         self::assertSame(3, $result->total);
     }
+
+    public function testLookup(): void
+    {
+        $this->queueJson(200, '{"match":"book","directory_checked":false,"entry_id":"11111111-2222-4333-8444-555555555555"}');
+
+        $result = $this->client->travelRule->walletAddresses->lookup([
+            'address' => 'address-value',
+            'chain' => 'chain-value',
+            'memo' => 'memo-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/travel-rule/wallet-addresses/lookup/', $request->getUri()->getPath());
+        self::assertSame([
+            'address' => 'address-value',
+            'chain' => 'chain-value',
+            'memo' => 'memo-value',
+        ], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"match":"book","directory_checked":false,"entry_id":"11111111-2222-4333-8444-555555555555"}'), $result->toArray());
+        self::assertSame('book', $result->match);
+    }
+
+    public function testListTransfers(): void
+    {
+        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"transfer_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"AWAITING_COUNTERPARTY","created_at":"2026-01-15T10:30:00Z"}]}');
+
+        $result = $this->client->travelRule->walletAddresses->listTransfers('entryUuid-1', [
+            'limit' => 1,
+            'offset' => 1,
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/travel-rule/wallet-addresses/entryUuid-1/transfers/', $request->getUri()->getPath());
+        self::assertSame([
+            'limit' => '1',
+            'offset' => '1',
+        ], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertCount(1, $result->results);
+        self::assertContainsOnlyInstancesOf(Types\TravelRuleWalletTransfer::class, $result->results);
+        self::assertFalse($result->hasNextPage());
+        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"transfer_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","status":"AWAITING_COUNTERPARTY","created_at":"2026-01-15T10:30:00Z"}]}'), $result->toArray());
+    }
 }

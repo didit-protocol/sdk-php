@@ -59,6 +59,23 @@ final class TravelRuleCounterpartyQuestionnaire extends BaseModel
     public readonly ?array $answers;
 
     /**
+     * What the request asked for.
+     *
+     * @var list<string>|null
+     */
+    public readonly ?array $requestedItems;
+
+    /** When Didit last reminded the counterparty, or null. */
+    public readonly ?\DateTimeImmutable $reminderSentAt;
+
+    /**
+     * The documents the counterparty uploaded.
+     *
+     * @var list<TravelRuleCounterpartyQuestionnaireDocuments>|null
+     */
+    public readonly ?array $documents;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -74,5 +91,8 @@ final class TravelRuleCounterpartyQuestionnaire extends BaseModel
         $this->validUntil = Hydrate::dateTime($data['valid_until'] ?? null);
         $this->current = Hydrate::bool($data['current'] ?? null);
         $this->answers = Hydrate::map($data['answers'] ?? null, Hydrate::string(...));
+        $this->requestedItems = Hydrate::list($data['requested_items'] ?? null, Hydrate::string(...));
+        $this->reminderSentAt = Hydrate::dateTime($data['reminder_sent_at'] ?? null);
+        $this->documents = Hydrate::list($data['documents'] ?? null, static fn (mixed $v) => Hydrate::model($v, TravelRuleCounterpartyQuestionnaireDocuments::class));
     }
 }

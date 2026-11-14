@@ -10,7 +10,11 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * EU Trusted List check. For AES: `{"status": "not_applicable", "reason": "aes_not_qualified"}`.
+ * EU Trusted List check. AES: `{"status": "not_applicable", "reason": "aes_not_qualified"}`. QES:
+ * `{"status": "granted"}` when the certificate is a qualified certificate for electronic signatures
+ * issued under the qualified trust service provider's Trusted List entry, else `{"status":
+ * "not_granted", ...}`. A sandbox session's qualified level is sealed by Didit: `{"status":
+ * "not_applicable", "reason": "sandbox"}`.
  */
 final class SignatureResultValidationDocumentsTrustedList extends BaseModel
 {

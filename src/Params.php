@@ -96,6 +96,12 @@ namespace Didit;
  *     data_location?: string,
  *     initiate_login_uri?: string,
  * }
+ * @phpstan-type AsyncReportRetryRequest array{
+ *     item_ids?: list<string>,
+ *     date_from?: string,
+ *     date_to?: string,
+ *     notify_on_ready?: bool,
+ * }
  * @phpstan-type BankAccountCheckHolder array{
  *     full_name?: string,
  *     business_name?: string,
@@ -1759,6 +1765,13 @@ namespace Didit;
  *     report_type?: string,
  *     field_config?: array<string, mixed>,
  * }
+ * @phpstan-type ReportsListParams array{
+ *     limit?: int,
+ *     offset?: int,
+ *     status?: string,
+ *     report_type?: string,
+ *     q?: string,
+ * }
  * @phpstan-type RiskSignals array{
  *     ip?: string,
  *     device_id?: string,
@@ -2547,15 +2560,28 @@ namespace Didit;
  *     limit?: int,
  *     offset?: int,
  * }
+ * @phpstan-type TravelRuleAssignVaspParams array{
+ *     assignee_email: string|null,
+ * }
  * @phpstan-type TravelRuleCounterpartyContactCreate array{
  *     counterparty: string,
  *     email: string,
  *     name?: string,
+ *     role?: string,
+ *     phone?: string,
+ *     receives_requests?: bool,
  * }
  * @phpstan-type TravelRuleCounterpartyContactsListParams array{
  *     counterparty?: string,
  *     limit?: int,
  *     offset?: int,
+ * }
+ * @phpstan-type TravelRuleCounterpartyContactsUpdateParams array{
+ *     name?: string,
+ *     email?: string,
+ *     role?: string,
+ *     phone?: string,
+ *     receives_requests?: bool,
  * }
  * @phpstan-type TravelRuleCounterpartyDecisionRequest array{
  *     decision: string,
@@ -2563,6 +2589,8 @@ namespace Didit;
  * }
  * @phpstan-type TravelRuleCounterpartyQuestionnaireRequest array{
  *     sent_to?: string,
+ *     answer_by_days?: int,
+ *     requested_items?: list<string>,
  * }
  * @phpstan-type TravelRuleCounterpartyScreeningRequest array{
  *     refresh?: bool,
@@ -2570,6 +2598,14 @@ namespace Didit;
  * @phpstan-type TravelRuleDataSharingFields array{
  *     individual?: list<string>,
  *     company?: list<string>,
+ * }
+ * @phpstan-type TravelRuleDocumentsCreateParams array{
+ *     kind: string,
+ *     file: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
+ * }
+ * @phpstan-type TravelRuleDocumentsListParams array{
+ *     limit?: int,
+ *     offset?: int,
  * }
  * @phpstan-type TravelRuleInboundRequest array{
  *     chain: string,
@@ -2587,6 +2623,10 @@ namespace Didit;
  *     name?: string,
  *     lei?: string,
  *     travel_address?: string,
+ * }
+ * @phpstan-type TravelRuleListVaspDecisionHistoryParams array{
+ *     limit?: int,
+ *     offset?: int,
  * }
  * @phpstan-type TravelRuleListVaspsParams array{
  *     search?: string,
@@ -2653,6 +2693,12 @@ namespace Didit;
  *     confirmed: bool,
  *     wallet_address?: string,
  * }
+ * @phpstan-type TravelRuleReviewVaspScreeningHitParams array{
+ *     screening_id: string,
+ *     hit_id: string,
+ *     review_status: string,
+ *     reason?: string,
+ * }
  * @phpstan-type TravelRuleSettingsUpdate array{
  *     is_enabled?: bool,
  *     legal_name?: string,
@@ -2679,6 +2725,10 @@ namespace Didit;
  *     non_responsive_policy?: string,
  *     disabled_networks?: list<string>,
  *     licence?: string,
+ * }
+ * @phpstan-type TravelRuleShareVaspDocumentsParams array{
+ *     document_ids: list<string>,
+ *     sent_to?: string,
  * }
  * @phpstan-type TravelRuleTestVaspInboundRequest array{
  *     beneficiary_wallet_address: string,
@@ -2755,6 +2805,15 @@ namespace Didit;
  *     limit?: int,
  *     offset?: int,
  * }
+ * @phpstan-type TravelRuleWalletAddressesListTransfersParams array{
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type TravelRuleWalletAddressesLookupParams array{
+ *     address: string,
+ *     chain: string,
+ *     memo?: string,
+ * }
  * @phpstan-type TravelRuleWalletProofDecision array{
  *     decision: string,
  *     note?: string,
@@ -2773,6 +2832,9 @@ namespace Didit;
  *     satoshi_deposit_address?: string,
  *     callback_url?: string,
  *     expires_in_minutes?: int,
+ *     wallet_entry_id?: string,
+ *     request_action?: string,
+ *     request_key?: string,
  * }
  * @phpstan-type TravelRuleWorkspaceBillingRequest array{
  *     enabled?: bool,
@@ -2980,6 +3042,10 @@ namespace Didit;
  *     enabled?: bool,
  *     webhook_version?: string,
  *     subscribed_events?: list<string>,
+ * }
+ * @phpstan-type WebhooksDestinationsListActivityParams array{
+ *     limit?: int,
+ *     offset?: int,
  * }
  * @phpstan-type WebhooksDestinationsListDeliveriesParams array{
  *     limit?: int,

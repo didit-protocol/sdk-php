@@ -209,4 +209,29 @@ final class DestinationsTest extends GeneratedTestCase
         self::assertSame($this->decoded('{"uuid":"66666666-7777-8888-9999-000000000004","session_id":"22222222-3333-4444-5555-666666666666","request_url":"https://yourapp.com/webhooks/didit","response_status":200,"response_time_ms":151,"status":"In Progress","webhook_type":"status.updated","created_at":"2026-10-16T14:05:42.330981Z","request_header":"{\\"Content-Type\\": \\"application/json\\", \\"X-Signature\\": \\"b8eb1e376517ee0cad8ba98ff7f8fd35fc72eca231000963a96a335f82328835\\", \\"X-Signature-V2\\": \\"9efd2ce9ed1303e1d05273ef9608a59363ed9789a05253db4748b3e8e50cb109\\", \\"X-Signature-Simple\\": \\"bf3a9dc04b2c20ab539203b0cd5cca2a10f630bf62d8feb6d68d82af80f64774\\", \\"X-Timestamp\\": \\"1792159542\\", \\"User-Agent\\": \\"DiditWebhook/2.0 +https://didit.me\\"}","request_body":"{\\"application_id\\":\\"aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee\\",\\"created_at\\":1792056057,\\"environment\\":\\"live\\",\\"event_id\\":\\"33333333-4444-5555-6666-777777777777\\",\\"sandbox_scenario\\":null,\\"session_id\\":\\"22222222-3333-4444-5555-666666666666\\",\\"status\\":\\"In Progress\\",\\"timestamp\\":1792159542,\\"vendor_data\\":\\"user-123\\",\\"webhook_type\\":\\"status.updated\\",\\"workflow_id\\":\\"44444444-5555-6666-7777-888888888888\\",\\"workflow_version\\":3}"}'), $result->toArray());
         self::assertSame('66666666-7777-8888-9999-000000000004', $result->uuid);
     }
+
+    public function testListActivity(): void
+    {
+        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"id":"00000000-0000-4000-8000-000000000003","type":"failure_alert","occurred_at":"2026-11-11T01:00:00Z","failure_count":3}]}');
+
+        $result = $this->client->webhooks->destinations->listActivity('destinationUuid-1', [
+            'limit' => 1,
+            'offset' => 1,
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/organization/org-7f3a/application/app-91c2/webhook/destinations/destinationUuid-1/activity/', $request->getUri()->getPath());
+        self::assertSame([
+            'limit' => '1',
+            'offset' => '1',
+        ], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertCount(1, $result->results);
+        self::assertContainsOnlyInstancesOf(Types\WebhookDestinationActivity::class, $result->results);
+        self::assertFalse($result->hasNextPage());
+        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"id":"00000000-0000-4000-8000-000000000003","type":"failure_alert","occurred_at":"2026-11-11T01:00:00Z","failure_count":3}]}'), $result->toArray());
+    }
 }

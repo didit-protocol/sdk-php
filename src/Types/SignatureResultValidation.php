@@ -20,7 +20,11 @@ final class SignatureResultValidation extends BaseModel
     /** `true` when every document is valid. `null` when the outcome of signing couldn't be confirmed. */
     public readonly ?bool $valid;
 
-    /** Set when `valid` is `null`: `signature_provider_outcome_unknown`. */
+    /**
+     * `signature_provider_outcome_unknown` while `valid` is `null` (the signing outcome is not known yet);
+     * `signature_provider_failed` when the qualified trust service provider ended a Qualified (QES)
+     * signing without a signature: the attempt is back at review and the signer can ask for a new code.
+     */
     public readonly ?string $reason;
 
     /** The `checked_at` field. */
@@ -28,6 +32,9 @@ final class SignatureResultValidation extends BaseModel
 
     /** @var list<SignatureResultValidationDocuments>|null */
     public readonly ?array $documents;
+
+    /** The PAdES profile every signed document reached. */
+    public readonly ?string $profile;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -39,5 +46,6 @@ final class SignatureResultValidation extends BaseModel
         $this->reason = Hydrate::string($data['reason'] ?? null);
         $this->checkedAt = Hydrate::dateTime($data['checked_at'] ?? null);
         $this->documents = Hydrate::list($data['documents'] ?? null, static fn (mixed $v) => Hydrate::model($v, SignatureResultValidationDocuments::class));
+        $this->profile = Hydrate::string($data['profile'] ?? null);
     }
 }
