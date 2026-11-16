@@ -1419,7 +1419,7 @@
                   },
                   "expected_details": {
                     "type": "object",
-                    "description": "Expected user details used to cross-validate against the data extracted from the user's ID document, Proof of Address, and other verification steps. Mismatches are surfaced as warnings on the decision; some fields (e.g. `id_country`, `expected_document_types`) also alter the user-facing flow. For Business Verification (KYB) workflows only the business fields (`company_name`, `registry_country`, `registration_number`) are used — they pre-fill the company registry search for the user — and all person-level fields are ignored.",
+                    "description": "Expected user details used to cross-validate against the data extracted from the user's ID document, Proof of Address, and other verification steps. Mismatches are surfaced as warnings on the decision; some fields (e.g. `id_country`, `expected_document_types`) also alter the user-facing flow. For Business Verification (KYB) workflows only the business fields (`company_name`, `registry_country`, `registration_number`) are used — they pre-fill the company registry search for the user — and all person-level fields are ignored. UAE PASS (an ID Verification wallet) only confirms these details and never returns the person's identity: it is offered only when they include `identification_number` (the Emirates ID number), or a name (`first_name` and/or `last_name`) with `date_of_birth`.",
                     "example": {
                       "first_name": "John",
                       "last_name": "Doe",
@@ -59153,7 +59153,7 @@
           "auth": "api_key",
           "server": true
         },
-        "description": "Start a UAE PASS sign-in (UAE Digital Government Authority; ARE) without any workflow. Billed once, only when the identity is verified. The response carries next_action.type=redirect with the URL to send the user's browser to; the user returns to return_url with request_id and result appended. Read the outcome with GET /v3/id-verification/wallets/verifications/{request_id}/ or from the webhook, never from the URL. Sandbox applications get a deterministic simulation (simulated: true) that never contacts the provider.",
+        "description": "UAE PASS (UAE Digital Government Authority; ARE) never returns an identity: it only confirms whether the details you declared for your user (expected_details: name, date of birth, Emirates ID number) match, so it runs only inside a verification session created with expected_details. This endpoint never starts it and always answers 403 wallet_unavailable, sandbox applications included.",
         "summary": "Start UAE PASS verification",
         "parameters": [
           {
@@ -59210,42 +59210,10 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/DigitalIdWalletApiWalletVerificationResponse"
-                },
-                "example": {
-                  "request_id": "00000000-0000-4000-8000-000000000001",
-                  "wallet_verification": {
-                    "wallet": {
-                      "id": "uae_pass",
-                      "name": "UAE PASS",
-                      "issuing_authority": "UAE Digital Government Authority"
-                    },
-                    "country": "ARE",
-                    "status": "Not Finished",
-                    "outcome": "pending",
-                    "error": null,
-                    "interaction": "redirect",
-                    "simulated": false,
-                    "expires_at": "2026-01-01T10:10:00Z",
-                    "next_action": {
-                      "type": "redirect",
-                      "url": "https://wallet.example.com/authorize"
-                    },
-                    "identity": null,
-                    "attributes": null,
-                    "level_of_assurance": null,
-                    "verified_at": null,
-                    "signature_valid": null,
-                    "credential_type": "person_identification"
-                  },
-                  "vendor_data": "your-customer-reference",
-                  "metadata": {
-                    "reference": "example"
-                  },
-                  "created_at": "2026-01-01T10:00:00Z"
                 }
               }
             },
-            "description": ""
+            "description": "Never returned for UAE PASS: this endpoint always answers 403 wallet_unavailable."
           },
           "400": {
             "content": {
@@ -59265,7 +59233,7 @@
                 }
               }
             },
-            "description": "Missing credentials ({detail}), or error wallet_unavailable, insufficient_credits or contract_rate_missing."
+            "description": "Missing credentials ({detail}), or error wallet_unavailable: always for UAE PASS, which runs only inside a verification session created with expected_details."
           },
           "409": {
             "content": {
@@ -116337,7 +116305,7 @@
                 "wallet_verification": {
                   "type": "object",
                   "nullable": true,
-                  "description": "Credential evidence. Present only when `verification_method` is `wallet`; `null` otherwise.",
+                  "description": "Credential evidence. Present only when `verification_method` is `wallet`; `null` otherwise. UAE PASS (`provider` `uae_pass`) is outcome only: the identity fields of this ID verification (`full_name`, `first_name`, `last_name`, `date_of_birth`, `nationality`, the document numbers) stay `null`, `attributes` holds only whether each detail declared in `expected_details` matched, and nothing UAE PASS shared about the person is returned or kept.",
                   "properties": {
                     "provider": {
                       "type": "string",
@@ -116386,7 +116354,7 @@
                     "attributes": {
                       "type": "object",
                       "additionalProperties": true,
-                      "description": "The attributes the wallet shared, keyed as the wallet's catalog entry lists them."
+                      "description": "The attributes the wallet shared, keyed as the wallet's catalog entry lists them. For UAE PASS only the comparison with `expected_details`, one key per declared detail, each `match` or `no_match`: `name_match` (`first_name` / `last_name`), `date_of_birth_match` and `identification_number_match` (the Emirates ID number). A declared detail that does not match also raises the expected-details warning (`FULL_NAME_MISMATCH_WITH_PROVIDED`, `DOB_MISMATCH_WITH_PROVIDED` or `IDENTIFICATION_NUMBER_MISMATCH_WITH_PROVIDED`), handled by the workflow's expected-details mismatch action."
                     },
                     "portrait": {
                       "type": "string",

@@ -56,7 +56,13 @@ final class SessionDecisionIdVerifications extends BaseModel
     /** Registry evidence. Present only when `verification_method` is `id_lookup`; `null` otherwise. */
     public readonly ?SessionDecisionIdVerificationsIdLookup $idLookup;
 
-    /** Credential evidence. Present only when `verification_method` is `wallet`; `null` otherwise. */
+    /**
+     * Credential evidence. Present only when `verification_method` is `wallet`; `null` otherwise. UAE PASS
+     * (`provider` `uae_pass`) is outcome only: the identity fields of this ID verification (`full_name`,
+     * `first_name`, `last_name`, `date_of_birth`, `nationality`, the document numbers) stay `null`,
+     * `attributes` holds only whether each detail declared in `expected_details` matched, and nothing UAE
+     * PASS shared about the person is returned or kept.
+     */
     public readonly ?SessionDecisionIdVerificationsWalletVerification $walletVerification;
 
     /**
