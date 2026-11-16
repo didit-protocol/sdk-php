@@ -10,7 +10,11 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Credential evidence. Present only when `verification_method` is `wallet`; `null` otherwise.
+ * Credential evidence. Present only when `verification_method` is `wallet`; `null` otherwise. UAE PASS
+ * (`provider` `uae_pass`) is outcome only: the identity fields of this ID verification (`full_name`,
+ * `first_name`, `last_name`, `date_of_birth`, `nationality`, the document numbers) stay `null`,
+ * `attributes` holds only whether each detail declared in `expected_details` matched, and nothing UAE
+ * PASS shared about the person is returned or kept.
  */
 final class SessionDecisionIdVerificationsWalletVerification extends BaseModel
 {
@@ -44,7 +48,13 @@ final class SessionDecisionIdVerificationsWalletVerification extends BaseModel
     public readonly ?bool $signatureValid;
 
     /**
-     * The attributes the wallet shared, keyed as the wallet's catalog entry lists them.
+     * The attributes the wallet shared, keyed as the wallet's catalog entry lists them. For UAE PASS only
+     * the comparison with `expected_details`, one key per declared detail, each `match` or `no_match`:
+     * `name_match` (`first_name` / `last_name`), `date_of_birth_match` and `identification_number_match`
+     * (the Emirates ID number). A declared detail that does not match also raises the expected-details
+     * warning (`FULL_NAME_MISMATCH_WITH_PROVIDED`, `DOB_MISMATCH_WITH_PROVIDED` or
+     * `IDENTIFICATION_NUMBER_MISMATCH_WITH_PROVIDED`), handled by the workflow's expected-details mismatch
+     * action.
      *
      * @var array<string, mixed>|null
      */
