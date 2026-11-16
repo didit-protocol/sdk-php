@@ -1927,6 +1927,9 @@ namespace Didit;
  *     node_id?: string,
  *     month?: string,
  * }
+ * @phpstan-type SessionsGeneratePdfParams array{
+ *     language?: string,
+ * }
  * @phpstan-type SessionsImportSharedParams array{
  *     share_token: string,
  *     trust_review: bool,
