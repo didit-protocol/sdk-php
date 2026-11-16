@@ -30,6 +30,7 @@ use Didit\Types;
  * @phpstan-import-type SessionsDeleteKybPartyDraftParams from Params
  * @phpstan-import-type SessionsDeleteParams from Params
  * @phpstan-import-type SessionsExportAmlScreeningHistoryParams from Params
+ * @phpstan-import-type SessionsGeneratePdfParams from Params
  * @phpstan-import-type SessionsImportSharedParams from Params
  * @phpstan-import-type SessionsListAmlScreeningHistoryParams from Params
  * @phpstan-import-type SessionsListEventsParams from Params
@@ -168,17 +169,19 @@ final class Sessions extends BaseResource
      * `GET /v3/session/{sessionId}/generate-pdf/`
      *
      * @param string $sessionId UUID of the User Verification (KYC) or Business Verification (KYB) session to render, the `session_id` returned by `POST /v3/session/`
+     * @param SessionsGeneratePdfParams $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function generatePdf(string $sessionId, ?RequestOptions $options = null): BinaryContent
+    public function generatePdf(string $sessionId, array $params = [], ?RequestOptions $options = null): BinaryContent
     {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/v3/session/{sessionId}/generate-pdf/',
+            query: ['language' => 'language'],
             accept: 'application/pdf, application/json',
-        ), ['sessionId' => $sessionId], [], $options);
+        ), ['sessionId' => $sessionId], $params, $options);
 
         return BinaryContent::fromResponse($response);
     }

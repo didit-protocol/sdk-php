@@ -142,13 +142,17 @@ final class SessionsTest extends GeneratedTestCase
     {
         $this->queueBinary(200, 'binary-content', 'application/pdf');
 
-        $result = $this->client->sessions->generatePdf('sessionId-1');
+        $result = $this->client->sessions->generatePdf('sessionId-1', [
+            'language' => 'en',
+        ]);
 
         $request = $this->lastRequest();
         self::assertSame('GET', $request->getMethod());
         self::assertSame('verification.didit.me', $request->getUri()->getHost());
         self::assertSame('/v3/session/sessionId-1/generate-pdf/', $request->getUri()->getPath());
-        self::assertSame([], $this->queryParams($request));
+        self::assertSame([
+            'language' => 'en',
+        ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/pdf, application/json', $request->getHeaderLine('Accept'));
         self::assertSame('', (string) $request->getBody());
