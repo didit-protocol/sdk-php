@@ -111,6 +111,14 @@ final class GeolocationAttempt extends BaseModel
     /** Nearest populated place, a label for reviewers. */
     public readonly ?string $city;
 
+    /**
+     * Street address at the device fix, reverse geocoded. `country_code`, `region_code` and `city` stay
+     * the offline place used by geofences; this is the address for reviewers and for comparison with
+     * `kyc.parsed_address` or `poa.parsed_address` in workflow rules. See the schema for when it is
+     * `null`.
+     */
+    public readonly ?GeolocationParsedAddress $parsedAddress;
+
     /** Result of the country and area rules of the step. */
     public readonly ?GeolocationAttemptGeofence $geofence;
 
@@ -222,6 +230,7 @@ final class GeolocationAttempt extends BaseModel
         $this->countryCode = Hydrate::string($data['country_code'] ?? null);
         $this->regionCode = Hydrate::string($data['region_code'] ?? null);
         $this->city = Hydrate::string($data['city'] ?? null);
+        $this->parsedAddress = Hydrate::model($data['parsed_address'] ?? null, GeolocationParsedAddress::class);
         $this->geofence = Hydrate::model($data['geofence'] ?? null, GeolocationAttemptGeofence::class);
         $this->insideGeofence = Hydrate::bool($data['inside_geofence'] ?? null);
         $this->geofenceBasis = Hydrate::string($data['geofence_basis'] ?? null);
