@@ -10,9 +10,8 @@ namespace Didit\Types;
  * `Declined` when the overall `match_type` triggers a `DECLINE` action (`no_match_action` defaults to
  * `DECLINE`, `partial_match_action` to `NO_ACTION`); `In Review` when no service produced a usable
  * comparison, for example when the only selected service came back `REGISTRY_UNAVAILABLE` or
- * `INCONCLUSIVE`; `Approved` otherwise. A request that selected several services can be `Approved` on
- * one service's match while another was unavailable, so check `errors` and the per-service
- * `outcome_code`s too.
+ * `INCONCLUSIVE`, and when the registry confirmed the identification number but returned a different
+ * name while `partial_match_action` is `NO_ACTION`; `Approved` otherwise.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
