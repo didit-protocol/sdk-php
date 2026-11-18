@@ -188,7 +188,8 @@ final class SessionDecisionIdVerifications extends BaseModel
 
     /**
      * Face match score between the portrait extracted from the front document image and the front camera
-     * image.
+     * image. `null` when the comparison did not run; when the client reported no front-camera frame and
+     * neither side has a score, the ID verification warnings carry `SELFIE_MATCH_NOT_COMPUTED`.
      */
     public readonly ?float $frontImageCameraFrontFaceMatchScore;
 

@@ -24,7 +24,12 @@ final class SessionDecisionIdVerificationsWarnings extends BaseModel
      */
     public readonly ?string $feature;
 
-    /** The `risk` field. */
+    /**
+     * Machine-readable risk code. In ID verification warnings, `SELFIE_MATCH_NOT_COMPUTED` means document
+     * selfie matching is enabled but the front-camera comparison never ran because the client reported no
+     * front-camera frame (`front_camera_image_unavailable`); it resolves to `In Review` by default or
+     * `Declined` when `document_selfie_portrait_match_not_computed_action` is `DECLINE`.
+     */
     public readonly ?string $risk;
 
     /**
