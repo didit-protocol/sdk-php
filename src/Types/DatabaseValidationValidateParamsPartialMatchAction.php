@@ -8,7 +8,8 @@ namespace Didit\Types;
 
 /**
  * What a `partial_match` does to `database_validation.status`. Defaults to `NO_ACTION` (status stays
- * `Approved`, with a warning).
+ * `Approved`, with a warning). When the registry confirmed the identification number but returned a
+ * different name, `NO_ACTION` answers `In Review` instead of `Approved`; `DECLINE` still declines.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
