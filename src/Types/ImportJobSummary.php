@@ -33,13 +33,19 @@ final class ImportJobSummary extends BaseModel
     public readonly ?string $filename;
 
     /**
-     * The job's state as the console shows it; `errors` is a completed job with rejected rows.
+     * The job's state as the console shows it; `errors` is a completed job with rejected rows. `waiting`:
+     * the month's import limit is used up. `held`: a check holds the import for review by Didit.
+     * `declined`: Didit declined the held import. `undoing` and `undone`: Undo import is running or
+     * finished.
      *
      * Known values: {@see ImportJobSummaryState}.
      */
     public readonly ?string $state;
 
-    /** The `status` field. */
+    /**
+     * The job's status; the same values as a verification import job's `status`, including `WAITING`,
+     * `HELD`, `DECLINED`, `UNDOING` and `UNDONE`.
+     */
     public readonly ?string $status;
 
     /** The `is_dry_run` field. */
@@ -76,6 +82,52 @@ final class ImportJobSummary extends BaseModel
     public readonly ?\DateTimeImmutable $completedAt;
 
     /**
+     * The monthly limit this job counts against: `provider` for a migration read from another provider
+     * (`source=provider`), `file` for an upload or file URL.
+     *
+     * Known values: {@see ImportJobSummaryLimitLane}.
+     */
+    public readonly ?string $limitLane;
+
+    /**
+     * Why a `WAITING` job waits. `null` otherwise.
+     *
+     * Known values: {@see ImportJobSummaryWaitingReason}.
+     */
+    public readonly ?string $waitingReason;
+
+    /**
+     * What the checks found in the whole file or account. Empty when nothing was flagged.
+     *
+     * @var list<ImportCheck>|null
+     */
+    public readonly ?array $checks;
+
+    /** The note from Didit on a `DECLINED` job. */
+    public readonly ?string $reviewNote;
+
+    /** The request for a higher limit made for this job, or `null`. */
+    public readonly ?ImportLimitRequest $limitRequest;
+
+    /** Records Didit approved for this job beyond the monthly limit. */
+    public readonly ?int $grantedRecords;
+
+    /**
+     * `true` when the job recorded what it created, so `POST /v3/session/imports/{importId}/undo/` can
+     * delete it. Imports made before Undo import existed did not record it.
+     */
+    public readonly ?bool $canUndo;
+
+    /** Records deleted by Undo import. */
+    public readonly ?int $undoneCount;
+
+    /** The `undone_at` field. */
+    public readonly ?\DateTimeImmutable $undoneAt;
+
+    /** Who undid the import. */
+    public readonly ?string $undoneBy;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -100,5 +152,15 @@ final class ImportJobSummary extends BaseModel
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);
         $this->startedAt = Hydrate::dateTime($data['started_at'] ?? null);
         $this->completedAt = Hydrate::dateTime($data['completed_at'] ?? null);
+        $this->limitLane = Hydrate::string($data['limit_lane'] ?? null);
+        $this->waitingReason = Hydrate::string($data['waiting_reason'] ?? null);
+        $this->checks = Hydrate::list($data['checks'] ?? null, static fn (mixed $v) => Hydrate::model($v, ImportCheck::class));
+        $this->reviewNote = Hydrate::string($data['review_note'] ?? null);
+        $this->limitRequest = Hydrate::model($data['limit_request'] ?? null, ImportLimitRequest::class);
+        $this->grantedRecords = Hydrate::int($data['granted_records'] ?? null);
+        $this->canUndo = Hydrate::bool($data['can_undo'] ?? null);
+        $this->undoneCount = Hydrate::int($data['undone_count'] ?? null);
+        $this->undoneAt = Hydrate::dateTime($data['undone_at'] ?? null);
+        $this->undoneBy = Hydrate::string($data['undone_by'] ?? null);
     }
 }

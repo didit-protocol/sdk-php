@@ -7,6 +7,12 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
+ * `WAITING`: the month's limit is used up. The import continues by itself when the limit goes up (a
+ * top-up, the next month, or Didit approving a limit request). `HELD`: a check held the file for
+ * review by Didit; nothing is written. `DECLINED`: Didit declined the held file (`review_note` says
+ * why); nothing was written and the source and credentials are erased. `UNDOING` and `UNDONE`: an Undo
+ * import is running or has finished.
+ *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
 final class SessionImportJobStatus
@@ -24,6 +30,16 @@ final class SessionImportJobStatus
     public const CANCELLED = 'CANCELLED';
 
     public const READY = 'READY';
+
+    public const WAITING = 'WAITING';
+
+    public const HELD = 'HELD';
+
+    public const DECLINED = 'DECLINED';
+
+    public const UNDOING = 'UNDOING';
+
+    public const UNDONE = 'UNDONE';
 
     private function __construct()
     {

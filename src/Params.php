@@ -1316,6 +1316,9 @@ namespace Didit;
  *     device?: string,
  *     idempotency_key?: string,
  * }
+ * @phpstan-type ImportLimitRequestInput array{
+ *     note?: string,
+ * }
  * @phpstan-type InvestigatorAcceptRequest array{
  *     narrative?: string,
  *     send_email?: bool,
