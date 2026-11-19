@@ -11,7 +11,11 @@ use Didit\Core\Hydrate;
 
 /**
  * Whether the Didit network lists your VASP profile, so other Didit customers find it in the directory
- * and reach it on the INTERNAL rail, and each condition it still misses.
+ * and reach it on the INTERNAL rail, and each condition it still misses. Listing needs: a live (not
+ * sandbox) application with Travel Rule on, Discoverable on, a legal name, a compliance email
+ * confirmed through the emailed link, an LEI that GLEIF lists as issued to an active entity, and a
+ * review by Didit that the company is a virtual asset service provider (the review is for that LEI:
+ * changing the LEI or the legal name needs a new review).
  */
 final class TravelRuleSettingsDetailDiditNetwork extends BaseModel
 {
@@ -19,9 +23,13 @@ final class TravelRuleSettingsDetailDiditNetwork extends BaseModel
     public readonly ?bool $listed;
 
     /**
-     * Empty when listed. compliance_email_unconfirmed: send the confirmation with POST
+     * Empty when listed, in this order when present. lei_missing: set lei with PUT
+     * /v3/travel-rule/settings/. lei_unverified: GLEIF does not list the LEI as issued to an active
+     * entity; see lei_check.reason. compliance_email_unconfirmed: send the confirmation with POST
      * /v3/travel-rule/settings/compliance-email/confirmation/ and open the emailed link.
-     * excluded_by_staff: Didit marked the application as a test, demo or internal one.
+     * excluded_by_staff: Didit marked the application as a test, demo, internal or not-a-VASP one.
+     * review_pending: Didit has not yet reviewed that the company is a virtual asset service provider for
+     * this LEI.
      *
      * @var list<string>|null
      */
@@ -29,6 +37,9 @@ final class TravelRuleSettingsDetailDiditNetwork extends BaseModel
 
     /** Whether the current compliance_email was confirmed through the emailed link. */
     public readonly ?bool $complianceEmailConfirmed;
+
+    /** What GLEIF said about your current LEI. null before the LEI was first checked. */
+    public readonly ?TravelRuleSettingsDetailDiditNetworkLeiCheck $leiCheck;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -39,5 +50,6 @@ final class TravelRuleSettingsDetailDiditNetwork extends BaseModel
         $this->listed = Hydrate::bool($data['listed'] ?? null);
         $this->missing = Hydrate::list($data['missing'] ?? null, Hydrate::string(...));
         $this->complianceEmailConfirmed = Hydrate::bool($data['compliance_email_confirmed'] ?? null);
+        $this->leiCheck = Hydrate::model($data['lei_check'] ?? null, TravelRuleSettingsDetailDiditNetworkLeiCheck::class);
     }
 }

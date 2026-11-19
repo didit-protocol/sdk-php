@@ -24,7 +24,13 @@ final class VaspDirectoryEntryEssentialChecksChecks extends BaseModel
      */
     public readonly ?string $status;
 
-    /** Machine-readable code of the verdict. */
+    /**
+     * Machine-readable code of the verdict. lei check: no_lei, no_gleif_record, gleif_lei_unknown (GLEIF
+     * has no record of the LEI), gleif_other_lei, gleif_entity_inactive, gleif_lei_not_issued,
+     * gleif_name_mismatch, gleif_country_mismatch, gleif_consistent. registration: gleif_issued,
+     * gleif_not_issued, no_register and the register reasons. licence: no_licence_record,
+     * no_authorisation_date. domain: no_domain.
+     */
     public readonly ?string $reason;
 
     /** One-line English explanation. */

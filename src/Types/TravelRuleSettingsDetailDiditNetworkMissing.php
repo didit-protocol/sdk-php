@@ -19,6 +19,10 @@ final class TravelRuleSettingsDetailDiditNetworkMissing
 
     public const LEGAL_NAME_MISSING = 'legal_name_missing';
 
+    public const LEI_MISSING = 'lei_missing';
+
+    public const LEI_UNVERIFIED = 'lei_unverified';
+
     public const COMPLIANCE_EMAIL_MISSING = 'compliance_email_missing';
 
     public const COMPLIANCE_EMAIL_UNCONFIRMED = 'compliance_email_unconfirmed';
@@ -26,6 +30,8 @@ final class TravelRuleSettingsDetailDiditNetworkMissing
     public const EXCLUDED_BY_STAFF = 'excluded_by_staff';
 
     public const INTERNAL_ORGANIZATION = 'internal_organization';
+
+    public const REVIEW_PENDING = 'review_pending';
 
     private function __construct()
     {
