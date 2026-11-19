@@ -7,7 +7,10 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * The job's state as the console shows it; `errors` is a completed job with rejected rows.
+ * The job's state as the console shows it; `errors` is a completed job with rejected rows. `waiting`:
+ * the month's import limit is used up. `held`: a check holds the import for review by Didit.
+ * `declined`: Didit declined the held import. `undoing` and `undone`: Undo import is running or
+ * finished.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -28,6 +31,16 @@ final class SessionImportJobState
     public const FAILED = 'failed';
 
     public const CANCELLED = 'cancelled';
+
+    public const WAITING = 'waiting';
+
+    public const HELD = 'held';
+
+    public const DECLINED = 'declined';
+
+    public const UNDOING = 'undoing';
+
+    public const UNDONE = 'undone';
 
     private function __construct()
     {

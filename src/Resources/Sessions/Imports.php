@@ -19,6 +19,7 @@ use Didit\Types;
 /**
  * The `sessions.imports` resource.
  *
+ * @phpstan-import-type ImportLimitRequestInput from Params
  * @phpstan-import-type SessionsImportsCheckProviderParams from Params
  * @phpstan-import-type SessionsImportsCreateParams from Params
  * @phpstan-import-type SessionsImportsListErrorsParams from Params
@@ -34,9 +35,9 @@ final class Imports extends BaseResource
      *
      * Create an asynchronous import job for historical User Verification sessions, Business Verification
      * sessions, transaction monitoring records, or workflow custom status rules. Set `source=provider` to
-     * migrate from another provider: Didit reads Sumsub, Onfido, Persona and ComplyCube with your
-     * read-only key, reads Veriff, iDenfy and MetaMap records by the IDs you upload in `file`, and imports
-     * an export file in Didit's format for the other providers.
+     * migrate from another provider: `GET /v3/session/imports/providers/` lists the providers and how each
+     * is read: with your read-only key, from the record IDs you upload in `file`, or from an export file
+     * in Didit's format.
      *
      * `POST /v3/session/imports/`
      *
@@ -177,8 +178,9 @@ final class Imports extends BaseResource
     /**
      * Start a dry run.
      *
-     * Start a migration whose dry run finished (`READY`): the same job imports for real, with the status
-     * mapping and face templates choice as sent now.
+     * Start an import whose dry run finished (`READY`): the same job imports for real, with the status
+     * mapping and face templates choice as sent now. A file or API job runs the checks again over the
+     * whole file first.
      *
      * `POST /v3/session/imports/{importId}/start/`
      *
@@ -242,7 +244,8 @@ final class Imports extends BaseResource
     /**
      * Cancel an import job.
      *
-     * Cancel an import. What was imported stays; the uploaded file and the key are erased.
+     * Cancel an import. What was imported stays, unless you undo it with `POST
+     * /v3/session/imports/{importId}/undo/`; the uploaded file and the key are erased.
      *
      * `POST /v3/session/imports/{importId}/cancel/`
      *
@@ -289,7 +292,9 @@ final class Imports extends BaseResource
      * List import jobs.
      *
      * Every import of the application in one shape: verification imports and migrations, people and
-     * businesses.
+     * businesses. `limit_lane`, `waiting_reason`, `checks`, `review_note`, `limit_request`,
+     * `granted_records` and the Undo fields apply to verification imports; they are `null`, empty or
+     * `false` for people and company imports.
      *
      * `GET /v3/import-jobs/`
      *
@@ -326,5 +331,83 @@ final class Imports extends BaseResource
         ), [], [], $options);
 
         return Types\SessionsImportsListActiveJobsResponse::fromResponse($response);
+    }
+
+    /**
+     * Get import limits.
+     *
+     * Read how many verifications your organization can still import this month. Limits follow what the
+     * organization pays and are counted per organization, across all its live applications, per calendar
+     * month in UTC, in records written by imports that are not dry runs: 2,000 from a provider and 500
+     * from a file or the API until the first paid top-up, then 250,000 and 25,000, and no monthly limit
+     * (`limit: null`) on a contract or when Didit set the organization to always allowed.
+     *
+     * `GET /v3/session/imports/limits/`
+     *
+     * @throws DiditException
+     */
+    public function retrieveLimits(?RequestOptions $options = null): Types\ImportLimits
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/session/imports/limits/',
+        ), [], [], $options);
+
+        return Types\ImportLimits::fromResponse($response);
+    }
+
+    /**
+     * Request a higher import limit.
+     *
+     * Ask Didit to let one import go past the monthly limit. Allowed on a job that is `READY`, `PENDING`,
+     * `PROCESSING` or `WAITING` and whose lane has a limit; one request can be pending per job.
+     * `requested_records` is not sent: it is computed from the job's dry run or check pass as what the
+     * import still has to write beyond what it may write now (one month of the lane when no pass counted
+     * the file). An approval lets that job finish and does not change the organization's monthly limit.
+     *
+     * `POST /v3/session/imports/{importId}/request-limit/`
+     *
+     * @param ImportLimitRequestInput $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function requestLimit(
+        string $importId,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\SessionImportJob {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/imports/{importId}/request-limit/',
+            bodyTypes: ['json'],
+        ), ['importId' => $importId], $params, $options);
+
+        return Types\SessionImportJob::fromResponse($response);
+    }
+
+    /**
+     * Undo an import.
+     *
+     * Delete what an import created. Every verification (User Verification, Business Verification) and
+     * transaction the job created is deleted with its images and videos, its face templates, and the
+     * blocklist entries the job added, exactly as `DELETE /v3/session/{sessionId}/delete/` deletes a
+     * session. Records that were already in Didit, and the workflow status rules an import changed, are
+     * not affected. The records you undo are given back to the month's import limit. Deletion cannot be
+     * reversed.
+     *
+     * `POST /v3/session/imports/{importId}/undo/`
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function undo(string $importId, ?RequestOptions $options = null): Types\SessionImportJob
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/session/imports/{importId}/undo/',
+        ), ['importId' => $importId], [], $options);
+
+        return Types\SessionImportJob::fromResponse($response);
     }
 }

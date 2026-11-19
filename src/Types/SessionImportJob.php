@@ -17,7 +17,15 @@ final class SessionImportJob extends BaseModel
     /** Import job id. Use this value to poll progress and fetch row errors. */
     public readonly ?string $uuid;
 
-    /** Known values: {@see SessionImportJobStatus}. */
+    /**
+     * `WAITING`: the month's limit is used up. The import continues by itself when the limit goes up (a
+     * top-up, the next month, or Didit approving a limit request). `HELD`: a check held the file for
+     * review by Didit; nothing is written. `DECLINED`: Didit declined the held file (`review_note` says
+     * why); nothing was written and the source and credentials are erased. `UNDOING` and `UNDONE`: an Undo
+     * import is running or has finished.
+     *
+     * Known values: {@see SessionImportJobStatus}.
+     */
     public readonly ?string $status;
 
     /** Known values: {@see SessionImportJobImportType}. */
@@ -69,7 +77,10 @@ final class SessionImportJob extends BaseModel
     public readonly ?\DateTimeImmutable $completedAt;
 
     /**
-     * The job's state as the console shows it; `errors` is a completed job with rejected rows.
+     * The job's state as the console shows it; `errors` is a completed job with rejected rows. `waiting`:
+     * the month's import limit is used up. `held`: a check holds the import for review by Didit.
+     * `declined`: Didit declined the held import. `undoing` and `undone`: Undo import is running or
+     * finished.
      *
      * Known values: {@see SessionImportJobState}.
      */
@@ -101,7 +112,8 @@ final class SessionImportJob extends BaseModel
 
     /**
      * What a dry run found: `total`, `by_status`, `already_in_didit`, `same_person`, `not_finished`,
-     * `failed`, `unmapped_statuses`.
+     * `failed`, `unmapped_statuses` and `checks` (only the checks that fired, the same list as the job's
+     * `checks`).
      *
      * @var array<string, mixed>|null
      */
@@ -133,6 +145,53 @@ final class SessionImportJob extends BaseModel
 
     /** The `created_by_email` field. */
     public readonly ?string $createdByEmail;
+
+    /**
+     * The monthly limit this job counts against: `provider` for a migration read from another provider
+     * (`source=provider`), `file` for an upload or file URL.
+     *
+     * Known values: {@see SessionImportJobLimitLane}.
+     */
+    public readonly ?string $limitLane;
+
+    /**
+     * Why a `WAITING` job waits. `null` otherwise.
+     *
+     * Known values: {@see SessionImportJobWaitingReason}.
+     */
+    public readonly ?string $waitingReason;
+
+    /**
+     * Only the checks that fired over the whole file or account, each saying whether it holds the import.
+     * Empty when nothing fired.
+     *
+     * @var list<ImportCheck>|null
+     */
+    public readonly ?array $checks;
+
+    /** The note from Didit on a `DECLINED` job. */
+    public readonly ?string $reviewNote;
+
+    /** The request for a higher limit made for this job, or `null`. */
+    public readonly ?ImportLimitRequest $limitRequest;
+
+    /** Records Didit approved for this job beyond the monthly limit. */
+    public readonly ?int $grantedRecords;
+
+    /**
+     * `true` when the job recorded what it created, so `POST /v3/session/imports/{importId}/undo/` can
+     * delete it. Imports made before Undo import existed did not record it.
+     */
+    public readonly ?bool $canUndo;
+
+    /** Records deleted by Undo import. */
+    public readonly ?int $undoneCount;
+
+    /** The `undone_at` field. */
+    public readonly ?\DateTimeImmutable $undoneAt;
+
+    /** Who undid the import. */
+    public readonly ?string $undoneBy;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -177,5 +236,15 @@ final class SessionImportJob extends BaseModel
         $this->faceBlocklistHitsCount = Hydrate::int($data['face_blocklist_hits_count'] ?? null);
         $this->createdByName = Hydrate::string($data['created_by_name'] ?? null);
         $this->createdByEmail = Hydrate::string($data['created_by_email'] ?? null);
+        $this->limitLane = Hydrate::string($data['limit_lane'] ?? null);
+        $this->waitingReason = Hydrate::string($data['waiting_reason'] ?? null);
+        $this->checks = Hydrate::list($data['checks'] ?? null, static fn (mixed $v) => Hydrate::model($v, ImportCheck::class));
+        $this->reviewNote = Hydrate::string($data['review_note'] ?? null);
+        $this->limitRequest = Hydrate::model($data['limit_request'] ?? null, ImportLimitRequest::class);
+        $this->grantedRecords = Hydrate::int($data['granted_records'] ?? null);
+        $this->canUndo = Hydrate::bool($data['can_undo'] ?? null);
+        $this->undoneCount = Hydrate::int($data['undone_count'] ?? null);
+        $this->undoneAt = Hydrate::dateTime($data['undone_at'] ?? null);
+        $this->undoneBy = Hydrate::string($data['undone_by'] ?? null);
     }
 }
