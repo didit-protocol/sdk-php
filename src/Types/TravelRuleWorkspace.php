@@ -44,7 +44,8 @@ final class TravelRuleWorkspace extends BaseModel
     public readonly ?\DateTimeImmutable $billingEnabledAt;
 
     /**
-     * Whether the Didit network lists this VASP and, when not, each condition it still misses.
+     * Whether the Didit network lists this VASP and, when not, each condition it still misses. Same shape
+     * as didit_network in GET /v3/travel-rule/settings/.
      *
      * @var array<string, mixed>|null
      */

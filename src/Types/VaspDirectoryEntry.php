@@ -12,10 +12,10 @@ use Didit\Core\Hydrate;
 /**
  * A VASP of the directory or a member of the Didit network, with the routes your application has to
  * it. A customer is a member of the Didit network only while its application is live, its Travel Rule
- * is on, its profile is discoverable, has a legal name and a confirmed compliance email, and Didit has
- * not marked the application as a test, demo or internal one. Each row also carries the shared
- * due-diligence assessment (dd_score, risk_level, responsiveness, essential_checks) and your
- * application's own decision, entity screening and questionnaires, which no other customer sees.
+ * is on, its profile is discoverable, has a legal name and a confirmed compliance email, has an LEI
+ * that GLEIF lists as issued to an active entity and has been reviewed by Didit as a virtual asset
+ * service provider, and Didit has not marked the application as a test, demo, internal or not-a-VASP
+ * one.
  */
 final class VaspDirectoryEntry extends BaseModel
 {

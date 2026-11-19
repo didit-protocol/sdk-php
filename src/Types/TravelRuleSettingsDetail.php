@@ -104,7 +104,11 @@ final class TravelRuleSettingsDetail extends BaseModel
     /** Your VASP's legal name. Required (non-blank) to set is_enabled to true. */
     public readonly ?string $legalName;
 
-    /** Your Legal Entity Identifier, surfaced in the VASP directory. */
+    /**
+     * Your Legal Entity Identifier (ISO 17442): 20 letters and digits whose last two are check digits (ISO
+     * 7064 MOD 97-10). It is stored in upper case. Surfaced in the VASP directory. Didit checks it with
+     * GLEIF; didit_network.lei_check shows the answer.
+     */
     public readonly ?string $lei;
 
     /**
@@ -117,8 +121,9 @@ final class TravelRuleSettingsDetail extends BaseModel
     /**
      * Whether your VASP profile can be listed in the Didit network: found in GET /v3/travel-rule/vasps/ by
      * other Didit customers and reached on the INTERNAL rail. Listing also needs a live application,
-     * Travel Rule on, a legal name and a confirmed compliance email; didit_network says which are missing.
-     * Default true.
+     * Travel Rule on, a legal name, a confirmed compliance email, an LEI that GLEIF lists as issued to an
+     * active entity and a review by Didit that you are a virtual asset service provider; didit_network
+     * says which are missing. Default true.
      */
     public readonly ?bool $isDiscoverable;
 
@@ -217,7 +222,11 @@ final class TravelRuleSettingsDetail extends BaseModel
 
     /**
      * Whether the Didit network lists your VASP profile, so other Didit customers find it in the directory
-     * and reach it on the INTERNAL rail, and each condition it still misses.
+     * and reach it on the INTERNAL rail, and each condition it still misses. Listing needs: a live (not
+     * sandbox) application with Travel Rule on, Discoverable on, a legal name, a compliance email
+     * confirmed through the emailed link, an LEI that GLEIF lists as issued to an active entity, and a
+     * review by Didit that the company is a virtual asset service provider (the review is for that LEI:
+     * changing the LEI or the legal name needs a new review).
      */
     public readonly ?TravelRuleSettingsDetailDiditNetwork $diditNetwork;
 
