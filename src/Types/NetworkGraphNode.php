@@ -14,7 +14,9 @@ use Didit\Core\Hydrate;
  * vendor_business | transaction_party) carry id, kind, subject, node_status (approved | in_review |
  * declined | not_completed), and tags. Signal nodes (kind: signal) carry id, kind, uuid, signal_type,
  * subject_count, coverage, is_hub, is_datacenter_ip, is_high_collision_device, node_status
- * (signal_active | signal_guarded), tags, risk_evidence, first_seen_at, and last_seen_at.
+ * (signal_active | signal_guarded), tags, risk_evidence, first_seen_at, and last_seen_at. A signal
+ * node with `signal_type: wallet_address` also carries `wallet`: where the money went through that
+ * wallet.
  */
 final class NetworkGraphNode extends BaseModel
 {
@@ -24,6 +26,9 @@ final class NetworkGraphNode extends BaseModel
     /** Known values: {@see NetworkGraphNodeKind}. */
     public readonly ?string $kind;
 
+    /** Only on a signal node of type `wallet_address`. */
+    public readonly ?NetworkGraphNodeWallet $wallet;
+
     /**
      * @param array<string, mixed> $data the decoded JSON object
      */
@@ -32,5 +37,6 @@ final class NetworkGraphNode extends BaseModel
         parent::__construct($data);
         $this->id = Hydrate::string($data['id'] ?? null);
         $this->kind = Hydrate::string($data['kind'] ?? null);
+        $this->wallet = Hydrate::model($data['wallet'] ?? null, NetworkGraphNodeWallet::class);
     }
 }

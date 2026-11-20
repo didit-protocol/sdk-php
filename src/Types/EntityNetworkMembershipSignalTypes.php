@@ -25,6 +25,8 @@ final class EntityNetworkMembershipSignalTypes
 
     public const ADDRESS = 'address';
 
+    public const WALLET_ADDRESS = 'wallet_address';
+
     private function __construct()
     {
     }
