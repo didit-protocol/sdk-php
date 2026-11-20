@@ -27,8 +27,10 @@ final class AMLScreeningRun extends BaseModel
     public readonly ?\DateTimeImmutable $startedAt;
 
     /**
-     * `NO_CHANGE`: completed and the result did not move. `CHANGED`: completed and the score, status, hit
-     * count or hits changed. `FAILED`: no usable answer for this subject, so the check was left as it was.
+     * `NO_CHANGE`: completed and the result did not move. `CHANGED`: completed and the score, the status
+     * or a match at or above your Match Score Threshold changed (added, removed or updated). Matches below
+     * that threshold start as False Positive and can come and go between runs without making a run
+     * `CHANGED`. `FAILED`: no usable answer for this subject, so the check was left as it was.
      *
      * Known values: {@see AMLScreeningRunOutcome}.
      */
