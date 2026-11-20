@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated;
 
+use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
 use Didit\Types;
 
@@ -73,6 +74,55 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z"}]}'), $result->toArray());
     }
 
+    public function testSearchSignals(): void
+    {
+        $this->queueJson(200, '{"signal_type":"wallet_address","match_count":1,"matches":[],"cross_organization":{"available":false,"signals_checked":0,"insights":[]},"wallet":{"signal_id":"8f1f6b0e-2f64-4f0b-9e0d-3c5b9a2f7d10","is_shared_service":false,"account_count":3,"payout_count":14,"paid_out":{"amount":"5950.00","currency":"USD"},"first_payout_at":"2026-09-02T10:14:00Z","last_payout_at":"2026-11-16T18:02:00Z","recent_payouts":[]}}');
+
+        $result = $this->client->networks->searchSignals([
+            'signal_type' => 'ip_address',
+            'value' => 'value-value',
+            'image' => File::fromBytes('fake-image-bytes', 'image.jpg', 'image/jpeg'),
+            'issuing_state' => 'issuing_state-value',
+            'document_type' => 'document_type-value',
+            'region' => 'region-value',
+            'tag' => 'tag-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/organization/org-7f3a/application/app-91c2/networks/signals/search/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertStringStartsWith('multipart/form-data; boundary=', $request->getHeaderLine('Content-Type'));
+        self::assertSame([
+            'signal_type' => [
+                'ip_address',
+            ],
+            'value' => [
+                'value-value',
+            ],
+            'image' => [
+                'file:image.jpg:image/jpeg:fake-image-bytes',
+            ],
+            'issuing_state' => [
+                'issuing_state-value',
+            ],
+            'document_type' => [
+                'document_type-value',
+            ],
+            'region' => [
+                'region-value',
+            ],
+            'tag' => [
+                'tag-value',
+            ],
+        ], $this->multipartFields($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"signal_type":"wallet_address","match_count":1,"matches":[],"cross_organization":{"available":false,"signals_checked":0,"insights":[]},"wallet":{"signal_id":"8f1f6b0e-2f64-4f0b-9e0d-3c5b9a2f7d10","is_shared_service":false,"account_count":3,"payout_count":14,"paid_out":{"amount":"5950.00","currency":"USD"},"first_payout_at":"2026-09-02T10:14:00Z","last_payout_at":"2026-11-16T18:02:00Z","recent_payouts":[]}}'), $result->toArray());
+        self::assertSame('wallet_address', $result->signalType);
+    }
+
     public function testRetrieve(): void
     {
         $this->queueJson(200, '{"uuid":"3fa85f64-5717-4562-b3fc-2c963f66afa6","network_id":"N-0042","name":null,"status":"in_review","risk":{"score":82,"band":"high","bar":0.82},"pattern_types":["exact_same_device","same_email"],"signal_types":["device","email"],"member_counts":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signal_coverage":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}},"first_activity_at":"2026-10-01T09:12:44Z","last_activity_at":"2026-10-12T16:03:10Z","stats":{"members":{"total":3,"users":3,"businesses":0,"transaction_parties":0},"member_status":{"approved":1,"declined":1,"in_review":0,"not_completed":1},"signals":{"total":2,"by_type":{"device":{"signals":1,"subjects":3,"coverage":1.0},"email":{"signals":1,"subjects":2,"coverage":0.6667}}}},"fraud_tags":[],"risk_signals":{"residential_proxy_reuse":{"detected":false,"signal_count":0,"max_subject_count":0},"email_intelligence":{"enriched_signal_count":1,"high_risk_count":0,"social_profile_count":0},"phone_intelligence":{"enriched_signal_count":0,"high_risk_count":0}},"reviewed_at":"2026-10-12T16:30:00Z","reviewed_by":"reviewer@example.com","review_reason":"Shared device across three new accounts.","notes_count":0,"sharing_mode":"global","cross_org_available":true,"cross_org_unavailable_reason":null,"tags":[{"uuid":"7c9e6679-7425-40de-944b-e07fc1f90ae7","name":"SUSPICIOUS","color":"#6366F1","source":"custom","added_by":null,"added_at":"2026-10-13T08:15:00Z"}],"outcomes":{"approved":1,"declined":1,"in_review":0,"total":3},"patterns":[{"type":"background","score":0.8125,"members":3,"reason":null,"computed_at":"2026-10-13T08:00:00Z"}]}');
@@ -93,7 +143,7 @@ final class NetworksTest extends GeneratedTestCase
 
     public function testRetrieveGraph(): void
     {
-        $this->queueJson(200, '{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z","stats":{"key":"value"},"fraud_tags":[{"key":"value"}],"risk_signals":{"key":"value"},"reviewed_at":"2026-01-15T10:30:00Z","reviewed_by":"reviewed_by-value","review_reason":"review_reason-value"},"depth":1,"truncated":true,"nodes":[{"id":"id-value","kind":"vendor_user"}],"edges":[{"id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","source":"source-value","target":"target-value","subject_kind":"vendor_user","signal_type":"ip_address","confidence":1.5,"observation_count":1,"first_seen_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}],"metrics":{"node_count":1,"edge_count":1,"hub_signal_count":1}}');
+        $this->queueJson(200, '{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z","stats":{"key":"value"},"fraud_tags":[{"key":"value"}],"risk_signals":{"key":"value"},"reviewed_at":"2026-01-15T10:30:00Z","reviewed_by":"reviewed_by-value","review_reason":"review_reason-value"},"depth":1,"truncated":true,"nodes":[{"id":"id-value","kind":"vendor_user","wallet":{"asset":"asset-value","network":"tron","account_count":1,"payout_count":1,"paid_out":{"amount":"amount-value","currency":"currency-value"},"first_payout_at":"2026-01-15T10:30:00Z","last_payout_at":"2026-01-15T10:30:00Z"}}],"edges":[{"id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","source":"source-value","target":"target-value","subject_kind":"vendor_user","signal_type":"ip_address","confidence":1.5,"observation_count":1,"first_seen_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}],"metrics":{"node_count":1,"edge_count":1,"hub_signal_count":1}}');
 
         $result = $this->client->networks->retrieveGraph('networkUuid-1', [
             'depth' => '1',
@@ -113,7 +163,7 @@ final class NetworksTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z","stats":{"key":"value"},"fraud_tags":[{"key":"value"}],"risk_signals":{"key":"value"},"reviewed_at":"2026-01-15T10:30:00Z","reviewed_by":"reviewed_by-value","review_reason":"review_reason-value"},"depth":1,"truncated":true,"nodes":[{"id":"id-value","kind":"vendor_user"}],"edges":[{"id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","source":"source-value","target":"target-value","subject_kind":"vendor_user","signal_type":"ip_address","confidence":1.5,"observation_count":1,"first_seen_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}],"metrics":{"node_count":1,"edge_count":1,"hub_signal_count":1}}'), $result->toArray());
+        self::assertSame($this->decoded('{"network":{"uuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","network_id":"network_id-value","name":"name-value","status":"active","risk":{"score":1,"band":"low","bar":1.5},"pattern_types":["exact_same_device"],"signal_types":["ip_address"],"member_counts":{"key":"value"},"member_status":{"key":"value"},"signal_coverage":{"key":"value"},"first_activity_at":"2026-01-15T10:30:00Z","last_activity_at":"2026-01-15T10:30:00Z","stats":{"key":"value"},"fraud_tags":[{"key":"value"}],"risk_signals":{"key":"value"},"reviewed_at":"2026-01-15T10:30:00Z","reviewed_by":"reviewed_by-value","review_reason":"review_reason-value"},"depth":1,"truncated":true,"nodes":[{"id":"id-value","kind":"vendor_user","wallet":{"asset":"asset-value","network":"tron","account_count":1,"payout_count":1,"paid_out":{"amount":"amount-value","currency":"currency-value"},"first_payout_at":"2026-01-15T10:30:00Z","last_payout_at":"2026-01-15T10:30:00Z"}}],"edges":[{"id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","source":"source-value","target":"target-value","subject_kind":"vendor_user","signal_type":"ip_address","confidence":1.5,"observation_count":1,"first_seen_at":"2026-01-15T10:30:00Z","last_seen_at":"2026-01-15T10:30:00Z"}],"metrics":{"node_count":1,"edge_count":1,"hub_signal_count":1}}'), $result->toArray());
         self::assertSame(1, $result->depth);
     }
 

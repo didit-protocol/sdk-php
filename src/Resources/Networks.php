@@ -20,6 +20,7 @@ use Didit\Types;
 /**
  * The `networks` resource.
  *
+ * @phpstan-import-type NetworkSignalSearchRequest from Params
  * @phpstan-import-type NetworkTagRequest from Params
  * @phpstan-import-type NetworksDownloadReportParams from Params
  * @phpstan-import-type NetworksListParams from Params
@@ -62,6 +63,35 @@ final class Networks extends BaseResource
             applicationScope: true,
             query: ['status' => 'status', 'scope' => 'scope', 'signal_type' => 'signal_type', 'pattern_type' => 'pattern_type', 'risk_band' => 'risk_band', 'min_size' => 'min_size', 'max_size' => 'max_size', 'assignee' => 'assignee', 'priority' => 'priority', 'risk_min' => 'risk_min', 'has_case' => 'has_case', 'date_from' => 'date_from', 'date_to' => 'date_to', 'q' => 'q', 'ordering' => 'ordering', 'limit' => 'limit', 'offset' => 'offset', 'summary' => 'summary'],
         ), [], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\NetworkListItem::class));
+    }
+
+    /**
+     * Search signals.
+     *
+     * Check one value against every network of your organization before you open an investigation. Choose
+     * a `signal_type` and send its value: an address, a phone number, an email, a device fingerprint, a
+     * document number with its issuing state and type, or a face image. A `wallet_address` search takes
+     * the address and optionally its destination tag or memo in `tag`, and answers with the `wallet`
+     * object: accounts, payouts, the amount paid out and the payout dates. A wallet many accounts use is a
+     * shared service: it answers `match_count: 0` and no matches, with `is_shared_service: true`.
+     *
+     * `POST /v3/organization/{organization_id}/application/{application_id}/networks/signals/search/`
+     *
+     * @param NetworkSignalSearchRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function searchSignals(array $params, ?RequestOptions $options = null): Types\NetworkSignalSearchResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/organization/{organization_id}/application/{application_id}/networks/signals/search/',
+            applicationScope: true,
+            bodyTypes: ['json', 'multipart'],
+        ), [], $params, $options);
+
+        return Types\NetworkSignalSearchResponse::fromResponse($response);
     }
 
     /**

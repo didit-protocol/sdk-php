@@ -1544,6 +1544,15 @@ namespace Didit;
  *     occurred_to?: \DateTimeInterface|string,
  *     search?: string,
  * }
+ * @phpstan-type NetworkSignalSearchRequest array{
+ *     signal_type: string,
+ *     value?: string,
+ *     image?: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
+ *     issuing_state?: string,
+ *     document_type?: string,
+ *     region?: string,
+ *     tag?: string,
+ * }
  * @phpstan-type NetworkTagRequest array{
  *     tag_uuid: string,
  * }
@@ -2882,6 +2891,10 @@ namespace Didit;
  * @phpstan-type UsersListParams array{
  *     limit?: int,
  *     offset?: int,
+ *     lookup?: string,
+ * }
+ * @phpstan-type UsersLookupRequest array{
+ *     identifiers: list<string>,
  * }
  * @phpstan-type UsersSetAmlMonitoringParams array{
  *     is_enabled: bool,

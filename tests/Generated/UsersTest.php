@@ -23,6 +23,7 @@ final class UsersTest extends GeneratedTestCase
         $result = $this->client->users->list([
             'limit' => 1,
             'offset' => 1,
+            'lookup' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
         ]);
 
         $request = $this->lastRequest();
@@ -32,6 +33,7 @@ final class UsersTest extends GeneratedTestCase
         self::assertSame([
             'limit' => '1',
             'offset' => '1',
+            'lookup' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
         ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
@@ -39,6 +41,47 @@ final class UsersTest extends GeneratedTestCase
         self::assertContainsOnlyInstancesOf(Types\UserListItem::class, $result->results);
         self::assertFalse($result->hasNextPage());
         self::assertSame($this->decoded('{"count":2,"next":null,"previous":null,"results":[{"didit_internal_id":"f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418","vendor_data":"user-abc-123","display_name":null,"full_name":"John Michael Doe","date_of_birth":"1990-05-15","effective_name":"John Michael Doe","status":"ACTIVE","portrait_image_url":"https://<media-host>/...","session_count":3,"approved_count":2,"declined_count":0,"in_review_count":1,"issuing_states":["USA"],"approved_emails":["john@example.com"],"approved_phones":["+14155551234"],"features":{"ID_VERIFICATION":"Approved","LIVENESS":"Approved","FACE_MATCH":"Approved","AML":"Approved"},"features_list":[{"feature":"ID_VERIFICATION","status":"Approved"},{"feature":"LIVENESS","status":"Approved"},{"feature":"FACE_MATCH","status":"Approved"},{"feature":"AML","status":"Approved"}],"last_session_at":"2025-06-15T10:30:00Z","last_activity_at":"2025-06-15T10:30:00Z","first_session_at":"2025-06-01T08:00:00Z","tags":[{"uuid":"9a8b7c6d-5e4f-4a3b-8c2d-1e0f9a8b7c6d","name":"VIP","color":"#2567FF"}],"created_at":"2025-06-01T08:00:00Z"},{"didit_internal_id":"6ed99d53-e8f5-4cf8-9ac1-4a506cb40f6b","vendor_data":null,"display_name":"Jane S.","full_name":"Jane Elizabeth Smith","date_of_birth":"1985-11-22","effective_name":"Jane S.","status":"FLAGGED","portrait_image_url":null,"session_count":1,"approved_count":0,"declined_count":0,"in_review_count":1,"issuing_states":[],"approved_emails":[],"approved_phones":[],"features":{"ID_VERIFICATION":"In Review"},"features_list":[{"feature":"ID_VERIFICATION","status":"In Review"}],"last_session_at":"2025-06-20T14:00:00Z","last_activity_at":"2025-06-20T14:05:00Z","first_session_at":"2025-06-20T14:00:00Z","tags":[],"created_at":"2025-06-20T14:00:00Z"}]}'), $result->toArray());
+    }
+
+    public function testLookup(): void
+    {
+        $this->queueJson(201, '{"lookup_id":"b3a6f0c2-6a2e-4c0a-9d0e-5f3c1d2a7e11","requested":4,"found":3,"not_found":[{"identifier":"usr_7001","position":4}],"expires_at":"2026-11-19T10:30:00Z"}');
+
+        $result = $this->client->users->lookup([
+            'identifiers' => [
+                'identifiers-value',
+            ],
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/users/lookup/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"identifiers":["identifiers-value"]}', $this->canonicalBody($request));
+        self::assertSame(201, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"lookup_id":"b3a6f0c2-6a2e-4c0a-9d0e-5f3c1d2a7e11","requested":4,"found":3,"not_found":[{"identifier":"usr_7001","position":4}],"expires_at":"2026-11-19T10:30:00Z"}'), $result->toArray());
+        self::assertSame('b3a6f0c2-6a2e-4c0a-9d0e-5f3c1d2a7e11', $result->lookupId);
+    }
+
+    public function testGetLookup(): void
+    {
+        $this->queueJson(200, '{"lookup_id":"b3a6f0c2-6a2e-4c0a-9d0e-5f3c1d2a7e11","requested":4,"found":3,"not_found":[{"identifier":"usr_7001","position":4}],"expires_at":"2026-11-19T10:30:00Z","identifiers":["usr_8842","maria.o@gmail.com","f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418","usr_7001"]}');
+
+        $result = $this->client->users->getLookup('lookupId-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/users/lookup/lookupId-1/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"lookup_id":"b3a6f0c2-6a2e-4c0a-9d0e-5f3c1d2a7e11","requested":4,"found":3,"not_found":[{"identifier":"usr_7001","position":4}],"expires_at":"2026-11-19T10:30:00Z","identifiers":["usr_8842","maria.o@gmail.com","f4e5e1f2-94a9-4f86-8c16-2b7d9b4db418","usr_7001"]}'), $result->toArray());
+        self::assertSame('b3a6f0c2-6a2e-4c0a-9d0e-5f3c1d2a7e11', $result->lookupId);
     }
 
     public function testRetrieve(): void

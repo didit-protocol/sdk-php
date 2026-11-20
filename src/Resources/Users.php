@@ -23,6 +23,7 @@ use Didit\Types;
  * @phpstan-import-type UsersBatchDeleteParams from Params
  * @phpstan-import-type UsersCreateParams from Params
  * @phpstan-import-type UsersListParams from Params
+ * @phpstan-import-type UsersLookupRequest from Params
  * @phpstan-import-type UsersSetAmlMonitoringParams from Params
  * @phpstan-import-type UsersUpdateParams from Params
  * @phpstan-import-type UsersUpdateStatusParams from Params
@@ -35,8 +36,9 @@ final class Users extends BaseResource
      *
      * List [users](/entities/users) Didit assembles from KYC sessions sharing the same `vendor_data`
      * (free-form string, NOT a UUID), plus users created via the API. Paginated, ordered by
-     * `last_session_at` desc. This endpoint does not support filtering or search parameters, fetch pages
-     * and filter client-side.
+     * `last_session_at` desc, or by the position in your list when `lookup` is set. Pass `lookup` to read
+     * only the users a list of identifiers resolved to (see [Look up users](#post-/v3/users/lookup/)). No
+     * other filter or search parameter is supported: fetch pages and filter client-side.
      *
      * `GET /v3/users/`
      *
@@ -52,8 +54,60 @@ final class Users extends BaseResource
         return $this->requester->requestPage(new Operation(
             method: 'GET',
             path: '/v3/users/',
-            query: ['limit' => 'limit', 'offset' => 'offset'],
+            query: ['limit' => 'limit', 'offset' => 'offset', 'lookup' => 'lookup'],
         ), [], $params, $options, static fn (mixed $v) => Hydrate::model($v, Types\UserListItem::class));
+    }
+
+    /**
+     * Look up users.
+     *
+     * Resolve a list of up to 20,000 identifiers to the users of your application, in one call. Each
+     * identifier is matched, in this order, against `vendor_data` (exactly), the Didit user ID (a UUID),
+     * then a verified email (case-insensitive). An email can match several users, and all of them count.
+     * Blank entries are dropped and duplicates removed, keeping the first; 1 to 20,000 identifiers must
+     * remain, and a request sends at most 100,000 entries before that clean-up. The call only reads.
+     *
+     * `POST /v3/users/lookup/`
+     *
+     * @param UsersLookupRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function lookup(array $params, ?RequestOptions $options = null): Types\UsersLookupResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/users/lookup/',
+            bodyTypes: ['json'],
+        ), [], $params, $options);
+
+        return Types\UsersLookupResponse::fromResponse($response);
+    }
+
+    /**
+     * Get a user lookup.
+     *
+     * Read back a lookup made with [Look up users](#post-/v3/users/lookup/): the same counts and
+     * `not_found` list, plus the `identifiers` you submitted after blanks and duplicates were removed, in
+     * order. A lookup lives 24 hours and belongs to the application that made it; an expired, unknown or
+     * other application's `lookup_id` returns `404` with `code: lookup_not_found`.
+     *
+     * `GET /v3/users/lookup/{lookup_id}/`
+     *
+     * @param string $lookupId the `lookup_id` returned by Look up users
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function getLookup(string $lookupId, ?RequestOptions $options = null): Types\UsersLookupDetail
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/users/lookup/{lookup_id}/',
+        ), ['lookup_id' => $lookupId], [], $options);
+
+        return Types\UsersLookupDetail::fromResponse($response);
     }
 
     /**
