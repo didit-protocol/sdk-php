@@ -727,9 +727,9 @@ final class Sessions extends BaseResource
      *
      * List every completed ongoing-monitoring re-screen of a session's AML check, newest first by
      * `completed_at`, including the runs where nothing changed: alerts, activity entries and webhooks fire
-     * only when a result moves, so this history is the evidence that a clean subject was still being
-     * screened. Works for KYC and KYB session IDs; pass `node_id` when the session ran more than one AML
-     * step.
+     * only when a result moves, so this history is the record of the re-screens a clean subject had. The
+     * daily monitoring date is `last_ongoing_screening_at` on the AML report. Works for KYC and KYB
+     * session IDs; pass `node_id` when the session ran more than one AML step.
      *
      * `GET /v3/session/{sessionId}/aml-screening-history/`
      *
