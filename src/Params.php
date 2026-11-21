@@ -1445,6 +1445,22 @@ namespace Didit;
  *     email: string,
  *     password: string,
  * }
+ * @phpstan-type MessagesListParams array{
+ *     limit?: int,
+ *     offset?: int,
+ *     status?: string,
+ *     channel?: string,
+ *     to?: string,
+ *     correlation_id?: string,
+ *     created_after?: \DateTimeInterface|string,
+ *     created_before?: \DateTimeInterface|string,
+ * }
+ * @phpstan-type MessagesListPricesParams array{
+ *     country: string,
+ * }
+ * @phpstan-type MessagesSettings array{
+ *     retention_days: int,
+ * }
  * @phpstan-type MonitoringEventCreateRequest array{
  *     event_id: string,
  *     event_category: string,
