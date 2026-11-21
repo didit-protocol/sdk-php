@@ -9,11 +9,14 @@ namespace Didit\Resources;
 use Didit\Core\BaseResource;
 use Didit\Core\Operation;
 use Didit\Exception\DiditException;
+use Didit\Params;
 use Didit\RequestOptions;
 use Didit\Types;
 
 /**
  * The `pricing` resource.
+ *
+ * @phpstan-import-type PricingPriceBookParams from Params
  */
 final class Pricing extends BaseResource
 {
@@ -38,5 +41,31 @@ final class Pricing extends BaseResource
         ), [], [], $options);
 
         return Types\BankVerificationPricing::fromResponse($response);
+    }
+
+    /**
+     * Get the price book (public, unauthenticated).
+     *
+     * Returns Didit's public list prices: every plan with its monthly and yearly price and its discount,
+     * the white label price, Didit's fee on each Messages channel, and every flat usage price. Use it to
+     * quote Didit's prices in your own product or to check a price before you build a workflow.
+     *
+     * `GET /v3/organization/price-book/`
+     *
+     * @param PricingPriceBookParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function priceBook(array $params = [], ?RequestOptions $options = null): Types\PublicPriceBook
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/organization/price-book/',
+            auth: 'none',
+            headers: ['if_none_match' => 'If-None-Match'],
+        ), [], $params, $options);
+
+        return Types\PublicPriceBook::fromResponse($response);
     }
 }

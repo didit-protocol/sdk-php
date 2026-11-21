@@ -1672,6 +1672,9 @@ namespace Didit;
  *     app_version?: string,
  *     user_agent?: string,
  * }
+ * @phpstan-type PricingPriceBookParams array{
+ *     if_none_match?: string,
+ * }
  * @phpstan-type ProofOfAddressVerifyParams array{
  *     document: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
  *     document_password?: string,
