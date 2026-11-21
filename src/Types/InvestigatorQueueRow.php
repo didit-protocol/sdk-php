@@ -65,6 +65,18 @@ final class InvestigatorQueueRow extends BaseModel
     public readonly ?\DateTimeImmutable $preparedAt;
 
     /**
+     * True for one of the organization's free reports: a review run at stage `none`, with no setup, never
+     * charged.
+     */
+    public readonly ?bool $freeReport;
+
+    /**
+     * True for an example report shown on a sandbox application. Example reports are read only and never
+     * cost anything.
+     */
+    public readonly ?bool $example;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -85,5 +97,7 @@ final class InvestigatorQueueRow extends BaseModel
         $this->waitingSince = Hydrate::dateTime($data['waiting_since'] ?? null);
         $this->dueAt = Hydrate::dateTime($data['due_at'] ?? null);
         $this->preparedAt = Hydrate::dateTime($data['prepared_at'] ?? null);
+        $this->freeReport = Hydrate::bool($data['free_report'] ?? null);
+        $this->example = Hydrate::bool($data['example'] ?? null);
     }
 }

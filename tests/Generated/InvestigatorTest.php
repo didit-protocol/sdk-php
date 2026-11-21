@@ -18,7 +18,7 @@ final class InvestigatorTest extends GeneratedTestCase
 {
     public function testRetrieveSummary(): void
     {
-        $this->queueJson(200, '{"stage":"stage-value","last_report_at":"2026-01-15T10:30:00Z","prepared_today":1,"ready_to_accept":1,"open":1,"decided_today":1,"automation_rate_month":1.5,"preparing":1}');
+        $this->queueJson(200, '{"stage":"stage-value","last_report_at":"2026-01-15T10:30:00Z","prepared_today":1,"ready_to_accept":1,"open":1,"decided_today":1,"automation_rate_month":1.5,"preparing":1,"free_reports":{"limit":1,"used":1,"remaining":1}}');
 
         $result = $this->client->investigator->retrieveSummary([
             'scope' => 'all',
@@ -36,13 +36,13 @@ final class InvestigatorTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"stage":"stage-value","last_report_at":"2026-01-15T10:30:00Z","prepared_today":1,"ready_to_accept":1,"open":1,"decided_today":1,"automation_rate_month":1.5,"preparing":1}'), $result->toArray());
+        self::assertSame($this->decoded('{"stage":"stage-value","last_report_at":"2026-01-15T10:30:00Z","prepared_today":1,"ready_to_accept":1,"open":1,"decided_today":1,"automation_rate_month":1.5,"preparing":1,"free_reports":{"limit":1,"used":1,"remaining":1}}'), $result->toArray());
         self::assertSame('stage-value', $result->stage);
     }
 
     public function testListQueue(): void
     {
-        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"run_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"session","queue":"kyc","stage":"shadow","subject":{"key":"value"},"recommendation":"approve","recommendation_detail":"recommendation_detail-value","confidence":"high","summary":"summary-value","sources_count":1,"ready_to_accept":true,"guardrails":"guardrails-value","waiting_since":"2026-01-15T10:30:00Z","due_at":"2026-01-15T10:30:00Z","prepared_at":"2026-01-15T10:30:00Z"}]}');
+        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"run_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"session","queue":"kyc","stage":"none","subject":{"key":"value"},"recommendation":"approve","recommendation_detail":"recommendation_detail-value","confidence":"high","summary":"summary-value","sources_count":1,"ready_to_accept":true,"guardrails":"guardrails-value","waiting_since":"2026-01-15T10:30:00Z","due_at":"2026-01-15T10:30:00Z","prepared_at":"2026-01-15T10:30:00Z","free_report":true,"example":true}]}');
 
         $result = $this->client->investigator->listQueue([
             'scope' => 'all',
@@ -76,12 +76,12 @@ final class InvestigatorTest extends GeneratedTestCase
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\InvestigatorQueueRow::class, $result->results);
         self::assertFalse($result->hasNextPage());
-        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"run_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"session","queue":"kyc","stage":"shadow","subject":{"key":"value"},"recommendation":"approve","recommendation_detail":"recommendation_detail-value","confidence":"high","summary":"summary-value","sources_count":1,"ready_to_accept":true,"guardrails":"guardrails-value","waiting_since":"2026-01-15T10:30:00Z","due_at":"2026-01-15T10:30:00Z","prepared_at":"2026-01-15T10:30:00Z"}]}'), $result->toArray());
+        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"run_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"session","queue":"kyc","stage":"none","subject":{"key":"value"},"recommendation":"approve","recommendation_detail":"recommendation_detail-value","confidence":"high","summary":"summary-value","sources_count":1,"ready_to_accept":true,"guardrails":"guardrails-value","waiting_since":"2026-01-15T10:30:00Z","due_at":"2026-01-15T10:30:00Z","prepared_at":"2026-01-15T10:30:00Z","free_report":true,"example":true}]}'), $result->toArray());
     }
 
     public function testRetrieveRun(): void
     {
-        $this->queueJson(200, '{"run_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"session","queue":"kyc","stage":"shadow","subject":{"key":"value"},"recommendation":"approve","recommendation_detail":"recommendation_detail-value","confidence":"high","summary":"summary-value","sources_count":1,"ready_to_accept":true,"guardrails":"guardrails-value","waiting_since":"2026-01-15T10:30:00Z","due_at":"2026-01-15T10:30:00Z","prepared_at":"2026-01-15T10:30:00Z","status":"status-value","is_open":true,"lookups":1,"duration_ms":1,"agent_version":"agent_version-value","prepared_before_opened":true,"report":{"key":"value"},"trail":"trail-value","decision":{"outcome":"accepted","action":"approve","actor_email":"actor_email-value","actor_name":"actor_name-value","override_category":"missing_context","override_reason":"override_reason-value","final_status":"final_status-value","agreed":true,"decided_at":"2026-01-15T10:30:00Z","billed":true,"decided_by":"investigator","original_outcome":{"action":"action-value","final_status":"final_status-value","decided_at":"2026-01-15T10:30:00Z"},"overrides":[{"action":"action-value","actor_email":"actor_email-value","actor_name":"actor_name-value","override_category":"override_category-value","override_reason":"override_reason-value","previous_status":"previous_status-value","final_status":"final_status-value","agreed":true,"overridden_at":"2026-01-15T10:30:00Z"}]},"autonomy":{"key":"value"}}');
+        $this->queueJson(200, '{"run_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"session","queue":"kyc","stage":"none","subject":{"key":"value"},"recommendation":"approve","recommendation_detail":"recommendation_detail-value","confidence":"high","summary":"summary-value","sources_count":1,"ready_to_accept":true,"guardrails":"guardrails-value","waiting_since":"2026-01-15T10:30:00Z","due_at":"2026-01-15T10:30:00Z","prepared_at":"2026-01-15T10:30:00Z","free_report":true,"example":true,"status":"status-value","is_open":true,"lookups":1,"duration_ms":1,"agent_version":"agent_version-value","prepared_before_opened":true,"report":{"key":"value"},"trail":"trail-value","decision":{"outcome":"accepted","action":"approve","actor_email":"actor_email-value","actor_name":"actor_name-value","override_category":"missing_context","override_reason":"override_reason-value","final_status":"final_status-value","agreed":true,"decided_at":"2026-01-15T10:30:00Z","billed":true,"decided_by":"investigator","original_outcome":{"action":"action-value","final_status":"final_status-value","decided_at":"2026-01-15T10:30:00Z"},"overrides":[{"action":"action-value","actor_email":"actor_email-value","actor_name":"actor_name-value","override_category":"override_category-value","override_reason":"override_reason-value","previous_status":"previous_status-value","final_status":"final_status-value","agreed":true,"overridden_at":"2026-01-15T10:30:00Z"}]},"autonomy":{"key":"value"}}');
 
         $result = $this->client->investigator->retrieveRun('runId-1');
 
@@ -93,7 +93,7 @@ final class InvestigatorTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"run_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"session","queue":"kyc","stage":"shadow","subject":{"key":"value"},"recommendation":"approve","recommendation_detail":"recommendation_detail-value","confidence":"high","summary":"summary-value","sources_count":1,"ready_to_accept":true,"guardrails":"guardrails-value","waiting_since":"2026-01-15T10:30:00Z","due_at":"2026-01-15T10:30:00Z","prepared_at":"2026-01-15T10:30:00Z","status":"status-value","is_open":true,"lookups":1,"duration_ms":1,"agent_version":"agent_version-value","prepared_before_opened":true,"report":{"key":"value"},"trail":"trail-value","decision":{"outcome":"accepted","action":"approve","actor_email":"actor_email-value","actor_name":"actor_name-value","override_category":"missing_context","override_reason":"override_reason-value","final_status":"final_status-value","agreed":true,"decided_at":"2026-01-15T10:30:00Z","billed":true,"decided_by":"investigator","original_outcome":{"action":"action-value","final_status":"final_status-value","decided_at":"2026-01-15T10:30:00Z"},"overrides":[{"action":"action-value","actor_email":"actor_email-value","actor_name":"actor_name-value","override_category":"override_category-value","override_reason":"override_reason-value","previous_status":"previous_status-value","final_status":"final_status-value","agreed":true,"overridden_at":"2026-01-15T10:30:00Z"}]},"autonomy":{"key":"value"}}'), $result->toArray());
+        self::assertSame($this->decoded('{"run_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","kind":"session","queue":"kyc","stage":"none","subject":{"key":"value"},"recommendation":"approve","recommendation_detail":"recommendation_detail-value","confidence":"high","summary":"summary-value","sources_count":1,"ready_to_accept":true,"guardrails":"guardrails-value","waiting_since":"2026-01-15T10:30:00Z","due_at":"2026-01-15T10:30:00Z","prepared_at":"2026-01-15T10:30:00Z","free_report":true,"example":true,"status":"status-value","is_open":true,"lookups":1,"duration_ms":1,"agent_version":"agent_version-value","prepared_before_opened":true,"report":{"key":"value"},"trail":"trail-value","decision":{"outcome":"accepted","action":"approve","actor_email":"actor_email-value","actor_name":"actor_name-value","override_category":"missing_context","override_reason":"override_reason-value","final_status":"final_status-value","agreed":true,"decided_at":"2026-01-15T10:30:00Z","billed":true,"decided_by":"investigator","original_outcome":{"action":"action-value","final_status":"final_status-value","decided_at":"2026-01-15T10:30:00Z"},"overrides":[{"action":"action-value","actor_email":"actor_email-value","actor_name":"actor_name-value","override_category":"override_category-value","override_reason":"override_reason-value","previous_status":"previous_status-value","final_status":"final_status-value","agreed":true,"overridden_at":"2026-01-15T10:30:00Z"}]},"autonomy":{"key":"value"}}'), $result->toArray());
         self::assertSame('3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f', $result->runId);
     }
 
@@ -353,5 +353,23 @@ final class InvestigatorTest extends GeneratedTestCase
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"stage":"none","stage_changed_at":"2026-01-15T10:30:00Z","stage_changed_by":"stage_changed_by-value","monthly_spend_limit":"10.50","spend_limit":{"enabled":true,"limit":"10.50","spent":"10.50","reviews":1,"reserved":"10.50","currency":"currency-value","paused":true}}'), $result->toArray());
         self::assertSame('none', $result->stage);
+    }
+
+    public function testRetrieveOffer(): void
+    {
+        $this->queueJson(200, '{"show":true,"manual_decisions_30d":1,"avg_handling_seconds":1,"stopped_halfway_30d":1,"stage":"none","followups_on":true}');
+
+        $result = $this->client->investigator->retrieveOffer();
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/investigator/offer/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"show":true,"manual_decisions_30d":1,"avg_handling_seconds":1,"stopped_halfway_30d":1,"stage":"none","followups_on":true}'), $result->toArray());
+        self::assertTrue($result->show);
     }
 }

@@ -102,6 +102,12 @@ namespace Didit;
  *     date_to?: string,
  *     notify_on_ready?: bool,
  * }
+ * @phpstan-type AuthenticationSetupGetBrandingParams array{
+ *     language?: string,
+ * }
+ * @phpstan-type AuthenticationSetupGetEmailsParams array{
+ *     language?: string,
+ * }
  * @phpstan-type BankAccountCheckHolder array{
  *     full_name?: string,
  *     business_name?: string,
@@ -2212,6 +2218,91 @@ namespace Didit;
  *     document_passwords?: list<string>,
  *     document_group?: string,
  *     locale?: string,
+ * }
+ * @phpstan-type SetupAndroidApp array{
+ *     package_name: string,
+ *     sha256_cert_fingerprints: list<string>,
+ * }
+ * @phpstan-type SetupBrandingTexts array{
+ *     sign_in_title?: string,
+ *     subtitle?: string,
+ *     sign_up_title?: string,
+ * }
+ * @phpstan-type SetupBrandingUpdate array{
+ *     texts?: array<string, SetupBrandingTexts>,
+ *     terms_url?: string,
+ *     privacy_url?: string,
+ * }
+ * @phpstan-type SetupConfigurationUpdate array{
+ *     redirect_uris?: list<string>,
+ *     allowed_origins?: list<string>,
+ *     post_logout_redirect_uri?: string,
+ *     session_lifetime?: int,
+ *     idle_timeout?: int,
+ *     multiple_sessions?: bool,
+ *     password_min_length?: int,
+ *     revoke_on_password_change?: bool,
+ *     allow_subaddresses?: bool,
+ *     signup_policy?: string,
+ *     allowed_email_domains?: list<string>,
+ * }
+ * @phpstan-type SetupDomainRequest array{
+ *     domain: string,
+ * }
+ * @phpstan-type SetupMethodUpdate array{
+ *     enabled: bool,
+ *     credentials?: SetupProviderCredentials,
+ *     credential_source?: string,
+ *     workflow_id?: string,
+ * }
+ * @phpstan-type SetupNativeAppsUpdate array{
+ *     ios_app_ids: list<string>,
+ *     android_apps: list<SetupAndroidApp>,
+ * }
+ * @phpstan-type SetupOnboardingUpdate array{
+ *     test_skipped?: bool,
+ *     import_skipped?: bool,
+ *     sign_in_ui?: string,
+ * }
+ * @phpstan-type SetupProtectionUpdate array{
+ *     enabled?: bool,
+ *     breached_password_check?: bool,
+ *     policies?: array<string, string>,
+ * }
+ * @phpstan-type SetupProviderCredentials array{
+ *     client_id: string,
+ *     client_secret: string,
+ * }
+ * @phpstan-type SetupSettingsUpdate array{
+ *     sign_in_ui?: string,
+ *     agent_humans_only?: bool,
+ *     agents_enabled?: bool,
+ *     agent_scopes?: list<string>,
+ *     agent_lifetime?: int,
+ *     agent_idle_timeout?: int,
+ *     agent_approval?: string,
+ *     organizations_enabled?: bool,
+ *     mfa_policy?: string,
+ *     default_member_role?: string,
+ *     webhook_events_disabled?: list<string>,
+ * }
+ * @phpstan-type SetupVerifiedUpdate array{
+ *     signup_level?: string,
+ *     rules?: list<SetupVerifiedUpdateRules>,
+ *     claims?: list<string>,
+ *     workflows?: SetupVerifiedUpdateWorkflows,
+ * }
+ * @phpstan-type SetupVerifiedUpdateRules array{
+ *     rule: string,
+ *     enabled?: bool,
+ *     method?: string,
+ *     threshold?: string,
+ *     currency?: string,
+ * }
+ * @phpstan-type SetupVerifiedUpdateWorkflows array{
+ *     liveness?: string|null,
+ *     selfie?: string|null,
+ *     full_id?: string|null,
  * }
  * @phpstan-type SignatureField array{
  *     key: string,
