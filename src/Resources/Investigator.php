@@ -383,4 +383,27 @@ final class Investigator extends BaseResource
 
         return Types\InvestigatorSettings::fromResponse($response);
     }
+
+    /**
+     * Investigator agent offer.
+     *
+     * Whether to offer the Investigator agent to this application: its decisions taken by hand in the last
+     * 30 days, the average handling time, the people who stopped halfway and whether follow-ups are on.
+     * Read from the daily analytics, never from a scan of sessions. `show` is true when 20 or more
+     * decisions were taken by hand and the agent is not set up, or when follow-ups are off and 50 or more
+     * people stopped halfway.
+     *
+     * `GET /v3/investigator/offer/`
+     *
+     * @throws DiditException
+     */
+    public function retrieveOffer(?RequestOptions $options = null): Types\InvestigatorRetrieveOfferResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/investigator/offer/',
+        ), [], [], $options);
+
+        return Types\InvestigatorRetrieveOfferResponse::fromResponse($response);
+    }
 }

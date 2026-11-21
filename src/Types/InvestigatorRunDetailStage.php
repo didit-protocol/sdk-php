@@ -11,6 +11,8 @@ namespace Didit\Types;
  */
 final class InvestigatorRunDetailStage
 {
+    public const NONE = 'none';
+
     public const SHADOW = 'shadow';
 
     public const LIVE = 'live';

@@ -11,6 +11,8 @@ namespace Didit\Types;
  */
 final class InvestigatorQueueRowStage
 {
+    public const NONE = 'none';
+
     public const SHADOW = 'shadow';
 
     public const LIVE = 'live';

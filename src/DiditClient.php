@@ -108,6 +108,8 @@ final class DiditClient extends BaseClient
 
     public readonly Resources\Account $account;
 
+    public readonly Resources\AuthenticationSetup $authenticationSetup;
+
     protected function initResources(): void
     {
         $this->email = new Resources\Email($this->requester);
@@ -154,5 +156,6 @@ final class DiditClient extends BaseClient
         $this->sandbox = new Resources\Sandbox($this->requester);
         $this->reports = new Resources\Reports($this->requester);
         $this->account = new Resources\Account($this->requester);
+        $this->authenticationSetup = new Resources\AuthenticationSetup($this->requester);
     }
 }

@@ -14,7 +14,10 @@ use Didit\Core\Hydrate;
  */
 final class InvestigatorRetrieveSummaryResponse extends BaseModel
 {
-    /** The `stage` field. */
+    /**
+     * `none` (not set up; free reports still run while `free_reports.remaining` is above 0), `shadow` or
+     * `live`.
+     */
     public readonly ?string $stage;
 
     /** The `last_report_at` field. */
@@ -39,6 +42,12 @@ final class InvestigatorRetrieveSummaryResponse extends BaseModel
     public readonly ?int $preparing;
 
     /**
+     * The organization's free reports: the first reports run with no setup, on any plan, and are never
+     * charged.
+     */
+    public readonly ?InvestigatorRetrieveSummaryResponseFreeReports $freeReports;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -52,5 +61,6 @@ final class InvestigatorRetrieveSummaryResponse extends BaseModel
         $this->decidedToday = Hydrate::int($data['decided_today'] ?? null);
         $this->automationRateMonth = Hydrate::float($data['automation_rate_month'] ?? null);
         $this->preparing = Hydrate::int($data['preparing'] ?? null);
+        $this->freeReports = Hydrate::model($data['free_reports'] ?? null, InvestigatorRetrieveSummaryResponseFreeReports::class);
     }
 }
