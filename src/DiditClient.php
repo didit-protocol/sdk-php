@@ -106,6 +106,8 @@ final class DiditClient extends BaseClient
 
     public readonly Resources\Reports $reports;
 
+    public readonly Resources\Messages $messages;
+
     public readonly Resources\Account $account;
 
     public readonly Resources\AuthenticationSetup $authenticationSetup;
@@ -155,6 +157,7 @@ final class DiditClient extends BaseClient
         $this->addressValidation = new Resources\AddressValidation($this->requester);
         $this->sandbox = new Resources\Sandbox($this->requester);
         $this->reports = new Resources\Reports($this->requester);
+        $this->messages = new Resources\Messages($this->requester);
         $this->account = new Resources\Account($this->requester);
         $this->authenticationSetup = new Resources\AuthenticationSetup($this->requester);
     }
