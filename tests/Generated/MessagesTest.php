@@ -57,7 +57,26 @@ final class MessagesTest extends GeneratedTestCase
     {
         $this->queueJson(201, '{"id":"6f1c2a9e-4b7d-4d8e-9a51-2f0f7e3c1b55","status":"sent","to":"+447700900123","channel":"sms","channels":["sms"],"body":"Your order 1042 ships today.","subject":null,"template_id":null,"locale":"en","correlation_id":"order-1042","segments":1,"encoding":"GSM-7","price":{"amount":"0.0512","currency":"USD","carrier":"0.0372","fee":"0.0140","final":false},"error":null,"schedule_at":null,"expires_at":null,"created_at":"2026-11-20T10:00:00Z","sent_at":"2026-11-20T10:00:02Z","delivered_at":null,"read_at":null,"failed_at":null,"attempts":[{"id":"0b9e5c2d-1f3a-4e8b-9c7d-2a6f4e1b77a1","channel":"sms","to":"+447700900123","status":"sent","error":null,"price":{"amount":"0.0512","currency":"USD","carrier":"0.0372","fee":"0.0140","final":false},"segments":1,"encoding":"GSM-7","created_at":"2026-11-20T10:00:00Z","sent_at":"2026-11-20T10:00:02Z","delivered_at":null,"read_at":null,"failed_at":null}],"is_sandbox":false}');
 
-        $result = $this->client->messages->send();
+        $result = $this->client->messages->send([
+            'to' => 'to-value',
+            'to_email' => 'user@example.com',
+            'channels' => [
+                'sms',
+            ],
+            'body' => 'body-value',
+            'template_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
+            'variables' => [
+                'key' => 'variables-value',
+            ],
+            'locale' => 'locale-value',
+            'subject' => 'subject-value',
+            'schedule_at' => '2026-01-15T10:30:00+00:00',
+            'expires_at' => '2026-01-15T10:30:00+00:00',
+            'correlation_id' => 'correlation_id-value',
+            'options' => [
+                'append_opt_out_line' => true,
+            ],
+        ]);
 
         $request = $this->lastRequest();
         self::assertSame('POST', $request->getMethod());
@@ -66,7 +85,7 @@ final class MessagesTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{}', $this->canonicalBody($request));
+        self::assertSame('{"to":"to-value","to_email":"user@example.com","channels":["sms"],"body":"body-value","template_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","variables":{"key":"variables-value"},"locale":"locale-value","subject":"subject-value","schedule_at":"2026-01-15T10:30:00+00:00","expires_at":"2026-01-15T10:30:00+00:00","correlation_id":"correlation_id-value","options":{"append_opt_out_line":true}}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"id":"6f1c2a9e-4b7d-4d8e-9a51-2f0f7e3c1b55","status":"sent","to":"+447700900123","channel":"sms","channels":["sms"],"body":"Your order 1042 ships today.","subject":null,"template_id":null,"locale":"en","correlation_id":"order-1042","segments":1,"encoding":"GSM-7","price":{"amount":"0.0512","currency":"USD","carrier":"0.0372","fee":"0.0140","final":false},"error":null,"schedule_at":null,"expires_at":null,"created_at":"2026-11-20T10:00:00Z","sent_at":"2026-11-20T10:00:02Z","delivered_at":null,"read_at":null,"failed_at":null,"attempts":[{"id":"0b9e5c2d-1f3a-4e8b-9c7d-2a6f4e1b77a1","channel":"sms","to":"+447700900123","status":"sent","error":null,"price":{"amount":"0.0512","currency":"USD","carrier":"0.0372","fee":"0.0140","final":false},"segments":1,"encoding":"GSM-7","created_at":"2026-11-20T10:00:00Z","sent_at":"2026-11-20T10:00:02Z","delivered_at":null,"read_at":null,"failed_at":null}],"is_sandbox":false}'), $result->toArray());
         self::assertSame('6f1c2a9e-4b7d-4d8e-9a51-2f0f7e3c1b55', $result->id);
