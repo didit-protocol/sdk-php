@@ -78,8 +78,6 @@ final class WebhookEvent
 
     public const INVESTIGATOR_EXTERNAL_REPORT_READY = 'investigator.external.report.ready';
 
-    public const MESSAGE_STATUS_UPDATED = 'message.status.updated';
-
     private function __construct()
     {
     }
