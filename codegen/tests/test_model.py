@@ -149,13 +149,7 @@ class MultiContentOneOfBodyTest(unittest.TestCase):
 
 
 class PropertiesAndOneOfBodyTest(unittest.TestCase):
-    """A body that lists its own ``properties`` and adds a top-level ``oneOf`` keeps them.
-
-    ``POST /v3/messages/`` sends an inline object whose ``properties`` hold every field and whose
-    ``oneOf`` adds two ``required`` branches, ``body`` or ``template_id`` (exactly one). That is a
-    constraint on one object, not a choice between two object shapes, so the operation keeps the
-    body and every field in it.
-    """
+    """The Messages request shape, with an extra field required in every branch."""
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -218,6 +212,7 @@ class PropertiesAndOneOfBodyTest(unittest.TestCase):
         self.assertIn("public function send(array $params, ?RequestOptions $options = null): Types\\MessagesSendResponse", source)
         self.assertIn("bodyTypes: ['json'],", source)
         params = php.emit_params(list(self.reg.shapes.values()), [])
+        self.assertIn("}|array{", params)
         text, template = params.split("}|array{")
         self.assertIn("body: string,", text)
         self.assertIn("template_id?: never,", text)
