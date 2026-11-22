@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Didit\Tests\Generated;
 
 use Didit\Tests\Support\GeneratedTestCase;
+use Didit\Types;
 
 /**
  * Generated tests for the `bank` resource.
@@ -54,5 +55,463 @@ final class BankTest extends GeneratedTestCase
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"c2f4a9e0-7b1d-4c3a-9e55-1d0a6b8f2a47","result":"close_match","holder_name":"MARIA R OLIVEIRA","name_match_score":83,"account":"****0001","vendor_data":"payout_20481","created_at":"2026-10-21T14:32:08Z"}'), $result->toArray());
         self::assertSame('c2f4a9e0-7b1d-4c3a-9e55-1d0a6b8f2a47', $result->requestId);
+    }
+
+    public function testCreateLink(): void
+    {
+        $this->queueJson(201, '{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/blu_7Xq2k9Lm3Vd8Rt5Yw1Ns6Ph4Zc0Bj","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":null,"check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}');
+
+        $result = $this->client->bank->createLink([
+            'mode' => 'connect',
+            'connection_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
+            'access' => 'one_time',
+            'country' => 'country-value',
+            'institution_id' => 'institution_id-value',
+            'segment' => 'personal',
+            'data' => [
+                'accounts',
+            ],
+            'history_days' => 1,
+            'history_from' => '2026-01-15',
+            'extended_history' => 'standard',
+            'consent_days' => 1,
+            'ownership' => [
+                'compare' => 'none',
+                'match' => 'any_holder',
+                'reference_identity' => [],
+                'session_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
+                'business' => [
+                    'legal_name' => 'legal_name-value',
+                ],
+                'business_session_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
+            ],
+            'end_user' => [
+                'reference' => 'reference-value',
+                'email' => 'user@example.com',
+            ],
+            'redirect_url' => 'https://example.com/callback',
+            'allowed_origins' => [
+                'https://example.com/callback',
+            ],
+            'language' => 'language-value',
+            'vendor_data' => 'vendor_data-value',
+            'expires_in' => 1,
+            'duplicates' => 'reuse',
+            'allow_one_time_fallback' => true,
+            'accept_reduced_grant' => true,
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/links/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"mode":"connect","connection_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","access":"one_time","country":"country-value","institution_id":"institution_id-value","segment":"personal","data":["accounts"],"history_days":1,"history_from":"2026-01-15","extended_history":"standard","consent_days":1,"ownership":{"compare":"none","match":"any_holder","reference_identity":{},"session_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","business":{"legal_name":"legal_name-value"},"business_session_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"},"end_user":{"reference":"reference-value","email":"user@example.com"},"redirect_url":"https://example.com/callback","allowed_origins":["https://example.com/callback"],"language":"language-value","vendor_data":"vendor_data-value","expires_in":1,"duplicates":"reuse","allow_one_time_fallback":true,"accept_reduced_grant":true}', $this->canonicalBody($request));
+        self::assertSame(201, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/blu_7Xq2k9Lm3Vd8Rt5Yw1Ns6Ph4Zc0Bj","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":null,"check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}'), $result->toArray());
+        self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $result->id);
+    }
+
+    public function testGetLink(): void
+    {
+        $this->queueJson(200, '{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"completed","url":null,"client_token":null,"expires_at":"2026-11-21T13:00:00Z","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}');
+
+        $result = $this->client->bank->getLink('id-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/links/id-1/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"completed","url":null,"client_token":null,"expires_at":"2026-11-21T13:00:00Z","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}'), $result->toArray());
+        self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $result->id);
+    }
+
+    public function testCancelLink(): void
+    {
+        $this->queueJson(200, '{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"cancelled","url":null,"client_token":null,"expires_at":"2026-11-21T13:00:00Z","connection_id":null,"check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}');
+
+        $result = $this->client->bank->cancelLink('id-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/links/id-1/cancel/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"cancelled","url":null,"client_token":null,"expires_at":"2026-11-21T13:00:00Z","connection_id":null,"check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}'), $result->toArray());
+        self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $result->id);
+    }
+
+    public function testListConnections(): void
+    {
+        $this->queueJson(200, '{"items":[{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","environment":"live","access":"ongoing","status":"active","status_reason":null,"institution":{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png"},"segment":"business","data":["accounts","balances","transactions"],"consent":{"status":"granted","version":1,"granted_at":"2026-11-21T12:04:11Z","expires_at":"2027-05-20T12:04:11Z","days_granted":180,"renewed_count":0,"scopes_requested":["accounts","balances","transactions"],"scopes_granted":["accounts","balances","transactions"],"accounts_granted":["a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"],"renewal_action":"bank_auth","renew_by":"2027-05-20T12:04:11Z","reconfirm_by":null,"renewable_until":null,"retain_until":null,"ended_at":null,"ended_by":null},"sync":{"status":"ok","initial_status":"succeeded","initial_complete":true,"history_complete":true,"last_synced_at":"2026-11-21T12:04:40Z","next_sync_at":"2026-11-22T06:00:00Z","budgets":[{"scope":"connection","resource":"all","limit":4,"remaining":3,"resets_at":"2026-11-22T00:00:00Z"}],"last_error":null,"frequency_per_day":1,"live_syncs_left_today":3},"accounts":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","name":"Cuenta negocio","type":"current","usage":"business","currency":"EUR","iban_last4":"1332","status":"open"},{"id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","name":"Cuenta de ahorro","type":"savings","usage":"business","currency":"EUR","iban_last4":"7708","status":"open"}],"ownership":{"compare":"none","match":null,"check_id":null,"result":null},"end_user":{"reference":"client-7731"},"manage_url":null,"billing":{"unit":"connection_month","price_usd":"0.9000","billed_through":"2026-11-30"},"possible_duplicate_of":null,"erasure":null,"vendor_data":"client-7731","created_at":"2026-11-21T12:03:02Z","updated_at":"2026-11-21T12:04:40Z"}],"next_cursor":null}');
+
+        $result = $this->client->bank->listConnections([
+            'status' => 'pending',
+            'access' => 'one_time',
+            'institution_id' => 'institution_id-value',
+            'country' => 'country-value',
+            'vendor_data' => 'vendor_data-value',
+            'end_user_reference' => 'end_user_reference-value',
+            'consent_expires_before' => '2026-01-15T10:30:00+00:00',
+            'created_after' => '2026-01-15T10:30:00+00:00',
+            'limit' => 1,
+            'cursor' => 'cursor-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/', $request->getUri()->getPath());
+        self::assertSame([
+            'status' => 'pending',
+            'access' => 'one_time',
+            'institution_id' => 'institution_id-value',
+            'country' => 'country-value',
+            'vendor_data' => 'vendor_data-value',
+            'end_user_reference' => 'end_user_reference-value',
+            'consent_expires_before' => '2026-01-15T10:30:00+00:00',
+            'created_after' => '2026-01-15T10:30:00+00:00',
+            'limit' => '1',
+            'cursor' => 'cursor-value',
+        ], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"items":[{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","environment":"live","access":"ongoing","status":"active","status_reason":null,"institution":{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png"},"segment":"business","data":["accounts","balances","transactions"],"consent":{"status":"granted","version":1,"granted_at":"2026-11-21T12:04:11Z","expires_at":"2027-05-20T12:04:11Z","days_granted":180,"renewed_count":0,"scopes_requested":["accounts","balances","transactions"],"scopes_granted":["accounts","balances","transactions"],"accounts_granted":["a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"],"renewal_action":"bank_auth","renew_by":"2027-05-20T12:04:11Z","reconfirm_by":null,"renewable_until":null,"retain_until":null,"ended_at":null,"ended_by":null},"sync":{"status":"ok","initial_status":"succeeded","initial_complete":true,"history_complete":true,"last_synced_at":"2026-11-21T12:04:40Z","next_sync_at":"2026-11-22T06:00:00Z","budgets":[{"scope":"connection","resource":"all","limit":4,"remaining":3,"resets_at":"2026-11-22T00:00:00Z"}],"last_error":null,"frequency_per_day":1,"live_syncs_left_today":3},"accounts":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","name":"Cuenta negocio","type":"current","usage":"business","currency":"EUR","iban_last4":"1332","status":"open"},{"id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","name":"Cuenta de ahorro","type":"savings","usage":"business","currency":"EUR","iban_last4":"7708","status":"open"}],"ownership":{"compare":"none","match":null,"check_id":null,"result":null},"end_user":{"reference":"client-7731"},"manage_url":null,"billing":{"unit":"connection_month","price_usd":"0.9000","billed_through":"2026-11-30"},"possible_duplicate_of":null,"erasure":null,"vendor_data":"client-7731","created_at":"2026-11-21T12:03:02Z","updated_at":"2026-11-21T12:04:40Z"}],"next_cursor":null}'), $result->toArray());
+    }
+
+    public function testGetConnection(): void
+    {
+        $this->queueJson(200, '{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","environment":"live","access":"ongoing","status":"active","status_reason":null,"institution":{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png"},"segment":"business","data":["accounts","balances","transactions"],"consent":{"status":"granted","version":1,"granted_at":"2026-11-21T12:04:11Z","expires_at":"2027-05-20T12:04:11Z","days_granted":180,"renewed_count":0,"scopes_requested":["accounts","balances","transactions"],"scopes_granted":["accounts","balances","transactions"],"accounts_granted":["a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"],"renewal_action":"bank_auth","renew_by":"2027-05-20T12:04:11Z","reconfirm_by":null,"renewable_until":null,"retain_until":null,"ended_at":null,"ended_by":null},"sync":{"status":"ok","initial_status":"succeeded","initial_complete":true,"history_complete":true,"last_synced_at":"2026-11-21T12:04:40Z","next_sync_at":"2026-11-22T06:00:00Z","budgets":[{"scope":"connection","resource":"all","limit":4,"remaining":3,"resets_at":"2026-11-22T00:00:00Z"}],"last_error":null,"frequency_per_day":1,"live_syncs_left_today":3},"accounts":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","name":"Cuenta negocio","type":"current","usage":"business","currency":"EUR","iban_last4":"1332","status":"open"},{"id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","name":"Cuenta de ahorro","type":"savings","usage":"business","currency":"EUR","iban_last4":"7708","status":"open"}],"ownership":{"compare":"none","match":null,"check_id":null,"result":null},"end_user":{"reference":"client-7731"},"manage_url":null,"billing":{"unit":"connection_month","price_usd":"0.9000","billed_through":"2026-11-30"},"possible_duplicate_of":null,"erasure":null,"vendor_data":"client-7731","created_at":"2026-11-21T12:03:02Z","updated_at":"2026-11-21T12:04:40Z"}');
+
+        $result = $this->client->bank->getConnection('id-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/id-1/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","environment":"live","access":"ongoing","status":"active","status_reason":null,"institution":{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png"},"segment":"business","data":["accounts","balances","transactions"],"consent":{"status":"granted","version":1,"granted_at":"2026-11-21T12:04:11Z","expires_at":"2027-05-20T12:04:11Z","days_granted":180,"renewed_count":0,"scopes_requested":["accounts","balances","transactions"],"scopes_granted":["accounts","balances","transactions"],"accounts_granted":["a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"],"renewal_action":"bank_auth","renew_by":"2027-05-20T12:04:11Z","reconfirm_by":null,"renewable_until":null,"retain_until":null,"ended_at":null,"ended_by":null},"sync":{"status":"ok","initial_status":"succeeded","initial_complete":true,"history_complete":true,"last_synced_at":"2026-11-21T12:04:40Z","next_sync_at":"2026-11-22T06:00:00Z","budgets":[{"scope":"connection","resource":"all","limit":4,"remaining":3,"resets_at":"2026-11-22T00:00:00Z"}],"last_error":null,"frequency_per_day":1,"live_syncs_left_today":3},"accounts":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","name":"Cuenta negocio","type":"current","usage":"business","currency":"EUR","iban_last4":"1332","status":"open"},{"id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","name":"Cuenta de ahorro","type":"savings","usage":"business","currency":"EUR","iban_last4":"7708","status":"open"}],"ownership":{"compare":"none","match":null,"check_id":null,"result":null},"end_user":{"reference":"client-7731"},"manage_url":null,"billing":{"unit":"connection_month","price_usd":"0.9000","billed_through":"2026-11-30"},"possible_duplicate_of":null,"erasure":null,"vendor_data":"client-7731","created_at":"2026-11-21T12:03:02Z","updated_at":"2026-11-21T12:04:40Z"}'), $result->toArray());
+        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $result->id);
+    }
+
+    public function testDeleteConnection(): void
+    {
+        $this->queueJson(202, '{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","erasure":{"status":"pending","requested_at":"2026-11-21T15:10:00Z"}}');
+
+        $result = $this->client->bank->deleteConnection('id-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('DELETE', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/id-1/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(202, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","erasure":{"status":"pending","requested_at":"2026-11-21T15:10:00Z"}}'), $result->toArray());
+        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $result->id);
+    }
+
+    public function testRefreshConnection(): void
+    {
+        $this->queueJson(200, '{"id":"d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14","connection_id":"5e1d2a70-6b3c-4f8e-a1d9-0c7b2e4f8a36","trigger":"requested","status":"succeeded","started_at":"2026-11-21T12:30:02Z","finished_at":"2026-11-21T12:30:09Z","results":[{"account_id":"a71f0c2e-4d85-4b1a-9e63-2f8c0d5b7a14","resource":"transactions","outcome":"succeeded","added":3,"modified":0,"removed":1,"error":null}],"outcome":"succeeded","balances_changed":true,"error":null}');
+
+        $result = $this->client->bank->refreshConnection('id-1', [
+            'wait' => true,
+            'prefer' => 'prefer-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/id-1/refresh/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('prefer-value', $request->getHeaderLine('Prefer'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"wait":true}', $this->canonicalBody($request));
+        self::assertInstanceOf(Types\BankSyncCompleted::class, $result);
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14","connection_id":"5e1d2a70-6b3c-4f8e-a1d9-0c7b2e4f8a36","trigger":"requested","status":"succeeded","started_at":"2026-11-21T12:30:02Z","finished_at":"2026-11-21T12:30:09Z","results":[{"account_id":"a71f0c2e-4d85-4b1a-9e63-2f8c0d5b7a14","resource":"transactions","outcome":"succeeded","added":3,"modified":0,"removed":1,"error":null}],"outcome":"succeeded","balances_changed":true,"error":null}'), $result->toArray());
+        self::assertSame('d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14', $result->id);
+    }
+
+    public function testListSyncRuns(): void
+    {
+        $this->queueJson(200, '{"items":[{"id":"d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","trigger":"scheduled","status":"succeeded","started_at":"2026-11-21T06:00:02Z","finished_at":"2026-11-21T06:00:19Z","results":[{"account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","resource":"transactions","outcome":"succeeded","added":3,"modified":0,"removed":1,"error":null},{"account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","resource":"balances","outcome":"succeeded","added":0,"modified":0,"removed":0,"error":null},{"account_id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","resource":"transactions","outcome":"succeeded","added":0,"modified":0,"removed":0,"error":null}],"error":null}],"next_cursor":null}');
+
+        $result = $this->client->bank->listSyncRuns('id-1', [
+            'limit' => 1,
+            'cursor' => 'cursor-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/id-1/sync-runs/', $request->getUri()->getPath());
+        self::assertSame([
+            'limit' => '1',
+            'cursor' => 'cursor-value',
+        ], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"items":[{"id":"d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","trigger":"scheduled","status":"succeeded","started_at":"2026-11-21T06:00:02Z","finished_at":"2026-11-21T06:00:19Z","results":[{"account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","resource":"transactions","outcome":"succeeded","added":3,"modified":0,"removed":1,"error":null},{"account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","resource":"balances","outcome":"succeeded","added":0,"modified":0,"removed":0,"error":null},{"account_id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","resource":"transactions","outcome":"succeeded","added":0,"modified":0,"removed":0,"error":null}],"error":null}],"next_cursor":null}'), $result->toArray());
+    }
+
+    public function testGetSyncRun(): void
+    {
+        $this->queueJson(200, '{"id":"d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","trigger":"scheduled","status":"succeeded","started_at":"2026-11-21T06:00:02Z","finished_at":"2026-11-21T06:00:19Z","results":[{"account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","resource":"transactions","outcome":"succeeded","added":3,"modified":0,"removed":1,"error":null},{"account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","resource":"balances","outcome":"succeeded","added":0,"modified":0,"removed":0,"error":null},{"account_id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","resource":"transactions","outcome":"succeeded","added":0,"modified":0,"removed":0,"error":null}],"error":null}');
+
+        $result = $this->client->bank->getSyncRun('id-1', 'syncId-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/id-1/sync-runs/syncId-1/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","trigger":"scheduled","status":"succeeded","started_at":"2026-11-21T06:00:02Z","finished_at":"2026-11-21T06:00:19Z","results":[{"account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","resource":"transactions","outcome":"succeeded","added":3,"modified":0,"removed":1,"error":null},{"account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","resource":"balances","outcome":"succeeded","added":0,"modified":0,"removed":0,"error":null},{"account_id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","resource":"transactions","outcome":"succeeded","added":0,"modified":0,"removed":0,"error":null}],"error":null}'), $result->toArray());
+        self::assertSame('d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14', $result->id);
+    }
+
+    public function testRenewConnection(): void
+    {
+        $this->queueJson(201, '{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"renew","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/blu_7Xq2k9Lm3Vd8Rt5Yw1Ns6Ph4Zc0Bj","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}');
+
+        $result = $this->client->bank->renewConnection('id-1', [
+            'redirect_url' => 'https://example.com/callback',
+            'allowed_origins' => [
+                'https://example.com/callback',
+            ],
+            'language' => 'language-value',
+            'expires_in' => 1,
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/id-1/renew/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"redirect_url":"https://example.com/callback","allowed_origins":["https://example.com/callback"],"language":"language-value","expires_in":1}', $this->canonicalBody($request));
+        self::assertSame(201, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"renew","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/blu_7Xq2k9Lm3Vd8Rt5Yw1Ns6Ph4Zc0Bj","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}'), $result->toArray());
+        self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $result->id);
+    }
+
+    public function testRevokeConnection(): void
+    {
+        $this->queueJson(200, '{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","environment":"live","access":"ongoing","status":"active","status_reason":null,"institution":{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png"},"segment":"business","data":["accounts","balances","transactions"],"consent":{"status":"revocation_pending","version":1,"granted_at":"2026-11-21T12:04:11Z","expires_at":"2027-05-20T12:04:11Z","days_granted":180,"renewed_count":0,"scopes_requested":["accounts","balances","transactions"],"scopes_granted":["accounts","balances","transactions"],"accounts_granted":["a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"],"renewal_action":"bank_auth","renew_by":"2027-05-20T12:04:11Z","reconfirm_by":null,"renewable_until":"2026-12-21T15:10:00Z","retain_until":"2026-12-21T15:10:00Z","ended_at":"2026-11-21T15:10:00Z","ended_by":"customer"},"sync":{"status":"ok","initial_status":"succeeded","initial_complete":true,"history_complete":true,"last_synced_at":"2026-11-21T12:04:40Z","next_sync_at":"2026-11-22T06:00:00Z","budgets":[{"scope":"connection","resource":"all","limit":4,"remaining":3,"resets_at":"2026-11-22T00:00:00Z"}],"last_error":null,"frequency_per_day":1,"live_syncs_left_today":3},"accounts":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","name":"Cuenta negocio","type":"current","usage":"business","currency":"EUR","iban_last4":"1332","status":"open"},{"id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","name":"Cuenta de ahorro","type":"savings","usage":"business","currency":"EUR","iban_last4":"7708","status":"open"}],"ownership":{"compare":"none","match":null,"check_id":null,"result":null},"end_user":{"reference":"client-7731"},"manage_url":null,"billing":{"unit":"connection_month","price_usd":"0.9000","billed_through":"2026-11-30"},"possible_duplicate_of":null,"erasure":null,"vendor_data":"client-7731","created_at":"2026-11-21T12:03:02Z","updated_at":"2026-11-21T12:04:40Z"}');
+
+        $result = $this->client->bank->revokeConnection('id-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/id-1/revoke/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","environment":"live","access":"ongoing","status":"active","status_reason":null,"institution":{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png"},"segment":"business","data":["accounts","balances","transactions"],"consent":{"status":"revocation_pending","version":1,"granted_at":"2026-11-21T12:04:11Z","expires_at":"2027-05-20T12:04:11Z","days_granted":180,"renewed_count":0,"scopes_requested":["accounts","balances","transactions"],"scopes_granted":["accounts","balances","transactions"],"accounts_granted":["a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"],"renewal_action":"bank_auth","renew_by":"2027-05-20T12:04:11Z","reconfirm_by":null,"renewable_until":"2026-12-21T15:10:00Z","retain_until":"2026-12-21T15:10:00Z","ended_at":"2026-11-21T15:10:00Z","ended_by":"customer"},"sync":{"status":"ok","initial_status":"succeeded","initial_complete":true,"history_complete":true,"last_synced_at":"2026-11-21T12:04:40Z","next_sync_at":"2026-11-22T06:00:00Z","budgets":[{"scope":"connection","resource":"all","limit":4,"remaining":3,"resets_at":"2026-11-22T00:00:00Z"}],"last_error":null,"frequency_per_day":1,"live_syncs_left_today":3},"accounts":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","name":"Cuenta negocio","type":"current","usage":"business","currency":"EUR","iban_last4":"1332","status":"open"},{"id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","name":"Cuenta de ahorro","type":"savings","usage":"business","currency":"EUR","iban_last4":"7708","status":"open"}],"ownership":{"compare":"none","match":null,"check_id":null,"result":null},"end_user":{"reference":"client-7731"},"manage_url":null,"billing":{"unit":"connection_month","price_usd":"0.9000","billed_through":"2026-11-30"},"possible_duplicate_of":null,"erasure":null,"vendor_data":"client-7731","created_at":"2026-11-21T12:03:02Z","updated_at":"2026-11-21T12:04:40Z"}'), $result->toArray());
+        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $result->id);
+    }
+
+    public function testListAccounts(): void
+    {
+        $this->queueJson(200, '{"items":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","name":"Cuenta negocio","product":"Cuenta corriente empresas","type":"current","usage":"business","currency":"EUR","holder_name":"EMPRESA DE EJEMPLO SL","holders":[{"name":"EMPRESA DE EJEMPLO SL","role":"holder"}],"identifiers":{"iban":"ES0000000000000000001332","bic":"XXXXESBBXXX","account_number":null,"sort_code":null,"other":[]},"account_ref":"ar_f3c1a85e9d27b640c8e1","account_ref_previous":null,"status":"open","scopes_granted":["accounts","balances","transactions"],"sync":{"last_synced_at":"2026-11-21T12:04:40Z","status":"ok","history_requested_from":"2025-11-21","history_available_from":"2026-01-02","pending_supported":true},"history_coverage":{"requested_from":"2025-11-21","oldest_booking_date":"2026-01-02","covered_ranges":[{"from":"2026-01-02","to":"2026-11-21"}],"missing_ranges":[{"from":"2025-11-21","to":"2026-01-01"}],"status":"partial","extended_auth_used":false}}],"next_cursor":null}');
+
+        $result = $this->client->bank->listAccounts('id-1', [
+            'limit' => 1,
+            'cursor' => 'cursor-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/id-1/accounts/', $request->getUri()->getPath());
+        self::assertSame([
+            'limit' => '1',
+            'cursor' => 'cursor-value',
+        ], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"items":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","name":"Cuenta negocio","product":"Cuenta corriente empresas","type":"current","usage":"business","currency":"EUR","holder_name":"EMPRESA DE EJEMPLO SL","holders":[{"name":"EMPRESA DE EJEMPLO SL","role":"holder"}],"identifiers":{"iban":"ES0000000000000000001332","bic":"XXXXESBBXXX","account_number":null,"sort_code":null,"other":[]},"account_ref":"ar_f3c1a85e9d27b640c8e1","account_ref_previous":null,"status":"open","scopes_granted":["accounts","balances","transactions"],"sync":{"last_synced_at":"2026-11-21T12:04:40Z","status":"ok","history_requested_from":"2025-11-21","history_available_from":"2026-01-02","pending_supported":true},"history_coverage":{"requested_from":"2025-11-21","oldest_booking_date":"2026-01-02","covered_ranges":[{"from":"2026-01-02","to":"2026-11-21"}],"missing_ranges":[{"from":"2025-11-21","to":"2026-01-01"}],"status":"partial","extended_auth_used":false}}],"next_cursor":null}'), $result->toArray());
+    }
+
+    public function testGetAccount(): void
+    {
+        $this->queueJson(200, '{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","name":"Cuenta negocio","product":"Cuenta corriente empresas","type":"current","usage":"business","currency":"EUR","holder_name":"EMPRESA DE EJEMPLO SL","holders":[{"name":"EMPRESA DE EJEMPLO SL","role":"holder"}],"identifiers":{"iban":"ES0000000000000000001332","bic":"XXXXESBBXXX","account_number":null,"sort_code":null,"other":[]},"account_ref":"ar_f3c1a85e9d27b640c8e1","account_ref_previous":null,"status":"open","scopes_granted":["accounts","balances","transactions"],"sync":{"last_synced_at":"2026-11-21T12:04:40Z","status":"ok","history_requested_from":"2025-11-21","history_available_from":"2026-01-02","pending_supported":true},"history_coverage":{"requested_from":"2025-11-21","oldest_booking_date":"2026-01-02","covered_ranges":[{"from":"2026-01-02","to":"2026-11-21"}],"missing_ranges":[{"from":"2025-11-21","to":"2026-01-01"}],"status":"partial","extended_auth_used":false}}');
+
+        $result = $this->client->bank->getAccount('accountId-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/accounts/accountId-1/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","name":"Cuenta negocio","product":"Cuenta corriente empresas","type":"current","usage":"business","currency":"EUR","holder_name":"EMPRESA DE EJEMPLO SL","holders":[{"name":"EMPRESA DE EJEMPLO SL","role":"holder"}],"identifiers":{"iban":"ES0000000000000000001332","bic":"XXXXESBBXXX","account_number":null,"sort_code":null,"other":[]},"account_ref":"ar_f3c1a85e9d27b640c8e1","account_ref_previous":null,"status":"open","scopes_granted":["accounts","balances","transactions"],"sync":{"last_synced_at":"2026-11-21T12:04:40Z","status":"ok","history_requested_from":"2025-11-21","history_available_from":"2026-01-02","pending_supported":true},"history_coverage":{"requested_from":"2025-11-21","oldest_booking_date":"2026-01-02","covered_ranges":[{"from":"2026-01-02","to":"2026-11-21"}],"missing_ranges":[{"from":"2025-11-21","to":"2026-01-01"}],"status":"partial","extended_auth_used":false}}'), $result->toArray());
+        self::assertSame('a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10', $result->id);
+    }
+
+    public function testGetBalances(): void
+    {
+        $this->queueJson(200, '{"account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","balances":[{"type":"booked","iso_type":"CLBD","amount":"18250.34","currency":"EUR","reference_date":"2026-11-20","last_change_at":"2026-11-20T22:10:00Z","credit_limit_included":false},{"type":"available","iso_type":"ITAV","amount":"17990.34","currency":"EUR","reference_date":"2026-11-21","last_change_at":"2026-11-21T11:58:00Z","credit_limit_included":false}],"last_synced_at":"2026-11-21T12:04:40Z"}');
+
+        $result = $this->client->bank->getBalances('accountId-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/accounts/accountId-1/balances/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","balances":[{"type":"booked","iso_type":"CLBD","amount":"18250.34","currency":"EUR","reference_date":"2026-11-20","last_change_at":"2026-11-20T22:10:00Z","credit_limit_included":false},{"type":"available","iso_type":"ITAV","amount":"17990.34","currency":"EUR","reference_date":"2026-11-21","last_change_at":"2026-11-21T11:58:00Z","credit_limit_included":false}],"last_synced_at":"2026-11-21T12:04:40Z"}'), $result->toArray());
+        self::assertSame('a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10', $result->accountId);
+    }
+
+    public function testListTransactions(): void
+    {
+        $this->queueJson(200, '{"items":[{"id":"e5b1f8a3-0d47-4c92-a6e0-7f3c2d9b1845","account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","status":"pending","pending_id":null,"reverses_id":null,"booking_date":null,"value_date":null,"transaction_date":"2026-11-21","effective_date":"2026-11-21","amount":"-64.90","currency":"EUR","direction":"debit","description":"PAGO TARJETA PAPELERIA CENTRAL","counterparty":{"name":"PAPELERIA CENTRAL","iban":null,"bic":null},"remittance":{"unstructured":[],"structured":null,"reference":null},"bank_transaction_code":null,"bank_reference":null,"identity_quality":"derived","end_to_end_id":null,"mandate_id":null,"creditor_id":null,"merchant_category_code":"5943","exchange":null,"balance_after":null,"category":"office_supplies","first_seen_at":"2026-11-21T12:04:40Z","updated_at":"2026-11-21T12:04:40Z"},{"id":"8f2b6d41-9c3a-4e57-b0d8-1a7e5c4f2963","account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","status":"booked","pending_id":null,"reverses_id":null,"booking_date":"2026-11-19","value_date":"2026-11-20","transaction_date":null,"effective_date":"2026-11-19","amount":"-1210.00","currency":"EUR","direction":"debit","description":"RECIBO SEGURIDAD SOCIAL","counterparty":{"name":"ENTIDAD PUBLICA DE EJEMPLO","iban":"ES0000000000000000005766","bic":null},"remittance":{"unstructured":["RECIBO SEGURIDAD SOCIAL 10/2026"],"structured":null,"reference":"0028123456789"},"bank_transaction_code":"PMNT-RDDT-ESDD","bank_reference":"2026111900012345","identity_quality":"bank_reference","end_to_end_id":"NOTPROVIDED","mandate_id":"ES-SS-000123","creditor_id":"ES00ZZZ00000000","merchant_category_code":null,"exchange":null,"balance_after":"18250.34","category":"taxes_and_social_security","first_seen_at":"2026-11-20T06:00:12Z","updated_at":"2026-11-20T06:00:12Z"},{"id":"2c9e7a05-6b14-4d38-8f2a-b3d51e0c9a67","account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","status":"booked","pending_id":null,"reverses_id":null,"booking_date":"2026-11-18","value_date":"2026-11-18","transaction_date":null,"effective_date":"2026-11-18","amount":"3450.00","currency":"EUR","direction":"credit","description":"TRANSFERENCIA FACTURA 2026-0418","counterparty":{"name":"CLIENTE DE EJEMPLO SL","iban":"ES0000000000000000007891","bic":null},"remittance":{"unstructured":["FRA 2026-0418"],"structured":null,"reference":null},"bank_transaction_code":"PMNT-RCDT-ESCT","bank_reference":"2026111800009876","identity_quality":"bank_reference","end_to_end_id":"2026-0418","mandate_id":null,"creditor_id":null,"merchant_category_code":null,"exchange":null,"balance_after":"19460.34","category":"income","first_seen_at":"2026-11-19T06:00:10Z","updated_at":"2026-11-19T06:00:10Z"}],"next_page_token":null,"has_more":false}');
+
+        $result = $this->client->bank->listTransactions('accountId-1', [
+            'date_from' => '2026-01-15',
+            'date_to' => '2026-01-15',
+            'status' => 'booked',
+            'limit' => 1,
+            'page_token' => 'page_token-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/accounts/accountId-1/transactions/', $request->getUri()->getPath());
+        self::assertSame([
+            'date_from' => '2026-01-15',
+            'date_to' => '2026-01-15',
+            'status' => 'booked',
+            'limit' => '1',
+            'page_token' => 'page_token-value',
+        ], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"items":[{"id":"e5b1f8a3-0d47-4c92-a6e0-7f3c2d9b1845","account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","status":"pending","pending_id":null,"reverses_id":null,"booking_date":null,"value_date":null,"transaction_date":"2026-11-21","effective_date":"2026-11-21","amount":"-64.90","currency":"EUR","direction":"debit","description":"PAGO TARJETA PAPELERIA CENTRAL","counterparty":{"name":"PAPELERIA CENTRAL","iban":null,"bic":null},"remittance":{"unstructured":[],"structured":null,"reference":null},"bank_transaction_code":null,"bank_reference":null,"identity_quality":"derived","end_to_end_id":null,"mandate_id":null,"creditor_id":null,"merchant_category_code":"5943","exchange":null,"balance_after":null,"category":"office_supplies","first_seen_at":"2026-11-21T12:04:40Z","updated_at":"2026-11-21T12:04:40Z"},{"id":"8f2b6d41-9c3a-4e57-b0d8-1a7e5c4f2963","account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","status":"booked","pending_id":null,"reverses_id":null,"booking_date":"2026-11-19","value_date":"2026-11-20","transaction_date":null,"effective_date":"2026-11-19","amount":"-1210.00","currency":"EUR","direction":"debit","description":"RECIBO SEGURIDAD SOCIAL","counterparty":{"name":"ENTIDAD PUBLICA DE EJEMPLO","iban":"ES0000000000000000005766","bic":null},"remittance":{"unstructured":["RECIBO SEGURIDAD SOCIAL 10/2026"],"structured":null,"reference":"0028123456789"},"bank_transaction_code":"PMNT-RDDT-ESDD","bank_reference":"2026111900012345","identity_quality":"bank_reference","end_to_end_id":"NOTPROVIDED","mandate_id":"ES-SS-000123","creditor_id":"ES00ZZZ00000000","merchant_category_code":null,"exchange":null,"balance_after":"18250.34","category":"taxes_and_social_security","first_seen_at":"2026-11-20T06:00:12Z","updated_at":"2026-11-20T06:00:12Z"},{"id":"2c9e7a05-6b14-4d38-8f2a-b3d51e0c9a67","account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","status":"booked","pending_id":null,"reverses_id":null,"booking_date":"2026-11-18","value_date":"2026-11-18","transaction_date":null,"effective_date":"2026-11-18","amount":"3450.00","currency":"EUR","direction":"credit","description":"TRANSFERENCIA FACTURA 2026-0418","counterparty":{"name":"CLIENTE DE EJEMPLO SL","iban":"ES0000000000000000007891","bic":null},"remittance":{"unstructured":["FRA 2026-0418"],"structured":null,"reference":null},"bank_transaction_code":"PMNT-RCDT-ESCT","bank_reference":"2026111800009876","identity_quality":"bank_reference","end_to_end_id":"2026-0418","mandate_id":null,"creditor_id":null,"merchant_category_code":null,"exchange":null,"balance_after":"19460.34","category":"income","first_seen_at":"2026-11-19T06:00:10Z","updated_at":"2026-11-19T06:00:10Z"}],"next_page_token":null,"has_more":false}'), $result->toArray());
+        self::assertFalse($result->hasMore);
+    }
+
+    public function testSyncTransactions(): void
+    {
+        $this->queueJson(200, '{"added":[{"id":"8f2b6d41-9c3a-4e57-b0d8-1a7e5c4f2963","account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","status":"booked","pending_id":null,"reverses_id":null,"booking_date":"2026-11-19","value_date":"2026-11-20","transaction_date":null,"effective_date":"2026-11-19","amount":"-1210.00","currency":"EUR","direction":"debit","description":"RECIBO SEGURIDAD SOCIAL","counterparty":{"name":"ENTIDAD PUBLICA DE EJEMPLO","iban":"ES0000000000000000005766","bic":null},"remittance":{"unstructured":["RECIBO SEGURIDAD SOCIAL 10/2026"],"structured":null,"reference":"0028123456789"},"bank_transaction_code":"PMNT-RDDT-ESDD","bank_reference":"2026111900012345","identity_quality":"bank_reference","end_to_end_id":"NOTPROVIDED","mandate_id":"ES-SS-000123","creditor_id":"ES00ZZZ00000000","merchant_category_code":null,"exchange":null,"balance_after":"18250.34","category":"taxes_and_social_security","first_seen_at":"2026-11-20T06:00:12Z","updated_at":"2026-11-20T06:00:12Z"}],"modified":[],"removed":[{"id":"e5b1f8a3-0d47-4c92-a6e0-7f3c2d9b1845","reason":"pending_booked"}],"has_more":false,"next_page_token":null,"next_cursor":"cur_01HZX9K4M2W7B3T8","reset":false}');
+
+        $result = $this->client->bank->syncTransactions('id-1', [
+            'cursor' => 'cursor-value',
+            'limit' => 1,
+            'page_token' => 'page_token-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/id-1/transactions/sync/', $request->getUri()->getPath());
+        self::assertSame([
+            'cursor' => 'cursor-value',
+            'limit' => '1',
+            'page_token' => 'page_token-value',
+        ], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"added":[{"id":"8f2b6d41-9c3a-4e57-b0d8-1a7e5c4f2963","account_id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","status":"booked","pending_id":null,"reverses_id":null,"booking_date":"2026-11-19","value_date":"2026-11-20","transaction_date":null,"effective_date":"2026-11-19","amount":"-1210.00","currency":"EUR","direction":"debit","description":"RECIBO SEGURIDAD SOCIAL","counterparty":{"name":"ENTIDAD PUBLICA DE EJEMPLO","iban":"ES0000000000000000005766","bic":null},"remittance":{"unstructured":["RECIBO SEGURIDAD SOCIAL 10/2026"],"structured":null,"reference":"0028123456789"},"bank_transaction_code":"PMNT-RDDT-ESDD","bank_reference":"2026111900012345","identity_quality":"bank_reference","end_to_end_id":"NOTPROVIDED","mandate_id":"ES-SS-000123","creditor_id":"ES00ZZZ00000000","merchant_category_code":null,"exchange":null,"balance_after":"18250.34","category":"taxes_and_social_security","first_seen_at":"2026-11-20T06:00:12Z","updated_at":"2026-11-20T06:00:12Z"}],"modified":[],"removed":[{"id":"e5b1f8a3-0d47-4c92-a6e0-7f3c2d9b1845","reason":"pending_booked"}],"has_more":false,"next_page_token":null,"next_cursor":"cur_01HZX9K4M2W7B3T8","reset":false}'), $result->toArray());
+        self::assertFalse($result->hasMore);
+    }
+
+    public function testListInstitutions(): void
+    {
+        $this->queueJson(200, '{"items":[{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png","timezone":"Europe/Madrid","segments":["personal","business"],"access":["one_time","ongoing"],"ongoing_access":true,"consent_days_max":180,"history_days_max":365,"pending_transactions":true,"pending_linkage":false,"balance_types":["booked","available"],"transaction_fields":["value_date","counterparty_name","counterparty_iban","remittance","bank_transaction_code","bank_reference","balance_after"],"sign_in":"redirect","requires_end_user_email":true,"corporate_accounts":true,"bank_account_selection":false,"separate_history_consent":false,"reconfirmation":false,"sync_frequency_hours":null,"health":"operational"}],"next_cursor":null}');
+
+        $result = $this->client->bank->listInstitutions([
+            'country' => 'country-value',
+            'segment' => 'personal',
+            'access' => 'one_time',
+            'q' => 'q-value',
+            'limit' => 1,
+            'cursor' => 'cursor-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/institutions/', $request->getUri()->getPath());
+        self::assertSame([
+            'country' => 'country-value',
+            'segment' => 'personal',
+            'access' => 'one_time',
+            'q' => 'q-value',
+            'limit' => '1',
+            'cursor' => 'cursor-value',
+        ], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"items":[{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png","timezone":"Europe/Madrid","segments":["personal","business"],"access":["one_time","ongoing"],"ongoing_access":true,"consent_days_max":180,"history_days_max":365,"pending_transactions":true,"pending_linkage":false,"balance_types":["booked","available"],"transaction_fields":["value_date","counterparty_name","counterparty_iban","remittance","bank_transaction_code","bank_reference","balance_after"],"sign_in":"redirect","requires_end_user_email":true,"corporate_accounts":true,"bank_account_selection":false,"separate_history_consent":false,"reconfirmation":false,"sync_frequency_hours":null,"health":"operational"}],"next_cursor":null}'), $result->toArray());
+    }
+
+    public function testGetInstitution(): void
+    {
+        $this->queueJson(200, '{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png","timezone":"Europe/Madrid","segments":["personal","business"],"access":["one_time","ongoing"],"ongoing_access":true,"consent_days_max":180,"history_days_max":365,"pending_transactions":true,"pending_linkage":false,"balance_types":["booked","available"],"transaction_fields":["value_date","counterparty_name","counterparty_iban","remittance","bank_transaction_code","bank_reference","balance_after"],"sign_in":"redirect","requires_end_user_email":true,"corporate_accounts":true,"bank_account_selection":false,"separate_history_consent":false,"reconfirmation":false,"sync_frequency_hours":null,"health":"operational"}');
+
+        $result = $this->client->bank->getInstitution('id-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/institutions/id-1/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png","timezone":"Europe/Madrid","segments":["personal","business"],"access":["one_time","ongoing"],"ongoing_access":true,"consent_days_max":180,"history_days_max":365,"pending_transactions":true,"pending_linkage":false,"balance_types":["booked","available"],"transaction_fields":["value_date","counterparty_name","counterparty_iban","remittance","bank_transaction_code","bank_reference","balance_after"],"sign_in":"redirect","requires_end_user_email":true,"corporate_accounts":true,"bank_account_selection":false,"separate_history_consent":false,"reconfirmation":false,"sync_frequency_hours":null,"health":"operational"}'), $result->toArray());
+        self::assertSame('es-banco-norte', $result->id);
+    }
+
+    public function testGetCoverage(): void
+    {
+        $this->queueJson(200, '{"items":[{"country":"ESP","name":"Spain","sign_in_available":true,"account_check_available":true,"ongoing_access":true,"institutions":42,"ongoing_institutions":18,"consent_days_max":180,"history_days_max":365,"business_accounts":true}]}');
+
+        $result = $this->client->bank->getCoverage();
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/coverage/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"items":[{"country":"ESP","name":"Spain","sign_in_available":true,"account_check_available":true,"ongoing_access":true,"institutions":42,"ongoing_institutions":18,"consent_days_max":180,"history_days_max":365,"business_accounts":true}]}'), $result->toArray());
     }
 }
