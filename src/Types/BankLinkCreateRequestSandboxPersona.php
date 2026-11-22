@@ -7,7 +7,11 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * The account set the Test Bank offers. `no_ongoing` makes the bank refuse ongoing access.
+ * The Test Bank customer: `personal_basic` (one current account, 60 movements), `business_multi`
+ * (three accounts held by a company), `long_history` (one account with 400 days and 1,400 movements; a
+ * read returns the last 365 days, so set `history_days` to 365), `pending` (includes pending
+ * transactions), `sparse_fields` (no value date, no counterparty IBAN, no bank reference) or
+ * `no_ongoing` (a bank that only allows one-time access: use `allow_one_time_fallback`).
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

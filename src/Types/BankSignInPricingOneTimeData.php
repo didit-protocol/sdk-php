@@ -21,6 +21,14 @@ final class BankSignInPricingOneTimeData extends BaseModel
     public readonly ?string $transactionsUsd;
 
     /**
+     * `true` when `transactions_usd` is the one-time bundle: one read that carries transactions and
+     * balances together, so the `balance` add-on is not charged on top of it. Absent - never `false` -
+     * where `transactions_usd` is the separate transactions add-on price, including while the one-time
+     * bundle is not offered in the country.
+     */
+    public readonly ?bool $bundleIncluded;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -28,5 +36,6 @@ final class BankSignInPricingOneTimeData extends BaseModel
         parent::__construct($data);
         $this->balancesUsd = Hydrate::string($data['balances_usd'] ?? null);
         $this->transactionsUsd = Hydrate::string($data['transactions_usd'] ?? null);
+        $this->bundleIncluded = Hydrate::bool($data['bundle_included'] ?? null);
     }
 }

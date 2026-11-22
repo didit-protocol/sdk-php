@@ -64,7 +64,7 @@ final class BankConnectionSync extends BaseModel
     /**
      * How many times a day the automatic sync runs for this connection, between one and four depending on
      * the bank. Where the bank allows more unattended reads, at least two a day always remain for live
-     * syncs. Your application can lower it to once a day in its settings.
+     * syncs.
      */
     public readonly ?int $frequencyPerDay;
 
