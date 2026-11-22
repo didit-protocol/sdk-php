@@ -162,10 +162,19 @@ def shape_key(key: str) -> str:
     return key if KEY_RE.match(key) else php_string(key)
 
 
-def array_shape(fields: list[tuple[str, str, bool]], indent: str) -> list[str]:
+def array_shape(fields: list[tuple[str, str, bool]], indent: str, exclusive_keys: tuple[str, ...] = ()) -> list[str]:
     """Multi-line ``array{...}`` lines; ``fields`` are (key, type, required)."""
     if not fields:
         return ["array<string, mixed>"]
+    if exclusive_keys:
+        variants = []
+        for selected in exclusive_keys:
+            branch = [
+                (key, "never" if key in exclusive_keys and key != selected else typ, required or key == selected)
+                for key, typ, required in fields
+            ]
+            variants.append("\n".join(array_shape(branch, indent)))
+        return "|".join(variants).splitlines()
     lines = ["array{"]
     for key, typ, required in fields:
         lines.append(f"{indent}    {shape_key(key)}{'' if required else '?'}: {typ},")
@@ -300,7 +309,7 @@ def _property_doc(prop) -> str:
     return docblock(doc, "    ")
 
 
-def emit_params(shapes: list[Shape], op_aliases: list[tuple[str, list[tuple[str, str, bool]]]]) -> str:
+def emit_params(shapes: list[Shape], op_aliases: list[OpModel]) -> str:
     lines = [HEADER, "namespace Didit;", ""]
     doc = [
         "Request parameter shapes for every operation, as PHPStan type aliases.",
@@ -310,11 +319,13 @@ def emit_params(shapes: list[Shape], op_aliases: list[tuple[str, list[tuple[str,
         "",
     ]
     entries: list[tuple[str, list[str]]] = []
-    for name, fields in op_aliases:
-        entries.append((name, array_shape(fields, "")))
+    for om in op_aliases:
+        assert om.body_alias is not None
+        keys = om.body.exclusive_keys if om.body else ()
+        entries.append((om.body_alias, array_shape(op_alias_fields(om), "", keys)))
     for shape in shapes:
         fields = [(p.wire, shape_type(p.type), p.required) for p in shape.props]
-        entries.append((shape.name, array_shape(fields, "")))
+        entries.append((shape.name, array_shape(fields, "", shape.exclusive_keys)))
     entries.sort(key=lambda e: e[0])
     for name, body in entries:
         doc.append(f"@phpstan-type {name} {body[0]}")
@@ -609,7 +620,7 @@ def _deprecation(o: Operation) -> str:
 def _params_required(om: OpModel) -> bool:
     if any(p.required for p in om.params):
         return True
-    if om.body is not None and om.body_required and any(p.required for p in om.body.props):
+    if om.body is not None and om.body_required and (om.body.exclusive_keys or any(p.required for p in om.body.props)):
         return True
     return False
 
