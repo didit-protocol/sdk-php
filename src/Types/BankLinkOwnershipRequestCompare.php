@@ -9,7 +9,8 @@ namespace Didit\Types;
 /**
  * What the holder of the account is compared with. `none` (default) gives no verdict and needs no
  * reference. `person` needs `reference_identity` or `session_id`. `business` needs `business` or
- * `business_session_id`.
+ * `business_session_id`. Send exactly one reference of the kind you compare with, and none with
+ * `none`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

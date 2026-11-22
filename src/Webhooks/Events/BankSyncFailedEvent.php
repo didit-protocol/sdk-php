@@ -7,18 +7,18 @@ namespace Didit\Webhooks\Events;
 use Didit\Core\Hydrate;
 
 /**
- * `bank.sync.failed`: a sync failed and the connection's sync health is failing.
+ * `bank.sync.failed`: syncs have been failing for 24 hours and are still retried.
  */
-final class BankSyncFailedEvent extends BankEvent
+final class BankSyncFailedEvent extends BankConnectionEvent
 {
-    /** The connection id. */
-    public readonly ?string $connectionId;
-
-    /** The latest failed sync, when there is one. */
+    /** The latest failed sync. */
     public readonly ?string $syncId;
 
-    /** The error code, when the API gives one. */
+    /** Didit error code of the failure. */
     public readonly ?string $errorCode;
+
+    /** When the syncs started to fail. */
+    public readonly ?\DateTimeImmutable $failingSince;
 
     /**
      * @param array<string, mixed> $payload the decoded JSON body
@@ -26,9 +26,8 @@ final class BankSyncFailedEvent extends BankEvent
     public function __construct(array $payload)
     {
         parent::__construct($payload);
-        $data = $this->data ?? [];
-        $this->connectionId = Hydrate::string($data['connection_id'] ?? null);
-        $this->syncId = Hydrate::string($data['sync_id'] ?? null);
-        $this->errorCode = Hydrate::string($data['error_code'] ?? null);
+        $this->syncId = Hydrate::string($this->fields['sync_id'] ?? null);
+        $this->errorCode = Hydrate::string($this->fields['error_code'] ?? null);
+        $this->failingSince = Hydrate::dateTime($this->fields['failing_since'] ?? null);
     }
 }

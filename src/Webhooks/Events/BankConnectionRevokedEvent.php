@@ -7,18 +7,24 @@ namespace Didit\Webhooks\Events;
 use Didit\Core\Hydrate;
 
 /**
- * `bank.connection.revoked`: access ended; `endedBy` says who ended it.
+ * `bank.connection.revoked`: access ended and the bank confirmed it.
  */
-final class BankConnectionRevokedEvent extends BankEvent
+final class BankConnectionRevokedEvent extends BankConnectionEvent
 {
-    /** The connection id. */
-    public readonly ?string $connectionId;
-
-    /** `revocation_pending`, `revoked` or `revocation_failed`. */
+    /** The consent status after revocation. */
     public readonly ?string $status;
 
     /** `end_user`, `bank`, `customer` or `unknown`. */
     public readonly ?string $endedBy;
+
+    /** Why the connection is in this status. */
+    public readonly ?string $statusReason;
+
+    /** When access ended. */
+    public readonly ?\DateTimeImmutable $endedAt;
+
+    /** How long the stored data stays readable. */
+    public readonly ?\DateTimeImmutable $retainUntil;
 
     /**
      * @param array<string, mixed> $payload the decoded JSON body
@@ -26,9 +32,10 @@ final class BankConnectionRevokedEvent extends BankEvent
     public function __construct(array $payload)
     {
         parent::__construct($payload);
-        $data = $this->data ?? [];
-        $this->connectionId = Hydrate::string($data['connection_id'] ?? null);
-        $this->status = Hydrate::string($data['status'] ?? null);
-        $this->endedBy = Hydrate::string($data['ended_by'] ?? null);
+        $this->status = Hydrate::string($this->fields['status'] ?? null);
+        $this->endedBy = Hydrate::string($this->fields['ended_by'] ?? null);
+        $this->statusReason = Hydrate::string($this->fields['status_reason'] ?? null);
+        $this->endedAt = Hydrate::dateTime($this->fields['ended_at'] ?? null);
+        $this->retainUntil = Hydrate::dateTime($this->fields['retain_until'] ?? null);
     }
 }

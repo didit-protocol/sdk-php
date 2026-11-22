@@ -9,22 +9,16 @@ use Didit\Core\Hydrate;
 /**
  * `bank.connection.consent_expiring`: the consent ends in 14, 7 or 1 day.
  */
-final class BankConnectionConsentExpiringEvent extends BankEvent
+final class BankConnectionConsentExpiringEvent extends BankConnectionEvent
 {
-    /** The connection id. */
-    public readonly ?string $connectionId;
-
     /** Days until the consent ends: 14, 7 or 1. */
     public readonly ?int $daysLeft;
 
     /** When the consent ends. */
-    public readonly ?\DateTimeImmutable $expiresAt;
+    public readonly ?\DateTimeImmutable $consentExpiresAt;
 
-    /**
-     * A ready renew link when the application has automatic renew links on.
-     * It is a credential: never log it.
-     */
-    public readonly ?string $renewUrl;
+    /** The consent's end: renew before it for no gap. */
+    public readonly ?\DateTimeImmutable $renewBy;
 
     /**
      * @param array<string, mixed> $payload the decoded JSON body
@@ -32,10 +26,8 @@ final class BankConnectionConsentExpiringEvent extends BankEvent
     public function __construct(array $payload)
     {
         parent::__construct($payload);
-        $data = $this->data ?? [];
-        $this->connectionId = Hydrate::string($data['connection_id'] ?? null);
-        $this->daysLeft = Hydrate::int($data['days_left'] ?? null);
-        $this->expiresAt = Hydrate::dateTime($data['expires_at'] ?? null);
-        $this->renewUrl = Hydrate::string($data['renew_url'] ?? null);
+        $this->daysLeft = Hydrate::int($this->fields['days_left'] ?? null);
+        $this->consentExpiresAt = Hydrate::dateTime($this->fields['consent_expires_at'] ?? null);
+        $this->renewBy = Hydrate::dateTime($this->fields['renew_by'] ?? null);
     }
 }

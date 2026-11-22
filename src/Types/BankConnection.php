@@ -11,7 +11,8 @@ use Didit\Core\Hydrate;
 
 /**
  * The person's permission for your application to read one bank. A renewal keeps the connection id and
- * every account id.
+ * every account id. A deleted connection answers only `id`, `status`, `status_reason`, `created_at`
+ * and `erasure`: every other field is absent, and no bank, person or account data remains in it.
  */
 final class BankConnection extends BaseModel
 {
@@ -28,14 +29,17 @@ final class BankConnection extends BaseModel
      * `pending`: first sync running. `active`: consent valid. `renewal_required`: the consent ended or the
      * bank wants the person to sign in again, data readable as last synced and nothing charged. `paused`:
      * balance too low for the month. `revoked`: access stopped by the person, the bank or you. `deleted`:
-     * only the id, dates and reason remain. `failed`: the first sync never succeeded.
+     * only `id`, `status`, `status_reason`, `created_at` and `erasure` remain. `failed`: the first sync
+     * never succeeded.
      *
      * Known values: {@see BankConnectionStatus}.
      */
     public readonly ?string $status;
 
     /**
-     * Why the connection is in this status. `paused_by_customer` is reserved.
+     * Why the connection is in this status. `paused_by_customer` is reserved. On a `deleted` connection:
+     * `deleted_by_customer`, `consent_lapsed`, `retention_elapsed`, `application_deleted` or
+     * `restored_after_deletion`.
      *
      * Known values: {@see BankConnectionStatusReason}.
      */
@@ -73,7 +77,7 @@ final class BankConnection extends BaseModel
     /** The `end_user` field. */
     public readonly ?BankConnectionEndUser $endUser;
 
-    /** Reserved. Always `null` for now. */
+    /** Reserved. Always `null`. */
     public readonly ?string $manageUrl;
 
     /** What this connection costs. Sandbox is never charged. */
