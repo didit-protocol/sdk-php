@@ -10,23 +10,25 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Progress of a deletion you asked for.
+ * The record of a deletion you asked for. The deletion itself is immediate: the connection's data is
+ * deleted and unreadable when the call returns. `status` is the confirmation of it.
  */
 final class BankConnectionErasure extends BaseModel
 {
     /**
-     * `pending` while deletion runs, `erased` when no stored copy and no access at the bank remain,
-     * `failed` when it could not be confirmed within 24 hours. A failed deletion keeps the connection's
-     * data closed, is retried, and Didit is alerted.
+     * The confirmation of the deletion. `pending`: the deletion is being confirmed, including the end of
+     * access at the bank. `erased`: confirmed, with `erased_at`. `failed`: the confirmation has not
+     * arrived yet and is repeated automatically; nothing is needed from you. The data is deleted and not
+     * readable in any of the three.
      *
      * Known values: {@see BankConnectionErasureStatus}.
      */
     public readonly ?string $status;
 
-    /** The `requested_at` field. */
+    /** When you asked for the deletion. */
     public readonly ?\DateTimeImmutable $requestedAt;
 
-    /** When the deletion finished. `null` until `status` is `erased`. */
+    /** When the deletion was confirmed. `null` until `status` is `erased`. */
     public readonly ?\DateTimeImmutable $erasedAt;
 
     /**

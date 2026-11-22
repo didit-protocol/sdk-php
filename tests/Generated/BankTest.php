@@ -215,7 +215,7 @@ final class BankTest extends GeneratedTestCase
 
     public function testDeleteConnection(): void
     {
-        $this->queueJson(202, '{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","erasure":{"status":"pending","requested_at":"2026-11-21T15:10:00Z","erased_at":null}}');
+        $this->queueJson(202, '{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","erasure":{"status":"erased","requested_at":"2026-11-21T15:10:00Z","erased_at":"2026-11-21T15:10:00Z"}}');
 
         $result = $this->client->bank->deleteConnection('id-1');
 
@@ -227,7 +227,7 @@ final class BankTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(202, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","erasure":{"status":"pending","requested_at":"2026-11-21T15:10:00Z","erased_at":null}}'), $result->toArray());
+        self::assertSame($this->decoded('{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","erasure":{"status":"erased","requested_at":"2026-11-21T15:10:00Z","erased_at":"2026-11-21T15:10:00Z"}}'), $result->toArray());
         self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $result->id);
     }
 
