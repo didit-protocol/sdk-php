@@ -34,7 +34,7 @@ abstract class BankLinkEvent extends BankEvent
     public function __construct(array $payload)
     {
         parent::__construct($payload);
-        $data = $this->fields;
+        $data = Hydrate::assoc($payload['data'] ?? null) ?? [];
         $this->linkId = Hydrate::string($data['link_id'] ?? null);
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->connectionId = Hydrate::string($data['connection_id'] ?? null);

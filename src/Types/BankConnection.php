@@ -38,8 +38,7 @@ final class BankConnection extends BaseModel
 
     /**
      * Why the connection is in this status. `paused_by_customer` is reserved. On a `deleted` connection:
-     * `deleted_by_customer`, `consent_lapsed`, `retention_elapsed`, `application_deleted` or
-     * `restored_after_deletion`.
+     * `deleted_by_customer`, `consent_lapsed`, `retention_elapsed` or `application_deleted`.
      *
      * Known values: {@see BankConnectionStatusReason}.
      */
@@ -77,7 +76,7 @@ final class BankConnection extends BaseModel
     /** The `end_user` field. */
     public readonly ?BankConnectionEndUser $endUser;
 
-    /** Reserved. Always `null`. */
+    /** The person's own access page. `null` until the access page is available. */
     public readonly ?string $manageUrl;
 
     /** What this connection costs. Sandbox is never charged. */

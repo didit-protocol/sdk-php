@@ -105,6 +105,11 @@ namespace Didit;
  * @phpstan-type AuthenticationSetupGetBrandingParams array{
  *     language?: string,
  * }
+ * @phpstan-type AuthenticationSetupGetEmailParams array{
+ *     organization?: string,
+ *     role?: string,
+ *     agent?: string,
+ * }
  * @phpstan-type AuthenticationSetupGetEmailsParams array{
  *     language?: string,
  * }

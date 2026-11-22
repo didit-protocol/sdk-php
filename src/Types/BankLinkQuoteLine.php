@@ -22,7 +22,7 @@ final class BankLinkQuoteLine extends BaseModel
 
     /**
      * Price of one unit in USD, a decimal string with 4 decimals. Amounts in examples are illustrative;
-     * the price for a country is shown on the pricing page and in the console.
+     * the price for a country is shown on the pricing page.
      */
     public readonly ?string $priceUsd;
 

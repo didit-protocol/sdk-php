@@ -38,9 +38,9 @@ final class BankLink extends BaseModel
     public readonly ?string $url;
 
     /**
-     * The token the web and native SDKs take. Returned only when the link is created; `null` on later
-     * reads. Single purpose and short lived: the hosted `url` and this token are redeemed once between
-     * them, and whichever arrives first wins. It carries no personal data. Never log it.
+     * The token for Didit's embedded Bank Link, which is not released yet: open `url` today. Returned only
+     * when the link is created; `null` on later reads. Single purpose and short lived. It carries no
+     * personal data. Never log it.
      */
     public readonly ?string $clientToken;
 

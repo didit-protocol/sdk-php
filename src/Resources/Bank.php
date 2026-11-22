@@ -60,8 +60,8 @@ final class Bank extends BaseResource
      * Create a bank link.
      *
      * Creates a Bank Link: one run of the flow in which a person connects a bank, or renews a connection.
-     * Send the person to `url`, or pass `client_token` to the web or native SDK. A completed link yields a
-     * connection.
+     * Send the person to `url`. The `client_token` is for Didit's embedded Bank Link, which is not
+     * released yet: open the `url` today. A completed link yields a connection.
      *
      * `POST /v3/bank/links/`
      *
@@ -182,9 +182,10 @@ final class Bank extends BaseResource
     /**
      * Delete a bank connection.
      *
-     * Deletes the connection's bank data and stops access at the bank. The connection's accounts,
-     * balances, transactions, sync history, consent records and ownership results are deleted. Deletion is
-     * irreversible.
+     * Deletes the connection's bank data and stops access at the bank. Deletion is immediate and
+     * irreversible: when the call returns, the connection's accounts, balances, transactions, sync
+     * history, consent records and ownership results are deleted, and its data operations (refresh, sync
+     * runs, accounts, balances, transactions and the change feed) answer `409 connection_not_active`.
      *
      * `DELETE /v3/bank/connections/{id}/`
      *
@@ -290,9 +291,7 @@ final class Bank extends BaseResource
      * Renew a bank connection.
      *
      * Creates a renew link for this connection, a shortcut for `create_link` with `mode: renew`. The
-     * person confirms what continues to be shared and signs in at the bank, or reconfirms on Didit's
-     * screen where the bank and country allow it (`consent.renewal_action`). The connection id and every
-     * account id stay the same, and history continues without duplicates.
+     * connection id and every account id stay the same.
      *
      * `POST /v3/bank/connections/{id}/renew/`
      *

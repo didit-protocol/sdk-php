@@ -23,7 +23,7 @@ final class BankSignInPricingOngoing extends BaseModel
      * when not available. Ongoing access is billed per active connection per month, with every account,
      * reads, refreshes within the bank's limits and renewals included; the current price is on the pricing
      * page (https://docs.didit.me/getting-started/pricing). Amounts in examples are illustrative; the
-     * price for a country is shown on the pricing page and in the console.
+     * price for a country is shown on the pricing page.
      */
     public readonly ?string $priceUsdPerMonth;
 
