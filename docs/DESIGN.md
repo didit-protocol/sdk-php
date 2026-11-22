@@ -215,6 +215,16 @@ Envelope fields on every event: `event_id`, `webhook_type`, `timestamp`, `create
 Session events add `session_id`, `business_session_id`, `session_kind`, `status`, `workflow_id`, `workflow_version`, `vendor_data`, `metadata`, `decision`, `resubmit_info`; transaction events add `transaction_id`, `txn_id`, `status`, `score`, `severity`, `amount`, `currency`, `direction`, `action_required`; Travel Rule events add `transaction_id`, `txn_id`, `travel_rule_status`, `rail`, `direction`; user and business events add `vendor_user_id` or `vendor_business_id`, `vendor_data`, `status`.
 Where the spec has a schema for the payload (for example the session decision), reuse the generated type.
 
+### 9.5 Bank events
+
+The Bank product adds these `webhook_type` values to the union: `bank.link.completed`, `bank.link.cancelled`, `bank.link.expired`, `bank.link.failed`, `bank.connection.created`, `bank.connection.updated`, `bank.connection.consent_expiring`, `bank.connection.renewal_required`, `bank.connection.renewed`, `bank.connection.revoked`, `bank.connection.deleted`, `bank.connection.history_complete`, `bank.data.updated`, `bank.sync.completed`, `bank.sync.failed` and `bank.sync.recovered`.
+They use the same envelope, and their payload is the `data` object: ids, statuses and counts only, never names, account numbers, tokens, emails or the end-user reference.
+- Link events: `link_id`, `status`, `connection_id`, `check_id` and `error_code`.
+- Connection events: `connection_id`, `status` and `status_reason`. `bank.connection.consent_expiring` instead carries `connection_id`, `days_left`, `expires_at` and `renew_url` (a credential: never log it); `bank.connection.revoked` carries `connection_id`, `status` and `ended_by`; `bank.connection.deleted` carries `connection_id` and `erasure_status`.
+- `bank.data.updated`: `connection_id`, `sync_id`, `account_ids`, `added`, `modified`, `removed` and `balances_changed`.
+- Sync events: `bank.sync.completed` adds `trigger`, `outcome` and `changed`; `bank.sync.failed` adds `error_code`; `bank.sync.recovered` carries only the ids.
+An event is a notification, not the source of truth: read the link or connection from the API. A connection id in an event is a convenience and is never trusted without that read.
+
 ## 10. Authentication (Didit customer authentication)
 
 Didit Authentication gives each application its own OpenID Connect issuer for the application's end users: hosted sign-in pages, passwords, codes, magic links, passkeys, social and enterprise SSO, MFA, organizations, step-up verification and agent access.
