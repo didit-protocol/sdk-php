@@ -43,9 +43,10 @@ def _emit_class(node: ResourceNode, namespace: str, cls: str) -> str:
     methods = []
     uses = {"Didit\\Tests\\Support\\GeneratedTestCase"}
     for om in node.ops:
-        text, needed = _emit_test(om, node)
-        methods.append(text)
-        uses |= needed
+        for suffix, values in _request_cases(om):
+            text, needed = _emit_test(om, suffix, values)
+            methods.append(text)
+            uses |= needed
     lines = [HEADER, f"namespace {namespace};", ""]
     for u in sorted(uses, key=str.lower):
         lines.append(f"use {u};")
@@ -80,7 +81,7 @@ def _example(content: dict[str, Any]) -> Any:
     return None
 
 
-def _emit_test(om: OpModel, node: ResourceNode) -> tuple[str, set[str]]:
+def _emit_test(om: OpModel, suffix: str, body_values: dict[str, Any]) -> tuple[str, set[str]]:
     o = om.op
     uses: set[str] = set()
     method = naming.camel(o.naming.method)
@@ -94,13 +95,9 @@ def _emit_test(om: OpModel, node: ResourceNode) -> tuple[str, set[str]]:
     expected_path = expected_path.replace("{organization_id}", ORG_ID).replace("{application_id}", APP_ID)
 
     # Params
-    params: dict[str, Any] = {}
+    params = dict(body_values)
     expected_query: dict[str, str | list[str]] = {}
     expected_headers: dict[str, str] = {}
-    body_values: dict[str, Any] = {}
-    if om.body is not None:
-        body_values = _body_sample(om)
-        params.update(body_values)
     for p in om.params:
         value = request_sample(p.type, p.key)
         params[p.key] = value
@@ -117,7 +114,7 @@ def _emit_test(om: OpModel, node: ResourceNode) -> tuple[str, set[str]]:
     queue, assertions, ret_uses = _response(om)
     uses |= ret_uses
 
-    body.append(f"    public function test{naming.pascal(o.naming.method)}(): void")
+    body.append(f"    public function test{naming.pascal(o.naming.method)}{suffix}(): void")
     body.append("    {")
     body.append(f"        {queue}")
     body.append("")
@@ -164,12 +161,28 @@ def _emit_test(om: OpModel, node: ResourceNode) -> tuple[str, set[str]]:
     return "\n".join(body), uses
 
 
-def _body_sample(om: OpModel) -> dict[str, Any]:
-    assert om.body is not None
-    sample: dict[str, Any] = {}
-    for p in om.body.props:
-        sample[p.wire] = request_sample(p.type, p.wire, 1)
-    return sample
+def _request_cases(om: OpModel) -> list[tuple[str, dict[str, Any]]]:
+    if om.body is None:
+        return [("", {})]
+    sample = {p.wire: request_sample(p.type, p.wire, 1) for p in om.body.props}
+    keys = set(om.body.exclusive_keys)
+    if not keys:
+        return [("", sample)]
+
+    rb = om.op.doc.deref(om.op.op["requestBody"])
+    examples = rb["content"].get("application/json", {}).get("examples", {})
+    required = {p.wire for p in om.body.props if p.required}
+    cases = []
+    for key in om.body.exclusive_keys:
+        for example in examples.values():
+            value = om.op.doc.deref(example).get("value")
+            if isinstance(value, dict) and keys.intersection(value) == {key} and required <= value.keys():
+                payload = scrub_credentials(value)
+                break
+        else:
+            payload = {k: v for k, v in sample.items() if k == key or k not in keys}
+        cases.append((naming.pascal(key), payload))
+    return cases
 
 
 def _query_expectation(value: Any) -> str | list[str]:
