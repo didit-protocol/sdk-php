@@ -8,8 +8,8 @@ use Didit\Core\Hydrate;
 use Didit\Webhooks\Event;
 
 /**
- * Base of the `bank.*` events. Their fields sit next to the envelope fields;
- * a payload that carries them in `data` is read too.
+ * Base of the `bank.*` events. The link events nest their fields in `data`;
+ * the connection, data and sync events carry them next to the envelope.
  */
 abstract class BankEvent extends Event
 {
@@ -27,6 +27,7 @@ abstract class BankEvent extends Event
     public function __construct(array $payload)
     {
         parent::__construct($payload);
-        $this->fields = Hydrate::assoc($payload['data'] ?? null) ?? $payload;
+        $nested = Hydrate::assoc($payload['data'] ?? null) ?? [];
+        $this->fields = $nested + $payload;
     }
 }
