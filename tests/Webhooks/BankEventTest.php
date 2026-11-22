@@ -58,7 +58,7 @@ final class BankEventTest extends TestCase
                 'connection_id' => $connectionId,
                 'check_id' => null,
                 'error_code' => 'failed' === $status ? 'consent_declined' : null,
-            ]);
+            ], nested: true);
 
             self::assertSame($class, $event::class);
             self::assertInstanceOf(BankLinkEvent::class, $event);
@@ -274,25 +274,18 @@ final class BankEventTest extends TestCase
         self::assertSame('d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14', $event->syncId);
     }
 
-    public function testLegacyNestedDataIsRead(): void
-    {
-        $event = Event::fromPayload(self::ENVELOPE + [
-            'webhook_type' => EventType::BANK_CONNECTION_CREATED,
-            'data' => [
-                'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-                'initial_status' => 'succeeded',
-            ],
-        ]);
-
-        self::assertInstanceOf(BankConnectionEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
-    }
-
     /**
      * @param array<string, mixed> $fields
      */
-    private function event(string $type, array $fields): Event
+    private function event(string $type, array $fields, bool $nested = false): Event
     {
-        return Event::fromPayload(self::ENVELOPE + ['webhook_type' => $type] + $fields);
+        $payload = self::ENVELOPE + ['webhook_type' => $type];
+        if ($nested) {
+            $payload['data'] = $fields;
+        } else {
+            $payload += $fields;
+        }
+
+        return Event::fromPayload($payload);
     }
 }
