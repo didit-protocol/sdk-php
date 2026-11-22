@@ -10,15 +10,18 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Accepted deletion. The connection's bank data is being deleted and its data operations answer `409
- * connection_not_active`; reading the connection returns a minimal record with this `erasure` status.
+ * The record of a deletion. The connection's bank data is deleted and its data operations answer `409
+ * connection_not_active`; reading the connection returns a minimal record with this `erasure` record.
  */
 final class BankConnectionDeletion extends BaseModel
 {
     /** The connection id. */
     public readonly ?string $id;
 
-    /** Progress of a deletion you asked for. */
+    /**
+     * The record of a deletion you asked for. The deletion itself is immediate: the connection's data is
+     * deleted and unreadable when the call returns. `status` is the confirmation of it.
+     */
     public readonly ?BankConnectionErasure $erasure;
 
     /**

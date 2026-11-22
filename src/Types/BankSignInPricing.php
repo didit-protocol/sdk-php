@@ -38,7 +38,9 @@ final class BankSignInPricing extends BaseModel
 
     /**
      * One-time data prices of a Bank Link, present only where Bank data is switched on. `null` where the
-     * country offers no one-time data: use `add_ons`.
+     * country offers no one-time data: use `add_ons`. Where the country offers the one-time bundle, the
+     * object also carries `bundle_included: true` and `transactions_usd` is that bundle: one read of
+     * transactions and balances.
      */
     public readonly ?BankSignInPricingOneTimeData $oneTimeData;
 

@@ -27,7 +27,7 @@ final class BankConnectionBilling extends BaseModel
      * for at least one account in that month. `null` for one-time connections and in the sandbox. Ongoing
      * access is billed per active connection per month; the current price is on the pricing page
      * (https://docs.didit.me/getting-started/pricing). Amounts in examples are illustrative; the price for
-     * a country is shown on the pricing page and in the console.
+     * a country is shown on the pricing page.
      */
     public readonly ?string $priceUsd;
 
