@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from itertools import combinations
 
 from . import naming
 from .model import (
@@ -170,8 +171,9 @@ def array_shape(fields: list[tuple[str, str, bool]], indent: str, exclusive_keys
         variants = []
         for selected in exclusive_keys:
             branch = [
-                (key, "never" if key in exclusive_keys and key != selected else typ, required or key == selected)
+                (key, typ, required or key == selected)
                 for key, typ, required in fields
+                if key == selected or key not in exclusive_keys
             ]
             variants.append("\n".join(array_shape(branch, indent)))
         return "|".join(variants).splitlines()
@@ -513,7 +515,14 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
         if pdesc:
             doc.append(f"@param {pp.php} ${pp.var} {pdesc}")
     if om.body_alias:
-        doc.append(f"@param {om.body_alias} $params")
+        param_type = om.body_alias
+        if om.body:
+            # Ordinary PHPStan array shapes allow extra keys. A union requires one
+            # choice; test the caller's keys separately to rule out overlapping choices.
+            for left, right in combinations(om.body.exclusive_keys, 2):
+                overlap = f"array{{{shape_key(left)}: mixed, {shape_key(right)}: mixed, ...}}"
+                param_type = f"($params is {overlap} ? never : {param_type})"
+        doc.append(f"@param {param_type} $params")
     native_ret, ret_doc = return_type(om.response)
     if ret_doc:
         doc.append("")
