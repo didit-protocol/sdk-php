@@ -23,6 +23,7 @@ In your own project, install the SDK with `composer require didit-protocol/sdk-p
 | [`id_verification.php`](id_verification.php) | Standalone ID verification from image files: `php examples/id_verification.php front.jpg [back.jpg]`. |
 | [`aml_screening.php`](aml_screening.php) | Screen a person against sanctions, PEP and watchlists and print the score and hits: `php examples/aml_screening.php "Full Name" 1990-05-17`. |
 | [`transaction_screening.php`](transaction_screening.php) | Submit a transaction for monitoring, read it back, and list the ones waiting for review. |
+| [`bank_connection.php`](bank_connection.php) | Create a Bank Link, wait for its connection, and print the accounts, balances and recent transactions. |
 | [`travel_rule.php`](travel_rule.php) | Screen a wallet address, then read the Travel Rule settings, the VASP directory and your wallet address book: `php examples/travel_rule.php [address] [blockchain]`. |
 | [`authentication.php`](authentication.php) | Didit Authentication: create PKCE, state and nonce values, verify an access token and handle `TokenVerificationException::$reason`, and check a session for revocation: `php examples/authentication.php <access-token> [--check-session]`. |
 

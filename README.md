@@ -1,7 +1,7 @@
 # Didit PHP SDK
 
 The official Didit PHP library.
-Identity verification (KYC), business verification (KYB), AML screening, biometrics, transaction monitoring, wallet screening, Travel Rule and customer authentication, from your backend, with typed requests and responses for every Didit server API.
+Identity verification (KYC), business verification (KYB), AML screening, biometrics, transaction monitoring, bank data, wallet screening, Travel Rule and customer authentication, from your backend, with typed requests and responses for every Didit server API.
 
 - API reference: [docs.didit.me](https://docs.didit.me)
 - Design contract shared by every Didit server SDK: [docs/DESIGN.md](docs/DESIGN.md)
@@ -244,8 +244,30 @@ match (true) {
 - `Webhook::verifyParsed($payload, $headers, $secret)` exists for code that only has the decoded body; it can check `X-Signature-V2` only. Prefer `verify()`.
 - Didit retries deliveries with the same `eventId`: use it to ignore duplicates.
 
-Events: `StatusUpdatedEvent`, `DataUpdatedEvent`, `UserStatusUpdatedEvent`, `UserDataUpdatedEvent`, `BusinessStatusUpdatedEvent`, `BusinessDataUpdatedEvent`, `ActivityCreatedEvent`, `TransactionCreatedEvent`, `TransactionStatusUpdatedEvent`, `TravelRuleStatusUpdatedEvent`, `WorkflowComplianceChangedEvent`, `KybRegistrySearchResolvedEvent` and `UnknownEvent`, all in `Didit\Webhooks\Events`.
+Events: `StatusUpdatedEvent`, `DataUpdatedEvent`, `UserStatusUpdatedEvent`, `UserDataUpdatedEvent`, `BusinessStatusUpdatedEvent`, `BusinessDataUpdatedEvent`, `ActivityCreatedEvent`, `TransactionCreatedEvent`, `TransactionStatusUpdatedEvent`, `TravelRuleStatusUpdatedEvent`, `WorkflowComplianceChangedEvent`, `KybRegistrySearchResolvedEvent`, the bank events (`bank.link.*`, `bank.connection.*`, `bank.data.updated`, `bank.sync.*`) and `UnknownEvent`, all in `Didit\Webhooks\Events`.
 Webhook receivers for plain PHP, Laravel and Symfony are in [examples/webhooks/](examples/webhooks/).
+
+## Bank data
+
+Create a Bank Link, send the person to its URL, then read the connection once its first sync is done.
+
+```php
+$link = $didit->bank->createLink([
+    'access' => 'ongoing',
+    'data' => ['accounts', 'balances', 'transactions'],
+    'end_user' => ['reference' => 'customer-42'],
+]);
+echo $link->url, "\n";
+
+$connection = $didit->bank->getConnection($link->connectionId);
+$page = $didit->bank->listAccounts($connection->id);
+$account = $page->items[0];
+$balances = $didit->bank->getBalances($account->id);
+$transactions = $didit->bank->listTransactions($account->id, ['date_from' => '2026-01-01']);
+```
+
+[examples/bank_connection.php](examples/bank_connection.php) waits for the connection and prints accounts, balances and recent transactions.
+Bank data needs the `bank-data` permission on the API key and is not part of full access.
 
 ## Transactions, wallet screening and Travel Rule
 
