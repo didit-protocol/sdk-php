@@ -22,16 +22,23 @@ use Didit\Webhooks\Events\BankLinkFailedEvent;
 use Didit\Webhooks\Events\BankSyncCompletedEvent;
 use Didit\Webhooks\Events\BankSyncFailedEvent;
 use Didit\Webhooks\Events\BankSyncRecoveredEvent;
+use Didit\Core\Hydrate;
 use Didit\Webhooks\EventType;
+use Didit\Webhooks\Webhook;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Parses recorded `bank.*` deliveries from the OpenAPI contract.
+ * Parses recorded `bank.*` deliveries from the OpenAPI contract through the
+ * public `Webhook::verify` path, from signed bodies.
  *
  * @internal
  */
 final class BankEventTest extends TestCase
 {
+    private const SECRET = 'whsec_unit_test_secret';
+
+    private const NOW = 1760702410;
+
     private const ENVELOPE = [
         'event_id' => '7c9e6679-7425-40de-944b-e07fc1f90ae7',
         'application_id' => '0b5e8d2c-1f4a-4c3b-9d6e-2a7f8c1b3e5d',
@@ -274,6 +281,42 @@ final class BankEventTest extends TestCase
     }
 
     /**
+     * The contract puts a connection event's fields next to the envelope, with
+     * no `data` wrapper: a body that nests them there must not fill the typed
+     * properties. The payload itself stays readable through `get()`.
+     */
+    public function testConnectionEventsDoNotReadANestedDataObject(): void
+    {
+        $event = $this->event(EventType::BANK_CONNECTION_UPDATED, [
+            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
+            'status' => 'active',
+            'revocation_status' => 'pending',
+        ], nested: true);
+
+        self::assertInstanceOf(BankConnectionUpdatedEvent::class, $event);
+        self::assertNull($event->connectionId);
+        self::assertNull($event->status);
+        self::assertNull($event->revocationStatus);
+
+        $data = Hydrate::assoc($event->get('data')) ?? [];
+        self::assertSame('active', $data['status'] ?? null);
+    }
+
+    public function testADeliveryIsVerifiedAndTheBodyIsAuthenticated(): void
+    {
+        $event = $this->event(EventType::BANK_LINK_COMPLETED, [
+            'link_id' => '0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40',
+            'status' => 'completed',
+            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
+            'check_id' => null,
+            'error_code' => null,
+        ], nested: true);
+
+        self::assertSame(Webhook::HEADER_SIGNATURE, $event->verifiedWith());
+        self::assertTrue($event->bodyAuthenticated());
+    }
+
+    /**
      * @param array<string, mixed> $fields
      */
     private function event(string $type, array $fields, bool $nested = false): Event
@@ -285,6 +328,26 @@ final class BankEventTest extends TestCase
             $payload += $fields;
         }
 
-        return Event::fromPayload($payload);
+        return self::deliver($payload);
+    }
+
+    /**
+     * Verifies a delivery the way a receiving application does.
+     *
+     * @param array<string, mixed> $payload
+     */
+    private static function deliver(array $payload): Event
+    {
+        $body = json_encode($payload, \JSON_THROW_ON_ERROR);
+
+        return Webhook::verify(
+            $body,
+            [
+                'X-Signature' => hash_hmac('sha256', $body, self::SECRET),
+                'X-Timestamp' => (string) self::ENVELOPE['timestamp'],
+            ],
+            self::SECRET,
+            now: self::NOW,
+        );
     }
 }
