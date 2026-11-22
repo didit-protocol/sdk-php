@@ -8,16 +8,18 @@ use Didit\Core\Hydrate;
 use Didit\Webhooks\Event;
 
 /**
- * Base of the `bank.*` events. Their payload is in the event's `data` object.
+ * Base of the `bank.*` events. Their fields sit next to the envelope fields;
+ * a payload that carries them in `data` is read too.
  */
 abstract class BankEvent extends Event
 {
     /**
-     * The event's `data` object, exactly as sent.
+     * The event's own fields: the body itself, or its `data` object when the
+     * payload nests them there.
      *
-     * @var array<string, mixed>|null
+     * @var array<string, mixed>
      */
-    public readonly ?array $data;
+    protected readonly array $fields;
 
     /**
      * @param array<string, mixed> $payload the decoded JSON body
@@ -25,6 +27,6 @@ abstract class BankEvent extends Event
     public function __construct(array $payload)
     {
         parent::__construct($payload);
-        $this->data = Hydrate::assoc($payload['data'] ?? null);
+        $this->fields = Hydrate::assoc($payload['data'] ?? null) ?? $payload;
     }
 }
