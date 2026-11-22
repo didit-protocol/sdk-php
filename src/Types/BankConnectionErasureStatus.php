@@ -7,9 +7,10 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `pending` while deletion runs, `erased` when no stored copy and no access at the bank remain,
- * `failed` when it could not be confirmed within 24 hours. A failed deletion keeps the connection's
- * data closed, is retried, and Didit is alerted.
+ * The confirmation of the deletion. `pending`: the deletion is being confirmed, including the end of
+ * access at the bank. `erased`: confirmed, with `erased_at`. `failed`: the confirmation has not
+ * arrived yet and is repeated automatically; nothing is needed from you. The data is deleted and not
+ * readable in any of the three.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

@@ -182,9 +182,10 @@ final class Bank extends BaseResource
     /**
      * Delete a bank connection.
      *
-     * Deletes the connection's bank data and stops access at the bank. The connection's accounts,
-     * balances, transactions, sync history, consent records and ownership results are deleted. Deletion is
-     * irreversible.
+     * Deletes the connection's bank data and stops access at the bank. Deletion is immediate and
+     * irreversible: when the call returns, the connection's accounts, balances, transactions, sync
+     * history, consent records and ownership results are deleted, and its data operations (refresh, sync
+     * runs, accounts, balances, transactions and the change feed) answer `409 connection_not_active`.
      *
      * `DELETE /v3/bank/connections/{id}/`
      *
