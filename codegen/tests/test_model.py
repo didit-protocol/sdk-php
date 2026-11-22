@@ -211,12 +211,16 @@ class PropertiesAndOneOfBodyTest(unittest.TestCase):
         source = php.emit_resource(next(php.walk(php.resource_tree([self.op]))))
         self.assertIn("public function send(array $params, ?RequestOptions $options = null): Types\\MessagesSendResponse", source)
         self.assertIn("bodyTypes: ['json'],", source)
+        self.assertIn(
+            "@param ($params is array{body: mixed, template_id: mixed, ...} ? never : MessagesSendParams) $params",
+            source,
+        )
         params = php.emit_params(list(self.reg.shapes.values()), [])
         self.assertIn("}|array{", params)
         text, template = params.split("}|array{")
         self.assertIn("body: string,", text)
-        self.assertIn("template_id?: never,", text)
-        self.assertIn("body?: never,", template)
+        self.assertNotIn("template_id", text)
+        self.assertNotIn("body:", template)
         self.assertIn("template_id: string,", template)
         for branch in (text, template):
             self.assertIn("to: string,", branch)
