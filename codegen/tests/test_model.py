@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 from helpers import document, naming, ok, write_openapi, write_sessions
-from didit_codegen import model, php, spec
+from didit_codegen import model, php, spec, tests_gen
 from didit_codegen.model import AnyT, ArrayT, FreeObjT, MapT, Prop, Scalar, Shape, ShapeT
 
 
@@ -149,13 +149,7 @@ class MultiContentOneOfBodyTest(unittest.TestCase):
 
 
 class PropertiesAndOneOfBodyTest(unittest.TestCase):
-    """A body that lists its own ``properties`` and adds a top-level ``oneOf`` keeps them.
-
-    ``POST /v3/messages/`` sends an inline object whose ``properties`` hold every field and whose
-    ``oneOf`` adds two ``required`` branches, ``body`` or ``template_id`` (exactly one). That is a
-    constraint on one object, not a choice between two object shapes, so the operation keeps the
-    body and every field in it.
-    """
+    """The Messages request shape, with an extra field required in every branch."""
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -163,9 +157,10 @@ class PropertiesAndOneOfBodyTest(unittest.TestCase):
             "type": "object",
             "required": ["to"],
             "description": "Send exactly one of `body` or `template_id`.",
-            "oneOf": [{"required": ["body"]}, {"required": ["template_id"]}],
+            "oneOf": [{"required": ["common", "body"]}, {"required": ["common", "template_id"]}],
             "properties": {
                 "to": {"type": "string", "description": "Recipient."},
+                "common": {"type": "string"},
                 "body": {"type": "string", "description": "Free text."},
                 "template_id": {"type": "string", "format": "uuid"},
                 "channels": {"type": "array", "items": {"type": "string", "enum": ["sms", "whatsapp"]}},
@@ -175,7 +170,13 @@ class PropertiesAndOneOfBodyTest(unittest.TestCase):
             "/v3/messages/": {
                 "post": {
                     "summary": "Send a message",
-                    "requestBody": {"required": True, "content": {"application/json": {"schema": schema}}},
+                    "requestBody": {"required": True, "content": {"application/json": {
+                        "schema": schema,
+                        "examples": {
+                            "sms_text": {"value": {"to": "recipient", "common": "abc", "body": "Example text"}},
+                            "template": {"value": {"to": "recipient", "common": "abc", "template_id": "example-id"}},
+                        },
+                    }}},
                     "responses": ok({"type": "object", "properties": {"id": {"type": "string"}}}, "201"),
                 }
             }
@@ -194,13 +195,14 @@ class PropertiesAndOneOfBodyTest(unittest.TestCase):
 
     def test_every_property_of_the_body_is_typed(self) -> None:
         body = {p.wire: p for p in self.op.body.props}
-        self.assertEqual(sorted(body), ["body", "channels", "template_id", "to"])
+        self.assertEqual(sorted(body), ["body", "channels", "common", "template_id", "to"])
         self.assertIsInstance(body["body"].type, Scalar)
         self.assertIsInstance(body["channels"].type, ArrayT)
 
-    def test_only_the_schema_required_field_is_required(self) -> None:
+    def test_parent_and_common_branch_fields_are_required(self) -> None:
         body = {p.wire: p for p in self.op.body.props}
         self.assertTrue(body["to"].required)
+        self.assertTrue(body["common"].required)
         # Neither branch is required of every caller: the caller sends exactly one.
         self.assertFalse(body["body"].required)
         self.assertFalse(body["template_id"].required)
@@ -210,7 +212,31 @@ class PropertiesAndOneOfBodyTest(unittest.TestCase):
         self.assertIn("public function send(array $params, ?RequestOptions $options = null): Types\\MessagesSendResponse", source)
         self.assertIn("bodyTypes: ['json'],", source)
         params = php.emit_params(list(self.reg.shapes.values()), [])
-        self.assertIn("body?: string,", params)
+        self.assertIn("}|array{", params)
+        text, template = params.split("}|array{")
+        self.assertIn("body: string,", text)
+        self.assertIn("template_id?: never,", text)
+        self.assertIn("body?: never,", template)
+        self.assertIn("template_id: string,", template)
+        for branch in (text, template):
+            self.assertIn("to: string,", branch)
+            self.assertIn("common: string,", branch)
+
+    def test_generated_requests_assert_each_example_separately(self) -> None:
+        tree = php.resource_tree([self.op])
+        source = tests_gen.emit([self.op], tree)["tests/Generated/MessagesTest.php"]
+        self.assertEqual(source.count("->messages->send(["), 2)
+        self.assertIn('{"to":"recipient","common":"abc","body":"Example text"}', source)
+        self.assertIn('{"to":"recipient","common":"abc","template_id":"example-id"}', source)
+
+    def test_shared_properties_do_not_hide_a_scalar_alternative(self) -> None:
+        schema = {
+            "properties": {"shared": {"type": "string"}},
+            "oneOf": [{"type": "object", "properties": {"id": {"type": "integer"}}}, {"type": "string"}],
+        }
+        t = model.Registry().convert(self.op.op.doc, schema, "MixedResponse", "response", "mixed")
+        self.assertIsInstance(t, model.UnionT)
+        self.assertEqual(php.doc_type(t), "MixedResponse|string")
 
 
 class IdempotencyKeyHeaderTest(unittest.TestCase):

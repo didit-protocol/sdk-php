@@ -107,6 +107,7 @@ class Shape:
     description: str
     props: list[Prop] = field(default_factory=list)
     origin: str = ""
+    exclusive_keys: tuple[str, ...] = ()
 
 
 @dataclass
@@ -190,14 +191,7 @@ class Registry:
 
         variants = schema.get("oneOf") or schema.get("anyOf")
         if isinstance(variants, list) and variants:
-            if schema.get("properties"):
-                # A schema that lists its own properties and adds a top-level oneOf describes one
-                # object whose branches only constrain which fields are required; see
-                # _merge_one_of_properties. Converting the branches alone drops the properties.
-                merged = self._merge_one_of_properties(doc, schema, variants)
-                t = self._convert(doc, merged, hint, mode, origin)
-            else:
-                t = self._convert_one_of(doc, schema, variants, hint, mode, origin)
+            t = self._convert_one_of(doc, schema, variants, hint, mode, origin)
             t.nullable = t.nullable or nullable
             return t
 
@@ -281,6 +275,10 @@ class Registry:
 
     def _convert_one_of(self, doc: Document, schema: dict[str, Any], variants: list[Any], hint: str, mode: str, origin: str) -> T:
         resolved = [self._flatten(doc, v) for v in variants]
+        if schema.get("properties") and schema.get("type", "object") == "object" and all(
+            v.get("required") and v.get("type", "object") == "object" for v in resolved
+        ):
+            return self._constrained_object(doc, schema, resolved, hint, mode, origin)
         objects = [v for v in resolved if _is_objectish(v)]
         others = [variants[i] for i, v in enumerate(resolved) if not _is_objectish(v)]
         out: list[T] = []
@@ -309,34 +307,26 @@ class Registry:
             return out[0]
         return UnionT(out)
 
-    def _merge_one_of_properties(self, doc: Document, schema: dict[str, Any], variants: list[Any]) -> dict[str, Any]:
-        """One object from a schema with its own ``properties`` and a top-level ``oneOf``.
-
-        ``POST /v3/messages/`` lists every field in ``properties`` and adds two ``oneOf``
-        branches that carry only ``required`` (``body`` or ``template_id``). The branches
-        constrain one object rather than choosing between object shapes, so their fields join
-        the schema's own instead of replacing them, and the schema's ``required`` list stands.
-        """
-        props = dict(schema.get("properties", {}))
-        branch_required: list[set[str]] = []
-        for variant in variants:
-            v = self._flatten(doc, variant)
-            if not _is_objectish(v):
-                continue
-            branch_required.append(set(v.get("required", [])))
+    def _constrained_object(self, doc: Document, schema: dict[str, Any], variants: list[dict[str, Any]], hint: str, mode: str, origin: str) -> T:
+        props = dict(schema["properties"])
+        for v in variants:
             for key, prop in v.get("properties", {}).items():
                 if key in props:
                     props[key] = self._merge_prop(doc, props[key], prop)
                 else:
                     props[key] = prop
-        required = list(schema.get("required", []))
-        if not required and branch_required:
-            # No required list of its own: a key is required only when every branch requires it.
-            every = set.intersection(*branch_required)
-            required = [k for k in props if k in every]
-        merged = {k: v for k, v in schema.items() if k not in ("oneOf", "anyOf")}
-        merged.update({"type": "object", "properties": props, "required": required})
-        return merged
+        branches = [set(v["required"]) for v in variants]
+        required = set(schema.get("required", [])) | set.intersection(*branches)
+        merged = {**schema, "properties": props, "required": required}
+        t = self._object(doc, hint, merged, mode, origin, False)
+        # When only presence distinguishes branches, exactly one of their distinct keys may occur.
+        if isinstance(t, ShapeT) and "oneOf" in schema and all(v.keys() <= {"type", "required"} for v in variants):
+            choices = [branch - required for branch in branches]
+            if all(len(choice) == 1 for choice in choices):
+                keys = tuple(next(iter(choice)) for choice in choices)
+                if len(set(keys)) == len(keys) and set(keys) <= props.keys():
+                    t.shape.exclusive_keys = keys
+        return t
 
     def _merge_prop(self, doc: Document, a: Any, b: Any) -> Any:
         da, db = doc.deref(a), doc.deref(b)

@@ -34,10 +34,10 @@ def build(root: Path) -> tuple[dict[str, str], list[str]]:
     for om in ops:
         if om.body_alias is None:
             continue
-        if om.body is not None and om.body_alias == om.body.name:
+        if om.body is not None and om.body_alias == om.body.name and not (om.params and om.body.exclusive_keys):
             continue
-        op_aliases.append((om.body_alias, php.op_alias_fields(om)))
-    alias_names = {a for a, _ in op_aliases}
+        op_aliases.append(om)
+    alias_names = {om.body_alias for om in op_aliases}
     for shape in reg.shapes.values():
         if shape.name in alias_names:
             continue  # the op-level alias (body + query + headers) replaces the body-only shape
