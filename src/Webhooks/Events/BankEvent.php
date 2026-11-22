@@ -27,6 +27,7 @@ abstract class BankEvent extends Event
     public function __construct(array $payload)
     {
         parent::__construct($payload);
-        $this->fields = Hydrate::assoc($payload['data'] ?? null) ?? $payload;
+        $nested = Hydrate::assoc($payload['data'] ?? null) ?? [];
+        $this->fields = $nested + $payload;
     }
 }
