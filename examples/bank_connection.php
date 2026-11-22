@@ -31,7 +31,7 @@ $didit = new DiditClient(baseUrl: false === $baseUrl || '' === $baseUrl ? null :
 function waitFor(callable $ready, int $timeoutSeconds, string $what): void
 {
     $deadline = time() + $timeoutSeconds;
-    while (! $ready()) {
+    while (!$ready()) {
         if (time() >= $deadline) {
             throw new RuntimeException("Timed out waiting for {$what}.");
         }

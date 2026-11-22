@@ -249,9 +249,12 @@ Webhook receivers for plain PHP, Laravel and Symfony are in [examples/webhooks/]
 
 ## Bank data
 
-Create a Bank Link, send the person to its URL, then read the connection once its first sync is done.
+Create a Bank Link and send the person to its URL. A new link has no connection yet: read the accounts once the `bank.connection.created` webhook says the first sync is done.
 
 ```php
+use Didit\Webhooks\Events\BankConnectionCreatedEvent;
+
+// 1. Create the link and redirect the person to its hosted URL.
 $link = $didit->bank->createLink([
     'access' => 'ongoing',
     'data' => ['accounts', 'balances', 'transactions'],
@@ -259,11 +262,19 @@ $link = $didit->bank->createLink([
 ]);
 echo $link->url, "\n";
 
-$connection = $didit->bank->getConnection($link->connectionId);
-$page = $didit->bank->listAccounts($connection->id);
-$account = $page->items[0];
-$balances = $didit->bank->getBalances($account->id);
-$transactions = $didit->bank->listTransactions($account->id, ['date_from' => '2026-01-01']);
+// 2. In your webhook endpoint, wait for the connection, then read its data.
+$event = $didit->webhooks->verify(
+    file_get_contents('php://input'),
+    getallheaders(),
+    getenv('DIDIT_WEBHOOK_SECRET'),
+);
+if ($event instanceof BankConnectionCreatedEvent && null !== $event->connectionId) {
+    $page = $didit->bank->listAccounts($event->connectionId);
+    foreach ($page->items ?? [] as $account) {
+        $balances = $didit->bank->getBalances($account->id ?? '');
+        $transactions = $didit->bank->listTransactions($account->id ?? '', ['date_from' => '2026-01-01']);
+    }
+}
 ```
 
 [examples/bank_connection.php](examples/bank_connection.php) waits for the connection and prints accounts, balances and recent transactions.
