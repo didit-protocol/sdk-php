@@ -148,6 +148,71 @@ class MultiContentOneOfBodyTest(unittest.TestCase):
         self.assertIn("entries?: list<WalletAddressImportRow>,", source)
 
 
+class PropertiesAndOneOfBodyTest(unittest.TestCase):
+    """A body that lists its own ``properties`` and adds a top-level ``oneOf`` keeps them.
+
+    ``POST /v3/messages/`` sends an inline object whose ``properties`` hold every field and whose
+    ``oneOf`` adds two ``required`` branches, ``body`` or ``template_id`` (exactly one). That is a
+    constraint on one object, not a choice between two object shapes, so the operation keeps the
+    body and every field in it.
+    """
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        schema = {
+            "type": "object",
+            "required": ["to"],
+            "description": "Send exactly one of `body` or `template_id`.",
+            "oneOf": [{"required": ["body"]}, {"required": ["template_id"]}],
+            "properties": {
+                "to": {"type": "string", "description": "Recipient."},
+                "body": {"type": "string", "description": "Free text."},
+                "template_id": {"type": "string", "format": "uuid"},
+                "channels": {"type": "array", "items": {"type": "string", "enum": ["sms", "whatsapp"]}},
+            },
+        }
+        paths = {
+            "/v3/messages/": {
+                "post": {
+                    "summary": "Send a message",
+                    "requestBody": {"required": True, "content": {"application/json": {"schema": schema}}},
+                    "responses": ok({"type": "object", "properties": {"id": {"type": "string"}}}, "201"),
+                }
+            }
+        }
+        overlay = {"POST /v3/messages/": naming("messages", "send")}
+        with tempfile.TemporaryDirectory() as tmp:
+            write_openapi(Path(tmp), document(paths), overlay)
+            s = spec.load(Path(tmp))
+        cls.reg = model.Registry()
+        cls.op = next(o for o in model.build(cls.reg, s.server_operations))
+
+    def test_the_operation_keeps_the_body(self) -> None:
+        self.assertIsNotNone(self.op.body, "the generator dropped the request body")
+        self.assertTrue(self.op.body_required)
+        self.assertEqual(self.op.body_types, ["json"])
+
+    def test_every_property_of_the_body_is_typed(self) -> None:
+        body = {p.wire: p for p in self.op.body.props}
+        self.assertEqual(sorted(body), ["body", "channels", "template_id", "to"])
+        self.assertIsInstance(body["body"].type, Scalar)
+        self.assertIsInstance(body["channels"].type, ArrayT)
+
+    def test_only_the_schema_required_field_is_required(self) -> None:
+        body = {p.wire: p for p in self.op.body.props}
+        self.assertTrue(body["to"].required)
+        # Neither branch is required of every caller: the caller sends exactly one.
+        self.assertFalse(body["body"].required)
+        self.assertFalse(body["template_id"].required)
+
+    def test_the_generated_method_takes_params(self) -> None:
+        source = php.emit_resource(next(php.walk(php.resource_tree([self.op]))))
+        self.assertIn("public function send(array $params, ?RequestOptions $options = null): Types\\MessagesSendResponse", source)
+        self.assertIn("bodyTypes: ['json'],", source)
+        params = php.emit_params(list(self.reg.shapes.values()), [])
+        self.assertIn("body?: string,", params)
+
+
 class IdempotencyKeyHeaderTest(unittest.TestCase):
     """The shared ``Idempotency-Key`` header is generated only where it was already published (DESIGN.md)."""
 
