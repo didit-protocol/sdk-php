@@ -75,8 +75,9 @@ try {
 
     $connection = $didit->bank->getConnection($connectionId);
     echo "Connection {$connectionId} is {$connection->status}";
-    if (null !== $connection->consent?->expiresAt) {
-        echo ", consent until {$connection->consent->expiresAt->format('Y-m-d')}";
+    $expiresAt = $connection->consent?->expiresAt;
+    if (null !== $expiresAt) {
+        echo ", consent until {$expiresAt->format('Y-m-d')}";
     }
     echo "\n";
 
@@ -101,7 +102,7 @@ try {
         }
         $cursor = $page->nextCursor;
     } while (null !== $cursor);
-} catch (DiditException|RuntimeException|UnexpectedValueException $e) {
+} catch (DiditException|RuntimeException $e) {
     fwrite(\STDERR, 'Error: ' . $e->getMessage() . "\n");
     exit(1);
 }

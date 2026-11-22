@@ -8,6 +8,7 @@ use Didit\Webhooks\Event;
 use Didit\Webhooks\Events\BankConnectionConsentExpiringEvent;
 use Didit\Webhooks\Events\BankConnectionCreatedEvent;
 use Didit\Webhooks\Events\BankConnectionDeletedEvent;
+use Didit\Webhooks\Events\BankConnectionEvent;
 use Didit\Webhooks\Events\BankConnectionHistoryCompleteEvent;
 use Didit\Webhooks\Events\BankConnectionRenewalRequiredEvent;
 use Didit\Webhooks\Events\BankConnectionRenewedEvent;
@@ -16,6 +17,7 @@ use Didit\Webhooks\Events\BankConnectionUpdatedEvent;
 use Didit\Webhooks\Events\BankDataUpdatedEvent;
 use Didit\Webhooks\Events\BankLinkCancelledEvent;
 use Didit\Webhooks\Events\BankLinkCompletedEvent;
+use Didit\Webhooks\Events\BankLinkEvent;
 use Didit\Webhooks\Events\BankLinkExpiredEvent;
 use Didit\Webhooks\Events\BankLinkFailedEvent;
 use Didit\Webhooks\Events\BankSyncCompletedEvent;
@@ -41,6 +43,7 @@ final class BankEventTest extends TestCase
 
     public function testBankLinkEvents(): void
     {
+        /** @var array<string, array{class-string<BankLinkEvent>, string, string|null}> $events */
         $events = [
             EventType::BANK_LINK_COMPLETED => [BankLinkCompletedEvent::class, 'completed', '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35'],
             EventType::BANK_LINK_CANCELLED => [BankLinkCancelledEvent::class, 'cancelled', null],
@@ -57,7 +60,8 @@ final class BankEventTest extends TestCase
                 'error_code' => 'failed' === $status ? 'consent_declined' : null,
             ]);
 
-            self::assertInstanceOf($class, $event);
+            self::assertSame($class, $event::class);
+            self::assertInstanceOf(BankLinkEvent::class, $event);
             self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $event->linkId);
             self::assertSame($status, $event->status);
             self::assertSame($connectionId, $event->connectionId);
@@ -68,6 +72,7 @@ final class BankEventTest extends TestCase
 
     public function testBankConnectionEvents(): void
     {
+        /** @var array<string, class-string<BankConnectionEvent>> $events */
         $events = [
             EventType::BANK_CONNECTION_CREATED => BankConnectionCreatedEvent::class,
             EventType::BANK_CONNECTION_UPDATED => BankConnectionUpdatedEvent::class,
@@ -83,7 +88,8 @@ final class BankEventTest extends TestCase
                 'status_reason' => 'bank_requires_sign_in',
             ]);
 
-            self::assertInstanceOf($class, $event);
+            self::assertSame($class, $event::class);
+            self::assertInstanceOf(BankConnectionEvent::class, $event);
             self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
             self::assertSame('active', $event->status);
             self::assertSame('bank_requires_sign_in', $event->statusReason);
