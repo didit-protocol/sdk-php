@@ -133,6 +133,110 @@ namespace Didit;
  *     cbu_cvu?: string,
  *     registration_id?: string,
  * }
+ * @phpstan-type BankLinkCreateRequest array{
+ *     mode?: string,
+ *     connection_id?: string,
+ *     access?: string,
+ *     country?: string,
+ *     institution_id?: string,
+ *     segment?: string,
+ *     data?: list<string>,
+ *     history_days?: int,
+ *     history_from?: string,
+ *     extended_history?: string,
+ *     consent_days?: int,
+ *     ownership?: BankLinkOwnershipRequest,
+ *     end_user?: BankLinkEndUser,
+ *     redirect_url?: string,
+ *     allowed_origins?: list<string>,
+ *     language?: string,
+ *     vendor_data?: string,
+ *     expires_in?: int,
+ *     duplicates?: string,
+ *     allow_one_time_fallback?: bool,
+ *     accept_reduced_grant?: bool,
+ *     sandbox?: BankLinkCreateRequestSandbox,
+ * }
+ * @phpstan-type BankLinkCreateRequestSandbox array{
+ *     persona?: string,
+ *     switches?: list<string>,
+ * }
+ * @phpstan-type BankLinkEndUser array{
+ *     reference?: string,
+ *     email?: string,
+ * }
+ * @phpstan-type BankLinkOwnershipRequest array{
+ *     compare?: string,
+ *     match?: string,
+ *     reference_identity?: BankLinkOwnershipRequestReferenceIdentity,
+ *     session_id?: string,
+ *     business?: BankLinkOwnershipRequestBusiness,
+ *     business_session_id?: string,
+ * }
+ * @phpstan-type BankLinkOwnershipRequestBusiness array{
+ *     legal_name: string,
+ *     registration_id?: string,
+ * }
+ * @phpstan-type BankLinkOwnershipRequestReferenceIdentity array{
+ *     full_name?: string,
+ *     date_of_birth?: string,
+ *     address?: string,
+ *     phone?: string,
+ *     email?: string,
+ * }
+ * @phpstan-type BankListAccountsParams array{
+ *     limit?: int,
+ *     cursor?: string,
+ * }
+ * @phpstan-type BankListConnectionsParams array{
+ *     status?: string,
+ *     access?: string,
+ *     institution_id?: string,
+ *     country?: string,
+ *     vendor_data?: string,
+ *     end_user_reference?: string,
+ *     consent_expires_before?: \DateTimeInterface|string,
+ *     created_after?: \DateTimeInterface|string,
+ *     limit?: int,
+ *     cursor?: string,
+ * }
+ * @phpstan-type BankListInstitutionsParams array{
+ *     country?: string,
+ *     segment?: string,
+ *     access?: string,
+ *     q?: string,
+ *     limit?: int,
+ *     cursor?: string,
+ * }
+ * @phpstan-type BankListSyncRunsParams array{
+ *     limit?: int,
+ *     cursor?: string,
+ * }
+ * @phpstan-type BankListTransactionsParams array{
+ *     date_from?: string,
+ *     date_to?: string,
+ *     status?: string,
+ *     limit?: int,
+ *     page_token?: string,
+ * }
+ * @phpstan-type BankRefreshConnectionParams array{
+ *     wait?: bool,
+ *     prefer?: string,
+ * }
+ * @phpstan-type BankRefreshRequest array{
+ *     wait?: bool,
+ * }
+ * @phpstan-type BankRenewLinkRequest array{
+ *     redirect_url?: string,
+ *     allowed_origins?: list<string>,
+ *     language?: string,
+ *     expires_in?: int,
+ * }
+ * @phpstan-type BankSyncTransactionsParams array{
+ *     cursor?: string,
+ *     limit?: int,
+ *     page_token?: string,
+ * }
  * @phpstan-type BillingTopUpParams array{
  *     amount_in_dollars: float|int,
  *     success_url?: string,
