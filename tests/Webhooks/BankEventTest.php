@@ -8,7 +8,6 @@ use Didit\Webhooks\Event;
 use Didit\Webhooks\Events\BankConnectionConsentExpiringEvent;
 use Didit\Webhooks\Events\BankConnectionCreatedEvent;
 use Didit\Webhooks\Events\BankConnectionDeletedEvent;
-use Didit\Webhooks\Events\BankConnectionEvent;
 use Didit\Webhooks\Events\BankConnectionHistoryCompleteEvent;
 use Didit\Webhooks\Events\BankConnectionRenewalRequiredEvent;
 use Didit\Webhooks\Events\BankConnectionRenewedEvent;
