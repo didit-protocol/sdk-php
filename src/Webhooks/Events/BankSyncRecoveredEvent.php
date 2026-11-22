@@ -7,13 +7,10 @@ namespace Didit\Webhooks\Events;
 use Didit\Core\Hydrate;
 
 /**
- * `bank.sync.recovered`: a sync succeeded after failures.
+ * `bank.sync.recovered`: syncs work again after failures.
  */
-final class BankSyncRecoveredEvent extends BankEvent
+final class BankSyncRecoveredEvent extends BankConnectionEvent
 {
-    /** The connection id. */
-    public readonly ?string $connectionId;
-
     /** The sync that succeeded. */
     public readonly ?string $syncId;
 
@@ -23,8 +20,6 @@ final class BankSyncRecoveredEvent extends BankEvent
     public function __construct(array $payload)
     {
         parent::__construct($payload);
-        $data = $this->data ?? [];
-        $this->connectionId = Hydrate::string($data['connection_id'] ?? null);
-        $this->syncId = Hydrate::string($data['sync_id'] ?? null);
+        $this->syncId = Hydrate::string($this->fields['sync_id'] ?? null);
     }
 }

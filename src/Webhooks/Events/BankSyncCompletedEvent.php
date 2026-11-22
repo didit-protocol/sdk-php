@@ -9,15 +9,12 @@ use Didit\Core\Hydrate;
 /**
  * `bank.sync.completed`: a sync finished; `outcome` says whether it fully succeeded.
  */
-final class BankSyncCompletedEvent extends BankEvent
+final class BankSyncCompletedEvent extends BankConnectionEvent
 {
-    /** The connection id. */
-    public readonly ?string $connectionId;
-
     /** The sync id. */
     public readonly ?string $syncId;
 
-    /** `scheduled`, `requested` or `initial`. */
+    /** `initial`, `scheduled` or `requested`. */
     public readonly ?string $trigger;
 
     /** `succeeded`, `partial` or `failed`. */
@@ -32,11 +29,9 @@ final class BankSyncCompletedEvent extends BankEvent
     public function __construct(array $payload)
     {
         parent::__construct($payload);
-        $data = $this->data ?? [];
-        $this->connectionId = Hydrate::string($data['connection_id'] ?? null);
-        $this->syncId = Hydrate::string($data['sync_id'] ?? null);
-        $this->trigger = Hydrate::string($data['trigger'] ?? null);
-        $this->outcome = Hydrate::string($data['outcome'] ?? null);
-        $this->changed = Hydrate::bool($data['changed'] ?? null);
+        $this->syncId = Hydrate::string($this->fields['sync_id'] ?? null);
+        $this->trigger = Hydrate::string($this->fields['trigger'] ?? null);
+        $this->outcome = Hydrate::string($this->fields['outcome'] ?? null);
+        $this->changed = Hydrate::bool($this->fields['changed'] ?? null);
     }
 }

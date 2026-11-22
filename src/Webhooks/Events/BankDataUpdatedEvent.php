@@ -9,31 +9,22 @@ use Didit\Core\Hydrate;
 /**
  * `bank.data.updated`: a sync stored changes; read them with the change feed.
  */
-final class BankDataUpdatedEvent extends BankEvent
+final class BankDataUpdatedEvent extends BankConnectionEvent
 {
-    /** The connection id. */
-    public readonly ?string $connectionId;
-
     /** The sync that stored the changes. */
     public readonly ?string $syncId;
 
+    /** `initial`, `scheduled` or `requested`. */
+    public readonly ?string $trigger;
+
     /**
-     * Accounts whose data changed.
+     * The accounts whose transactions changed, with their counts.
      *
-     * @var list<string>|null
+     * @var list<BankDataUpdatedAccount>|null
      */
-    public readonly ?array $accountIds;
+    public readonly ?array $accounts;
 
-    /** Transactions added. */
-    public readonly ?int $added;
-
-    /** Transactions modified. */
-    public readonly ?int $modified;
-
-    /** Transactions removed. */
-    public readonly ?int $removed;
-
-    /** Whether balances changed. */
+    /** Whether any balance changed. */
     public readonly ?bool $balancesChanged;
 
     /**
@@ -42,13 +33,12 @@ final class BankDataUpdatedEvent extends BankEvent
     public function __construct(array $payload)
     {
         parent::__construct($payload);
-        $data = $this->data ?? [];
-        $this->connectionId = Hydrate::string($data['connection_id'] ?? null);
-        $this->syncId = Hydrate::string($data['sync_id'] ?? null);
-        $this->accountIds = Hydrate::list($data['account_ids'] ?? null, Hydrate::string(...));
-        $this->added = Hydrate::int($data['added'] ?? null);
-        $this->modified = Hydrate::int($data['modified'] ?? null);
-        $this->removed = Hydrate::int($data['removed'] ?? null);
-        $this->balancesChanged = Hydrate::bool($data['balances_changed'] ?? null);
+        $this->syncId = Hydrate::string($this->fields['sync_id'] ?? null);
+        $this->trigger = Hydrate::string($this->fields['trigger'] ?? null);
+        $this->accounts = Hydrate::list(
+            $this->fields['accounts'] ?? null,
+            static fn (mixed $value) => Hydrate::model($value, BankDataUpdatedAccount::class),
+        );
+        $this->balancesChanged = Hydrate::bool($this->fields['balances_changed'] ?? null);
     }
 }
