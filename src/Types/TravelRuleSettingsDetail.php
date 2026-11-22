@@ -23,8 +23,9 @@ final class TravelRuleSettingsDetail extends BaseModel
     /**
      * Your VASP's regulatory regime code. Default `"EU"`. Didit maps it to the regime it stamps on your
      * Travel Rule transactions as `travel_rule_regime` (for example `EU` or an EU member code becomes
-     * `eu`, `CA` or `CAN` becomes `canada`, `US` or `USA` becomes `us`), which transaction rules can key
-     * on, and it decides which data fields the exchange must share.
+     * `eu`), which transaction rules can key on, and it decides which data fields the exchange must share.
+     * Other Didit customers see `vasp_jurisdiction` in the VASP directory; while `vasp_jurisdiction` is
+     * empty, the directory shows this value instead.
      */
     public readonly ?string $jurisdiction;
 
