@@ -24,9 +24,9 @@ final class Pricing extends BaseResource
      * Get bank verification prices (public, unauthenticated).
      *
      * Returns the list price of each Bank Verification method in every country: bank sign-in with its
-     * balance and transactions add-ons, and the account check. A method a country does not offer today
-     * shows as not available, with no price. Use it to quote a bank step before you build a workflow, or
-     * to show bank prices in your own product.
+     * balance and transactions add-ons, ongoing access to bank data, and the account check. A method a
+     * country does not offer today shows as not available, with no price. Use it to quote a bank step
+     * before you build a workflow, or to show bank prices in your own product.
      *
      * `GET /v3/organization/bank-verification-pricing/`
      *
