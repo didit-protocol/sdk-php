@@ -17,6 +17,7 @@ use Didit\Types;
  * The `authentication_setup` resource.
  *
  * @phpstan-import-type AuthenticationSetupGetBrandingParams from Params
+ * @phpstan-import-type AuthenticationSetupGetEmailParams from Params
  * @phpstan-import-type AuthenticationSetupGetEmailsParams from Params
  * @phpstan-import-type SetupBrandingUpdate from Params
  * @phpstan-import-type SetupConfigurationUpdate from Params
@@ -349,15 +350,18 @@ final class AuthenticationSetup extends BaseResource
      * Preview a sign-in email.
      *
      * Returns one email as it renders, with sample codes and links. An invitation preview uses a sample
-     * organization for a grant or named key. A console session can see a customer organization's name. The
-     * address of a console member is left out for a grant or a key, which have no mailbox. An email
-     * Authentication does not send answers `{"error": "email_not_sent_by_authentication"}`.
+     * organization for a grant or named key, or the `organization` and `role` you pass. `agentoff` is the
+     * email a person receives when your team ends an agent's access with a notification; `agent` names the
+     * agent. A console session can see a customer organization's name. The address of a console member is
+     * left out for a grant or a key, which have no mailbox. An email Authentication does not send answers
+     * `{"error": "email_not_sent_by_authentication"}`.
      *
      * `GET /organizations/{organization_id}/applications/{application_id}/authentication/emails/{key}/`
      *
      * @param string $organizationId UUID of the organization that owns the application
      * @param string $applicationId UUID of the application: live or sandbox
      * @param string $key the email: `code`, `magic`, `reset`, `device`, `invite`, `org`, `agent` or `agentoff`
+     * @param AuthenticationSetupGetEmailParams $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
@@ -366,13 +370,15 @@ final class AuthenticationSetup extends BaseResource
         string $organizationId,
         string $applicationId,
         string $key,
+        array $params = [],
         ?RequestOptions $options = null,
     ): Types\SetupEmail {
         $response = $this->requester->request(new Operation(
             method: 'GET',
             path: '/organizations/{organization_id}/applications/{application_id}/authentication/emails/{key}/',
             base: 'account',
-        ), ['organization_id' => $organizationId, 'application_id' => $applicationId, 'key' => $key], [], $options);
+            query: ['organization' => 'organization', 'role' => 'role', 'agent' => 'agent'],
+        ), ['organization_id' => $organizationId, 'application_id' => $applicationId, 'key' => $key], $params, $options);
 
         return Types\SetupEmail::fromResponse($response);
     }
