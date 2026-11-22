@@ -21,6 +21,7 @@ use Didit\Types;
  *
  * @phpstan-import-type MessagesListParams from Params
  * @phpstan-import-type MessagesListPricesParams from Params
+ * @phpstan-import-type MessagesSendParams from Params
  * @phpstan-import-type MessagesSettings from Params
  */
 final class Messages extends BaseResource
@@ -58,15 +59,19 @@ final class Messages extends BaseResource
      *
      * `POST /v3/messages/`
      *
+     * @param MessagesSendParams $params
+     *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function send(?RequestOptions $options = null): Types\Message
+    public function send(array $params, ?RequestOptions $options = null): Types\Message
     {
         $response = $this->requester->request(new Operation(
             method: 'POST',
             path: '/v3/messages/',
             bodyTypes: ['json'],
-        ), [], [], $options);
+            jsonHints: ['variables' => ['o'], 'options' => ['o']],
+        ), [], $params, $options);
 
         return Types\Message::fromResponse($response);
     }

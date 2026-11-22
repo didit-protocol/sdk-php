@@ -1458,6 +1458,23 @@ namespace Didit;
  * @phpstan-type MessagesListPricesParams array{
  *     country: string,
  * }
+ * @phpstan-type MessagesSendParams array{
+ *     to: string,
+ *     to_email?: string,
+ *     channels?: list<string>,
+ *     body?: string,
+ *     template_id?: string,
+ *     variables?: array<string, string>,
+ *     locale?: string,
+ *     subject?: string,
+ *     schedule_at?: \DateTimeInterface|string,
+ *     expires_at?: \DateTimeInterface|string,
+ *     correlation_id?: string,
+ *     options?: MessagesSendParamsOptions,
+ * }
+ * @phpstan-type MessagesSendParamsOptions array{
+ *     append_opt_out_line?: bool,
+ * }
  * @phpstan-type MessagesSettings array{
  *     retention_days: int,
  * }
