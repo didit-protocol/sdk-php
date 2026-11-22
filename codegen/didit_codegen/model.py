@@ -190,7 +190,14 @@ class Registry:
 
         variants = schema.get("oneOf") or schema.get("anyOf")
         if isinstance(variants, list) and variants:
-            t = self._convert_one_of(doc, schema, variants, hint, mode, origin)
+            if schema.get("properties"):
+                # A schema that lists its own properties and adds a top-level oneOf describes one
+                # object whose branches only constrain which fields are required; see
+                # _merge_one_of_properties. Converting the branches alone drops the properties.
+                merged = self._merge_one_of_properties(doc, schema, variants)
+                t = self._convert(doc, merged, hint, mode, origin)
+            else:
+                t = self._convert_one_of(doc, schema, variants, hint, mode, origin)
             t.nullable = t.nullable or nullable
             return t
 
@@ -301,6 +308,35 @@ class Registry:
         if len(out) == 1:
             return out[0]
         return UnionT(out)
+
+    def _merge_one_of_properties(self, doc: Document, schema: dict[str, Any], variants: list[Any]) -> dict[str, Any]:
+        """One object from a schema with its own ``properties`` and a top-level ``oneOf``.
+
+        ``POST /v3/messages/`` lists every field in ``properties`` and adds two ``oneOf``
+        branches that carry only ``required`` (``body`` or ``template_id``). The branches
+        constrain one object rather than choosing between object shapes, so their fields join
+        the schema's own instead of replacing them, and the schema's ``required`` list stands.
+        """
+        props = dict(schema.get("properties", {}))
+        branch_required: list[set[str]] = []
+        for variant in variants:
+            v = self._flatten(doc, variant)
+            if not _is_objectish(v):
+                continue
+            branch_required.append(set(v.get("required", [])))
+            for key, prop in v.get("properties", {}).items():
+                if key in props:
+                    props[key] = self._merge_prop(doc, props[key], prop)
+                else:
+                    props[key] = prop
+        required = list(schema.get("required", []))
+        if not required and branch_required:
+            # No required list of its own: a key is required only when every branch requires it.
+            every = set.intersection(*branch_required)
+            required = [k for k in props if k in every]
+        merged = {k: v for k, v in schema.items() if k not in ("oneOf", "anyOf")}
+        merged.update({"type": "object", "properties": props, "required": required})
+        return merged
 
     def _merge_prop(self, doc: Document, a: Any, b: Any) -> Any:
         da, db = doc.deref(a), doc.deref(b)
