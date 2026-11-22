@@ -220,11 +220,12 @@ final class BankEventTest extends TestCase
         self::assertSame('d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14', $event->syncId);
         self::assertSame('scheduled', $event->trigger);
         self::assertTrue($event->balancesChanged);
-        self::assertCount(1, $event->accounts);
-        self::assertSame('a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10', $event->accounts[0]->accountId);
-        self::assertSame(3, $event->accounts[0]->added);
-        self::assertSame(2, $event->accounts[0]->modified);
-        self::assertSame(1, $event->accounts[0]->removed);
+        $accounts = $event->accounts ?? [];
+        self::assertCount(1, $accounts);
+        self::assertSame('a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10', $accounts[0]->accountId);
+        self::assertSame(3, $accounts[0]->added);
+        self::assertSame(2, $accounts[0]->modified);
+        self::assertSame(1, $accounts[0]->removed);
     }
 
     public function testBankSyncCompletedEvent(): void
