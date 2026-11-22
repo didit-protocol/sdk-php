@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Webhooks;
 
+use Didit\Core\Hydrate;
 use Didit\Webhooks\Event;
 use Didit\Webhooks\Events\BankConnectionConsentExpiringEvent;
 use Didit\Webhooks\Events\BankConnectionCreatedEvent;
@@ -22,7 +23,6 @@ use Didit\Webhooks\Events\BankLinkFailedEvent;
 use Didit\Webhooks\Events\BankSyncCompletedEvent;
 use Didit\Webhooks\Events\BankSyncFailedEvent;
 use Didit\Webhooks\Events\BankSyncRecoveredEvent;
-use Didit\Core\Hydrate;
 use Didit\Webhooks\EventType;
 use Didit\Webhooks\Webhook;
 use PHPUnit\Framework\TestCase;
