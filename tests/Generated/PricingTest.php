@@ -17,7 +17,7 @@ final class PricingTest extends GeneratedTestCase
 {
     public function testBankVerification(): void
     {
-        $this->queueJson(200, '{"currency":"USD","statement_upload":{"price_usd":"0.2000","included_after_charged_bank_attempt":true,"standalone_available":true},"own_provider_fee_usd":"0.0200","countries":{"GBR":{"name":"United Kingdom","methods":{"open_banking":{"available":true,"market":"UK and EEA","price_usd":"0.7900","add_ons":{"balance":"0.3500","transactions":"1.3000"}},"account_lookup":{"available":true,"price_usd":"0.4000"}}},"CAN":{"name":"Canada","methods":{"open_banking":{"available":false,"market":null,"price_usd":null,"add_ons":{}},"account_lookup":{"available":false,"price_usd":null}}}}}');
+        $this->queueJson(200, '{"currency":"USD","statement_upload":{"price_usd":"0.2000","included_after_charged_bank_attempt":true,"standalone_available":true},"own_provider_fee_usd":"0.0200","countries":{"GBR":{"name":"United Kingdom","methods":{"open_banking":{"available":true,"market":"UK and EEA","price_usd":"0.7900","add_ons":{"balance":"0.3500","transactions":"1.3000"},"ongoing":{"available":true,"price_usd_per_month":"0.9000"},"one_time_data":{"balances_usd":"0.3500","transactions_usd":"1.3000"}},"account_lookup":{"available":true,"price_usd":"0.4000"}}},"CAN":{"name":"Canada","methods":{"open_banking":{"available":false,"market":null,"price_usd":null,"add_ons":{},"ongoing":{"available":false,"price_usd_per_month":null},"one_time_data":null},"account_lookup":{"available":false,"price_usd":null}}}}}');
 
         $result = $this->client->pricing->bankVerification();
 
@@ -30,7 +30,7 @@ final class PricingTest extends GeneratedTestCase
         self::assertSame('', $request->getHeaderLine('Authorization'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"currency":"USD","statement_upload":{"price_usd":"0.2000","included_after_charged_bank_attempt":true,"standalone_available":true},"own_provider_fee_usd":"0.0200","countries":{"GBR":{"name":"United Kingdom","methods":{"open_banking":{"available":true,"market":"UK and EEA","price_usd":"0.7900","add_ons":{"balance":"0.3500","transactions":"1.3000"}},"account_lookup":{"available":true,"price_usd":"0.4000"}}},"CAN":{"name":"Canada","methods":{"open_banking":{"available":false,"market":null,"price_usd":null,"add_ons":{}},"account_lookup":{"available":false,"price_usd":null}}}}}'), $result->toArray());
+        self::assertSame($this->decoded('{"currency":"USD","statement_upload":{"price_usd":"0.2000","included_after_charged_bank_attempt":true,"standalone_available":true},"own_provider_fee_usd":"0.0200","countries":{"GBR":{"name":"United Kingdom","methods":{"open_banking":{"available":true,"market":"UK and EEA","price_usd":"0.7900","add_ons":{"balance":"0.3500","transactions":"1.3000"},"ongoing":{"available":true,"price_usd_per_month":"0.9000"},"one_time_data":{"balances_usd":"0.3500","transactions_usd":"1.3000"}},"account_lookup":{"available":true,"price_usd":"0.4000"}}},"CAN":{"name":"Canada","methods":{"open_banking":{"available":false,"market":null,"price_usd":null,"add_ons":{},"ongoing":{"available":false,"price_usd_per_month":null},"one_time_data":null},"account_lookup":{"available":false,"price_usd":null}}}}}'), $result->toArray());
         self::assertSame('USD', $result->currency);
     }
 

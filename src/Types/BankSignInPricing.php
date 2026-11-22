@@ -31,6 +31,20 @@ final class BankSignInPricing extends BaseModel
     public readonly ?BankSignInPricingAddOns $addOns;
 
     /**
+     * Ongoing access to bank data (Bank Link `access: ongoing`). Present only where Bank data is switched
+     * on.
+     */
+    public readonly ?BankSignInPricingOngoing $ongoing;
+
+    /**
+     * One-time data prices of a Bank Link, present only where Bank data is switched on. `null` where the
+     * country offers no one-time data: use `add_ons`. Where the country offers the one-time bundle, the
+     * object also carries `bundle_included: true` and `transactions_usd` is that bundle: one read of
+     * transactions and balances.
+     */
+    public readonly ?BankSignInPricingOneTimeData $oneTimeData;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -40,5 +54,7 @@ final class BankSignInPricing extends BaseModel
         $this->market = Hydrate::string($data['market'] ?? null);
         $this->priceUsd = Hydrate::string($data['price_usd'] ?? null);
         $this->addOns = Hydrate::model($data['add_ons'] ?? null, BankSignInPricingAddOns::class);
+        $this->ongoing = Hydrate::model($data['ongoing'] ?? null, BankSignInPricingOngoing::class);
+        $this->oneTimeData = Hydrate::model($data['one_time_data'] ?? null, BankSignInPricingOneTimeData::class);
     }
 }
