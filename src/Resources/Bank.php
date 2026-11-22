@@ -76,7 +76,7 @@ final class Bank extends BaseResource
             method: 'POST',
             path: '/v3/bank/links/',
             bodyTypes: ['json'],
-            jsonHints: ['ownership' => ['o', ['reference_identity' => ['o'], 'business' => ['o']]], 'end_user' => ['o']],
+            jsonHints: ['ownership' => ['o', ['reference_identity' => ['o'], 'business' => ['o']]], 'end_user' => ['o'], 'sandbox' => ['o']],
         ), [], $params, $options);
 
         return Types\BankLink::fromResponse($response);
@@ -341,7 +341,8 @@ final class Bank extends BaseResource
     /**
      * List accounts of a connection.
      *
-     * Lists every account of the connection with full identifiers and holders. A read never bills.
+     * Lists every account of the connection, oldest first, with full identifiers and holders. A read never
+     * bills.
      *
      * `GET /v3/bank/connections/{id}/accounts/`
      *
@@ -414,10 +415,10 @@ final class Bank extends BaseResource
      *
      * Date-range read of an account's transactions, sorted by `effective_date` descending, then `id`
      * descending, in pages of up to 500. `date_from` and `date_to` are calendar dates, inclusive, in the
-     * bank's own time zone with nothing converted. They apply to `effective_date`: the booking date of a
-     * booked transaction, and for a pending one its transaction date or, failing that, the date it was
-     * first seen. By default `date_from` is the start of the stored history and `date_to` has no upper
-     * bound, and booked and pending are both returned.
+     * bank's own time zone with nothing converted. They apply to `effective_date`: for a booked
+     * transaction its booking date, else its value date, else the date it was first seen; for a pending
+     * one its transaction date, else the date it was first seen. By default `date_from` is the start of
+     * the stored history and `date_to` has no upper bound, and booked and pending are both returned.
      *
      * `GET /v3/bank/accounts/{account_id}/transactions/`
      *

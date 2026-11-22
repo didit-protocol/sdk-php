@@ -16,8 +16,8 @@ final class BankConnectionErasure extends BaseModel
 {
     /**
      * `pending` while deletion runs, `erased` when no stored copy and no access at the bank remain,
-     * `failed` when it could not be confirmed within 24 hours. A failed deletion keeps every read and
-     * write of the connection blocked, is retried, and Didit is alerted.
+     * `failed` when it could not be confirmed within 24 hours. A failed deletion keeps the connection's
+     * data closed, is retried, and Didit is alerted.
      *
      * Known values: {@see BankConnectionErasureStatus}.
      */
@@ -25,6 +25,9 @@ final class BankConnectionErasure extends BaseModel
 
     /** The `requested_at` field. */
     public readonly ?\DateTimeImmutable $requestedAt;
+
+    /** When the deletion finished. `null` until `status` is `erased`. */
+    public readonly ?\DateTimeImmutable $erasedAt;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -34,5 +37,6 @@ final class BankConnectionErasure extends BaseModel
         parent::__construct($data);
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->requestedAt = Hydrate::dateTime($data['requested_at'] ?? null);
+        $this->erasedAt = Hydrate::dateTime($data['erased_at'] ?? null);
     }
 }

@@ -155,6 +155,11 @@ namespace Didit;
  *     duplicates?: string,
  *     allow_one_time_fallback?: bool,
  *     accept_reduced_grant?: bool,
+ *     sandbox?: BankLinkCreateRequestSandbox,
+ * }
+ * @phpstan-type BankLinkCreateRequestSandbox array{
+ *     persona?: string,
+ *     switches?: list<string>,
  * }
  * @phpstan-type BankLinkEndUser array{
  *     reference?: string,

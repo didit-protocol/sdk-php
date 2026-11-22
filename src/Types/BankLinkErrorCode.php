@@ -37,6 +37,8 @@ final class BankLinkErrorCode
 
     public const RENEWAL_WINDOW_EXPIRED = 'renewal_window_expired';
 
+    public const FIRST_SYNC_FAILED = 'first_sync_failed';
+
     private function __construct()
     {
     }

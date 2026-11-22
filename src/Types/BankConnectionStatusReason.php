@@ -7,7 +7,9 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Why the connection is in this status. `paused_by_customer` is reserved.
+ * Why the connection is in this status. `paused_by_customer` is reserved. On a `deleted` connection:
+ * `deleted_by_customer`, `consent_lapsed`, `retention_elapsed`, `application_deleted` or
+ * `restored_after_deletion`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -32,6 +34,14 @@ final class BankConnectionStatusReason
     public const PAUSED_BY_CUSTOMER = 'paused_by_customer';
 
     public const FIRST_SYNC_FAILED = 'first_sync_failed';
+
+    public const DELETED_BY_CUSTOMER = 'deleted_by_customer';
+
+    public const RETENTION_ELAPSED = 'retention_elapsed';
+
+    public const APPLICATION_DELETED = 'application_deleted';
+
+    public const RESTORED_AFTER_DELETION = 'restored_after_deletion';
 
     private function __construct()
     {

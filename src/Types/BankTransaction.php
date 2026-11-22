@@ -50,8 +50,8 @@ final class BankTransaction extends BaseModel
 
     /**
      * The date the date filters use, as the bank reports it in its own time zone with nothing converted:
-     * the booking date of a booked transaction, and for a pending one its transaction date or, failing
-     * that, the date it was first seen.
+     * for a booked transaction its booking date, else its value date, else the date it was first seen; for
+     * a pending one its transaction date, else the date it was first seen.
      */
     public readonly ?string $effectiveDate;
 

@@ -20,7 +20,7 @@ final class BankSyncError extends BaseModel
     /** Plain-language explanation. */
     public readonly ?string $message;
 
-    /** When it happened. */
+    /** When it happened. `null` on a per-account result. */
     public readonly ?\DateTimeImmutable $at;
 
     /**

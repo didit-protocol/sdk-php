@@ -14,7 +14,11 @@ use Didit\Core\Hydrate;
  */
 final class BankConnectionBilling extends BaseModel
 {
-    /** Billing unit, `connection_month` for ongoing access, `one_time` otherwise. */
+    /**
+     * Billing unit, `connection_month` for ongoing access, `one_time` otherwise.
+     *
+     * Known values: {@see BankConnectionBillingUnit}.
+     */
     public readonly ?string $unit;
 
     /**

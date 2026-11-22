@@ -59,7 +59,7 @@ final class BankTest extends GeneratedTestCase
 
     public function testCreateLink(): void
     {
-        $this->queueJson(201, '{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/blu_7Xq2k9Lm3Vd8Rt5Yw1Ns6Ph4Zc0Bj","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":null,"check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}');
+        $this->queueJson(201, '{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/example-link-token","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":null,"check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}');
 
         $result = $this->client->bank->createLink([
             'mode' => 'connect',
@@ -99,6 +99,12 @@ final class BankTest extends GeneratedTestCase
             'duplicates' => 'reuse',
             'allow_one_time_fallback' => true,
             'accept_reduced_grant' => true,
+            'sandbox' => [
+                'persona' => 'personal_basic',
+                'switches' => [
+                    'partial_grant',
+                ],
+            ],
         ]);
 
         $request = $this->lastRequest();
@@ -108,9 +114,9 @@ final class BankTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"mode":"connect","connection_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","access":"one_time","country":"country-value","institution_id":"institution_id-value","segment":"personal","data":["accounts"],"history_days":1,"history_from":"2026-01-15","extended_history":"standard","consent_days":1,"ownership":{"compare":"none","match":"any_holder","reference_identity":{},"session_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","business":{"legal_name":"legal_name-value"},"business_session_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"},"end_user":{"reference":"reference-value","email":"user@example.com"},"redirect_url":"https://example.com/callback","allowed_origins":["https://example.com/callback"],"language":"language-value","vendor_data":"vendor_data-value","expires_in":1,"duplicates":"reuse","allow_one_time_fallback":true,"accept_reduced_grant":true}', $this->canonicalBody($request));
+        self::assertSame('{"mode":"connect","connection_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","access":"one_time","country":"country-value","institution_id":"institution_id-value","segment":"personal","data":["accounts"],"history_days":1,"history_from":"2026-01-15","extended_history":"standard","consent_days":1,"ownership":{"compare":"none","match":"any_holder","reference_identity":{},"session_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","business":{"legal_name":"legal_name-value"},"business_session_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"},"end_user":{"reference":"reference-value","email":"user@example.com"},"redirect_url":"https://example.com/callback","allowed_origins":["https://example.com/callback"],"language":"language-value","vendor_data":"vendor_data-value","expires_in":1,"duplicates":"reuse","allow_one_time_fallback":true,"accept_reduced_grant":true,"sandbox":{"persona":"personal_basic","switches":["partial_grant"]}}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/blu_7Xq2k9Lm3Vd8Rt5Yw1Ns6Ph4Zc0Bj","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":null,"check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}'), $result->toArray());
+        self::assertSame($this->decoded('{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/example-link-token","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":null,"check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}'), $result->toArray());
         self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $result->id);
     }
 
@@ -209,7 +215,7 @@ final class BankTest extends GeneratedTestCase
 
     public function testDeleteConnection(): void
     {
-        $this->queueJson(202, '{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","erasure":{"status":"pending","requested_at":"2026-11-21T15:10:00Z"}}');
+        $this->queueJson(202, '{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","erasure":{"status":"pending","requested_at":"2026-11-21T15:10:00Z","erased_at":null}}');
 
         $result = $this->client->bank->deleteConnection('id-1');
 
@@ -221,7 +227,7 @@ final class BankTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(202, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","erasure":{"status":"pending","requested_at":"2026-11-21T15:10:00Z"}}'), $result->toArray());
+        self::assertSame($this->decoded('{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","erasure":{"status":"pending","requested_at":"2026-11-21T15:10:00Z","erased_at":null}}'), $result->toArray());
         self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $result->id);
     }
 
@@ -292,7 +298,7 @@ final class BankTest extends GeneratedTestCase
 
     public function testRenewConnection(): void
     {
-        $this->queueJson(201, '{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"renew","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/blu_7Xq2k9Lm3Vd8Rt5Yw1Ns6Ph4Zc0Bj","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}');
+        $this->queueJson(201, '{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"renew","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/example-link-token","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}');
 
         $result = $this->client->bank->renewConnection('id-1', [
             'redirect_url' => 'https://example.com/callback',
@@ -312,7 +318,7 @@ final class BankTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"redirect_url":"https://example.com/callback","allowed_origins":["https://example.com/callback"],"language":"language-value","expires_in":1}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"renew","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/blu_7Xq2k9Lm3Vd8Rt5Yw1Ns6Ph4Zc0Bj","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}'), $result->toArray());
+        self::assertSame($this->decoded('{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"renew","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/example-link-token","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}'), $result->toArray());
         self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $result->id);
     }
 
