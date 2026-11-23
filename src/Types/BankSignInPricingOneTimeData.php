@@ -17,7 +17,10 @@ final class BankSignInPricingOneTimeData extends BaseModel
     /** Price of one read of balances only. Decimal string with 4 decimals in USD. */
     public readonly ?string $balancesUsd;
 
-    /** Price of one read of transactions, with or without balances. Decimal string with 4 decimals in USD. */
+    /**
+     * Price of one read of transactions. Where `bundle_included` is `true` it also covers balances;
+     * otherwise balances are a separate line (`balances_usd`). Decimal string with 4 decimals in USD.
+     */
     public readonly ?string $transactionsUsd;
 
     /**
