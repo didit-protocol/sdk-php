@@ -29,6 +29,8 @@ final class BankLinkCreateRequestSandboxPersona
 
     public const NO_ONGOING = 'no_ongoing';
 
+    public const REQUIRES_EMAIL = 'requires_email';
+
     private function __construct()
     {
     }
