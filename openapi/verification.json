@@ -99886,7 +99886,7 @@
             }
           },
           "400": {
-            "description": "The request was refused before any screen. `field` names what to correct: `invalid_request` for a value outside its range or a combination that is not allowed, `country_not_available` for a country the product does not serve or where no bank is offered, and the more specific codes shown here.",
+            "description": "The request was refused before any screen. `field` names what to correct: `invalid_request` for a value outside its range or a combination that is not allowed, `country_not_available` for a country the product does not serve or where no bank is offered, and the more specific codes shown here. A `language` outside the supported list answers `invalid_request` with `field: language`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -99967,6 +99967,17 @@
                       "request_id": "3f6a1c8e-92b5-4d07-a1e3-8c4b7f0d2e59",
                       "field": "country",
                       "next_action": "create_link",
+                      "retry_after": null
+                    }
+                  },
+                  "Language not supported": {
+                    "summary": "Language not supported",
+                    "value": {
+                      "code": "invalid_request",
+                      "message": "Invalid language. Supported languages are: en, ar, bn, bg, bs, ca, cs, da, de, el, es, et, fa, fi, fr, he, hi, hr, hu, hy, id, it, ja, ka, kk, ko, ky, lt, lv, cnr, mk, mn, ms, nl, no, pl, pt-BR, pt, ro, ru, sk, sl, so, sq, sr, sv, th, tr, uk, uz, vi, zh-CN, zh-TW, zh.",
+                      "request_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+                      "field": "language",
+                      "next_action": null,
                       "retry_after": null
                     }
                   }
@@ -102405,7 +102416,7 @@
             }
           },
           "400": {
-            "description": "The request was refused.",
+            "description": "The request was refused. A `language` outside the supported list answers `invalid_request` with `field: language`.",
             "content": {
               "application/json": {
                 "schema": {
@@ -102430,6 +102441,17 @@
                       "message": "The request is not valid.",
                       "request_id": "3f6a1c8e-92b5-4d07-a1e3-8c4b7f0d2e59",
                       "field": "expires_in",
+                      "next_action": null,
+                      "retry_after": null
+                    }
+                  },
+                  "Language not supported": {
+                    "summary": "Language not supported",
+                    "value": {
+                      "code": "invalid_request",
+                      "message": "Invalid language. Supported languages are: en, ar, bn, bg, bs, ca, cs, da, de, el, es, et, fa, fi, fr, he, hi, hr, hu, hy, id, it, ja, ka, kk, ko, ky, lt, lv, cnr, mk, mn, ms, nl, no, pl, pt-BR, pt, ro, ru, sk, sl, so, sq, sr, sv, th, tr, uk, uz, vi, zh-CN, zh-TW, zh.",
+                      "request_id": "4bf92f3577b34da6a3ce929d0e0e4736",
+                      "field": "language",
                       "next_action": null,
                       "retry_after": null
                     }
@@ -149853,7 +149875,7 @@
           },
           "language": {
             "type": "string",
-            "description": "Optional language code such as `es` or `pt-BR`. Otherwise the browser language.",
+            "description": "Optional. One of the [supported languages](/integration/supported-languages), the same codes the `language` of the session API takes, for example `es`, `pt`, `pt-BR` or `zh-CN` (`pt-PT` is not one of them). The match is exact and case-sensitive (`ES` and `pt-PT` are refused). A code outside that list answers `400 invalid_request` with `field: language`. Otherwise the browser language.",
             "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$",
             "maxLength": 16
           },
@@ -150713,7 +150735,8 @@
           "language": {
             "type": "string",
             "pattern": "^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$",
-            "maxLength": 16
+            "maxLength": 16,
+            "description": "Optional. One of the [supported languages](/integration/supported-languages), the same codes the `language` of the session API takes, for example `es`, `pt`, `pt-BR` or `zh-CN` (`pt-PT` is not one of them). The match is exact and case-sensitive (`ES` and `pt-PT` are refused). A code outside that list answers `400 invalid_request` with `field: language`."
           },
           "expires_in": {
             "type": "integer",
