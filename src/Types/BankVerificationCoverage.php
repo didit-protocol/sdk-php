@@ -19,7 +19,7 @@ final class BankVerificationCoverage extends BaseModel
     public readonly ?\DateTimeImmutable $updatedAt;
 
     /** The `open` field. */
-    public readonly ?BankVerificationCoverageOpen $open;
+    public readonly ?BankVerificationCoverageAvailability $open;
 
     /**
      * What a read of any covered bank returns.
@@ -45,7 +45,7 @@ final class BankVerificationCoverage extends BaseModel
     {
         parent::__construct($data);
         $this->updatedAt = Hydrate::dateTime($data['updated_at'] ?? null);
-        $this->open = Hydrate::model($data['open'] ?? null, BankVerificationCoverageOpen::class);
+        $this->open = Hydrate::model($data['open'] ?? null, BankVerificationCoverageAvailability::class);
         $this->dataRead = Hydrate::list($data['data_read'] ?? null, Hydrate::string(...));
         $this->balancesNote = Hydrate::string($data['balances_note'] ?? null);
         $this->countries = Hydrate::map($data['countries'] ?? null, static fn (mixed $v) => Hydrate::model($v, BankVerificationCoverageCountriesValue::class));

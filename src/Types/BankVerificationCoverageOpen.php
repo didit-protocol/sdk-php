@@ -14,14 +14,17 @@ use Didit\Core\Hydrate;
  */
 final class BankVerificationCoverageOpen extends BaseModel
 {
-    /** Bank Verification inside verification workflows. */
-    public readonly ?BankVerificationCoverageOpenBankVerificationInWorkflows $bankVerificationInWorkflows;
+    /** The `bank_verification_in_workflows` field. */
+    public readonly ?bool $bankVerificationInWorkflows;
 
-    /** The Bank data API with one-time access, for live applications. */
-    public readonly ?BankVerificationCoverageOpenBankDataApiOneTime $bankDataApiOneTime;
+    /** The `bank_data_api_one_time` field. */
+    public readonly ?bool $bankDataApiOneTime;
 
-    /** The Bank data API with ongoing access, for live applications. */
-    public readonly ?BankVerificationCoverageOpenBankDataApiOngoing $bankDataApiOngoing;
+    /** The `bank_data_api_ongoing` field. */
+    public readonly ?bool $bankDataApiOngoing;
+
+    /** The `account_check` field. */
+    public readonly ?bool $accountCheck;
 
     /**
      * @param array<string, mixed> $data the decoded JSON object
@@ -29,8 +32,9 @@ final class BankVerificationCoverageOpen extends BaseModel
     public function __construct(array $data)
     {
         parent::__construct($data);
-        $this->bankVerificationInWorkflows = Hydrate::model($data['bank_verification_in_workflows'] ?? null, BankVerificationCoverageOpenBankVerificationInWorkflows::class);
-        $this->bankDataApiOneTime = Hydrate::model($data['bank_data_api_one_time'] ?? null, BankVerificationCoverageOpenBankDataApiOneTime::class);
-        $this->bankDataApiOngoing = Hydrate::model($data['bank_data_api_ongoing'] ?? null, BankVerificationCoverageOpenBankDataApiOngoing::class);
+        $this->bankVerificationInWorkflows = Hydrate::bool($data['bank_verification_in_workflows'] ?? null);
+        $this->bankDataApiOneTime = Hydrate::bool($data['bank_data_api_one_time'] ?? null);
+        $this->bankDataApiOngoing = Hydrate::bool($data['bank_data_api_ongoing'] ?? null);
+        $this->accountCheck = Hydrate::bool($data['account_check'] ?? null);
     }
 }

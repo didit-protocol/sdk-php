@@ -10,9 +10,9 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * The Bank data API with one-time access, for live applications.
+ * The Bank data API with ongoing access, for live applications.
  */
-final class BankVerificationCoverageOpenBankDataApiOneTime extends BaseModel
+final class BankVerificationOngoingAvailability extends BaseModel
 {
     /** The `live_applications` field. */
     public readonly ?bool $liveApplications;

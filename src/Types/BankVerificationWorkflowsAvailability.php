@@ -12,7 +12,7 @@ use Didit\Core\Hydrate;
 /**
  * Bank Verification inside verification workflows.
  */
-final class BankVerificationCoverageOpenBankVerificationInWorkflows extends BaseModel
+final class BankVerificationWorkflowsAvailability extends BaseModel
 {
     /** The `live` field. */
     public readonly ?bool $live;
