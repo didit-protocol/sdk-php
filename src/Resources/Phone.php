@@ -8,6 +8,7 @@ namespace Didit\Resources;
 
 use Didit\Core\BaseResource;
 use Didit\Core\Operation;
+use Didit\Core\Requester;
 use Didit\Exception\DiditException;
 use Didit\Params;
 use Didit\RequestOptions;
@@ -16,12 +17,28 @@ use Didit\Types;
 /**
  * The `phone` resource.
  *
- * @phpstan-import-type PhoneCheckCodeParams from Params
  * @phpstan-import-type PhoneRiskRequest from Params
  * @phpstan-import-type PhoneSendCodeParams from Params
  */
 final class Phone extends BaseResource
 {
+    public readonly Phone\Silent $silent;
+
+    public readonly Phone\Factors $factors;
+
+    public readonly Phone\SdkKeys $sdkKeys;
+
+    public readonly Phone\Network $network;
+
+    public function __construct(Requester $requester)
+    {
+        parent::__construct($requester);
+        $this->silent = new Phone\Silent($requester);
+        $this->factors = new Phone\Factors($requester);
+        $this->sdkKeys = new Phone\SdkKeys($requester);
+        $this->network = new Phone\Network($requester);
+    }
+
     /**
      * Risk-score a phone number.
      *
@@ -82,19 +99,16 @@ final class Phone extends BaseResource
      *
      * `POST /v3/phone/check/`
      *
-     * @param PhoneCheckCodeParams $params
-     *
      * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function checkCode(array $params, ?RequestOptions $options = null): Types\PhoneVerificationCheckResponse
+    public function checkCode(?RequestOptions $options = null): Types\PhoneCheckCodeResponse
     {
         $response = $this->requester->request(new Operation(
             method: 'POST',
             path: '/v3/phone/check/',
             bodyTypes: ['json'],
-        ), [], $params, $options);
+        ), [], [], $options);
 
-        return Types\PhoneVerificationCheckResponse::fromResponse($response);
+        return Types\PhoneCheckCodeResponse::fromResponse($response);
     }
 }

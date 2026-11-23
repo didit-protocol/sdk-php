@@ -1762,19 +1762,45 @@ namespace Didit;
  *     vendor_data?: string,
  *     metadata?: array<string, mixed>,
  * }
- * @phpstan-type PhoneCheckCodeParams array{
+ * @phpstan-type PhoneFactorCreateRequest array{
+ *     type: string,
+ *     user_id: string,
+ *     friendly_name?: string,
+ *     metadata?: array<string, string>,
+ * }
+ * @phpstan-type PhoneFactorUpdateRequest array{
+ *     friendly_name?: string,
+ *     metadata?: array<string, string>,
+ *     status?: string,
+ * }
+ * @phpstan-type PhoneFactorsListParams array{
+ *     user_id: string,
+ *     type?: string,
+ *     status?: string,
+ *     limit?: int,
+ *     offset?: int,
+ *     format?: string,
+ * }
+ * @phpstan-type PhoneNetworkRegistrationRequest array{
+ *     feature: string,
+ *     country: string,
+ *     use_case: string,
+ *     networks?: list<string>,
+ *     company_name: string,
+ *     website: string,
+ *     purpose?: string,
+ *     monthly_volume?: int,
+ * }
+ * @phpstan-type PhoneNetworkRegistrationTestNumberRequest array{
  *     phone_number: string,
- *     code: string,
- *     duplicated_phone_number_action?: string,
- *     disposable_number_action?: string,
- *     voip_number_action?: string,
- *     enable_enrichment?: bool,
- *     phone_intelligence_score_action?: string,
- *     phone_type_risk_action?: string,
- *     recent_port_action?: string,
- *     low_phone_trust_action?: string,
- *     enable_social?: bool,
- *     phone_no_social_presence_action?: string,
+ * }
+ * @phpstan-type PhoneNetworkRegistrationsListParams array{
+ *     feature?: string,
+ *     country?: string,
+ *     status?: string,
+ *     limit?: int,
+ *     offset?: int,
+ *     format?: string,
  * }
  * @phpstan-type PhoneRiskRequest array{
  *     phone_number: string,
@@ -1783,6 +1809,17 @@ namespace Didit;
  *     vendor_data?: string,
  *     metadata?: array<string, mixed>|null,
  *     enable_social?: bool,
+ * }
+ * @phpstan-type PhoneSdkKeyRequest array{
+ *     platform: string,
+ *     app_ids: list<string>,
+ *     name?: string,
+ * }
+ * @phpstan-type PhoneSdkKeyRotateRequest array{
+ *     overlap_hours?: int,
+ * }
+ * @phpstan-type PhoneSdkKeysListParams array{
+ *     platform?: string,
  * }
  * @phpstan-type PhoneSendCodeParams array{
  *     phone_number: string,
@@ -1806,6 +1843,27 @@ namespace Didit;
  *     os_version?: string,
  *     app_version?: string,
  *     user_agent?: string,
+ * }
+ * @phpstan-type PhoneSilentCoverageParams array{
+ *     country?: string,
+ * }
+ * @phpstan-type PhoneSilentEligibilityParams array{
+ *     phone_number: string,
+ *     ip_address?: string,
+ *     x_publishable_key?: string,
+ * }
+ * @phpstan-type PhoneSilentEligibilityRequest array{
+ *     phone_number: string,
+ *     ip_address?: string,
+ * }
+ * @phpstan-type PhoneSilentRegistrationRequest array{
+ *     country: string,
+ *     networks?: list<string>,
+ *     use_case: string,
+ *     company_name: string,
+ *     website: string,
+ *     monthly_volume?: int,
+ *     flow_screenshots?: list<string>,
  * }
  * @phpstan-type PricingBankVerificationCountryCoverageParams array{
  *     if_none_match?: string,
