@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.23.0](https://github.com/didit-protocol/sdk-php/compare/v2.22.0...v2.23.0) (2026-11-23)
+
+
+### Features
+
+* **bank:** Bank data operations and typed bank.* webhook events ([#101](https://github.com/didit-protocol/sdk-php/issues/101)) ([fbb20ec](https://github.com/didit-protocol/sdk-php/commit/fbb20ecea13ef98511cde3f3cbd44f0e6dc604ed))
+
 ## [2.22.0](https://github.com/didit-protocol/sdk-php/compare/v2.21.0...v2.22.0) (2026-11-22)
 
 
