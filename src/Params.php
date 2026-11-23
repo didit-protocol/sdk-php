@@ -1797,6 +1797,12 @@ namespace Didit;
  *     app_version?: string,
  *     user_agent?: string,
  * }
+ * @phpstan-type PricingBankVerificationCountryCoverageParams array{
+ *     if_none_match?: string,
+ * }
+ * @phpstan-type PricingBankVerificationCoverageParams array{
+ *     if_none_match?: string,
+ * }
  * @phpstan-type PricingPriceBookParams array{
  *     if_none_match?: string,
  * }

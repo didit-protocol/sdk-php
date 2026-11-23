@@ -105888,6 +105888,279 @@
           }
         }
       }
+    },
+    "/v3/organization/bank-verification-coverage/": {
+      "get": {
+        "summary": "List the countries with bank coverage (public, unauthenticated)",
+        "description": "Lists the countries where Didit covers banks, how many, and what is open today for each product. Public: no auth header. Cached publicly and revalidated with an `ETag`. What is open is read on every request from the switches the API uses, so a product that is not open today reads `false` even when its banks are listed. It carries no prices (see the bank verification pricing feed) and never names a supplier.",
+        "operationId": "get_v3_bank_verification_coverage",
+        "tags": [
+          "Pricing"
+        ],
+        "security": [
+          {}
+        ],
+        "parameters": [
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "description": "The `ETag` of the coverage feed you already hold: the response is `304 Not Modified`, with no body, when nothing changed.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "curl",
+            "source": "curl -fsS https://verification.didit.me/v3/organization/bank-verification-coverage/"
+          }
+        ],
+        "x-didit-sdk": {
+          "resource": "pricing",
+          "method": "bank_verification_coverage",
+          "auth": "none",
+          "server": true
+        },
+        "responses": {
+          "200": {
+            "description": "Lists the countries where Didit covers banks, how many, and what is open today for each product.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Weak validator; send it back in If-None-Match."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankVerificationCoverage"
+                },
+                "examples": {
+                  "Spain": {
+                    "value": {
+                      "updated_at": "2026-11-23T08:00:00Z",
+                      "open": {
+                        "bank_verification_in_workflows": {
+                          "live": true,
+                          "countries": [
+                            "ESP"
+                          ]
+                        },
+                        "bank_data_api_one_time": {
+                          "live_applications": false,
+                          "countries": []
+                        },
+                        "bank_data_api_ongoing": {
+                          "live_applications": false,
+                          "countries": []
+                        }
+                      },
+                      "data_read": [
+                        "accounts",
+                        "balances",
+                        "transactions"
+                      ],
+                      "balances_note": "Balances are read for every account a bank shares. The balance types a bank states are listed per bank only when Didit has observed them.",
+                      "countries": {
+                        "ESP": {
+                          "name": "Spain",
+                          "banks": 92,
+                          "banks_by_segment": {
+                            "personal": 84,
+                            "business": 87
+                          },
+                          "open": {
+                            "bank_verification_in_workflows": true,
+                            "bank_data_api_one_time": false,
+                            "bank_data_api_ongoing": false,
+                            "account_check": false
+                          },
+                          "banks_url": "/v3/organization/bank-verification-coverage/ESP/"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not modified: the `ETag` you sent in `If-None-Match` still matches. No body."
+          }
+        }
+      }
+    },
+    "/v3/organization/bank-verification-coverage/{country}/": {
+      "get": {
+        "summary": "List the banks of one country (public, unauthenticated)",
+        "description": "Lists the banks Didit covers in one country: id, name, segments, access modes, history days, pending transactions and whether the bank is operational. Public: no auth header. One cached document per country.",
+        "operationId": "get_v3_bank_verification_country_coverage",
+        "tags": [
+          "Pricing"
+        ],
+        "security": [
+          {}
+        ],
+        "parameters": [
+          {
+            "name": "country",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 3,
+              "maxLength": 3
+            },
+            "description": "ISO 3166-1 alpha-3 code, for example `ESP`."
+          },
+          {
+            "name": "If-None-Match",
+            "in": "header",
+            "required": false,
+            "description": "The `ETag` of the country feed you already hold: the response is `304 Not Modified`, with no body, when nothing changed.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "curl",
+            "source": "curl -fsS https://verification.didit.me/v3/organization/bank-verification-coverage/ESP/"
+          }
+        ],
+        "x-didit-sdk": {
+          "resource": "pricing",
+          "method": "bank_verification_country_coverage",
+          "auth": "none",
+          "server": true
+        },
+        "responses": {
+          "200": {
+            "description": "Lists the banks Didit covers in one country: id, name, segments, access modes, history days, pending transactions and whether the bank is operational.",
+            "headers": {
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Weak validator; send it back in If-None-Match."
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankVerificationCountryCoverage"
+                },
+                "examples": {
+                  "Spain": {
+                    "value": {
+                      "country": "ESP",
+                      "name": "Spain",
+                      "updated_at": "2026-11-23T08:00:00Z",
+                      "open": {
+                        "bank_verification_in_workflows": true,
+                        "bank_data_api_one_time": false,
+                        "bank_data_api_ongoing": false,
+                        "account_check": false
+                      },
+                      "data_read": [
+                        "accounts",
+                        "balances",
+                        "transactions"
+                      ],
+                      "balances_note": "Balances are read for every account a bank shares. The balance types a bank states are listed per bank only when Didit has observed them.",
+                      "banks": [
+                        {
+                          "id": "es-bbva",
+                          "name": "BBVA",
+                          "country": "ESP",
+                          "segments": [
+                            "personal",
+                            "business"
+                          ],
+                          "access": [
+                            "one_time"
+                          ],
+                          "history_days_max": 60,
+                          "pending_transactions": true,
+                          "status": "operational"
+                        },
+                        {
+                          "id": "es-caixabank",
+                          "name": "CaixaBank",
+                          "country": "ESP",
+                          "segments": [
+                            "personal",
+                            "business"
+                          ],
+                          "access": [
+                            "one_time"
+                          ],
+                          "history_days_max": 60,
+                          "pending_transactions": false,
+                          "status": "operational"
+                        },
+                        {
+                          "id": "es-santander",
+                          "name": "Santander",
+                          "country": "ESP",
+                          "segments": [
+                            "personal",
+                            "business"
+                          ],
+                          "access": [
+                            "one_time"
+                          ],
+                          "history_days_max": 60,
+                          "pending_transactions": true,
+                          "status": "operational"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No banks are listed for this country code, for example a code that is not an ISO 3166-1 alpha-3 code.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "detail": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "detail": "No banks are listed for this country."
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not modified: the `ETag` you sent in `If-None-Match` still matches. No body."
+          }
+        }
+      }
     }
   },
   "components": {
@@ -146559,7 +146832,7 @@
               "renewal_window_expired",
               "first_sync_failed"
             ],
-            "description": "Why the link failed. A failed link is not an HTTP error: the link reads with `status: failed` and this object. A renew link whose connection changed meanwhile reads `renewal_not_needed` or `renewal_window_expired`."
+            "description": "Why the link failed. A failed link is not an HTTP error: the link reads with `status: failed` and this object. `bank_cancelled` ends a link only on the fifth cancel at the bank: until then a person who backs out at the bank returns to the list of banks with a notice and the link stays `opened`. A bank that cannot be reached (`bank_unavailable`) also returns the person to the list of banks and leaves the link `opened`. A link ended by the simulate operation fails at once. A renew link whose connection changed meanwhile reads `renewal_not_needed` or `renewal_window_expired`."
           },
           "message": {
             "type": "string",
@@ -149294,7 +149567,7 @@
         ]
       },
       "BankLinkFailedEvent": {
-        "description": "A Bank Link failed. `data.error_code` says why, for example `duplicate_conflict`. Nothing was published or charged. Sent for live and sandbox applications. Ids and statuses only: fetch the object to read it.",
+        "description": "A Bank Link failed: it is over. `data.error_code` says why, for example `duplicate_conflict`. A cancel at the bank sends this event with `bank_cancelled` only on the fifth cancel; before that the person returns to the list of banks and the link stays open. A bank that cannot be reached (`bank_unavailable`) also leaves the link open and sends no event. Nothing was published or charged. Sent for live and sandbox applications. Ids and statuses only: fetch the object to read it.",
         "allOf": [
           {
             "$ref": "#/components/schemas/WebhookEventEnvelope"
@@ -150832,6 +151105,296 @@
           "connection_id",
           "status"
         ]
+      },
+      "BankVerificationCountryCoverage": {
+        "type": "object",
+        "required": [
+          "country",
+          "name",
+          "updated_at",
+          "open",
+          "data_read",
+          "balances_note",
+          "banks"
+        ],
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "open": {
+            "$ref": "#/components/schemas/BankVerificationCoverageOpen"
+          },
+          "data_read": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "balances_note": {
+            "type": "string"
+          },
+          "banks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BankVerificationCoverageBank"
+            },
+            "description": "Alphabetical, a fixed order that says nothing about size."
+          }
+        }
+      },
+      "BankVerificationCoverage": {
+        "type": "object",
+        "description": "Where Didit covers bank data and what is open today. No prices: see the bank verification pricing feed.",
+        "required": [
+          "updated_at",
+          "open",
+          "data_read",
+          "balances_note",
+          "countries"
+        ],
+        "properties": {
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "When the catalogue was last refreshed."
+          },
+          "open": {
+            "type": "object",
+            "required": [
+              "bank_verification_in_workflows",
+              "bank_data_api_one_time",
+              "bank_data_api_ongoing"
+            ],
+            "properties": {
+              "bank_verification_in_workflows": {
+                "type": "object",
+                "required": [
+                  "live",
+                  "countries"
+                ],
+                "properties": {
+                  "live": {
+                    "type": "boolean"
+                  },
+                  "countries": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "description": "Bank Verification inside verification workflows."
+              },
+              "bank_data_api_one_time": {
+                "type": "object",
+                "required": [
+                  "live_applications",
+                  "countries"
+                ],
+                "properties": {
+                  "live_applications": {
+                    "type": "boolean"
+                  },
+                  "countries": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "description": "The Bank data API with one-time access, for live applications."
+              },
+              "bank_data_api_ongoing": {
+                "type": "object",
+                "required": [
+                  "live_applications",
+                  "countries"
+                ],
+                "properties": {
+                  "live_applications": {
+                    "type": "boolean"
+                  },
+                  "countries": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "description": "The Bank data API with ongoing access, for live applications."
+              }
+            }
+          },
+          "data_read": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "accounts",
+                "balances",
+                "transactions"
+              ]
+            },
+            "description": "What a read of any covered bank returns."
+          },
+          "balances_note": {
+            "type": "string"
+          },
+          "countries": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "object",
+              "required": [
+                "name",
+                "banks",
+                "banks_by_segment",
+                "open",
+                "banks_url"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "banks": {
+                  "type": "integer"
+                },
+                "banks_by_segment": {
+                  "type": "object",
+                  "properties": {
+                    "personal": {
+                      "type": "integer"
+                    },
+                    "business": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "open": {
+                  "$ref": "#/components/schemas/BankVerificationCoverageOpen"
+                },
+                "banks_url": {
+                  "type": "string",
+                  "description": "Path of the banks of this country, under `/v3/organization/bank-verification-coverage/`."
+                }
+              }
+            },
+            "description": "Countries keyed by ISO 3166-1 alpha-3 code."
+          }
+        }
+      },
+      "BankVerificationCoverageBank": {
+        "type": "object",
+        "description": "One bank. Only what the catalogue has: a field nobody observed is left out. The id is a permanent public identifier.",
+        "required": [
+          "id",
+          "name",
+          "country",
+          "segments",
+          "access",
+          "history_days_max",
+          "pending_transactions",
+          "status"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Permanent public identifier and URL slug, for example `es-santander`. Never changes once published."
+          },
+          "name": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string",
+            "description": "ISO 3166-1 alpha-3."
+          },
+          "segments": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "personal",
+                "business"
+              ]
+            }
+          },
+          "access": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "enum": [
+                "one_time",
+                "ongoing"
+              ]
+            },
+            "description": "Access modes a link can use at this bank today, as far as the bank and its readiness go: `one_time`, plus `ongoing` only once Didit has marked the bank's route ready for ongoing access. The same value the authenticated institutions endpoint publishes."
+          },
+          "history_days_max": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Days of transaction history a read can obtain. The same number the authenticated institutions endpoint publishes, so a cap applied there applies here."
+          },
+          "pending_transactions": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "operational",
+              "degraded",
+              "down"
+            ],
+            "description": "Whether the bank can be reached today: `operational`, `degraded` or `down`."
+          },
+          "consent_days_max": {
+            "type": "integer",
+            "description": "Longest consent in days. Present only when `ongoing` is in `access`."
+          },
+          "balance_types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Present only when the balance types were observed."
+          },
+          "logo_url": {
+            "type": "string",
+            "format": "uri",
+            "description": "Present only for a logo Didit hosts."
+          }
+        }
+      },
+      "BankVerificationCoverageOpen": {
+        "type": "object",
+        "required": [
+          "bank_verification_in_workflows",
+          "bank_data_api_one_time",
+          "bank_data_api_ongoing",
+          "account_check"
+        ],
+        "properties": {
+          "bank_verification_in_workflows": {
+            "type": "boolean"
+          },
+          "bank_data_api_one_time": {
+            "type": "boolean"
+          },
+          "bank_data_api_ongoing": {
+            "type": "boolean"
+          },
+          "account_check": {
+            "type": "boolean"
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -151887,7 +152450,7 @@
     "bank.link.failed": {
       "post": {
         "summary": "Bank link failed",
-        "description": "A Bank Link failed. `data.error_code` says why, for example `duplicate_conflict`. Nothing was published or charged. Sent for live and sandbox applications.",
+        "description": "A Bank Link failed: it is over. `data.error_code` says why, for example `duplicate_conflict`. A cancel at the bank sends this event with `bank_cancelled` only on the fifth cancel; before that the person returns to the list of banks and the link stays open. A bank that cannot be reached (`bank_unavailable`) also leaves the link open and sends no event. Nothing was published or charged. Sent for live and sandbox applications.",
         "tags": [
           "Webhook"
         ],
