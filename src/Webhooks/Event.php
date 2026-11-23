@@ -7,6 +7,22 @@ namespace Didit\Webhooks;
 use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 use Didit\Webhooks\Events\ActivityCreatedEvent;
+use Didit\Webhooks\Events\BankConnectionConsentExpiringEvent;
+use Didit\Webhooks\Events\BankConnectionCreatedEvent;
+use Didit\Webhooks\Events\BankConnectionDeletedEvent;
+use Didit\Webhooks\Events\BankConnectionHistoryCompleteEvent;
+use Didit\Webhooks\Events\BankConnectionRenewalRequiredEvent;
+use Didit\Webhooks\Events\BankConnectionRenewedEvent;
+use Didit\Webhooks\Events\BankConnectionRevokedEvent;
+use Didit\Webhooks\Events\BankConnectionUpdatedEvent;
+use Didit\Webhooks\Events\BankDataUpdatedEvent;
+use Didit\Webhooks\Events\BankLinkCancelledEvent;
+use Didit\Webhooks\Events\BankLinkCompletedEvent;
+use Didit\Webhooks\Events\BankLinkExpiredEvent;
+use Didit\Webhooks\Events\BankLinkFailedEvent;
+use Didit\Webhooks\Events\BankSyncCompletedEvent;
+use Didit\Webhooks\Events\BankSyncFailedEvent;
+use Didit\Webhooks\Events\BankSyncRecoveredEvent;
 use Didit\Webhooks\Events\BusinessDataUpdatedEvent;
 use Didit\Webhooks\Events\BusinessStatusUpdatedEvent;
 use Didit\Webhooks\Events\DataUpdatedEvent;
@@ -92,6 +108,22 @@ abstract class Event extends BaseModel
             EventType::TRAVEL_RULE_STATUS_UPDATED => new TravelRuleStatusUpdatedEvent($payload),
             EventType::WORKFLOW_COMPLIANCE_CHANGED => new WorkflowComplianceChangedEvent($payload),
             EventType::KYB_REGISTRY_SEARCH_RESOLVED => new KybRegistrySearchResolvedEvent($payload),
+            EventType::BANK_LINK_COMPLETED => new BankLinkCompletedEvent($payload),
+            EventType::BANK_LINK_CANCELLED => new BankLinkCancelledEvent($payload),
+            EventType::BANK_LINK_EXPIRED => new BankLinkExpiredEvent($payload),
+            EventType::BANK_LINK_FAILED => new BankLinkFailedEvent($payload),
+            EventType::BANK_CONNECTION_CREATED => new BankConnectionCreatedEvent($payload),
+            EventType::BANK_CONNECTION_UPDATED => new BankConnectionUpdatedEvent($payload),
+            EventType::BANK_CONNECTION_CONSENT_EXPIRING => new BankConnectionConsentExpiringEvent($payload),
+            EventType::BANK_CONNECTION_RENEWAL_REQUIRED => new BankConnectionRenewalRequiredEvent($payload),
+            EventType::BANK_CONNECTION_RENEWED => new BankConnectionRenewedEvent($payload),
+            EventType::BANK_CONNECTION_REVOKED => new BankConnectionRevokedEvent($payload),
+            EventType::BANK_CONNECTION_DELETED => new BankConnectionDeletedEvent($payload),
+            EventType::BANK_CONNECTION_HISTORY_COMPLETE => new BankConnectionHistoryCompleteEvent($payload),
+            EventType::BANK_DATA_UPDATED => new BankDataUpdatedEvent($payload),
+            EventType::BANK_SYNC_COMPLETED => new BankSyncCompletedEvent($payload),
+            EventType::BANK_SYNC_FAILED => new BankSyncFailedEvent($payload),
+            EventType::BANK_SYNC_RECOVERED => new BankSyncRecoveredEvent($payload),
             default => new UnknownEvent($payload),
         };
     }
