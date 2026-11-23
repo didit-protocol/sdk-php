@@ -7,7 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Why the connection is in this status. `paused_by_customer` is reserved. On a `deleted` connection:
+ * Why the connection is in this status. `collection_complete`: a one-time connection whose read is
+ * complete, so its access has ended. `paused_by_customer` is reserved. On a `deleted` connection:
  * `deleted_by_customer`, `consent_lapsed`, `retention_elapsed` or `application_deleted`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.

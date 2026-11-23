@@ -1,8 +1,8 @@
 {
  "verification.json": {
   "url": "https://docs.didit.me/openapi-25.json",
-  "sha256": "7307d9759a750b5942c13bfcfc53fffd77b9e76c4725a292ef18f9843bcc6890",
-  "fetched_at": "2026-11-23T03:32:54Z"
+  "sha256": "3698071011b68be59c8c567b4ba7a8f6a6c5b96de993a722e8dabde109b0f1ea",
+  "fetched_at": "2026-11-23T03:52:29Z"
  },
  "account.json": {
   "url": "https://docs.didit.me/openapi-auth.json",
