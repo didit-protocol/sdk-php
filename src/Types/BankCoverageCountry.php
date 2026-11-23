@@ -38,7 +38,7 @@ final class BankCoverageCountry extends BaseModel
     /** The longest consent any bank in the country allows, in days. */
     public readonly ?int $consentDaysMax;
 
-    /** The deepest history any bank in the country delivers, in days. */
+    /** The most history a link can obtain at any bank in the country today, in days. */
     public readonly ?int $historyDaysMax;
 
     /** Whether at least one bank supports business accounts. */
