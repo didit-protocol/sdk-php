@@ -222,7 +222,7 @@ final class AuthenticationSetup extends BaseResource
     /**
      * Update the application settings.
      *
-     * Changes the settings in the body. `agent_humans_only` needs a person: a named API key answers 403
+     * Changes the settings in the body. `agent_humans_only` needs a person: an API key answers 403
      * `owner_or_admin_required`, and turning it on needs an owner or admin with an enrolled passkey.
      *
      * `PATCH /organizations/{organization_id}/applications/{application_id}/authentication/settings/`
@@ -350,7 +350,7 @@ final class AuthenticationSetup extends BaseResource
      * Preview a sign-in email.
      *
      * Returns one email as it renders, with sample codes and links. An invitation preview uses a sample
-     * organization for a grant or named key, or the `organization` and `role` you pass. `agentoff` is the
+     * organization for a grant or an API key, or the `organization` and `role` you pass. `agentoff` is the
      * email a person receives when your team ends an agent's access with a notification; `agent` names the
      * agent. A console session can see a customer organization's name. The address of a console member is
      * left out for a grant or a key, which have no mailbox. An email Authentication does not send answers
@@ -387,7 +387,7 @@ final class AuthenticationSetup extends BaseResource
      * Get bot protection.
      *
      * Returns whether protection is on, each policy's mode and the last 14 days of detections. Console
-     * sessions, grants and named keys receive the same aggregate counters.
+     * sessions, grants and API keys receive the same aggregate counters.
      *
      * `GET /organizations/{organization_id}/applications/{application_id}/authentication/protection/`
      *
