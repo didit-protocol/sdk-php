@@ -1,5 +1,17 @@
 # Changelog
 
+## [2.28.0](https://github.com/didit-protocol/sdk-php/compare/v2.27.0...v2.28.0) (2026-11-23)
+
+
+### API changes that can break typed code
+
+* **spec:** `phone.check_code()` (`POST /v3/phone/check/`): request body `(anyOf 1)`: type changed from object to any ([2110854](https://github.com/didit-protocol/sdk-php/commit/211085416967b9b6b2eff399d4aa5baf9707f775))
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-23 ([2110854](https://github.com/didit-protocol/sdk-php/commit/211085416967b9b6b2eff399d4aa5baf9707f775))
+
 ## [2.27.0](https://github.com/didit-protocol/sdk-php/compare/v2.26.0...v2.27.0) (2026-11-23)
 
 
