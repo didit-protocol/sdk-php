@@ -249,35 +249,37 @@ Webhook receivers for plain PHP, Laravel and Symfony are in [examples/webhooks/]
 
 ## Bank data
 
-Create a Bank Link and send the person to its URL. A new link has no connection yet: read the accounts once the `bank.connection.created` webhook says the first sync is done.
+Create the link in the customer's authenticated session. Save its ID against that customer before redirecting them to the hosted URL.
+
+```php
+$link = $didit->bank->createLink([
+    'access' => 'ongoing',
+    'data' => ['accounts'],
+    'end_user' => ['reference' => $customerReference],
+]);
+saveBankLinkId($customerReference, $link->id);
+header('Cache-Control: no-store');
+header('Location: ' . $link->url, true, 303);
+exit;
+```
+
+In the webhook endpoint, verify the raw delivery and look up the link ID saved for the customer you are processing. A signed event can belong to another customer in the same application.
 
 ```php
 use Didit\Webhooks\Events\BankConnectionCreatedEvent;
 
-// 1. Create the link and redirect the person to its hosted URL.
-$link = $didit->bank->createLink([
-    'access' => 'ongoing',
-    'data' => ['accounts', 'balances', 'transactions'],
-    'end_user' => ['reference' => 'customer-42'],
-]);
-echo $link->url, "\n";
-
-// 2. In your webhook endpoint, wait for the connection, then read its data.
-$event = $didit->webhooks->verify(
-    file_get_contents('php://input'),
-    getallheaders(),
-    getenv('DIDIT_WEBHOOK_SECRET'),
-);
+$event = $didit->webhooks->verify($rawBody, $headers, $webhookSecret);
 if ($event instanceof BankConnectionCreatedEvent && null !== $event->connectionId) {
-    $page = $didit->bank->listAccounts($event->connectionId);
-    foreach ($page->items ?? [] as $account) {
-        $balances = $didit->bank->getBalances($account->id ?? '');
-        $transactions = $didit->bank->listTransactions($account->id ?? '', ['date_from' => '2026-01-01']);
+    $link = $didit->bank->getLink(loadBankLinkId($customerReference));
+    if (null === $link->connectionId) {
+        http_response_code(503); // Retry once the connection is visible.
+    } elseif ($link->connectionId === $event->connectionId) {
+        $page = $didit->bank->listAccounts($link->connectionId);
     }
 }
 ```
 
-[examples/bank_connection.php](examples/bank_connection.php) waits for the connection and prints accounts, balances and recent transactions.
+The [runnable example](examples/bank_connection.php) saves one customer's hosted URL privately and reports their account count after a successful or partial first sync.
 Bank data needs the `bank-data` permission on the API key and is not part of full access.
 
 ## Transactions, wallet screening and Travel Rule
