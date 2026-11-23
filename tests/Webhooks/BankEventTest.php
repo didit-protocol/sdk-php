@@ -28,256 +28,170 @@ use Didit\Webhooks\Webhook;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Parses recorded `bank.*` deliveries from the OpenAPI contract through the
+ * Parses recorded `bank.*` deliveries from the backend through the
  * public `Webhook::verify` path, from signed bodies.
  *
  * @internal
  */
 final class BankEventTest extends TestCase
 {
-    private const SECRET = 'whsec_unit_test_secret';
-
-    private const NOW = 1760702410;
-
-    private const ENVELOPE = [
-        'event_id' => '7c9e6679-7425-40de-944b-e07fc1f90ae7',
-        'application_id' => '0b5e8d2c-1f4a-4c3b-9d6e-2a7f8c1b3e5d',
-        'environment' => 'sandbox',
-        'timestamp' => 1760702400,
-        'created_at' => 1760702399,
-    ];
-
     public function testBankLinkEvents(): void
     {
-        /** @var array<string, array{class-string<BankLinkEvent>, string, string|null}> $events */
+        /** @var array<string, class-string<BankLinkEvent>> $events */
         $events = [
-            EventType::BANK_LINK_COMPLETED => [BankLinkCompletedEvent::class, 'completed', '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35'],
-            EventType::BANK_LINK_CANCELLED => [BankLinkCancelledEvent::class, 'cancelled', null],
-            EventType::BANK_LINK_EXPIRED => [BankLinkExpiredEvent::class, 'expired', null],
-            EventType::BANK_LINK_FAILED => [BankLinkFailedEvent::class, 'failed', null],
+            EventType::BANK_LINK_COMPLETED => BankLinkCompletedEvent::class,
+            EventType::BANK_LINK_CANCELLED => BankLinkCancelledEvent::class,
+            EventType::BANK_LINK_EXPIRED => BankLinkExpiredEvent::class,
+            EventType::BANK_LINK_FAILED => BankLinkFailedEvent::class,
         ];
 
-        foreach ($events as $type => [$class, $status, $connectionId]) {
-            $event = $this->event($type, [
-                'link_id' => '0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40',
-                'status' => $status,
-                'connection_id' => $connectionId,
-                'check_id' => null,
-                'error_code' => 'failed' === $status ? 'consent_declined' : null,
-            ], nested: true);
-
-            self::assertSame($class, $event::class);
-            self::assertInstanceOf(BankLinkEvent::class, $event);
-            self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $event->linkId);
-            self::assertSame($status, $event->status);
-            self::assertSame($connectionId, $event->connectionId);
-            self::assertNull($event->checkId);
-            self::assertSame('failed' === $status ? 'consent_declined' : null, $event->errorCode);
+        foreach ($events as $type => $class) {
+            $event = $this->event($type);
+            self::assertInstanceOf($class, $event);
+            $fields = Hydrate::assoc($event->get('data')) ?? [];
+            self::assertSame($fields['link_id'], $event->linkId);
+            self::assertSame($fields['status'], $event->status);
+            self::assertSame($fields['connection_id'], $event->connectionId);
+            self::assertSame($fields['check_id'], $event->checkId);
+            self::assertSame($fields['error_code'], $event->errorCode);
         }
     }
 
     public function testBankConnectionCreatedEvent(): void
     {
-        $event = $this->event(EventType::BANK_CONNECTION_CREATED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'initial_status' => 'partial',
-        ]);
+        $event = $this->event(EventType::BANK_CONNECTION_CREATED);
 
         self::assertInstanceOf(BankConnectionCreatedEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
-        self::assertSame('partial', $event->initialStatus);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
+        self::assertSame('succeeded', $event->initialStatus);
     }
 
     public function testBankConnectionUpdatedEvent(): void
     {
-        $event = $this->event(EventType::BANK_CONNECTION_UPDATED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'status' => 'active',
-            'revocation_status' => 'pending',
-        ]);
+        $event = $this->event(EventType::BANK_CONNECTION_UPDATED);
 
         self::assertInstanceOf(BankConnectionUpdatedEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
         self::assertSame('active', $event->status);
         self::assertSame('pending', $event->revocationStatus);
     }
 
     public function testBankConnectionConsentExpiringEvent(): void
     {
-        $event = $this->event(EventType::BANK_CONNECTION_CONSENT_EXPIRING, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'days_left' => 7,
-            'consent_expires_at' => '2027-05-20T12:04:11Z',
-            'renew_by' => '2027-05-20T12:04:11Z',
-        ]);
+        $event = $this->event(EventType::BANK_CONNECTION_CONSENT_EXPIRING);
 
         self::assertInstanceOf(BankConnectionConsentExpiringEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
         self::assertSame(7, $event->daysLeft);
-        self::assertSame('2027-05-20T12:04:11+00:00', $event->consentExpiresAt?->format(\DATE_ATOM));
-        self::assertSame('2027-05-20T12:04:11+00:00', $event->renewBy?->format(\DATE_ATOM));
+        self::assertSame('2026-11-29T09:00:00+00:00', $event->consentExpiresAt?->format(\DATE_ATOM));
+        self::assertSame('2026-11-29T09:00:00+00:00', $event->renewBy?->format(\DATE_ATOM));
     }
 
     public function testBankConnectionRenewalRequiredEvent(): void
     {
-        $event = $this->event(EventType::BANK_CONNECTION_RENEWAL_REQUIRED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'status' => 'renewal_required',
-            'reason' => 'bank_requires_sign_in',
-            'renew_by' => '2027-05-20T12:04:11Z',
-            'renewable_until' => '2027-06-19T12:04:11Z',
-        ]);
+        $event = $this->event(EventType::BANK_CONNECTION_RENEWAL_REQUIRED);
 
         self::assertInstanceOf(BankConnectionRenewalRequiredEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
         self::assertSame('renewal_required', $event->status);
-        self::assertSame('bank_requires_sign_in', $event->reason);
-        self::assertSame('2027-05-20T12:04:11+00:00', $event->renewBy?->format(\DATE_ATOM));
-        self::assertSame('2027-06-19T12:04:11+00:00', $event->renewableUntil?->format(\DATE_ATOM));
+        self::assertSame('consent_expired', $event->reason);
+        self::assertSame('2026-11-29T09:00:00+00:00', $event->renewBy?->format(\DATE_ATOM));
+        self::assertSame('2026-12-29T09:00:00+00:00', $event->renewableUntil?->format(\DATE_ATOM));
     }
 
     public function testBankConnectionRenewedEvent(): void
     {
-        $event = $this->event(EventType::BANK_CONNECTION_RENEWED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'status' => 'active',
-            'consent_version' => 2,
-            'link_id' => '0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40',
-            'consent_expires_at' => '2027-05-20T12:04:11Z',
-        ]);
+        $event = $this->event(EventType::BANK_CONNECTION_RENEWED);
 
         self::assertInstanceOf(BankConnectionRenewedEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
         self::assertSame('active', $event->status);
         self::assertSame(2, $event->consentVersion);
-        self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $event->linkId);
-        self::assertSame('2027-05-20T12:04:11+00:00', $event->consentExpiresAt?->format(\DATE_ATOM));
+        self::assertSame('bbbbbbbb-0000-4000-8000-000000000005', $event->linkId);
+        self::assertSame('2027-11-29T09:00:00+00:00', $event->consentExpiresAt?->format(\DATE_ATOM));
     }
 
     public function testBankConnectionRevokedEvent(): void
     {
-        $event = $this->event(EventType::BANK_CONNECTION_REVOKED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'status' => 'revoked',
-            'ended_by' => 'bank',
-            'status_reason' => 'revoked_by_bank',
-            'ended_at' => '2026-11-21T15:10:00Z',
-            'retain_until' => '2026-12-21T15:10:00Z',
-        ]);
+        $event = $this->event(EventType::BANK_CONNECTION_REVOKED);
 
         self::assertInstanceOf(BankConnectionRevokedEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
         self::assertSame('revoked', $event->status);
         self::assertSame('bank', $event->endedBy);
         self::assertSame('revoked_by_bank', $event->statusReason);
-        self::assertSame('2026-11-21T15:10:00+00:00', $event->endedAt?->format(\DATE_ATOM));
-        self::assertSame('2026-12-21T15:10:00+00:00', $event->retainUntil?->format(\DATE_ATOM));
+        self::assertSame('2026-11-22T09:00:00+00:00', $event->endedAt?->format(\DATE_ATOM));
+        self::assertSame('2027-02-20T09:00:00+00:00', $event->retainUntil?->format(\DATE_ATOM));
     }
 
     public function testBankConnectionDeletedEvent(): void
     {
-        $event = $this->event(EventType::BANK_CONNECTION_DELETED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'status' => 'deleted',
-            'erasure_status' => 'erased',
-            'reason' => 'deleted_by_customer',
-            'erased_at' => '2026-11-21T15:10:00Z',
-        ]);
+        $event = $this->event(EventType::BANK_CONNECTION_DELETED);
 
         self::assertInstanceOf(BankConnectionDeletedEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
         self::assertSame('deleted', $event->status);
         self::assertSame('erased', $event->erasureStatus);
         self::assertSame('deleted_by_customer', $event->reason);
-        self::assertSame('2026-11-21T15:10:00+00:00', $event->erasedAt?->format(\DATE_ATOM));
+        self::assertSame('2026-11-22T09:00:00+00:00', $event->erasedAt?->format(\DATE_ATOM));
     }
 
     public function testBankConnectionHistoryCompleteEvent(): void
     {
-        $event = $this->event(EventType::BANK_CONNECTION_HISTORY_COMPLETE, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'status' => 'partial',
-        ]);
+        $event = $this->event(EventType::BANK_CONNECTION_HISTORY_COMPLETE);
 
         self::assertInstanceOf(BankConnectionHistoryCompleteEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
-        self::assertSame('partial', $event->status);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
+        self::assertSame('complete', $event->status);
     }
 
     public function testBankDataUpdatedEvent(): void
     {
-        $event = $this->event(EventType::BANK_DATA_UPDATED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'sync_id' => 'd4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14',
-            'trigger' => 'scheduled',
-            'accounts' => [
-                [
-                    'account_id' => 'a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10',
-                    'added' => 3,
-                    'modified' => 2,
-                    'removed' => 1,
-                ],
-            ],
-            'balances_changed' => true,
-        ]);
+        $event = $this->event(EventType::BANK_DATA_UPDATED);
 
         self::assertInstanceOf(BankDataUpdatedEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
-        self::assertSame('d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14', $event->syncId);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
+        self::assertSame('eeeeeeee-0000-4000-8000-000000000001', $event->syncId);
         self::assertSame('scheduled', $event->trigger);
         self::assertTrue($event->balancesChanged);
         $accounts = $event->accounts ?? [];
         self::assertCount(1, $accounts);
-        self::assertSame('a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10', $accounts[0]->accountId);
+        self::assertSame('ffffffff-0000-4000-8000-000000000001', $accounts[0]->accountId);
         self::assertSame(3, $accounts[0]->added);
-        self::assertSame(2, $accounts[0]->modified);
-        self::assertSame(1, $accounts[0]->removed);
+        self::assertSame(1, $accounts[0]->modified);
+        self::assertSame(0, $accounts[0]->removed);
     }
 
     public function testBankSyncCompletedEvent(): void
     {
-        $event = $this->event(EventType::BANK_SYNC_COMPLETED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'sync_id' => 'd4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14',
-            'trigger' => 'requested',
-            'outcome' => 'partial',
-            'changed' => true,
-        ]);
+        $event = $this->event(EventType::BANK_SYNC_COMPLETED);
 
         self::assertInstanceOf(BankSyncCompletedEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
-        self::assertSame('d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14', $event->syncId);
-        self::assertSame('requested', $event->trigger);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
+        self::assertSame('eeeeeeee-0000-4000-8000-000000000001', $event->syncId);
+        self::assertSame('scheduled', $event->trigger);
         self::assertSame('partial', $event->outcome);
         self::assertTrue($event->changed);
     }
 
     public function testBankSyncFailedEvent(): void
     {
-        $event = $this->event(EventType::BANK_SYNC_FAILED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'sync_id' => 'd4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14',
-            'error_code' => 'bank_unavailable',
-            'failing_since' => '2026-11-20T09:00:00Z',
-        ]);
+        $event = $this->event(EventType::BANK_SYNC_FAILED);
 
         self::assertInstanceOf(BankSyncFailedEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
-        self::assertSame('d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14', $event->syncId);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
+        self::assertSame('eeeeeeee-0000-4000-8000-000000000001', $event->syncId);
         self::assertSame('bank_unavailable', $event->errorCode);
-        self::assertSame('2026-11-20T09:00:00+00:00', $event->failingSince?->format(\DATE_ATOM));
+        self::assertSame('2026-11-21T09:00:00+00:00', $event->failingSince?->format(\DATE_ATOM));
     }
 
     public function testBankSyncRecoveredEvent(): void
     {
-        $event = $this->event(EventType::BANK_SYNC_RECOVERED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'sync_id' => 'd4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14',
-        ]);
+        $event = $this->event(EventType::BANK_SYNC_RECOVERED);
 
         self::assertInstanceOf(BankSyncRecoveredEvent::class, $event);
-        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $event->connectionId);
-        self::assertSame('d4a9e7b2-1c58-4f03-96ab-5e2d8c7f0b14', $event->syncId);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
+        self::assertSame('eeeeeeee-0000-4000-8000-000000000002', $event->syncId);
     }
 
     /**
@@ -287,11 +201,10 @@ final class BankEventTest extends TestCase
      */
     public function testConnectionEventsDoNotReadANestedDataObject(): void
     {
-        $event = $this->event(EventType::BANK_CONNECTION_UPDATED, [
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'status' => 'active',
-            'revocation_status' => 'pending',
-        ], nested: true);
+        $event = Event::fromPayload([
+            'webhook_type' => EventType::BANK_CONNECTION_UPDATED,
+            'data' => ['connection_id' => 'nested', 'status' => 'active', 'revocation_status' => 'pending'],
+        ]);
 
         self::assertInstanceOf(BankConnectionUpdatedEvent::class, $event);
         self::assertNull($event->connectionId);
@@ -302,52 +215,31 @@ final class BankEventTest extends TestCase
         self::assertSame('active', $data['status'] ?? null);
     }
 
-    public function testADeliveryIsVerifiedAndTheBodyIsAuthenticated(): void
+    /**
+     * Replay both backend-signed deliveries from sdk-java PR #108 at 412c4a4.
+     * The rotation case uses the previous secret with the original headers.
+     */
+    private function event(string $type): Event
     {
-        $event = $this->event(EventType::BANK_LINK_COMPLETED, [
-            'link_id' => '0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40',
-            'status' => 'completed',
-            'connection_id' => '5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35',
-            'check_id' => null,
-            'error_code' => null,
-        ], nested: true);
-
+        $json = file_get_contents(__DIR__ . '/fixtures/bank-deliveries.json');
+        self::assertIsString($json);
+        /** @var array<string, array{body: string, headers: array<string, string>, secret: string, previous_secret: ?string, now: int}> $deliveries */
+        $deliveries = json_decode($json, true, flags: \JSON_THROW_ON_ERROR);
+        $name = str_replace('.', '_', $type);
+        $current = $deliveries[$name];
+        $event = Webhook::verify($current['body'], $current['headers'], $current['secret'], now: $current['now']);
         self::assertSame(Webhook::HEADER_SIGNATURE, $event->verifiedWith());
         self::assertTrue($event->bodyAuthenticated());
-    }
+        self::assertSame($type, $event->webhookType);
 
-    /**
-     * @param array<string, mixed> $fields
-     */
-    private function event(string $type, array $fields, bool $nested = false): Event
-    {
-        $payload = self::ENVELOPE + ['webhook_type' => $type];
-        if ($nested) {
-            $payload['data'] = $fields;
-        } else {
-            $payload += $fields;
-        }
+        $rotation = $deliveries[$name . '_rotation'];
+        self::assertNotNull($rotation['previous_secret']);
+        $rotated = Webhook::verify($rotation['body'], $rotation['headers'], $rotation['previous_secret'], now: $rotation['now']);
+        self::assertSame(Webhook::HEADER_SIGNATURE_PREVIOUS, $rotated->verifiedWith());
+        self::assertTrue($rotated->bodyAuthenticated());
+        self::assertSame($event::class, $rotated::class);
+        self::assertSame($event->toArray(), $rotated->toArray());
 
-        return self::deliver($payload);
-    }
-
-    /**
-     * Verifies a delivery the way a receiving application does.
-     *
-     * @param array<string, mixed> $payload
-     */
-    private static function deliver(array $payload): Event
-    {
-        $body = json_encode($payload, \JSON_THROW_ON_ERROR);
-
-        return Webhook::verify(
-            $body,
-            [
-                'X-Signature' => hash_hmac('sha256', $body, self::SECRET),
-                'X-Timestamp' => (string) self::ENVELOPE['timestamp'],
-            ],
-            self::SECRET,
-            now: self::NOW,
-        );
+        return $event;
     }
 }
