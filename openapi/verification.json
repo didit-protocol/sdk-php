@@ -100426,6 +100426,255 @@
         ]
       }
     },
+    "/v3/bank/links/{id}/simulate/": {
+      "post": {
+        "summary": "Simulate a bank link (sandbox)",
+        "description": "Finishes a link of your sandbox application in one call, as if the person had gone through the Didit Test Bank: you choose the Test Bank customer (`persona`) and how the link ends (`outcome`). The link goes through the same completion code as a real bank sign-in, so the connection, its accounts, the first sync and the `bank.*` webhooks happen exactly as they would for a real person. Answers the link, so read `status` and `connection_id`.\n\n`outcome` is `completed` (the default: the person agrees and the connection is created), `cancelled` (the person leaves, the link ends `cancelled`), `failed` (the link ends `failed`; `error_code` picks the reason, `bank_unavailable` by default), `duplicate_conflict` (the person already has a connection with the same bank), `reduced_grant` (the person shares less than you asked for) or `renewal_login_mismatch` (a renewal with another bank login; on a connect link it ends as the failure it is). `error_code` is only accepted with `outcome: failed`.\n\nA link that allows the one-time fallback and meets a bank that cannot keep access open accepts the reduced access and finishes in the same call. A link that is no longer open (completed, cancelled, expired or failed) is returned unchanged, so the call is safe to repeat.\n\nNeeds an API key with the Bank data permission (`bank-data`): write for this operation, which changes something. A key with full access does not include it: grant it explicitly when you create the key, or the call answers `403 bank_data_access_denied`. Sandbox only: a live application, or a link or connection that belongs to the live environment, answers `404 not_found`, exactly as an unknown route does.",
+        "operationId": "simulateBankLink",
+        "tags": [
+          "Bank Data"
+        ],
+        "x-didit-sdk": {
+          "resource": "bank",
+          "method": "simulate_link",
+          "auth": "api_key",
+          "server": true
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The link id."
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankLinkSimulateRequest"
+              },
+              "examples": {
+                "Completed": {
+                  "summary": "The default: a personal customer agrees",
+                  "value": {
+                    "persona": "personal_basic",
+                    "outcome": "completed"
+                  }
+                },
+                "Failed": {
+                  "summary": "The bank cannot be reached",
+                  "value": {
+                    "persona": "personal_basic",
+                    "outcome": "failed",
+                    "error_code": "bank_unavailable"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The link after the simulated end.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankLink"
+                },
+                "examples": {
+                  "Completed": {
+                    "summary": "A completed link",
+                    "value": {
+                      "id": "0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40",
+                      "mode": "connect",
+                      "access": "ongoing",
+                      "status": "completed",
+                      "url": null,
+                      "client_token": null,
+                      "expires_at": "2026-11-21T13:00:00Z",
+                      "connection_id": "5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35",
+                      "check_id": null,
+                      "reused": false,
+                      "error": null,
+                      "quote": {
+                        "id": "7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43",
+                        "lines": [
+                          {
+                            "meter": "bank_data_connection_month",
+                            "unit": "connection_month",
+                            "price_usd": "0.9000"
+                          }
+                        ],
+                        "fallback_lines": null,
+                        "total_usd": "0.9000",
+                        "valid_until": "2026-11-21T13:00:00Z",
+                        "scopes": [
+                          "accounts",
+                          "balances",
+                          "transactions"
+                        ]
+                      },
+                      "vendor_data": "client-7731"
+                    }
+                  },
+                  "Failed": {
+                    "summary": "A failed link",
+                    "value": {
+                      "id": "0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40",
+                      "mode": "connect",
+                      "access": "ongoing",
+                      "status": "failed",
+                      "url": null,
+                      "client_token": null,
+                      "expires_at": "2026-11-21T13:00:00Z",
+                      "connection_id": null,
+                      "check_id": null,
+                      "reused": false,
+                      "error": {
+                        "code": "bank_unavailable",
+                        "message": "The bank could not be reached."
+                      },
+                      "quote": {
+                        "id": "7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43",
+                        "lines": [
+                          {
+                            "meter": "bank_data_connection_month",
+                            "unit": "connection_month",
+                            "price_usd": "0.9000"
+                          }
+                        ],
+                        "fallback_lines": null,
+                        "total_usd": "0.9000",
+                        "valid_until": "2026-11-21T13:00:00Z",
+                        "scopes": [
+                          "accounts",
+                          "balances",
+                          "transactions"
+                        ]
+                      },
+                      "vendor_data": "client-7731"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid: an unknown `persona`, `outcome` or `error_code`, or an `error_code` sent without `outcome: failed`. `field` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankDataError"
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request",
+                    "value": {
+                      "code": "invalid_request",
+                      "message": "The request is not valid.",
+                      "request_id": "3f6a1c8e-92b5-4d07-a1e3-8c4b7f0d2e59",
+                      "field": "error_code",
+                      "next_action": null,
+                      "retry_after": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/BankDataAccessDenied"
+          },
+          "404": {
+            "description": "The link does not exist in this application and environment, or the application is not a sandbox application.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankDataError"
+                },
+                "examples": {
+                  "Not found": {
+                    "summary": "Not found",
+                    "value": {
+                      "code": "not_found",
+                      "message": "The resource does not exist.",
+                      "request_id": "3f6a1c8e-92b5-4d07-a1e3-8c4b7f0d2e59",
+                      "field": null,
+                      "next_action": null,
+                      "retry_after": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The `Idempotency-Key` was used with another request (`idempotency_key_reused`), or the first request with it is still running (`idempotency_key_in_progress`, with `Retry-After`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankIdempotencyConflictError"
+                },
+                "examples": {
+                  "Key reused": {
+                    "summary": "The key was used with another body",
+                    "value": {
+                      "detail": "This Idempotency-Key was already used with a different request.",
+                      "code": "idempotency_key_reused"
+                    }
+                  },
+                  "Key in progress": {
+                    "summary": "The first request is still running",
+                    "value": {
+                      "detail": "A request with this Idempotency-Key is still in progress.",
+                      "code": "idempotency_key_in_progress"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before asking again (with `idempotency_key_in_progress`).",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimitedWrite"
+          },
+          "500": {
+            "$ref": "#/components/responses/BankDataInternalError"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "curl",
+            "source": "curl -X POST 'https://verification.didit.me/v3/bank/links/0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40/simulate/' \\\n  -H 'x-api-key: YOUR_SANDBOX_API_KEY' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"persona\": \"personal_basic\",\n    \"outcome\": \"completed\"\n  }'"
+          }
+        ]
+      }
+    },
     "/v3/bank/connections/": {
       "get": {
         "summary": "List bank connections",
@@ -102569,6 +102818,388 @@
             "lang": "csharp",
             "label": ".NET",
             "source": "using System;\nusing System.Text.Json;\nusing Didit;\n\n// Reads DIDIT_API_KEY.\nusing var client = new DiditClient();\n\nvar result = await client.Bank.RevokeConnectionAsync(\"11111111-2222-3333-4444-555555555555\");\nConsole.WriteLine(JsonSerializer.Serialize(result));"
+          }
+        ]
+      }
+    },
+    "/v3/bank/connections/{id}/simulate/": {
+      "post": {
+        "summary": "Simulate a bank connection event (sandbox)",
+        "description": "Moves a sandbox connection through time without waiting: new transactions, a pending row that posts, a consent that is about to end or has ended, a revocation, a failing sync, a duplicate webhook or a used-up refresh allowance. It uses the real sync engine and the real webhooks, so `bank.*` deliveries, the change feed and `sync` behave as they do for a real bank. Answers the connection as `get_connection` would.\n\n`action` is required and is one of:\n\n- `new_transactions`: the bank adds `count` booked transactions (1 to 500, default 3). A sync follows.\n- `pending_posted`: one day passes at the bank: pending rows leave the change feed as `removed` and their booked rows arrive as `added`. It needs a test customer with pending transactions (`pending`); with `personal_basic` nothing changes. A sync follows.\n- `booking_correction`: the next sync returns booked rows again with a corrected booking, so they arrive as `modified`. A sync follows.\n- `midnight_booking`: a row is booked across midnight, to test day boundaries. A sync follows.\n- `consent_expiring`: the consent now ends in `days` days and the expiry notice is sent (`bank.connection.consent_expiring`). `days` accepts only the notification thresholds, 14, 7 or 1 (default 7); any other value answers `400 invalid_request` with `field` `days`.\n- `consent_expired`: the consent has ended now and the connection becomes `renewal_required`.\n- `revoked_by_user` and `revoked_by_bank`: the bank tells Didit the consent ended, as if the person or the bank had revoked it. The connection reads `revoked` with `status_reason` `revoked_by_end_user` or `revoked_by_bank`, and `consent.ended_by` is `end_user` or `bank`.\n- `sync_failed`: the bank fails every read until `sync_recovered`; the connection has been failing for 24 hours, so `bank.sync.failed` is sent. A sync follows.\n- `sync_recovered`: the bank answers again. A sync follows.\n- `webhook_twice`: the last `bank.*` webhook of this connection is delivered again with the same `event_id` and a fresh signature, to test your deduplication. It answers `400 invalid_request` if the connection has no delivery yet.\n- `budget_used`: today's refresh allowance is used up on the bank's own day, so the next `refresh_connection` answers `429 refresh_limit_reached` with `Retry-After`, and `sync.live_syncs_left_today` and the `sync.budgets` `remaining` read 0.\n- `budget_reset`: today's refresh allowance is restored: `sync.live_syncs_left_today` and the `remaining` of `sync.budgets` read what they read on a new connection.\n\n`days` is only accepted with `consent_expiring` and `count` only with `new_transactions`: sent with another action, each answers `400 invalid_request` with `field` naming it.\n\nNeeds an API key with the Bank data permission (`bank-data`): write for this operation, which changes something. A key with full access does not include it: grant it explicitly when you create the key, or the call answers `403 bank_data_access_denied`. Sandbox only: a live application, or a link or connection that belongs to the live environment, answers `404 not_found`, exactly as an unknown route does.",
+        "operationId": "simulateBankConnection",
+        "tags": [
+          "Bank Data"
+        ],
+        "x-didit-sdk": {
+          "resource": "bank",
+          "method": "simulate_connection",
+          "auth": "api_key",
+          "server": true
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "The connection id."
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKey"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BankConnectionSimulateRequest"
+              },
+              "examples": {
+                "New transactions": {
+                  "summary": "Five new booked transactions",
+                  "value": {
+                    "action": "new_transactions",
+                    "count": 5
+                  }
+                },
+                "Consent expiring": {
+                  "summary": "The consent ends in 7 days",
+                  "value": {
+                    "action": "consent_expiring",
+                    "days": 7
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The connection after the simulated event.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankConnection"
+                },
+                "examples": {
+                  "Active": {
+                    "summary": "The connection",
+                    "value": {
+                      "id": "5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35",
+                      "environment": "sandbox",
+                      "access": "ongoing",
+                      "status": "active",
+                      "status_reason": null,
+                      "institution": {
+                        "id": "es-banco-norte",
+                        "name": "Banco Norte",
+                        "country": "ESP",
+                        "logo_url": "https://static.example.com/banks/es-banco-norte.png"
+                      },
+                      "segment": "business",
+                      "data": [
+                        "accounts",
+                        "balances",
+                        "transactions"
+                      ],
+                      "consent": {
+                        "status": "granted",
+                        "version": 1,
+                        "granted_at": "2026-11-21T12:04:11Z",
+                        "expires_at": "2027-05-20T12:04:11Z",
+                        "days_granted": 180,
+                        "renewed_count": 0,
+                        "scopes_requested": [
+                          "accounts",
+                          "balances",
+                          "transactions"
+                        ],
+                        "scopes_granted": [
+                          "accounts",
+                          "balances",
+                          "transactions"
+                        ],
+                        "accounts_granted": [
+                          "a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10",
+                          "c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"
+                        ],
+                        "renewal_action": "bank_auth",
+                        "renew_by": "2027-05-20T12:04:11Z",
+                        "reconfirm_by": null,
+                        "renewable_until": null,
+                        "retain_until": null,
+                        "ended_at": null,
+                        "ended_by": null
+                      },
+                      "sync": {
+                        "status": "ok",
+                        "initial_status": "succeeded",
+                        "initial_complete": true,
+                        "history_complete": true,
+                        "last_synced_at": "2026-11-21T12:04:40Z",
+                        "next_sync_at": "2026-11-22T06:00:00Z",
+                        "budgets": [
+                          {
+                            "scope": "connection",
+                            "resource": "all",
+                            "limit": 4,
+                            "remaining": 3,
+                            "resets_at": "2026-11-22T00:00:00Z"
+                          }
+                        ],
+                        "last_error": null,
+                        "frequency_per_day": 1,
+                        "live_syncs_left_today": 3
+                      },
+                      "accounts": [
+                        {
+                          "id": "a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10",
+                          "name": "Cuenta negocio",
+                          "type": "current",
+                          "usage": "business",
+                          "currency": "EUR",
+                          "iban_last4": "1332",
+                          "status": "open"
+                        },
+                        {
+                          "id": "c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72",
+                          "name": "Cuenta de ahorro",
+                          "type": "savings",
+                          "usage": "business",
+                          "currency": "EUR",
+                          "iban_last4": "7708",
+                          "status": "open"
+                        }
+                      ],
+                      "ownership": {
+                        "compare": "none",
+                        "match": null,
+                        "check_id": null,
+                        "result": null
+                      },
+                      "end_user": {
+                        "reference": "client-7731"
+                      },
+                      "manage_url": null,
+                      "billing": {
+                        "unit": "connection_month",
+                        "price_usd": "0.9000",
+                        "billed_through": "2026-11-30"
+                      },
+                      "possible_duplicate_of": null,
+                      "erasure": null,
+                      "vendor_data": "client-7731",
+                      "created_at": "2026-11-21T12:03:02Z",
+                      "updated_at": "2026-11-21T12:04:40Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The body is not valid: `action` is missing or unknown, `days` is not 14, 7 or 1, `count` is out of range, `days` or `count` is sent with an action that does not read it, or `webhook_twice` has no delivery to repeat. `field` names it.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankDataError"
+                },
+                "examples": {
+                  "Invalid request": {
+                    "summary": "Invalid request",
+                    "value": {
+                      "code": "invalid_request",
+                      "message": "The request is not valid.",
+                      "request_id": "3f6a1c8e-92b5-4d07-a1e3-8c4b7f0d2e59",
+                      "field": "action",
+                      "next_action": null,
+                      "retry_after": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/BankDataAccessDenied"
+          },
+          "404": {
+            "description": "The connection does not exist in this application and environment, was deleted, or the application is not a sandbox application.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BankDataError"
+                },
+                "examples": {
+                  "Not found": {
+                    "summary": "Not found",
+                    "value": {
+                      "code": "not_found",
+                      "message": "The resource does not exist.",
+                      "request_id": "3f6a1c8e-92b5-4d07-a1e3-8c4b7f0d2e59",
+                      "field": null,
+                      "next_action": null,
+                      "retry_after": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The action cannot run on this connection: `connection_not_active` (revoked, paused, failed or deleted, when the action asks for a sync) or `one_time_connection` (a one-time read has ended: create a new link). The `Idempotency-Key` was used with another request (`idempotency_key_reused`), or the first request with it is still running (`idempotency_key_in_progress`, with `Retry-After`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BankDataError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/BankIdempotencyConflictError"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Not active": {
+                    "summary": "Not active",
+                    "value": {
+                      "code": "connection_not_active",
+                      "message": "This connection is not active.",
+                      "request_id": "3f6a1c8e-92b5-4d07-a1e3-8c4b7f0d2e59",
+                      "field": null,
+                      "next_action": "create_link",
+                      "retry_after": null
+                    }
+                  },
+                  "One-time connection": {
+                    "summary": "One-time connection",
+                    "value": {
+                      "code": "one_time_connection",
+                      "message": "This connection was a one-time read and its access has ended. Create a new link to read this bank again.",
+                      "request_id": "3f6a1c8e-92b5-4d07-a1e3-8c4b7f0d2e59",
+                      "field": null,
+                      "next_action": "create_link",
+                      "retry_after": null
+                    }
+                  },
+                  "Key reused": {
+                    "summary": "The key was used with another body",
+                    "value": {
+                      "detail": "This Idempotency-Key was already used with a different request.",
+                      "code": "idempotency_key_reused"
+                    }
+                  },
+                  "Key in progress": {
+                    "summary": "The first request is still running",
+                    "value": {
+                      "detail": "A request with this Idempotency-Key is still in progress.",
+                      "code": "idempotency_key_in_progress"
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "description": "Seconds to wait before asking again (with `idempotency_key_in_progress`).",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Either an action that asks for a sync found the day's budget of reads without the person present used up (`refresh_limit_reached`, with `Retry-After` and a `sync` object; `budget_reset` restores it in sandbox), or the shared write limit of 300 requests per minute per API key was exceeded (honor `Retry-After`).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/BankRefreshLimitError"
+                    },
+                    {
+                      "$ref": "#/components/schemas/RateLimitBudgetError"
+                    }
+                  ]
+                },
+                "examples": {
+                  "Refresh limit reached": {
+                    "summary": "Refresh limit reached",
+                    "value": {
+                      "code": "refresh_limit_reached",
+                      "message": "The bank's limit on fetches without the person present is used up for today.",
+                      "request_id": "3f6a1c8e-92b5-4d07-a1e3-8c4b7f0d2e59",
+                      "field": null,
+                      "next_action": "retry_later",
+                      "retry_after": 3600,
+                      "sync": {
+                        "live_syncs_left_today": 0,
+                        "budgets": [
+                          {
+                            "scope": "connection",
+                            "resource": "all",
+                            "limit": 4,
+                            "remaining": 0,
+                            "resets_at": "2026-11-22T00:00:00Z"
+                          }
+                        ]
+                      }
+                    }
+                  },
+                  "Write rate limit": {
+                    "summary": "The shared write limit",
+                    "value": {
+                      "detail": "Write request rate limit exceeded. You can make up to 300 requests per minute.",
+                      "reference": "RL-00000000000040008000000000000001",
+                      "limit": 300,
+                      "remaining": 0,
+                      "reset": 1794358860,
+                      "window_seconds": 60
+                    }
+                  }
+                }
+              }
+            },
+            "headers": {
+              "Retry-After": {
+                "$ref": "#/components/headers/BudgetRetryAfter"
+              },
+              "X-RateLimit-Scope": {
+                "$ref": "#/components/headers/BudgetXRateLimitScope"
+              },
+              "X-RateLimit-Limit": {
+                "$ref": "#/components/headers/BudgetXRateLimitLimit"
+              },
+              "X-RateLimit-Remaining": {
+                "$ref": "#/components/headers/BudgetXRateLimitRemaining"
+              },
+              "X-RateLimit-Reset": {
+                "$ref": "#/components/headers/BudgetXRateLimitReset"
+              }
+            }
+          },
+          "500": {
+            "$ref": "#/components/responses/BankDataInternalError"
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "curl",
+            "label": "curl",
+            "source": "curl -X POST 'https://verification.didit.me/v3/bank/connections/5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35/simulate/' \\\n  -H 'x-api-key: YOUR_SANDBOX_API_KEY' \\\n  -H 'Content-Type: application/json' \\\n  -d '{\n    \"action\": \"new_transactions\",\n    \"count\": 5\n  }'"
           }
         ]
       }
@@ -151128,6 +151759,120 @@
         "required": [
           "connection_id",
           "status"
+        ]
+      },
+      "BankLinkSimulateRequest": {
+        "type": "object",
+        "description": "How a sandbox link ends. Every field is optional: an empty body completes the link for the `personal_basic` Test Bank customer.",
+        "properties": {
+          "persona": {
+            "type": "string",
+            "enum": [
+              "personal_basic",
+              "business_multi",
+              "long_history",
+              "pending",
+              "sparse_fields",
+              "no_ongoing"
+            ],
+            "default": "personal_basic",
+            "description": "The Test Bank customer who signs in: `personal_basic` (one current account), `business_multi` (several business accounts), `long_history` (a long transaction history), `pending` (pending rows), `sparse_fields` (transactions with fields missing, one automatic sync a day) or `no_ongoing` (a bank that cannot keep access open)."
+          },
+          "outcome": {
+            "type": "string",
+            "enum": [
+              "completed",
+              "cancelled",
+              "failed",
+              "duplicate_conflict",
+              "reduced_grant",
+              "renewal_login_mismatch"
+            ],
+            "default": "completed",
+            "description": "How the link ends."
+          },
+          "error_code": {
+            "type": "string",
+            "enum": [
+              "duplicate_conflict",
+              "renewal_login_mismatch",
+              "reduced_grant",
+              "corporate_approval_not_supported",
+              "ongoing_access_not_available",
+              "bank_unavailable",
+              "bank_cancelled",
+              "consent_declined",
+              "read_limit"
+            ],
+            "description": "The failure the link records. Only accepted with `outcome: failed`, where it defaults to `bank_unavailable`."
+          }
+        }
+      },
+      "BankConnectionSimulateRequest": {
+        "type": "object",
+        "description": "The event to move on a sandbox connection.",
+        "required": [
+          "action"
+        ],
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "new_transactions",
+              "pending_posted",
+              "booking_correction",
+              "consent_expiring",
+              "consent_expired",
+              "revoked_by_user",
+              "revoked_by_bank",
+              "sync_failed",
+              "sync_recovered",
+              "webhook_twice",
+              "midnight_booking",
+              "budget_used",
+              "budget_reset"
+            ],
+            "description": "What happens. The operation description explains each value."
+          },
+          "days": {
+            "type": "integer",
+            "enum": [
+              14,
+              7,
+              1
+            ],
+            "default": 7,
+            "description": "Only for `consent_expiring`: days until the consent ends. Only the notification thresholds are accepted: 14, 7 or 1. Any other value, or `days` with another action, answers `400 invalid_request` with `field` `days`."
+          },
+          "count": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 500,
+            "default": 3,
+            "description": "Only for `new_transactions`: how many booked transactions the bank adds. With another action it answers `400 invalid_request` with `field` `count`."
+          }
+        }
+      },
+      "BankIdempotencyConflictError": {
+        "type": "object",
+        "description": "The refusal of the shared idempotency layer: the same `Idempotency-Key` was used with another request, or while the first request is still running (with `Retry-After`).",
+        "properties": {
+          "detail": {
+            "type": "string",
+            "description": "Plain-language explanation."
+          },
+          "code": {
+            "type": "string",
+            "enum": [
+              "idempotency_key_reused",
+              "idempotency_key_in_progress"
+            ],
+            "description": "`idempotency_key_reused`: the key was used with another endpoint, query or body. `idempotency_key_in_progress`: the first request with this key is still running."
+          }
+        },
+        "required": [
+          "detail",
+          "code"
         ]
       },
       "BankVerificationCountryCoverage": {

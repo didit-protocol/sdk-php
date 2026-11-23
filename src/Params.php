@@ -138,6 +138,11 @@ namespace Didit;
  *     cbu_cvu?: string,
  *     registration_id?: string,
  * }
+ * @phpstan-type BankConnectionSimulateRequest array{
+ *     action: string,
+ *     days?: int,
+ *     count?: int,
+ * }
  * @phpstan-type BankLinkCreateRequest array{
  *     mode?: string,
  *     connection_id?: string,
@@ -188,6 +193,11 @@ namespace Didit;
  *     address?: string,
  *     phone?: string,
  *     email?: string,
+ * }
+ * @phpstan-type BankLinkSimulateRequest array{
+ *     persona?: string,
+ *     outcome?: string,
+ *     error_code?: string,
  * }
  * @phpstan-type BankListAccountsParams array{
  *     limit?: int,

@@ -156,6 +156,29 @@ final class BankTest extends GeneratedTestCase
         self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $result->id);
     }
 
+    public function testSimulateLink(): void
+    {
+        $this->queueJson(200, '{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"completed","url":null,"client_token":null,"expires_at":"2026-11-21T13:00:00Z","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}');
+
+        $result = $this->client->bank->simulateLink('id-1', [
+            'persona' => 'personal_basic',
+            'outcome' => 'completed',
+            'error_code' => 'duplicate_conflict',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/links/id-1/simulate/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"persona":"personal_basic","outcome":"completed","error_code":"duplicate_conflict"}', $this->canonicalBody($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"connect","access":"ongoing","status":"completed","url":null,"client_token":null,"expires_at":"2026-11-21T13:00:00Z","connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}'), $result->toArray());
+        self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $result->id);
+    }
+
     public function testListConnections(): void
     {
         $this->queueJson(200, '{"items":[{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","environment":"live","access":"ongoing","status":"active","status_reason":null,"institution":{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png"},"segment":"business","data":["accounts","balances","transactions"],"consent":{"status":"granted","version":1,"granted_at":"2026-11-21T12:04:11Z","expires_at":"2027-05-20T12:04:11Z","days_granted":180,"renewed_count":0,"scopes_requested":["accounts","balances","transactions"],"scopes_granted":["accounts","balances","transactions"],"accounts_granted":["a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"],"renewal_action":"bank_auth","renew_by":"2027-05-20T12:04:11Z","reconfirm_by":null,"renewable_until":null,"retain_until":null,"ended_at":null,"ended_by":null},"sync":{"status":"ok","initial_status":"succeeded","initial_complete":true,"history_complete":true,"last_synced_at":"2026-11-21T12:04:40Z","next_sync_at":"2026-11-22T06:00:00Z","budgets":[{"scope":"connection","resource":"all","limit":4,"remaining":3,"resets_at":"2026-11-22T00:00:00Z"}],"last_error":null,"frequency_per_day":1,"live_syncs_left_today":3},"accounts":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","name":"Cuenta negocio","type":"current","usage":"business","currency":"EUR","iban_last4":"1332","status":"open"},{"id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","name":"Cuenta de ahorro","type":"savings","usage":"business","currency":"EUR","iban_last4":"7708","status":"open"}],"ownership":{"compare":"none","match":null,"check_id":null,"result":null},"end_user":{"reference":"client-7731"},"manage_url":null,"billing":{"unit":"connection_month","price_usd":"0.9000","billed_through":"2026-11-30"},"possible_duplicate_of":null,"erasure":null,"vendor_data":"client-7731","created_at":"2026-11-21T12:03:02Z","updated_at":"2026-11-21T12:04:40Z"}],"next_cursor":null}');
@@ -337,6 +360,29 @@ final class BankTest extends GeneratedTestCase
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","environment":"live","access":"ongoing","status":"active","status_reason":null,"institution":{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png"},"segment":"business","data":["accounts","balances","transactions"],"consent":{"status":"revocation_pending","version":1,"granted_at":"2026-11-21T12:04:11Z","expires_at":"2027-05-20T12:04:11Z","days_granted":180,"renewed_count":0,"scopes_requested":["accounts","balances","transactions"],"scopes_granted":["accounts","balances","transactions"],"accounts_granted":["a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"],"renewal_action":"bank_auth","renew_by":"2027-05-20T12:04:11Z","reconfirm_by":null,"renewable_until":"2026-12-21T15:10:00Z","retain_until":"2026-12-21T15:10:00Z","ended_at":"2026-11-21T15:10:00Z","ended_by":"customer"},"sync":{"status":"ok","initial_status":"succeeded","initial_complete":true,"history_complete":true,"last_synced_at":"2026-11-21T12:04:40Z","next_sync_at":"2026-11-22T06:00:00Z","budgets":[{"scope":"connection","resource":"all","limit":4,"remaining":3,"resets_at":"2026-11-22T00:00:00Z"}],"last_error":null,"frequency_per_day":1,"live_syncs_left_today":3},"accounts":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","name":"Cuenta negocio","type":"current","usage":"business","currency":"EUR","iban_last4":"1332","status":"open"},{"id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","name":"Cuenta de ahorro","type":"savings","usage":"business","currency":"EUR","iban_last4":"7708","status":"open"}],"ownership":{"compare":"none","match":null,"check_id":null,"result":null},"end_user":{"reference":"client-7731"},"manage_url":null,"billing":{"unit":"connection_month","price_usd":"0.9000","billed_through":"2026-11-30"},"possible_duplicate_of":null,"erasure":null,"vendor_data":"client-7731","created_at":"2026-11-21T12:03:02Z","updated_at":"2026-11-21T12:04:40Z"}'), $result->toArray());
+        self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $result->id);
+    }
+
+    public function testSimulateConnection(): void
+    {
+        $this->queueJson(200, '{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","environment":"sandbox","access":"ongoing","status":"active","status_reason":null,"institution":{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png"},"segment":"business","data":["accounts","balances","transactions"],"consent":{"status":"granted","version":1,"granted_at":"2026-11-21T12:04:11Z","expires_at":"2027-05-20T12:04:11Z","days_granted":180,"renewed_count":0,"scopes_requested":["accounts","balances","transactions"],"scopes_granted":["accounts","balances","transactions"],"accounts_granted":["a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"],"renewal_action":"bank_auth","renew_by":"2027-05-20T12:04:11Z","reconfirm_by":null,"renewable_until":null,"retain_until":null,"ended_at":null,"ended_by":null},"sync":{"status":"ok","initial_status":"succeeded","initial_complete":true,"history_complete":true,"last_synced_at":"2026-11-21T12:04:40Z","next_sync_at":"2026-11-22T06:00:00Z","budgets":[{"scope":"connection","resource":"all","limit":4,"remaining":3,"resets_at":"2026-11-22T00:00:00Z"}],"last_error":null,"frequency_per_day":1,"live_syncs_left_today":3},"accounts":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","name":"Cuenta negocio","type":"current","usage":"business","currency":"EUR","iban_last4":"1332","status":"open"},{"id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","name":"Cuenta de ahorro","type":"savings","usage":"business","currency":"EUR","iban_last4":"7708","status":"open"}],"ownership":{"compare":"none","match":null,"check_id":null,"result":null},"end_user":{"reference":"client-7731"},"manage_url":null,"billing":{"unit":"connection_month","price_usd":"0.9000","billed_through":"2026-11-30"},"possible_duplicate_of":null,"erasure":null,"vendor_data":"client-7731","created_at":"2026-11-21T12:03:02Z","updated_at":"2026-11-21T12:04:40Z"}');
+
+        $result = $this->client->bank->simulateConnection('id-1', [
+            'action' => 'new_transactions',
+            'days' => 14,
+            'count' => 1,
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/bank/connections/id-1/simulate/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"action":"new_transactions","days":14,"count":1}', $this->canonicalBody($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","environment":"sandbox","access":"ongoing","status":"active","status_reason":null,"institution":{"id":"es-banco-norte","name":"Banco Norte","country":"ESP","logo_url":"https://static.example.com/banks/es-banco-norte.png"},"segment":"business","data":["accounts","balances","transactions"],"consent":{"status":"granted","version":1,"granted_at":"2026-11-21T12:04:11Z","expires_at":"2027-05-20T12:04:11Z","days_granted":180,"renewed_count":0,"scopes_requested":["accounts","balances","transactions"],"scopes_granted":["accounts","balances","transactions"],"accounts_granted":["a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72"],"renewal_action":"bank_auth","renew_by":"2027-05-20T12:04:11Z","reconfirm_by":null,"renewable_until":null,"retain_until":null,"ended_at":null,"ended_by":null},"sync":{"status":"ok","initial_status":"succeeded","initial_complete":true,"history_complete":true,"last_synced_at":"2026-11-21T12:04:40Z","next_sync_at":"2026-11-22T06:00:00Z","budgets":[{"scope":"connection","resource":"all","limit":4,"remaining":3,"resets_at":"2026-11-22T00:00:00Z"}],"last_error":null,"frequency_per_day":1,"live_syncs_left_today":3},"accounts":[{"id":"a71f0c2e-5d38-4b96-a1c4-3e9f8d2b7a10","name":"Cuenta negocio","type":"current","usage":"business","currency":"EUR","iban_last4":"1332","status":"open"},{"id":"c3d84e19-2a7b-4f60-b5e1-9a0c6d3f8e72","name":"Cuenta de ahorro","type":"savings","usage":"business","currency":"EUR","iban_last4":"7708","status":"open"}],"ownership":{"compare":"none","match":null,"check_id":null,"result":null},"end_user":{"reference":"client-7731"},"manage_url":null,"billing":{"unit":"connection_month","price_usd":"0.9000","billed_through":"2026-11-30"},"possible_duplicate_of":null,"erasure":null,"vendor_data":"client-7731","created_at":"2026-11-21T12:03:02Z","updated_at":"2026-11-21T12:04:40Z"}'), $result->toArray());
         self::assertSame('5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35', $result->id);
     }
 

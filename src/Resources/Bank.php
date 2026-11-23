@@ -17,7 +17,9 @@ use Didit\Types;
  * The `bank` resource.
  *
  * @phpstan-import-type BankAccountCheckRequest from Params
+ * @phpstan-import-type BankConnectionSimulateRequest from Params
  * @phpstan-import-type BankLinkCreateRequest from Params
+ * @phpstan-import-type BankLinkSimulateRequest from Params
  * @phpstan-import-type BankListAccountsParams from Params
  * @phpstan-import-type BankListConnectionsParams from Params
  * @phpstan-import-type BankListInstitutionsParams from Params
@@ -126,6 +128,34 @@ final class Bank extends BaseResource
             method: 'POST',
             path: '/v3/bank/links/{id}/cancel/',
         ), ['id' => $id], [], $options);
+
+        return Types\BankLink::fromResponse($response);
+    }
+
+    /**
+     * Simulate a bank link (sandbox).
+     *
+     * Finishes a link of your sandbox application in one call, as if the person had gone through the Didit
+     * Test Bank: you choose the Test Bank customer (`persona`) and how the link ends (`outcome`). The link
+     * goes through the same completion code as a real bank sign-in, so the connection, its accounts, the
+     * first sync and the `bank.*` webhooks happen exactly as they would for a real person. Answers the
+     * link, so read `status` and `connection_id`.
+     *
+     * `POST /v3/bank/links/{id}/simulate/`
+     *
+     * @param string $id the link id
+     * @param BankLinkSimulateRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function simulateLink(string $id, array $params = [], ?RequestOptions $options = null): Types\BankLink
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/bank/links/{id}/simulate/',
+            bodyTypes: ['json'],
+        ), ['id' => $id], $params, $options);
 
         return Types\BankLink::fromResponse($response);
     }
@@ -334,6 +364,34 @@ final class Bank extends BaseResource
             method: 'POST',
             path: '/v3/bank/connections/{id}/revoke/',
         ), ['id' => $id], [], $options);
+
+        return Types\BankConnection::fromResponse($response);
+    }
+
+    /**
+     * Simulate a bank connection event (sandbox).
+     *
+     * Moves a sandbox connection through time without waiting: new transactions, a pending row that posts,
+     * a consent that is about to end or has ended, a revocation, a failing sync, a duplicate webhook or a
+     * used-up refresh allowance. It uses the real sync engine and the real webhooks, so `bank.*`
+     * deliveries, the change feed and `sync` behave as they do for a real bank. Answers the connection as
+     * `get_connection` would.
+     *
+     * `POST /v3/bank/connections/{id}/simulate/`
+     *
+     * @param string $id the connection id
+     * @param BankConnectionSimulateRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function simulateConnection(string $id, array $params, ?RequestOptions $options = null): Types\BankConnection
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/bank/connections/{id}/simulate/',
+            bodyTypes: ['json'],
+        ), ['id' => $id], $params, $options);
 
         return Types\BankConnection::fromResponse($response);
     }
