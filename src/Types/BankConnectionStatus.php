@@ -11,7 +11,8 @@ namespace Didit\Types;
  * bank wants the person to sign in again, data readable as last synced and nothing charged. `paused`:
  * balance too low for the month. `revoked`: access stopped by the person, the bank or you, or ended
  * because the read of a one-time connection is complete. `deleted`: only `id`, `status`,
- * `status_reason`, `created_at` and `erasure` remain. `failed`: the first sync never succeeded.
+ * `status_reason`, `created_at` and `erasure` remain. The list returns these only for
+ * `status=deleted`; reading one by id always returns it. `failed`: the first sync never succeeded.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

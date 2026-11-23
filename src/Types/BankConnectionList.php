@@ -10,7 +10,8 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * A page of connections.
+ * A page of connections. Deleted connections are not in it unless the request asked for
+ * `status=deleted`.
  */
 final class BankConnectionList extends BaseModel
 {
