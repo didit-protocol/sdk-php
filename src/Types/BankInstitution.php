@@ -46,7 +46,7 @@ final class BankInstitution extends BaseModel
     /** The longest consent the bank allows, in days. `null` when not observed. */
     public readonly ?int $consentDaysMax;
 
-    /** The deepest history the bank delivers, in days. `null` when not observed. */
+    /** The most history a link can obtain at this bank today, in days. `null` when not observed. */
     public readonly ?int $historyDaysMax;
 
     /** Whether the bank reports pending transactions. */
