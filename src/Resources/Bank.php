@@ -318,7 +318,8 @@ final class Bank extends BaseResource
      * Stops access to the bank. Bank fetches stop the moment you ask, even while the bank's confirmation
      * is pending: the consent reads `revocation_pending`, then `revoked` once the bank confirms access is
      * terminated, or `revocation_failed` while the call is retried automatically. `consent.ended_by` is
-     * `customer`.
+     * `customer`. Until the bank confirms, `status` keeps its value and `status_reason` is `null`; once
+     * `status` is `revoked`, `status_reason` is `revoked_by_customer`.
      *
      * `POST /v3/bank/connections/{id}/revoke/`
      *
