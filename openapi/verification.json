@@ -154096,71 +154096,7 @@
             "description": "When the catalogue was last refreshed."
           },
           "open": {
-            "type": "object",
-            "required": [
-              "bank_verification_in_workflows",
-              "bank_data_api_one_time",
-              "bank_data_api_ongoing"
-            ],
-            "properties": {
-              "bank_verification_in_workflows": {
-                "type": "object",
-                "required": [
-                  "live",
-                  "countries"
-                ],
-                "properties": {
-                  "live": {
-                    "type": "boolean"
-                  },
-                  "countries": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "description": "Bank Verification inside verification workflows."
-              },
-              "bank_data_api_one_time": {
-                "type": "object",
-                "required": [
-                  "live_applications",
-                  "countries"
-                ],
-                "properties": {
-                  "live_applications": {
-                    "type": "boolean"
-                  },
-                  "countries": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "description": "The Bank data API with one-time access, for live applications."
-              },
-              "bank_data_api_ongoing": {
-                "type": "object",
-                "required": [
-                  "live_applications",
-                  "countries"
-                ],
-                "properties": {
-                  "live_applications": {
-                    "type": "boolean"
-                  },
-                  "countries": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                },
-                "description": "The Bank data API with ongoing access, for live applications."
-              }
-            }
+            "$ref": "#/components/schemas/BankVerificationCoverageAvailability"
           },
           "data_read": {
             "type": "array",
@@ -155392,6 +155328,82 @@
           "code": [
             "Invalid code format. Enter 4 to 8 numeric digits."
           ]
+        }
+      },
+      "BankVerificationWorkflowsAvailability": {
+        "type": "object",
+        "required": [
+          "live",
+          "countries"
+        ],
+        "properties": {
+          "live": {
+            "type": "boolean"
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "Bank Verification inside verification workflows."
+      },
+      "BankVerificationOneTimeAvailability": {
+        "type": "object",
+        "required": [
+          "live_applications",
+          "countries"
+        ],
+        "properties": {
+          "live_applications": {
+            "type": "boolean"
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "The Bank data API with one-time access, for live applications."
+      },
+      "BankVerificationOngoingAvailability": {
+        "type": "object",
+        "required": [
+          "live_applications",
+          "countries"
+        ],
+        "properties": {
+          "live_applications": {
+            "type": "boolean"
+          },
+          "countries": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "description": "The Bank data API with ongoing access, for live applications."
+      },
+      "BankVerificationCoverageAvailability": {
+        "type": "object",
+        "required": [
+          "bank_verification_in_workflows",
+          "bank_data_api_one_time",
+          "bank_data_api_ongoing"
+        ],
+        "properties": {
+          "bank_verification_in_workflows": {
+            "$ref": "#/components/schemas/BankVerificationWorkflowsAvailability"
+          },
+          "bank_data_api_one_time": {
+            "$ref": "#/components/schemas/BankVerificationOneTimeAvailability"
+          },
+          "bank_data_api_ongoing": {
+            "$ref": "#/components/schemas/BankVerificationOngoingAvailability"
+          }
         }
       }
     },

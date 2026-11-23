@@ -24,7 +24,7 @@ final class BankVerificationCoverageCountriesValue extends BaseModel
     public readonly ?BankVerificationCoverageCountriesValueBanksBySegment $banksBySegment;
 
     /** The `open` field. */
-    public readonly ?BankVerificationCoverageOpen2 $open;
+    public readonly ?BankVerificationCoverageOpen $open;
 
     /** Path of the banks of this country, under `/v3/organization/bank-verification-coverage/`. */
     public readonly ?string $banksUrl;
@@ -38,7 +38,7 @@ final class BankVerificationCoverageCountriesValue extends BaseModel
         $this->name = Hydrate::string($data['name'] ?? null);
         $this->banks = Hydrate::int($data['banks'] ?? null);
         $this->banksBySegment = Hydrate::model($data['banks_by_segment'] ?? null, BankVerificationCoverageCountriesValueBanksBySegment::class);
-        $this->open = Hydrate::model($data['open'] ?? null, BankVerificationCoverageOpen2::class);
+        $this->open = Hydrate::model($data['open'] ?? null, BankVerificationCoverageOpen::class);
         $this->banksUrl = Hydrate::string($data['banks_url'] ?? null);
     }
 }
