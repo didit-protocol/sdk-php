@@ -550,7 +550,7 @@
     "/v3/phone/risk/": {
       "post": {
         "summary": "Risk-score a phone number",
-        "description": "Resolve a phone number and return carrier, line-type, porting, disposable-number, cross-session match, and normalized risk-intelligence signals without sending an OTP. The endpoint creates an API session and returns its id as `request_id`.\n\n**Decision.** The top-level `status` mirrors `phone.status`. It is normally `Approved`; the risk evaluation can produce `In Review` or `Declined`.\n\n**Compatibility aliases.** Live responses expose the normalized intelligence object as both `phone.phone_intelligence` and `phone.enrichment`. The values are identical. New integrations can read `phone.enrichment`. Both keys are absent when no usable intelligence data was returned.\n\n**Billing.** Live calls use Phone Risk API pricing. The request is billable once the lookup starts, even when some best-effort fields are unavailable.\n\n**Sandbox.** Sandbox keys validate the request and return deterministic approved data without sending an OTP, consuming credits, creating a session, or contributing to Networks.\n\n**Authentication.** Send your application's API key in `x-api-key`. Missing or invalid credentials return `403` - this API never returns `401`.\n\n**Rate limit.** Shared write budget of 300 requests per minute per API key across POST/PATCH/DELETE endpoints (transaction creates and event ingestion have a separate budget of 600).\n\n**Social footprint.** Set `enable_social` to `true` to add a `phone_social` block: the online platforms this number is registered on, with per-category counts and any profile details available. `profiles_registered: 0` means the platforms were checked and the number was found on none of them - a valid, billable answer. The block is absent when the add-on was not requested or the check could not be completed, and it is not billed in that case. Billing adds one `phone_social` unit per request on top of this endpoint's own price.",
+        "description": "Resolve a phone number and return carrier, line-type, porting, disposable-number, cross-session match, and normalized risk-intelligence signals without sending an OTP. The endpoint creates an API session and returns its id as `request_id`.\n\n**Decision.** The top-level `status` mirrors `phone.status`. It is normally `Approved`; the risk evaluation can produce `In Review` or `Declined`.\n\n**Compatibility aliases.** Live responses expose the normalized intelligence object as both `phone.phone_intelligence` and `phone.enrichment`. The values are identical. New integrations can read `phone.enrichment`. Both keys are absent when no usable intelligence data was returned.\n\n**Billing.** Live calls use Phone Risk API pricing. The request is billable once the lookup starts, even when some best-effort fields are unavailable. Phone Risk, including the optional `enable_social` add-on, is Phone usage: the free credit pays it only up to $1 a month, shared with phone verification codes, messages and the other Phone lookups. On the Free plan, what the $1 does not cover is paid from your top-up balance; Growth and Scale included credit pays for Phone in full. The request is refused with `403` only when the credit available to Phone, including the add-on, cannot cover it. Phone Risk has no first-top-up requirement; a top-up is needed only when the credit available to Phone (the free $1 or paid credit) cannot cover the lookup.\n\n**Sandbox.** Sandbox keys validate the request and return deterministic approved data without sending an OTP, consuming credits, creating a session, or contributing to Networks.\n\n**Authentication.** Send your application's API key in `x-api-key`. Missing or invalid credentials return `403` - this API never returns `401`.\n\n**Rate limit.** Shared write budget of 300 requests per minute per API key across POST/PATCH/DELETE endpoints (transaction creates and event ingestion have a separate budget of 600).\n\n**Social footprint.** Set `enable_social` to `true` to add a `phone_social` block: the online platforms this number is registered on, with per-category counts and any profile details available. `profiles_registered: 0` means the platforms were checked and the number was found on none of them - a valid, billable answer. The block is absent when the add-on was not requested or the check could not be completed, and it is not billed in that case. Billing adds one `phone_social` unit per request on top of this endpoint's own price.",
         "operationId": "post_v3phone_risk",
         "x-didit-sdk": {
           "resource": "phone",
@@ -778,7 +778,25 @@
             "$ref": "#/components/responses/PhoneRiskValidationError"
           },
           "403": {
-            "$ref": "#/components/responses/RiskPermissionDenied"
+            "description": "The API key is missing or invalid, or the credit that may pay a Phone lookup cannot cover it: paid credit, plus what this month's free credit has left of its $1 Phone allowance (shared with phone verification and the other Phone lookups, and covering the `enable_social` add-on). It is returned before the lookup starts, so nothing is charged. This API never returns `401`.",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Missing or invalid API key": {
+                    "summary": "No `x-api-key` header, or the key is invalid or revoked",
+                    "value": {
+                      "detail": "You do not have permission to perform this action."
+                    }
+                  },
+                  "Not enough credits": {
+                    "summary": "The credit available to Phone (paid credit plus what is left of the $1 monthly Phone allowance) cannot cover the lookup and its add-on",
+                    "value": {
+                      "error": "You don't have enough credits to perform this request."
+                    }
+                  }
+                }
+              }
+            }
           },
           "429": {
             "$ref": "#/components/responses/RateLimitedWrite"
@@ -16689,7 +16707,7 @@
             }
           },
           "403": {
-            "description": "Permission denied. Returned when the `x-api-key` header is missing (`{\"detail\": ...}`); a wrong, revoked or expired key returns `401`. Also returned before any send when the organization has never topped up (anti-abuse gate) or when its balance cannot cover the destination's send price (`{\"error\": ...}`).",
+            "description": "Permission denied. Returned when the `x-api-key` header is missing (`{\"detail\": ...}`); a wrong, revoked or expired key returns `401`. Also returned before any send when the organization has never topped up (anti-abuse gate) or when the credit that may pay it cannot cover the destination's send price: paid credit, plus what this month's free credit has left of its Phone allowance (`{\"error\": ...}`).",
             "content": {
               "application/json": {
                 "examples": {
@@ -16706,9 +16724,9 @@
                     }
                   },
                   "Not enough credits": {
-                    "summary": "Organization balance cannot cover the send price",
+                    "summary": "Neither the balance nor what this month's free credit has left of its Phone allowance covers the send price",
                     "value": {
-                      "error": "You don't have enough credits to perform this request."
+                      "error": "You don't have enough credits to perform this request. Please top up at https://business.didit.me"
                     }
                   }
                 }
@@ -17317,7 +17335,7 @@
             }
           },
           "403": {
-            "description": "Permission denied. Returned when the `x-api-key` header is missing; a wrong, revoked or expired key returns `401`. Checks are free, so there is no credit check here.",
+            "description": "Permission denied. Returned when the `x-api-key` header is missing; a wrong, revoked or expired key returns `401`. The check itself is free; a check that asks for Phone enrichment add-ons is refused (`{\"error\": ...}`) when the account's credit cannot cover them.",
             "content": {
               "application/json": {
                 "examples": {
@@ -17325,6 +17343,12 @@
                     "summary": "No `x-api-key` header, or the key is invalid/revoked",
                     "value": {
                       "detail": "You do not have permission to perform this action."
+                    }
+                  },
+                  "Not enough credits": {
+                    "summary": "The account's credit cannot cover the Phone enrichment add-ons the check asks for",
+                    "value": {
+                      "error": "You don't have enough credits to perform this request. Please top up at https://business.didit.me"
                     }
                   }
                 }
