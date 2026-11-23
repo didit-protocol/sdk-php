@@ -16,6 +16,8 @@ use Didit\Types;
 /**
  * The `pricing` resource.
  *
+ * @phpstan-import-type PricingBankVerificationCountryCoverageParams from Params
+ * @phpstan-import-type PricingBankVerificationCoverageParams from Params
  * @phpstan-import-type PricingPriceBookParams from Params
  */
 final class Pricing extends BaseResource
@@ -67,5 +69,65 @@ final class Pricing extends BaseResource
         ), [], $params, $options);
 
         return Types\PublicPriceBook::fromResponse($response);
+    }
+
+    /**
+     * List the countries with bank coverage (public, unauthenticated).
+     *
+     * Lists the countries where Didit covers banks, how many, and what is open today for each product.
+     * Public: no auth header. Cached publicly and revalidated with an `ETag`. What is open is read on
+     * every request from the switches the API uses, so a product that is not open today reads `false` even
+     * when its banks are listed. It carries no prices (see the bank verification pricing feed) and never
+     * names a supplier.
+     *
+     * `GET /v3/organization/bank-verification-coverage/`
+     *
+     * @param PricingBankVerificationCoverageParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function bankVerificationCoverage(
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\BankVerificationCoverage {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/organization/bank-verification-coverage/',
+            auth: 'none',
+            headers: ['if_none_match' => 'If-None-Match'],
+        ), [], $params, $options);
+
+        return Types\BankVerificationCoverage::fromResponse($response);
+    }
+
+    /**
+     * List the banks of one country (public, unauthenticated).
+     *
+     * Lists the banks Didit covers in one country: id, name, segments, access modes, history days, pending
+     * transactions and whether the bank is operational. Public: no auth header. One cached document per
+     * country.
+     *
+     * `GET /v3/organization/bank-verification-coverage/{country}/`
+     *
+     * @param string $country ISO 3166-1 alpha-3 code, for example `ESP`
+     * @param PricingBankVerificationCountryCoverageParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function bankVerificationCountryCoverage(
+        string $country,
+        array $params = [],
+        ?RequestOptions $options = null,
+    ): Types\BankVerificationCountryCoverage {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/organization/bank-verification-coverage/{country}/',
+            auth: 'none',
+            headers: ['if_none_match' => 'If-None-Match'],
+        ), ['country' => $country], $params, $options);
+
+        return Types\BankVerificationCountryCoverage::fromResponse($response);
     }
 }
