@@ -7,7 +7,8 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Who ended access, set from evidence. `unknown` when neither the bank nor the sync says.
+ * Who ended access, set from evidence. `system` when Didit ended it by design: a one-time connection
+ * once its read is complete. `unknown` when neither the bank nor the sync says.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -18,6 +19,8 @@ final class BankConnectionConsentEndedBy
     public const BANK = 'bank';
 
     public const CUSTOMER = 'customer';
+
+    public const SYSTEM = 'system';
 
     public const UNKNOWN = 'unknown';
 
