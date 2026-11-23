@@ -45,7 +45,7 @@ final class BankAccount extends BaseModel
      */
     public readonly ?array $holders;
 
-    /** Full identifiers, returned to server-side callers with the bank data permission. */
+    /** Full identifiers, returned to server-side callers with access to Bank data. */
     public readonly ?BankAccountIdentifiers $identifiers;
 
     /**

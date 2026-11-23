@@ -10,7 +10,7 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * Full identifiers, returned to server-side callers with the bank data permission.
+ * Full identifiers, returned to server-side callers with access to Bank data.
  */
 final class BankAccountIdentifiers extends BaseModel
 {
