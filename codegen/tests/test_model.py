@@ -211,10 +211,6 @@ class PropertiesAndOneOfBodyTest(unittest.TestCase):
         source = php.emit_resource(next(php.walk(php.resource_tree([self.op]))))
         self.assertIn("public function send(array $params, ?RequestOptions $options = null): Types\\MessagesSendResponse", source)
         self.assertIn("bodyTypes: ['json'],", source)
-        self.assertIn(
-            "@param ($params is array{body: mixed, template_id: mixed, ...} ? never : MessagesSendParams) $params",
-            source,
-        )
         params = php.emit_params(list(self.reg.shapes.values()), [])
         self.assertIn("}|array{", params)
         text, template = params.split("}|array{")
@@ -225,6 +221,13 @@ class PropertiesAndOneOfBodyTest(unittest.TestCase):
         for branch in (text, template):
             self.assertIn("to: string,", branch)
             self.assertIn("common: string,", branch)
+
+    def test_params_annotation_does_not_condition_on_itself(self) -> None:
+        source = php.emit_resource(next(php.walk(php.resource_tree([self.op]))))
+        annotation = next(line for line in source.splitlines() if "@param " in line and line.endswith(" $params"))
+        self.assertIn("MessagesSendParams", source)
+        # PHPStan evaluates this condition against the parameter's own declared type.
+        self.assertNotIn("$params is ", annotation)
 
     def test_generated_requests_assert_each_example_separately(self) -> None:
         tree = php.resource_tree([self.op])
