@@ -203,4 +203,26 @@ final class PhoneTest extends GeneratedTestCase
         self::assertSame('binary-content', $result->contents());
         self::assertSame('text/csv', $result->contentType());
     }
+
+    public function testValidate(): void
+    {
+        $this->queueJson(200, '{"valid":true,"format":{"e164":"+34600000012","national":"600 00 00 12"},"country":"ES","charged":false}');
+
+        $result = $this->client->phone->validate([
+            'phone_number' => 'phone_number-value',
+            'country' => 'country-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/phone/validate/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"phone_number":"phone_number-value","country":"country-value"}', $this->canonicalBody($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"valid":true,"format":{"e164":"+34600000012","national":"600 00 00 12"},"country":"ES","charged":false}'), $result->toArray());
+        self::assertTrue($result->valid);
+    }
 }

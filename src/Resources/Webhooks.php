@@ -17,6 +17,7 @@ use Didit\Types;
 /**
  * The `webhooks` resource.
  *
+ * @phpstan-import-type WebhookCreateRequest from Params
  * @phpstan-import-type WebhooksUpdateConfigParams from Params
  */
 final class Webhooks extends BaseResource
@@ -79,5 +80,31 @@ final class Webhooks extends BaseResource
         ), [], $params, $options);
 
         return Types\WebhookConfig::fromResponse($response);
+    }
+
+    /**
+     * Add a webhook endpoint.
+     *
+     * Create a webhook endpoint: an HTTPS endpoint that receives the events in `events`. Send the event
+     * types to deliver, or `["*"]` for every event Didit lists: `*` is expanded when the endpoint is
+     * created and the answer lists the event names it now carries. An event Didit does not know answers
+     * `400 invalid_events`.
+     *
+     * `POST /v3/webhooks/`
+     *
+     * @param WebhookCreateRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function create(array $params, ?RequestOptions $options = null): Types\WebhookCreateResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/webhooks/',
+            bodyTypes: ['json'],
+        ), [], $params, $options);
+
+        return Types\WebhookCreateResponse::fromResponse($response);
     }
 }
