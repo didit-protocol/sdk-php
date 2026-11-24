@@ -54,7 +54,7 @@ final class PhoneTest extends GeneratedTestCase
 
     public function testSendCode(): void
     {
-        $this->queueJson(200, '{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Success","reason":null,"vendor_data":"user-1234","metadata":null}');
+        $this->queueJson(200, '{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Success","channel":null,"reason":null,"vendor_data":"user-1234","metadata":null}');
 
         $result = $this->client->phone->sendCode([
             'phone_number' => 'phone_number-value',
@@ -89,7 +89,7 @@ final class PhoneTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"phone_number":"phone_number-value","options":{"code_size":1,"locale":"locale-value","preferred_channel":"whatsapp","use_white_label_customization":true,"sms_sender_name":"sms_sender_name-value"},"signals":{"ip":"ip-value","device_id":"device_id-value","device_platform":"android","device_model":"device_model-value","os_version":"os_version-value","app_version":"app_version-value","user_agent":"user_agent-value"},"vendor_data":"vendor_data-value","metadata":{"key":"value"}}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Success","reason":null,"vendor_data":"user-1234","metadata":null}'), $result->toArray());
+        self::assertSame($this->decoded('{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Success","channel":null,"reason":null,"vendor_data":"user-1234","metadata":null}'), $result->toArray());
         self::assertSame('e39cb057-92fc-4b59-b84e-02fec29a0f24', $result->requestId);
     }
 

@@ -31,6 +31,14 @@ final class PhoneVerificationSendResponse extends BaseModel
     public readonly ?string $status;
 
     /**
+     * The channel the code went out on, `voice` when a call reads it, or `null` when the delivery channel
+     * is not confirmed, for example when the carrier delivers the message without saying which channel
+     * carried it. A `Blocked` send returns the channel you asked for. A send that reuses the pending code
+     * returns the channel that code went out on.
+     */
+    public readonly ?string $channel;
+
+    /**
      * Why a send was `Blocked` (e.g., `repeated_attempts`, `suspicious`, `spam`). `null` on `Success` and
      * `Retry`.
      */
@@ -54,6 +62,7 @@ final class PhoneVerificationSendResponse extends BaseModel
         parent::__construct($data);
         $this->requestId = Hydrate::string($data['request_id'] ?? null);
         $this->status = Hydrate::string($data['status'] ?? null);
+        $this->channel = Hydrate::string($data['channel'] ?? null);
         $this->reason = Hydrate::string($data['reason'] ?? null);
         $this->vendorData = Hydrate::string($data['vendor_data'] ?? null);
         $this->metadata = Hydrate::assoc($data['metadata'] ?? null);

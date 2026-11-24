@@ -8,7 +8,11 @@ namespace Didit\Types;
 
 /**
  * Preferred delivery channel. If the channel is unavailable for the destination country or number, the
- * message automatically falls back to SMS, the send still reports `Success`.
+ * message automatically falls back to SMS, the send still reports `Success`. A new `sms` send to a
+ * fixed line is read out in a call instead only under the conditions in **Fixed lines** in the
+ * operation description: it never applies to a send that repeats or reuses the pending code, to a
+ * destination without voice delivery, when your routing settings do not allow voice, or in a sandbox
+ * application.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
