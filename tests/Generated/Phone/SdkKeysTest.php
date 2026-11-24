@@ -38,7 +38,7 @@ final class SdkKeysTest extends GeneratedTestCase
 
     public function testCreate(): void
     {
-        $this->queueJson(201, '{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"pk_live_ios_7Hq2","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z"}');
+        $this->queueJson(201, '{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z"}');
 
         $result = $this->client->phone->sdkKeys->create([
             'platform' => 'ios',
@@ -57,13 +57,13 @@ final class SdkKeysTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"platform":"ios","app_ids":["app_ids-value"],"name":"name-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"pk_live_ios_7Hq2","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z"}'), $result->toArray());
+        self::assertSame($this->decoded('{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z"}'), $result->toArray());
         self::assertSame('sk_01JCL2B6', $result->keyId);
     }
 
     public function testRotate(): void
     {
-        $this->queueJson(200, '{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"pk_live_ios_9Zt4","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z","previous_expires_at":"2026-11-24T09:00:00Z"}');
+        $this->queueJson(200, '{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z","previous_expires_at":"2026-11-24T09:00:00Z"}');
 
         $result = $this->client->phone->sdkKeys->rotate('keyId-1', [
             'overlap_hours' => 1,
@@ -78,7 +78,7 @@ final class SdkKeysTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"overlap_hours":1}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"pk_live_ios_9Zt4","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z","previous_expires_at":"2026-11-24T09:00:00Z"}'), $result->toArray());
+        self::assertSame($this->decoded('{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z","previous_expires_at":"2026-11-24T09:00:00Z"}'), $result->toArray());
         self::assertSame('sk_01JCL2B6', $result->keyId);
     }
 

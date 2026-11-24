@@ -151,6 +151,31 @@ class SpecSyncTest(unittest.TestCase):
         self.assertIn("is not valid JSON", err)
         self.assertEqual(self.snapshot(), before)
 
+    def test_removed_operation_scrubs_publishable_key_examples(self) -> None:
+        baseline = json.loads(self.verification_text)
+        response = baseline["paths"]["/v3/session/imports/{importId}/"]["get"]["responses"]["200"]
+        schema = {"$ref": "#/components/schemas/SessionImportJob"}
+        response["content"]["application/json"] = {
+            "schema": schema,
+            "examples": {"Issued": {"value": {"publishable_key": "pk_test_example", "status": "issued"}}},
+        }
+        (self.root / "openapi" / "verification.json").write_text(json.dumps(baseline), "utf-8")
+        self.upstream(self.remove)
+
+        code, _, err = self.sync()
+        self.assertEqual(code, 0, err)
+        [entry] = self.read("deprecated-operations.json")["operations"]
+        content = entry["operation"]["responses"]["200"]["content"]["application/json"]
+        self.assertEqual(content["schema"], schema)
+        self.assertEqual(
+            entry["components"]["schemas"]["SessionImportJob"],
+            baseline["components"]["schemas"]["SessionImportJob"],
+        )
+        self.assertEqual(content["examples"]["Issued"]["value"], {
+            "publishable_key": "sample-publishable-key",
+            "status": "issued",
+        })
+
     def test_removed_operation_is_deprecated(self) -> None:
         self.upstream(self.remove)
         code, _, err = self.sync()
