@@ -78,6 +78,38 @@ final class WebhookEvent
 
     public const INVESTIGATOR_EXTERNAL_REPORT_READY = 'investigator.external.report.ready';
 
+    public const BANK_LINK_COMPLETED = 'bank.link.completed';
+
+    public const BANK_LINK_CANCELLED = 'bank.link.cancelled';
+
+    public const BANK_LINK_EXPIRED = 'bank.link.expired';
+
+    public const BANK_LINK_FAILED = 'bank.link.failed';
+
+    public const BANK_CONNECTION_CREATED = 'bank.connection.created';
+
+    public const BANK_CONNECTION_UPDATED = 'bank.connection.updated';
+
+    public const BANK_CONNECTION_CONSENT_EXPIRING = 'bank.connection.consent_expiring';
+
+    public const BANK_CONNECTION_RENEWAL_REQUIRED = 'bank.connection.renewal_required';
+
+    public const BANK_CONNECTION_RENEWED = 'bank.connection.renewed';
+
+    public const BANK_CONNECTION_REVOKED = 'bank.connection.revoked';
+
+    public const BANK_CONNECTION_DELETED = 'bank.connection.deleted';
+
+    public const BANK_CONNECTION_HISTORY_COMPLETE = 'bank.connection.history_complete';
+
+    public const BANK_DATA_UPDATED = 'bank.data.updated';
+
+    public const BANK_SYNC_COMPLETED = 'bank.sync.completed';
+
+    public const BANK_SYNC_FAILED = 'bank.sync.failed';
+
+    public const BANK_SYNC_RECOVERED = 'bank.sync.recovered';
+
     public const MESSAGE_STATUS_UPDATED = 'message.status.updated';
 
     private function __construct()

@@ -61,7 +61,7 @@ final class Messages extends BaseResource
      *
      * @template TParams of array<string, mixed>
      *
-     * @param TParams&(TParams is array{body: mixed, template_id: mixed, ...} ? never : MessagesSendParams) $params
+     * @param TParams&(TParams is array{body: mixed, template_id: mixed, ...} ? never : (TParams is array{body: mixed, ...} ? MessagesSendParams : (TParams is array{template_id: mixed, ...} ? MessagesSendParams : never))) $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
@@ -204,7 +204,7 @@ final class Messages extends BaseResource
      * Set how many days a message keeps its text and recipient, from 2 to 365 (default 30). Shortening the
      * retention erases, within the hour, the text and recipient of every message already past the new one
      * (irreversible); the messages themselves, with their status, channel, country, segments, price and
-     * timestamps, stay. Lengthening it applies to the messages not erased yet.
+     * timestamps, stay. Lengthening it applies to the messages whose text and recipient are still held.
      *
      * `PATCH /v3/messages/settings/`
      *

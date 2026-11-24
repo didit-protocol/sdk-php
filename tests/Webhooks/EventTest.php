@@ -7,6 +7,22 @@ namespace Didit\Tests\Webhooks;
 use Didit\Types\SessionDecision;
 use Didit\Webhooks\Event;
 use Didit\Webhooks\Events\ActivityCreatedEvent;
+use Didit\Webhooks\Events\BankConnectionConsentExpiringEvent;
+use Didit\Webhooks\Events\BankConnectionCreatedEvent;
+use Didit\Webhooks\Events\BankConnectionDeletedEvent;
+use Didit\Webhooks\Events\BankConnectionHistoryCompleteEvent;
+use Didit\Webhooks\Events\BankConnectionRenewalRequiredEvent;
+use Didit\Webhooks\Events\BankConnectionRenewedEvent;
+use Didit\Webhooks\Events\BankConnectionRevokedEvent;
+use Didit\Webhooks\Events\BankConnectionUpdatedEvent;
+use Didit\Webhooks\Events\BankDataUpdatedEvent;
+use Didit\Webhooks\Events\BankLinkCancelledEvent;
+use Didit\Webhooks\Events\BankLinkCompletedEvent;
+use Didit\Webhooks\Events\BankLinkExpiredEvent;
+use Didit\Webhooks\Events\BankLinkFailedEvent;
+use Didit\Webhooks\Events\BankSyncCompletedEvent;
+use Didit\Webhooks\Events\BankSyncFailedEvent;
+use Didit\Webhooks\Events\BankSyncRecoveredEvent;
 use Didit\Webhooks\Events\BusinessDataUpdatedEvent;
 use Didit\Webhooks\Events\BusinessStatusUpdatedEvent;
 use Didit\Webhooks\Events\DataUpdatedEvent;
@@ -52,6 +68,22 @@ final class EventTest extends TestCase
             'travel_rule.status.updated' => [EventType::TRAVEL_RULE_STATUS_UPDATED, TravelRuleStatusUpdatedEvent::class],
             'workflow.compliance_changed' => [EventType::WORKFLOW_COMPLIANCE_CHANGED, WorkflowComplianceChangedEvent::class],
             'kyb.registry_search.resolved' => [EventType::KYB_REGISTRY_SEARCH_RESOLVED, KybRegistrySearchResolvedEvent::class],
+            'bank.link.completed' => [EventType::BANK_LINK_COMPLETED, BankLinkCompletedEvent::class],
+            'bank.link.cancelled' => [EventType::BANK_LINK_CANCELLED, BankLinkCancelledEvent::class],
+            'bank.link.expired' => [EventType::BANK_LINK_EXPIRED, BankLinkExpiredEvent::class],
+            'bank.link.failed' => [EventType::BANK_LINK_FAILED, BankLinkFailedEvent::class],
+            'bank.connection.created' => [EventType::BANK_CONNECTION_CREATED, BankConnectionCreatedEvent::class],
+            'bank.connection.updated' => [EventType::BANK_CONNECTION_UPDATED, BankConnectionUpdatedEvent::class],
+            'bank.connection.consent_expiring' => [EventType::BANK_CONNECTION_CONSENT_EXPIRING, BankConnectionConsentExpiringEvent::class],
+            'bank.connection.renewal_required' => [EventType::BANK_CONNECTION_RENEWAL_REQUIRED, BankConnectionRenewalRequiredEvent::class],
+            'bank.connection.renewed' => [EventType::BANK_CONNECTION_RENEWED, BankConnectionRenewedEvent::class],
+            'bank.connection.revoked' => [EventType::BANK_CONNECTION_REVOKED, BankConnectionRevokedEvent::class],
+            'bank.connection.deleted' => [EventType::BANK_CONNECTION_DELETED, BankConnectionDeletedEvent::class],
+            'bank.connection.history_complete' => [EventType::BANK_CONNECTION_HISTORY_COMPLETE, BankConnectionHistoryCompleteEvent::class],
+            'bank.data.updated' => [EventType::BANK_DATA_UPDATED, BankDataUpdatedEvent::class],
+            'bank.sync.completed' => [EventType::BANK_SYNC_COMPLETED, BankSyncCompletedEvent::class],
+            'bank.sync.failed' => [EventType::BANK_SYNC_FAILED, BankSyncFailedEvent::class],
+            'bank.sync.recovered' => [EventType::BANK_SYNC_RECOVERED, BankSyncRecoveredEvent::class],
             'newer backend type' => ['transaction_rule_suggestions.created', UnknownEvent::class],
             'authentication type' => ['auth.user.created', UnknownEvent::class],
             'empty type' => ['', UnknownEvent::class],

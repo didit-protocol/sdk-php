@@ -1,7 +1,7 @@
 # Didit PHP SDK
 
 The official Didit PHP library.
-Identity verification (KYC), business verification (KYB), AML screening, biometrics, transaction monitoring, wallet screening, Travel Rule and customer authentication, from your backend, with typed requests and responses for every Didit server API.
+Identity verification (KYC), business verification (KYB), AML screening, biometrics, transaction monitoring, bank data, wallet screening, Travel Rule and customer authentication, from your backend, with typed requests and responses for every Didit server API.
 
 - API reference: [docs.didit.me](https://docs.didit.me)
 - Design contract shared by every Didit server SDK: [docs/DESIGN.md](docs/DESIGN.md)
@@ -245,8 +245,43 @@ match (true) {
 - `Webhook::verifyParsed($payload, $headers, $secret)` exists for code that only has the decoded body; it can check `X-Signature-V2` only. Prefer `verify()`.
 - Didit retries deliveries with the same `eventId`: use it to ignore duplicates.
 
-Events: `StatusUpdatedEvent`, `DataUpdatedEvent`, `UserStatusUpdatedEvent`, `UserDataUpdatedEvent`, `BusinessStatusUpdatedEvent`, `BusinessDataUpdatedEvent`, `ActivityCreatedEvent`, `TransactionCreatedEvent`, `TransactionStatusUpdatedEvent`, `TravelRuleStatusUpdatedEvent`, `WorkflowComplianceChangedEvent`, `KybRegistrySearchResolvedEvent` and `UnknownEvent`, all in `Didit\Webhooks\Events`.
+Events: `StatusUpdatedEvent`, `DataUpdatedEvent`, `UserStatusUpdatedEvent`, `UserDataUpdatedEvent`, `BusinessStatusUpdatedEvent`, `BusinessDataUpdatedEvent`, `ActivityCreatedEvent`, `TransactionCreatedEvent`, `TransactionStatusUpdatedEvent`, `TravelRuleStatusUpdatedEvent`, `WorkflowComplianceChangedEvent`, `KybRegistrySearchResolvedEvent`, the bank events (`bank.link.*`, `bank.connection.*`, `bank.data.updated`, `bank.sync.*`) and `UnknownEvent`, all in `Didit\Webhooks\Events`.
 Webhook receivers for plain PHP, Laravel and Symfony are in [examples/webhooks/](examples/webhooks/).
+
+## Bank data
+
+Create the link in the customer's authenticated session. Save its ID against that customer before redirecting them to the hosted URL.
+
+```php
+$link = $didit->bank->createLink([
+    'access' => 'ongoing',
+    'data' => ['accounts'],
+    'end_user' => ['reference' => $customerReference],
+]);
+saveBankLinkId($customerReference, $link->id);
+header('Cache-Control: no-store');
+header('Location: ' . $link->url, true, 303);
+exit;
+```
+
+In the webhook endpoint, verify the raw delivery and look up the link ID saved for the customer you are processing. A signed event can belong to another customer in the same application.
+
+```php
+use Didit\Webhooks\Events\BankConnectionCreatedEvent;
+
+$event = $didit->webhooks->verify($rawBody, $headers, $webhookSecret);
+if ($event instanceof BankConnectionCreatedEvent && null !== $event->connectionId) {
+    $link = $didit->bank->getLink(loadBankLinkId($customerReference));
+    if (null === $link->connectionId) {
+        http_response_code(503); // Retry once the connection is visible.
+    } elseif ($link->connectionId === $event->connectionId) {
+        $page = $didit->bank->listAccounts($link->connectionId);
+    }
+}
+```
+
+The [runnable example](examples/bank_connection.php) saves one customer's hosted URL privately and reports their account count after a successful or partial first sync.
+Bank data needs the `bank-data` permission on the API key and is not part of full access.
 
 ## Transactions, wallet screening and Travel Rule
 

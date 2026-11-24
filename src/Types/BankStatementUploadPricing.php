@@ -14,7 +14,10 @@ use Didit\Core\Hydrate;
  */
 final class BankStatementUploadPricing extends BaseModel
 {
-    /** Price of a statement upload after a charged bank attempt. Decimal string with 4 decimals, in USD. */
+    /**
+     * Price of a statement upload with no charged bank attempt before it. After a charged bank attempt in
+     * the same session the statement costs nothing extra. Decimal string with 4 decimals, in USD.
+     */
     public readonly ?string $priceUsd;
 
     /**
@@ -23,10 +26,7 @@ final class BankStatementUploadPricing extends BaseModel
      */
     public readonly ?bool $includedAfterChargedBankAttempt;
 
-    /**
-     * `true` when a statement upload can run on its own, with no bank attempt first. `false` in
-     * production; sandbox sessions can test it without billing.
-     */
+    /** `true` when a statement upload can run on its own, with no bank attempt first, at `price_usd`. */
     public readonly ?bool $standaloneAvailable;
 
     /**

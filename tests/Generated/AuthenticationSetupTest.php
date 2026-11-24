@@ -264,13 +264,21 @@ final class AuthenticationSetupTest extends GeneratedTestCase
     {
         $this->queueJson(200, '{"key":"code","from":"Example <no-reply@example.com>","to":"","subject":"Your Example code: 123456","html":"<html>...</html>","enabled":true}');
 
-        $result = $this->client->authenticationSetup->getEmail('organizationId-1', 'applicationId-1', 'key-1');
+        $result = $this->client->authenticationSetup->getEmail('organizationId-1', 'applicationId-1', 'key-1', [
+            'organization' => 'organization-value',
+            'role' => 'member',
+            'agent' => 'agent-value',
+        ]);
 
         $request = $this->lastRequest();
         self::assertSame('GET', $request->getMethod());
         self::assertSame('apx.didit.me', $request->getUri()->getHost());
         self::assertSame('/auth/v2/organizations/organizationId-1/applications/applicationId-1/authentication/emails/key-1/', $request->getUri()->getPath());
-        self::assertSame([], $this->queryParams($request));
+        self::assertSame([
+            'organization' => 'organization-value',
+            'role' => 'member',
+            'agent' => 'agent-value',
+        ], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);

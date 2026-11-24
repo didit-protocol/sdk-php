@@ -17,7 +17,7 @@ final class PricingTest extends GeneratedTestCase
 {
     public function testBankVerification(): void
     {
-        $this->queueJson(200, '{"currency":"USD","statement_upload":{"price_usd":"0.0000","included_after_charged_bank_attempt":true,"standalone_available":false},"own_provider_fee_usd":"0.0200","countries":{"GBR":{"name":"United Kingdom","methods":{"open_banking":{"available":true,"market":"UK and EEA","price_usd":"0.7900","add_ons":{"balance":"0.3500","transactions":"1.3000"}},"account_lookup":{"available":true,"price_usd":"0.4000"}}},"CAN":{"name":"Canada","methods":{"open_banking":{"available":false,"market":null,"price_usd":null,"add_ons":{}},"account_lookup":{"available":false,"price_usd":null}}}}}');
+        $this->queueJson(200, '{"currency":"USD","statement_upload":{"price_usd":"0.2000","included_after_charged_bank_attempt":true,"standalone_available":true},"own_provider_fee_usd":"0.0200","countries":{"GBR":{"name":"United Kingdom","methods":{"open_banking":{"available":true,"market":"UK and EEA","price_usd":"0.7900","add_ons":{"balance":"0.3500","transactions":"1.3000"},"ongoing":{"available":true,"price_usd_per_month":"0.9000"},"one_time_data":{"balances_usd":"0.3500","transactions_usd":"1.3000"}},"account_lookup":{"available":true,"price_usd":"0.4000"}}},"CAN":{"name":"Canada","methods":{"open_banking":{"available":false,"market":null,"price_usd":null,"add_ons":{},"ongoing":{"available":false,"price_usd_per_month":null},"one_time_data":null},"account_lookup":{"available":false,"price_usd":null}}}}}');
 
         $result = $this->client->pricing->bankVerification();
 
@@ -30,7 +30,7 @@ final class PricingTest extends GeneratedTestCase
         self::assertSame('', $request->getHeaderLine('Authorization'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"currency":"USD","statement_upload":{"price_usd":"0.0000","included_after_charged_bank_attempt":true,"standalone_available":false},"own_provider_fee_usd":"0.0200","countries":{"GBR":{"name":"United Kingdom","methods":{"open_banking":{"available":true,"market":"UK and EEA","price_usd":"0.7900","add_ons":{"balance":"0.3500","transactions":"1.3000"}},"account_lookup":{"available":true,"price_usd":"0.4000"}}},"CAN":{"name":"Canada","methods":{"open_banking":{"available":false,"market":null,"price_usd":null,"add_ons":{}},"account_lookup":{"available":false,"price_usd":null}}}}}'), $result->toArray());
+        self::assertSame($this->decoded('{"currency":"USD","statement_upload":{"price_usd":"0.2000","included_after_charged_bank_attempt":true,"standalone_available":true},"own_provider_fee_usd":"0.0200","countries":{"GBR":{"name":"United Kingdom","methods":{"open_banking":{"available":true,"market":"UK and EEA","price_usd":"0.7900","add_ons":{"balance":"0.3500","transactions":"1.3000"},"ongoing":{"available":true,"price_usd_per_month":"0.9000"},"one_time_data":{"balances_usd":"0.3500","transactions_usd":"1.3000"}},"account_lookup":{"available":true,"price_usd":"0.4000"}}},"CAN":{"name":"Canada","methods":{"open_banking":{"available":false,"market":null,"price_usd":null,"add_ons":{},"ongoing":{"available":false,"price_usd_per_month":null},"one_time_data":null},"account_lookup":{"available":false,"price_usd":null}}}}}'), $result->toArray());
         self::assertSame('USD', $result->currency);
     }
 
@@ -54,5 +54,49 @@ final class PricingTest extends GeneratedTestCase
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"currency":"USD","plans":[{"key":"free","price_usd_month":"0.00","price_usd_year":null,"discount_percent":0,"transactions_included_per_month":1000},{"key":"growth","price_usd_month":"99.00","price_usd_year":"1128.00","discount_percent":4,"transactions_included_per_month":10000},{"key":"scale","price_usd_month":"299.00","price_usd_year":"3408.00","discount_percent":10,"transactions_included_per_month":100000},{"key":"enterprise","price_usd_month":null,"price_usd_year":null,"discount_percent":null,"transactions_included_per_month":null}],"white_label_usd":"0.10","messages_fee_usd":"0.02","message_fee_usd_by_channel":{"sms":"0.02","whatsapp":"0.004"},"lines":[{"key":"message_email","product":"identity","feature":"email","unit":"message","list_price_usd":"0.02"}]}'), $result->toArray());
         self::assertSame('USD', $result->currency);
+    }
+
+    public function testBankVerificationCoverage(): void
+    {
+        $this->queueJson(200, '{"updated_at":"2026-11-23T08:00:00Z","open":{"bank_verification_in_workflows":{"live":true,"countries":["ESP"]},"bank_data_api_one_time":{"live_applications":false,"countries":[]},"bank_data_api_ongoing":{"live_applications":false,"countries":[]}},"data_read":["accounts","balances","transactions"],"balances_note":"Balances are read for every account a bank shares. The balance types a bank states are listed per bank only when Didit has observed them.","countries":{"ESP":{"name":"Spain","banks":92,"banks_by_segment":{"personal":84,"business":87},"open":{"bank_verification_in_workflows":true,"bank_data_api_one_time":false,"bank_data_api_ongoing":false,"account_check":false},"banks_url":"/v3/organization/bank-verification-coverage/ESP/"}}}');
+
+        $result = $this->client->pricing->bankVerificationCoverage([
+            'if_none_match' => 'if_none_match-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/organization/bank-verification-coverage/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame('', $request->getHeaderLine('x-api-key'));
+        self::assertSame('', $request->getHeaderLine('Authorization'));
+        self::assertSame('if_none_match-value', $request->getHeaderLine('If-None-Match'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"updated_at":"2026-11-23T08:00:00Z","open":{"bank_verification_in_workflows":{"live":true,"countries":["ESP"]},"bank_data_api_one_time":{"live_applications":false,"countries":[]},"bank_data_api_ongoing":{"live_applications":false,"countries":[]}},"data_read":["accounts","balances","transactions"],"balances_note":"Balances are read for every account a bank shares. The balance types a bank states are listed per bank only when Didit has observed them.","countries":{"ESP":{"name":"Spain","banks":92,"banks_by_segment":{"personal":84,"business":87},"open":{"bank_verification_in_workflows":true,"bank_data_api_one_time":false,"bank_data_api_ongoing":false,"account_check":false},"banks_url":"/v3/organization/bank-verification-coverage/ESP/"}}}'), $result->toArray());
+        self::assertInstanceOf(\DateTimeImmutable::class, $result->updatedAt);
+    }
+
+    public function testBankVerificationCountryCoverage(): void
+    {
+        $this->queueJson(200, '{"country":"ESP","name":"Spain","updated_at":"2026-11-23T08:00:00Z","open":{"bank_verification_in_workflows":true,"bank_data_api_one_time":false,"bank_data_api_ongoing":false,"account_check":false},"data_read":["accounts","balances","transactions"],"balances_note":"Balances are read for every account a bank shares. The balance types a bank states are listed per bank only when Didit has observed them.","banks":[{"id":"es-bbva","name":"BBVA","country":"ESP","segments":["personal","business"],"access":["one_time"],"history_days_max":60,"pending_transactions":true,"status":"operational"},{"id":"es-caixabank","name":"CaixaBank","country":"ESP","segments":["personal","business"],"access":["one_time"],"history_days_max":60,"pending_transactions":false,"status":"operational"},{"id":"es-santander","name":"Santander","country":"ESP","segments":["personal","business"],"access":["one_time"],"history_days_max":60,"pending_transactions":true,"status":"operational"}]}');
+
+        $result = $this->client->pricing->bankVerificationCountryCoverage('country-1', [
+            'if_none_match' => 'if_none_match-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/organization/bank-verification-coverage/country-1/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame('', $request->getHeaderLine('x-api-key'));
+        self::assertSame('', $request->getHeaderLine('Authorization'));
+        self::assertSame('if_none_match-value', $request->getHeaderLine('If-None-Match'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"country":"ESP","name":"Spain","updated_at":"2026-11-23T08:00:00Z","open":{"bank_verification_in_workflows":true,"bank_data_api_one_time":false,"bank_data_api_ongoing":false,"account_check":false},"data_read":["accounts","balances","transactions"],"balances_note":"Balances are read for every account a bank shares. The balance types a bank states are listed per bank only when Didit has observed them.","banks":[{"id":"es-bbva","name":"BBVA","country":"ESP","segments":["personal","business"],"access":["one_time"],"history_days_max":60,"pending_transactions":true,"status":"operational"},{"id":"es-caixabank","name":"CaixaBank","country":"ESP","segments":["personal","business"],"access":["one_time"],"history_days_max":60,"pending_transactions":false,"status":"operational"},{"id":"es-santander","name":"Santander","country":"ESP","segments":["personal","business"],"access":["one_time"],"history_days_max":60,"pending_transactions":true,"status":"operational"}]}'), $result->toArray());
+        self::assertSame('ESP', $result->country);
     }
 }
