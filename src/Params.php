@@ -1790,6 +1790,21 @@ namespace Didit;
  *     vendor_data?: string,
  *     metadata?: array<string, mixed>,
  * }
+ * @phpstan-type PhoneCheckCodeParams array{
+ *     phone_number?: string,
+ *     code: string,
+ *     duplicated_phone_number_action?: string,
+ *     disposable_number_action?: string,
+ *     voip_number_action?: string,
+ *     enable_enrichment?: bool,
+ *     phone_intelligence_score_action?: string,
+ *     phone_type_risk_action?: string,
+ *     recent_port_action?: string,
+ *     low_phone_trust_action?: string,
+ *     enable_social?: bool,
+ *     phone_no_social_presence_action?: string,
+ *     factor_id?: string,
+ * }
  * @phpstan-type PhoneFactorCreateRequest array{
  *     type: string,
  *     user_id: string,

@@ -520,7 +520,11 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
     if om.body_alias:
         param_type = om.body_alias
         if len(exclusive_keys) > 1:
-            # Infer the caller's array before applying the shape and its oneOf exclusions.
+            # Require a branch key explicitly: PHPStan can merge the shape union's distinct keys into optional ones.
+            param_type = "never"
+            for key in reversed(exclusive_keys):
+                present = f"array{{{shape_key(key)}: mixed, ...}}"
+                param_type = f"(TParams is {present} ? {om.body_alias} : {param_type})"
             for left, right in combinations(exclusive_keys, 2):
                 overlap = f"array{{{shape_key(left)}: mixed, {shape_key(right)}: mixed, ...}}"
                 param_type = f"(TParams is {overlap} ? never : {param_type})"

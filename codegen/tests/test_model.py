@@ -226,7 +226,9 @@ class PropertiesAndOneOfBodyTest(unittest.TestCase):
         source = php.emit_resource(next(php.walk(php.resource_tree([self.op]))))
         annotation = next(line for line in source.splitlines() if "@param " in line and line.endswith(" $params"))
         self.assertIn("@template TParams of array<string, mixed>", source)
-        self.assertIn("TParams&(TParams is array{body: mixed, template_id: mixed, ...} ? never : MessagesSendParams)", annotation)
+        self.assertIn("TParams&(TParams is array{body: mixed, template_id: mixed, ...} ? never :", annotation)
+        self.assertIn("(TParams is array{body: mixed, ...} ? MessagesSendParams :", annotation)
+        self.assertIn("(TParams is array{template_id: mixed, ...} ? MessagesSendParams : never)", annotation)
         # PHPStan evaluates this condition against the parameter's own declared type.
         self.assertNotIn("$params is ", annotation)
 

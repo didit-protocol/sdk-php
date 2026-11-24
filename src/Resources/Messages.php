@@ -61,7 +61,7 @@ final class Messages extends BaseResource
      *
      * @template TParams of array<string, mixed>
      *
-     * @param TParams&(TParams is array{body: mixed, template_id: mixed, ...} ? never : MessagesSendParams) $params
+     * @param TParams&(TParams is array{body: mixed, template_id: mixed, ...} ? never : (TParams is array{body: mixed, ...} ? MessagesSendParams : (TParams is array{template_id: mixed, ...} ? MessagesSendParams : never))) $params
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded

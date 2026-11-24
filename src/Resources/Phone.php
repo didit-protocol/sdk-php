@@ -17,6 +17,7 @@ use Didit\Types;
 /**
  * The `phone` resource.
  *
+ * @phpstan-import-type PhoneCheckCodeParams from Params
  * @phpstan-import-type PhoneRiskRequest from Params
  * @phpstan-import-type PhoneSendCodeParams from Params
  */
@@ -99,15 +100,18 @@ final class Phone extends BaseResource
      *
      * `POST /v3/phone/check/`
      *
+     * @param PhoneCheckCodeParams $params
+     *
      * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function checkCode(?RequestOptions $options = null): Types\PhoneCheckCodeResponse
+    public function checkCode(array $params, ?RequestOptions $options = null): Types\PhoneCheckCodeResponse
     {
         $response = $this->requester->request(new Operation(
             method: 'POST',
             path: '/v3/phone/check/',
             bodyTypes: ['json'],
-        ), [], [], $options);
+        ), [], $params, $options);
 
         return Types\PhoneCheckCodeResponse::fromResponse($response);
     }
