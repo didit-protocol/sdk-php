@@ -1,0 +1,295 @@
+"""Type model and PHP emitters (docs/DESIGN.md section 5.1)."""
+
+from __future__ import annotations
+
+import tempfile
+import unittest
+from pathlib import Path
+
+from helpers import document, naming, ok, write_openapi, write_sessions
+from didit_codegen import model, php, spec, tests_gen
+from didit_codegen.model import AnyT, ArrayT, FreeObjT, MapT, Prop, Scalar, Shape, ShapeT
+
+
+class TypeNamingTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            write_sessions(Path(tmp))
+            s = spec.load(Path(tmp))
+        cls.reg = model.Registry()
+        cls.ops = {o.op.naming.method: o for o in model.build(cls.reg, s.server_operations)}
+
+    def test_a_component_keeps_its_name(self) -> None:
+        self.assertIn("SessionDecision", self.reg.models)
+        response = self.ops["retrieve_decision"].response
+        self.assertEqual(response.kind, "model")
+        self.assertEqual(response.type.model.name, "SessionDecision")
+
+    def test_inline_body_is_resource_method_params(self) -> None:
+        create = self.ops["create"]
+        self.assertEqual(create.body.name, "SessionsCreateParams")
+        self.assertEqual(create.body_alias, "SessionsCreateParams")
+        self.assertIn("SessionsCreateParams", self.reg.shapes)
+
+    def test_inline_response_is_resource_method_response(self) -> None:
+        response = self.ops["create"].response
+        self.assertEqual(response.status, "201")
+        self.assertEqual(response.type.model.name, "SessionsCreateResponse")
+
+    def test_nested_inline_object_appends_the_property_name(self) -> None:
+        self.assertIn("SessionsCreateParamsContactDetails", self.reg.shapes)
+        contact = next(p for p in self.ops["create"].body.props if p.wire == "contact_details")
+        self.assertEqual(contact.type.shape.name, "SessionsCreateParamsContactDetails")
+
+    def test_enums_are_open_string_constants(self) -> None:
+        enum = self.reg.enums["SessionDecisionStatus"]
+        self.assertEqual(enum.base, "string")
+        source = php.emit_enum(enum)
+        self.assertIn("final class SessionDecisionStatus", source)
+        self.assertIn("public const APPROVED = 'Approved';", source)
+        self.assertIn("public const IN_REVIEW = 'In Review';", source)
+        self.assertIn("The API may add values", source)
+        self.assertNotIn("enum SessionDecisionStatus", source)
+        # The model property is a plain string, so an unknown value never raises.
+        model_source = php.emit_model(self.reg.models["SessionDecision"])
+        self.assertIn("public readonly ?string $status;", model_source)
+        self.assertIn("Known values: {@see SessionDecisionStatus}.", model_source)
+        self.assertIn("public readonly ?\\DateTimeImmutable $createdAt;", model_source)
+
+
+class JsonHintTest(unittest.TestCase):
+    def _shape(self, *props: Prop) -> ShapeT:
+        return ShapeT(Shape("Test", "", list(props)))
+
+    def test_object_fields_get_object_hints(self) -> None:
+        nested = self._shape(Prop("email", "email", Scalar("string"), False, ""))
+        t = self._shape(
+            Prop("name", "name", Scalar("string"), True, ""),
+            Prop("contact", "contact", nested, False, ""),
+            Prop("meta", "meta", FreeObjT(), False, ""),
+            Prop("tags", "tags", MapT(Scalar("string")), False, ""),
+        )
+        self.assertEqual(php.json_hint(t), ["o", {"contact": ["o"], "meta": ["o"], "tags": ["o"]}])
+
+    def test_any_typed_field_with_an_object_example_gets_an_object_hint(self) -> None:
+        reg = model.Registry()
+        doc = spec.Document("verification", {})
+        with_object = reg.convert(doc, {"description": "x", "example": {"plan": "gold"}}, "H", "request", "o1")
+        with_string = reg.convert(doc, {"example": "gold"}, "H", "request", "o2")
+        self.assertIsInstance(with_object, AnyT)
+        self.assertEqual(php.json_hint(with_object), ["o"])
+        self.assertIsNone(php.json_hint(with_string))
+
+    def test_list_of_objects(self) -> None:
+        item = self._shape(Prop("meta", "meta", FreeObjT(), False, ""))
+        self.assertEqual(php.json_hint(ArrayT(item)), ["l", ["o", {"meta": ["o"]}]])
+        self.assertIsNone(php.json_hint(ArrayT(Scalar("string"))))
+
+    def test_hint_reaches_the_generated_operation(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            write_sessions(Path(tmp))
+            s = spec.load(Path(tmp))
+        reg = model.Registry()
+        ops = model.build(reg, s.server_operations)
+        source = php.emit_resource(php.walk(php.resource_tree(ops)).__next__())
+        self.assertIn("jsonHints: ['contact_details' => ['o'], 'metadata' => ['o']]", source)
+
+
+class MultiContentOneOfBodyTest(unittest.TestCase):
+    """A body that is a union in one content type and has another form (DESIGN 5.1)."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        row = {"$ref": "#/components/schemas/WalletAddressImportRow"}
+        paths = {
+            "/v3/travel-rule/wallet-addresses/import/": {
+                "post": {
+                    "summary": "Import wallet addresses",
+                    "requestBody": {
+                        "required": True,
+                        "content": {
+                            "application/json": {
+                                "schema": {"oneOf": [
+                                    {"type": "object", "required": ["entries"],
+                                     "properties": {"entries": {"type": "array", "minItems": 1, "items": row}}},
+                                    {"type": "array", "minItems": 1, "items": row},
+                                ]},
+                            },
+                            "multipart/form-data": {
+                                "schema": {"type": "object", "required": ["file"],
+                                           "properties": {"file": {"type": "string", "format": "binary"}}},
+                            },
+                        },
+                    },
+                    "responses": ok({"type": "object", "properties": {"total": {"type": "integer"}}}),
+                }
+            }
+        }
+        schemas = {"WalletAddressImportRow": {"type": "object", "properties": {"address": {"type": "string"}}}}
+        overlay = {"POST /v3/travel-rule/wallet-addresses/import/": naming("travel_rule.wallet_addresses", "bulk_import")}
+        with tempfile.TemporaryDirectory() as tmp:
+            write_openapi(Path(tmp), document(paths, schemas), overlay)
+            s = spec.load(Path(tmp))
+        cls.reg = model.Registry()
+        cls.op = next(o for o in model.build(cls.reg, s.server_operations))
+
+    def test_every_branch_of_the_union_reaches_the_params(self) -> None:
+        body = {p.wire: p for p in self.op.body.props}
+        self.assertEqual(sorted(body), ["entries", "file"])
+        self.assertIsInstance(body["entries"].type, ArrayT)
+        # Neither form is required of every caller: the JSON union keeps no
+        # key across its branches, and the multipart file is only one form.
+        self.assertFalse(body["entries"].required)
+        self.assertFalse(body["file"].required)
+
+    def test_the_generated_params_alias_lists_the_union_field(self) -> None:
+        source = php.emit_params(list(self.reg.shapes.values()), [])
+        self.assertIn("entries?: list<WalletAddressImportRow>,", source)
+
+
+class PropertiesAndOneOfBodyTest(unittest.TestCase):
+    """The Messages request shape, with an extra field required in every branch."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        schema = {
+            "type": "object",
+            "required": ["to"],
+            "description": "Send exactly one of `body` or `template_id`.",
+            "oneOf": [{"required": ["common", "body"]}, {"required": ["common", "template_id"]}],
+            "properties": {
+                "to": {"type": "string", "description": "Recipient."},
+                "common": {"type": "string"},
+                "body": {"type": "string", "description": "Free text."},
+                "template_id": {"type": "string", "format": "uuid"},
+                "channels": {"type": "array", "items": {"type": "string", "enum": ["sms", "whatsapp"]}},
+            },
+        }
+        paths = {
+            "/v3/messages/": {
+                "post": {
+                    "summary": "Send a message",
+                    "requestBody": {"required": True, "content": {"application/json": {
+                        "schema": schema,
+                        "examples": {
+                            "sms_text": {"value": {"to": "recipient", "common": "abc", "body": "Example text"}},
+                            "template": {"value": {"to": "recipient", "common": "abc", "template_id": "example-id"}},
+                        },
+                    }}},
+                    "responses": ok({"type": "object", "properties": {"id": {"type": "string"}}}, "201"),
+                }
+            }
+        }
+        overlay = {"POST /v3/messages/": naming("messages", "send")}
+        with tempfile.TemporaryDirectory() as tmp:
+            write_openapi(Path(tmp), document(paths), overlay)
+            s = spec.load(Path(tmp))
+        cls.reg = model.Registry()
+        cls.op = next(o for o in model.build(cls.reg, s.server_operations))
+
+    def test_the_operation_keeps_the_body(self) -> None:
+        self.assertIsNotNone(self.op.body, "the generator dropped the request body")
+        self.assertTrue(self.op.body_required)
+        self.assertEqual(self.op.body_types, ["json"])
+
+    def test_every_property_of_the_body_is_typed(self) -> None:
+        body = {p.wire: p for p in self.op.body.props}
+        self.assertEqual(sorted(body), ["body", "channels", "common", "template_id", "to"])
+        self.assertIsInstance(body["body"].type, Scalar)
+        self.assertIsInstance(body["channels"].type, ArrayT)
+
+    def test_parent_and_common_branch_fields_are_required(self) -> None:
+        body = {p.wire: p for p in self.op.body.props}
+        self.assertTrue(body["to"].required)
+        self.assertTrue(body["common"].required)
+        # Neither branch is required of every caller: the caller sends exactly one.
+        self.assertFalse(body["body"].required)
+        self.assertFalse(body["template_id"].required)
+
+    def test_the_generated_method_takes_params(self) -> None:
+        source = php.emit_resource(next(php.walk(php.resource_tree([self.op]))))
+        self.assertIn("public function send(array $params, ?RequestOptions $options = null): Types\\MessagesSendResponse", source)
+        self.assertIn("bodyTypes: ['json'],", source)
+        params = php.emit_params(list(self.reg.shapes.values()), [])
+        self.assertIn("}|array{", params)
+        text, template = params.split("}|array{")
+        self.assertIn("body: string,", text)
+        self.assertNotIn("template_id", text)
+        self.assertNotIn("body:", template)
+        self.assertIn("template_id: string,", template)
+        for branch in (text, template):
+            self.assertIn("to: string,", branch)
+            self.assertIn("common: string,", branch)
+
+    def test_params_annotation_does_not_condition_on_itself(self) -> None:
+        source = php.emit_resource(next(php.walk(php.resource_tree([self.op]))))
+        annotation = next(line for line in source.splitlines() if "@param " in line and line.endswith(" $params"))
+        self.assertIn("@template TParams of array<string, mixed>", source)
+        self.assertIn("TParams&(TParams is array{body: mixed, template_id: mixed, ...} ? never : MessagesSendParams)", annotation)
+        # PHPStan evaluates this condition against the parameter's own declared type.
+        self.assertNotIn("$params is ", annotation)
+
+    def test_generated_requests_assert_each_example_separately(self) -> None:
+        tree = php.resource_tree([self.op])
+        source = tests_gen.emit([self.op], tree)["tests/Generated/MessagesTest.php"]
+        self.assertEqual(source.count("->messages->send(["), 2)
+        self.assertIn('{"to":"recipient","common":"abc","body":"Example text"}', source)
+        self.assertIn('{"to":"recipient","common":"abc","template_id":"example-id"}', source)
+
+    def test_shared_properties_do_not_hide_a_scalar_alternative(self) -> None:
+        schema = {
+            "properties": {"shared": {"type": "string"}},
+            "oneOf": [{"type": "object", "properties": {"id": {"type": "integer"}}}, {"type": "string"}],
+        }
+        t = model.Registry().convert(self.op.op.doc, schema, "MixedResponse", "response", "mixed")
+        self.assertIsInstance(t, model.UnionT)
+        self.assertEqual(php.doc_type(t), "MixedResponse|string")
+
+
+class IdempotencyKeyHeaderTest(unittest.TestCase):
+    """The shared ``Idempotency-Key`` header is generated only where it was already published (DESIGN.md)."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        header = {"name": "Idempotency-Key", "in": "header", "required": False, "schema": {"type": "string"},
+                  "description": "Retry-safety key."}
+        trace = {"name": "X-Trace-Id", "in": "header", "required": False, "schema": {"type": "string"}}
+
+        def operation(summary: str, parameters: list) -> dict:
+            return {
+                "post": {
+                    "summary": summary,
+                    "parameters": parameters,
+                    "requestBody": {"content": {"application/json": {"schema": {"type": "object", "properties": {"name": {"type": "string"}}}}}},
+                    "responses": ok({"type": "object", "properties": {"id": {"type": "string"}}}),
+                }
+            }
+
+        paths = {
+            "/v3/aml/": operation("Screen", [header]),
+            "/v3/things/": operation("Create a thing", [header, trace]),
+        }
+        overlay = {"POST /v3/aml/": naming("aml", "screen"), "POST /v3/things/": naming("things", "create")}
+        with tempfile.TemporaryDirectory() as tmp:
+            write_openapi(Path(tmp), document(paths), overlay)
+            s = spec.load(Path(tmp))
+        built = model.build(model.Registry(), s.server_operations)
+        cls.ops = {o.op.naming.resource: o for o in built}
+
+    def test_a_newly_covered_operation_gets_no_generated_idempotency_key(self) -> None:
+        wires = [p.wire for p in self.ops["things"].params if p.location == "header"]
+        self.assertEqual(wires, ["X-Trace-Id"])
+
+    def test_a_published_operation_keeps_the_argument_and_deprecates_it(self) -> None:
+        headers = [p for p in self.ops["aml"].params if p.location == "header"]
+        self.assertEqual([p.wire for p in headers], ["Idempotency-Key"])
+        self.assertIn("Deprecated", headers[0].description)
+        self.assertIn("idempotencyKey", headers[0].description)
+
+    def test_the_legacy_list_is_the_28_published_operations(self) -> None:
+        self.assertEqual(len(model.LEGACY_IDEMPOTENCY_KEY_ARGUMENT), 28)
+
+
+if __name__ == "__main__":
+    unittest.main()
