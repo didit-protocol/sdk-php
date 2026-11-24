@@ -1,5 +1,37 @@
 # Changelog
 
+## [2.30.0](https://github.com/didit-protocol/sdk-php/compare/v2.29.0...v2.30.0) (2026-11-24)
+
+
+### API changes that can break typed code
+
+* **spec:** `phone.check_code()` (`POST /v3/phone/check/`): request body `code`: now required ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.check_code()` (`POST /v3/phone/check/`): request body `phone_number`: now required ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.check_code()` (`POST /v3/phone/check/`): request body: type changed from any or any to object ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.check_code()` (`POST /v3/phone/check/`): request body: type changed from any to object ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.check_code()` (`POST /v3/phone/check/`): response `status`: no longer required ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.check_code()` (`POST /v3/phone/check/`): response: type changed from object or object to object ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.factors.create()` (`POST /v3/phone/factors/`): response `status`: enum value `disabled` removed ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.factors.create()` (`POST /v3/phone/factors/`): response `status`: enum value `verified` removed ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.network.registrations.create()` (`POST /v3/phone/network/registrations/`): response `test_numbers[].test_access`: removed ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.network.registrations.create()` (`POST /v3/phone/network/registrations/`): response `test_numbers[].verification_id`: removed ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.network.registrations.retrieve()` (`GET /v3/phone/network/registrations/{registration_id}/`): response `test_numbers[].test_access`: removed ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.network.registrations.retrieve()` (`GET /v3/phone/network/registrations/{registration_id}/`): response `test_numbers[].verification_id`: removed ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.network.registrations.test_numbers.create()` (`POST /v3/phone/network/registrations/{registration_id}/test-numbers/`): response `status`: enum value `verified` removed ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.sdk_keys.rotate()` (`POST /v3/phone/sdk-keys/{key_id}/rotate/`): response `status`: enum value `expiring` removed ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.sdk_keys.rotate()` (`POST /v3/phone/sdk-keys/{key_id}/rotate/`): response `status`: enum value `revoked` removed ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+* **spec:** `phone.silent.eligibility()` (`POST /v3/phone/silent/eligibility/`): response `country`: can now be null ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-24 ([f048bf6](https://github.com/didit-protocol/sdk-php/commit/f048bf64f6bfbafa9bda12e278d5a4f19a10a048))
+
+
+### Bug Fixes
+
+* **codegen:** messages-&gt;send() takes and sends its request body ([b7e7eab](https://github.com/didit-protocol/sdk-php/commit/b7e7eab67a227a407680005febdd8cd3507f9362))
+
 ## [2.29.0](https://github.com/didit-protocol/sdk-php/compare/v2.28.0...v2.29.0) (2026-11-23)
 
 
