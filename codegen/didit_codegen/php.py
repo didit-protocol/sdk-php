@@ -510,18 +510,21 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
             "instead. The option wins when both are set."
         )
         doc.append("")
+    exclusive_keys = om.body.exclusive_keys if om.body else ()
+    if len(exclusive_keys) > 1:
+        doc.extend(["@template TParams of array<string, mixed>", ""])
     for pp in om.path_params:
         pdesc = annotation_text(first_sentence(pp.description))
         if pdesc:
             doc.append(f"@param {pp.php} ${pp.var} {pdesc}")
     if om.body_alias:
         param_type = om.body_alias
-        if om.body:
-            # Ordinary PHPStan array shapes allow extra keys. A union requires one
-            # choice; test the caller's keys separately to rule out overlapping choices.
-            for left, right in combinations(om.body.exclusive_keys, 2):
+        if len(exclusive_keys) > 1:
+            # Infer the caller's array before applying the shape and its oneOf exclusions.
+            for left, right in combinations(exclusive_keys, 2):
                 overlap = f"array{{{shape_key(left)}: mixed, {shape_key(right)}: mixed, ...}}"
-                param_type = f"($params is {overlap} ? never : {param_type})"
+                param_type = f"(TParams is {overlap} ? never : {param_type})"
+            param_type = f"TParams&{param_type}"
         doc.append(f"@param {param_type} $params")
     native_ret, ret_doc = return_type(om.response)
     if ret_doc:

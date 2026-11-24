@@ -104,6 +104,7 @@ $didit->webhooks->destinations->list();
 
 Parameters are plain arrays.
 Each one has a PHPStan array shape (`Didit\Params`), so PHPStan and your IDE check field names and types; unknown keys are sent as given, for API fields newer than this SDK.
+For `messages->send()`, supply the recipient in `to` and exactly one of `body` (free text) or `template_id`.
 Path parameters are positional arguments.
 Responses are read-only objects in `Didit\Types` with typed properties (`DateTimeImmutable` for date-times, string decimals stay strings).
 Every field the API sent stays readable, including fields this SDK version does not know yet:
