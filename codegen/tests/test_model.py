@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 
 from helpers import document, naming, ok, write_openapi, write_sessions
-from didit_codegen import model, php, spec
+from didit_codegen import model, php, spec, tests_gen
 from didit_codegen.model import AnyT, ArrayT, FreeObjT, MapT, Prop, Scalar, Shape, ShapeT
 
 
@@ -146,6 +146,107 @@ class MultiContentOneOfBodyTest(unittest.TestCase):
     def test_the_generated_params_alias_lists_the_union_field(self) -> None:
         source = php.emit_params(list(self.reg.shapes.values()), [])
         self.assertIn("entries?: list<WalletAddressImportRow>,", source)
+
+
+class PropertiesAndOneOfBodyTest(unittest.TestCase):
+    """The Messages request shape, with an extra field required in every branch."""
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        schema = {
+            "type": "object",
+            "required": ["to"],
+            "description": "Send exactly one of `body` or `template_id`.",
+            "oneOf": [{"required": ["common", "body"]}, {"required": ["common", "template_id"]}],
+            "properties": {
+                "to": {"type": "string", "description": "Recipient."},
+                "common": {"type": "string"},
+                "body": {"type": "string", "description": "Free text."},
+                "template_id": {"type": "string", "format": "uuid"},
+                "channels": {"type": "array", "items": {"type": "string", "enum": ["sms", "whatsapp"]}},
+            },
+        }
+        paths = {
+            "/v3/messages/": {
+                "post": {
+                    "summary": "Send a message",
+                    "requestBody": {"required": True, "content": {"application/json": {
+                        "schema": schema,
+                        "examples": {
+                            "sms_text": {"value": {"to": "recipient", "common": "abc", "body": "Example text"}},
+                            "template": {"value": {"to": "recipient", "common": "abc", "template_id": "example-id"}},
+                        },
+                    }}},
+                    "responses": ok({"type": "object", "properties": {"id": {"type": "string"}}}, "201"),
+                }
+            }
+        }
+        overlay = {"POST /v3/messages/": naming("messages", "send")}
+        with tempfile.TemporaryDirectory() as tmp:
+            write_openapi(Path(tmp), document(paths), overlay)
+            s = spec.load(Path(tmp))
+        cls.reg = model.Registry()
+        cls.op = next(o for o in model.build(cls.reg, s.server_operations))
+
+    def test_the_operation_keeps_the_body(self) -> None:
+        self.assertIsNotNone(self.op.body, "the generator dropped the request body")
+        self.assertTrue(self.op.body_required)
+        self.assertEqual(self.op.body_types, ["json"])
+
+    def test_every_property_of_the_body_is_typed(self) -> None:
+        body = {p.wire: p for p in self.op.body.props}
+        self.assertEqual(sorted(body), ["body", "channels", "common", "template_id", "to"])
+        self.assertIsInstance(body["body"].type, Scalar)
+        self.assertIsInstance(body["channels"].type, ArrayT)
+
+    def test_parent_and_common_branch_fields_are_required(self) -> None:
+        body = {p.wire: p for p in self.op.body.props}
+        self.assertTrue(body["to"].required)
+        self.assertTrue(body["common"].required)
+        # Neither branch is required of every caller: the caller sends exactly one.
+        self.assertFalse(body["body"].required)
+        self.assertFalse(body["template_id"].required)
+
+    def test_the_generated_method_takes_params(self) -> None:
+        source = php.emit_resource(next(php.walk(php.resource_tree([self.op]))))
+        self.assertIn("public function send(array $params, ?RequestOptions $options = null): Types\\MessagesSendResponse", source)
+        self.assertIn("bodyTypes: ['json'],", source)
+        params = php.emit_params(list(self.reg.shapes.values()), [])
+        self.assertIn("}|array{", params)
+        text, template = params.split("}|array{")
+        self.assertIn("body: string,", text)
+        self.assertNotIn("template_id", text)
+        self.assertNotIn("body:", template)
+        self.assertIn("template_id: string,", template)
+        for branch in (text, template):
+            self.assertIn("to: string,", branch)
+            self.assertIn("common: string,", branch)
+
+    def test_params_annotation_does_not_condition_on_itself(self) -> None:
+        source = php.emit_resource(next(php.walk(php.resource_tree([self.op]))))
+        annotation = next(line for line in source.splitlines() if "@param " in line and line.endswith(" $params"))
+        self.assertIn("@template TParams of array<string, mixed>", source)
+        self.assertIn("TParams&(TParams is array{body: mixed, template_id: mixed, ...} ? never :", annotation)
+        self.assertIn("(TParams is array{body: mixed, ...} ? MessagesSendParams :", annotation)
+        self.assertIn("(TParams is array{template_id: mixed, ...} ? MessagesSendParams : never)", annotation)
+        # PHPStan evaluates this condition against the parameter's own declared type.
+        self.assertNotIn("$params is ", annotation)
+
+    def test_generated_requests_assert_each_example_separately(self) -> None:
+        tree = php.resource_tree([self.op])
+        source = tests_gen.emit([self.op], tree)["tests/Generated/MessagesTest.php"]
+        self.assertEqual(source.count("->messages->send(["), 2)
+        self.assertIn('{"to":"recipient","common":"abc","body":"Example text"}', source)
+        self.assertIn('{"to":"recipient","common":"abc","template_id":"example-id"}', source)
+
+    def test_shared_properties_do_not_hide_a_scalar_alternative(self) -> None:
+        schema = {
+            "properties": {"shared": {"type": "string"}},
+            "oneOf": [{"type": "object", "properties": {"id": {"type": "integer"}}}, {"type": "string"}],
+        }
+        t = model.Registry().convert(self.op.op.doc, schema, "MixedResponse", "response", "mixed")
+        self.assertIsInstance(t, model.UnionT)
+        self.assertEqual(php.doc_type(t), "MixedResponse|string")
 
 
 class IdempotencyKeyHeaderTest(unittest.TestCase):

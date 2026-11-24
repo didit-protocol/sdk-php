@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass, field
+from itertools import combinations
 
 from . import naming
 from .model import (
@@ -162,10 +163,20 @@ def shape_key(key: str) -> str:
     return key if KEY_RE.match(key) else php_string(key)
 
 
-def array_shape(fields: list[tuple[str, str, bool]], indent: str) -> list[str]:
+def array_shape(fields: list[tuple[str, str, bool]], indent: str, exclusive_keys: tuple[str, ...] = ()) -> list[str]:
     """Multi-line ``array{...}`` lines; ``fields`` are (key, type, required)."""
     if not fields:
         return ["array<string, mixed>"]
+    if exclusive_keys:
+        variants = []
+        for selected in exclusive_keys:
+            branch = [
+                (key, typ, required or key == selected)
+                for key, typ, required in fields
+                if key == selected or key not in exclusive_keys
+            ]
+            variants.append("\n".join(array_shape(branch, indent)))
+        return "|".join(variants).splitlines()
     lines = ["array{"]
     for key, typ, required in fields:
         lines.append(f"{indent}    {shape_key(key)}{'' if required else '?'}: {typ},")
@@ -300,7 +311,7 @@ def _property_doc(prop) -> str:
     return docblock(doc, "    ")
 
 
-def emit_params(shapes: list[Shape], op_aliases: list[tuple[str, list[tuple[str, str, bool]]]]) -> str:
+def emit_params(shapes: list[Shape], op_aliases: list[OpModel]) -> str:
     lines = [HEADER, "namespace Didit;", ""]
     doc = [
         "Request parameter shapes for every operation, as PHPStan type aliases.",
@@ -310,11 +321,13 @@ def emit_params(shapes: list[Shape], op_aliases: list[tuple[str, list[tuple[str,
         "",
     ]
     entries: list[tuple[str, list[str]]] = []
-    for name, fields in op_aliases:
-        entries.append((name, array_shape(fields, "")))
+    for om in op_aliases:
+        assert om.body_alias is not None
+        keys = om.body.exclusive_keys if om.body else ()
+        entries.append((om.body_alias, array_shape(op_alias_fields(om), "", keys)))
     for shape in shapes:
         fields = [(p.wire, shape_type(p.type), p.required) for p in shape.props]
-        entries.append((shape.name, array_shape(fields, "")))
+        entries.append((shape.name, array_shape(fields, "", shape.exclusive_keys)))
     entries.sort(key=lambda e: e[0])
     for name, body in entries:
         doc.append(f"@phpstan-type {name} {body[0]}")
@@ -497,12 +510,26 @@ def _emit_method(om: OpModel) -> tuple[list[str], set[str], str | None]:
             "instead. The option wins when both are set."
         )
         doc.append("")
+    exclusive_keys = om.body.exclusive_keys if om.body else ()
+    if len(exclusive_keys) > 1:
+        doc.extend(["@template TParams of array<string, mixed>", ""])
     for pp in om.path_params:
         pdesc = annotation_text(first_sentence(pp.description))
         if pdesc:
             doc.append(f"@param {pp.php} ${pp.var} {pdesc}")
     if om.body_alias:
-        doc.append(f"@param {om.body_alias} $params")
+        param_type = om.body_alias
+        if len(exclusive_keys) > 1:
+            # Require a branch key explicitly: PHPStan can merge the shape union's distinct keys into optional ones.
+            param_type = "never"
+            for key in reversed(exclusive_keys):
+                present = f"array{{{shape_key(key)}: mixed, ...}}"
+                param_type = f"(TParams is {present} ? {om.body_alias} : {param_type})"
+            for left, right in combinations(exclusive_keys, 2):
+                overlap = f"array{{{shape_key(left)}: mixed, {shape_key(right)}: mixed, ...}}"
+                param_type = f"(TParams is {overlap} ? never : {param_type})"
+            param_type = f"TParams&{param_type}"
+        doc.append(f"@param {param_type} $params")
     native_ret, ret_doc = return_type(om.response)
     if ret_doc:
         doc.append("")
@@ -609,7 +636,7 @@ def _deprecation(o: Operation) -> str:
 def _params_required(om: OpModel) -> bool:
     if any(p.required for p in om.params):
         return True
-    if om.body is not None and om.body_required and any(p.required for p in om.body.props):
+    if om.body is not None and om.body_required and (om.body.exclusive_keys or any(p.required for p in om.body.props)):
         return True
     return False
 
