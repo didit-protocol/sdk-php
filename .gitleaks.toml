@@ -1,0 +1,51 @@
+# Secret scan configuration (CI job "Secret scan").
+#
+# The default gitleaks rules apply everywhere. Only two things are allowed:
+# - the upstream API documents in openapi/, which are byte-for-byte copies of
+#   the public docs at docs.didit.me and carry example values, and the earlier
+#   copies the spec sync tests use as fixtures (codegen/tests/fixtures/spec-sync);
+# - synthetic webhook secrets that start with whsec_test_.
+# Every other test value is generated at test time or written so that it does
+# not look like a credential.
+
+title = "didit sdk-php"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Upstream OpenAPI copies and synthetic webhook test secrets"
+paths = [
+  '''^openapi/verification\.json$''',
+  '''^openapi/account\.json$''',
+  '''^openapi/authentication\.json$''',
+  '''^openapi/webhook-vectors\.json$''',
+  '''^codegen/tests/fixtures/spec-sync/[0-9-]+/(before|after)\.json$''',
+]
+regexTarget = "match"
+regexes = [
+  '''whsec_test_[A-Za-z0-9_]+''',
+]
+
+# Synthetic consent-redaction test value: this one value, in this one test file, for this one rule.
+[[allowlists]]
+description = "Synthetic agent consent redaction test value"
+condition = "AND"
+targetRules = ["generic-api-key"]
+paths = [
+  '''^tests/Authentication/AgentConsentTest\.php$''',
+]
+regexes = [
+  '''^SECRET\-0123456789abcdef$''',
+]
+
+[[allowlists]]
+description = "Publishable keys from the spec examples that the generated tests inline: pk_test_ or pk_live_ followed by the base64 of the issuer URL, public by design (a browser sends them)"
+condition = "AND"
+targetRules = ["generic-api-key"]
+paths = [
+  '''^tests/Generated/''',
+]
+regexes = [
+  '''^pk_(test|live)_[A-Za-z0-9_-]+$''',
+]
