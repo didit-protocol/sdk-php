@@ -80,7 +80,9 @@ final class RegulatoryReports extends BaseResource
     /**
      * Get report.
      *
-     * Retrieve a regulatory report.
+     * Retrieve a regulatory report. A report filed on a case answers 403 `plan_upgrade_required` when the
+     * plan or the release does not include Cases, like the case's own routes; a standalone report is not
+     * refused.
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/`
      *
@@ -103,7 +105,9 @@ final class RegulatoryReports extends BaseResource
     /**
      * Update report.
      *
-     * Edit a draft or validated report's fields. Finalized reports cannot be edited (409).
+     * Edit a draft or validated report's fields. Finalized reports cannot be edited (409). A report filed
+     * on a case answers 403 `plan_upgrade_required` when the plan or the release does not include Cases,
+     * like the case's own routes; a standalone report is not refused.
      *
      * `PATCH /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/`
      *
@@ -191,7 +195,8 @@ final class RegulatoryReports extends BaseResource
      *
      * Re-validate, then render the goAML XML and PDF and upload both to S3. On SAR/STR/TFR reports, this
      * also moves the case's transaction alerts from Pending SAR to SAR filed. FFR and PNMR reports do not
-     * move alerts.
+     * move alerts. A report filed on a case answers 403 `plan_upgrade_required` when the plan or the
+     * release does not include Cases, like the case's own routes; a standalone report is not refused.
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/finalize/`
      *
@@ -214,7 +219,9 @@ final class RegulatoryReports extends BaseResource
     /**
      * Get report download URL.
      *
-     * Mint a presigned URL for a finalized report's goAML XML or PDF.
+     * Mint a presigned URL for a finalized report's goAML XML or PDF. A report filed on a case answers 403
+     * `plan_upgrade_required` when the plan or the release does not include Cases, like the case's own
+     * routes; a standalone report is not refused.
      *
      * `GET /v3/organization/{organization_id}/application/{application_id}/regulatory-reports/{report_uuid}/download-url/`
      *
