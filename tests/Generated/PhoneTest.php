@@ -54,7 +54,7 @@ final class PhoneTest extends GeneratedTestCase
 
     public function testSendCode(): void
     {
-        $this->queueJson(200, '{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Success","channel":null,"reason":null,"vendor_data":"user-1234","metadata":null}');
+        $this->queueJson(200, '{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Success","channel":null,"reason":null,"vendor_data":"user-1234","metadata":null,"verification_id":"c9b18621-9f8f-4590-a3b4-f8ebea4baa7d"}');
 
         $result = $this->client->phone->sendCode([
             'phone_number' => 'phone_number-value',
@@ -78,6 +78,12 @@ final class PhoneTest extends GeneratedTestCase
             'metadata' => [
                 'key' => 'value',
             ],
+            'code' => 'code-value',
+            'code_length' => 1,
+            'on_conflict' => 'replace',
+            'trusted_user' => true,
+            'force_challenge' => true,
+            'fraud_override' => 'fraud_override-value',
         ]);
 
         $request = $this->lastRequest();
@@ -87,9 +93,9 @@ final class PhoneTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"phone_number":"phone_number-value","options":{"code_size":1,"locale":"locale-value","preferred_channel":"whatsapp","use_white_label_customization":true,"sms_sender_name":"sms_sender_name-value"},"signals":{"ip":"ip-value","device_id":"device_id-value","device_platform":"android","device_model":"device_model-value","os_version":"os_version-value","app_version":"app_version-value","user_agent":"user_agent-value"},"vendor_data":"vendor_data-value","metadata":{"key":"value"}}', $this->canonicalBody($request));
+        self::assertSame('{"phone_number":"phone_number-value","options":{"code_size":1,"locale":"locale-value","preferred_channel":"whatsapp","use_white_label_customization":true,"sms_sender_name":"sms_sender_name-value"},"signals":{"ip":"ip-value","device_id":"device_id-value","device_platform":"android","device_model":"device_model-value","os_version":"os_version-value","app_version":"app_version-value","user_agent":"user_agent-value"},"vendor_data":"vendor_data-value","metadata":{"key":"value"},"code":"code-value","code_length":1,"on_conflict":"replace","trusted_user":true,"force_challenge":true,"fraud_override":"fraud_override-value"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Success","channel":null,"reason":null,"vendor_data":"user-1234","metadata":null}'), $result->toArray());
+        self::assertSame($this->decoded('{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Success","channel":null,"reason":null,"vendor_data":"user-1234","metadata":null,"verification_id":"c9b18621-9f8f-4590-a3b4-f8ebea4baa7d"}'), $result->toArray());
         self::assertSame('e39cb057-92fc-4b59-b84e-02fec29a0f24', $result->requestId);
     }
 
@@ -111,7 +117,7 @@ final class PhoneTest extends GeneratedTestCase
             'enable_social' => true,
             'phone_no_social_presence_action' => 'NO_ACTION',
             'factor_id' => 'factor_id-value',
-            'verification_id' => 'verification_id-value',
+            'verification_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
         ]);
 
         $request = $this->lastRequest();
@@ -121,7 +127,7 @@ final class PhoneTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"phone_number":"phone_number-value","code":"code-value","duplicated_phone_number_action":"NO_ACTION","disposable_number_action":"NO_ACTION","voip_number_action":"NO_ACTION","enable_enrichment":true,"phone_intelligence_score_action":"NO_ACTION","phone_type_risk_action":"NO_ACTION","recent_port_action":"NO_ACTION","low_phone_trust_action":"NO_ACTION","enable_social":true,"phone_no_social_presence_action":"NO_ACTION","factor_id":"factor_id-value","verification_id":"verification_id-value"}', $this->canonicalBody($request));
+        self::assertSame('{"phone_number":"phone_number-value","code":"code-value","duplicated_phone_number_action":"NO_ACTION","disposable_number_action":"NO_ACTION","voip_number_action":"NO_ACTION","enable_enrichment":true,"phone_intelligence_score_action":"NO_ACTION","phone_type_risk_action":"NO_ACTION","recent_port_action":"NO_ACTION","low_phone_trust_action":"NO_ACTION","enable_social":true,"phone_no_social_presence_action":"NO_ACTION","factor_id":"factor_id-value","verification_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Approved","message":"The verification code is correct.","phone":{"status":"Approved","phone_number_prefix":"+1","phone_number":"4155552671","full_number":"+14155552671","country_code":"US","country_name":"United States","carrier":{"name":"AT&T","type":"mobile"},"is_disposable":false,"is_virtual":false,"verification_method":"whatsapp","verification_attempts":1,"verified_at":"2026-06-12T01:24:47.311323Z","warnings":[],"lifecycle":[{"type":"PHONE_VERIFICATION_MESSAGE_SENT","timestamp":"2026-06-12T01:23:39.580554+00:00","details":{"status":"Success","reason":null,"channel":"whatsapp","actual_channel":"whatsapp","attempt":0,"delivery_status":"delivered"},"fee":0.0509},{"type":"PHONE_DELIVERY_DELIVERED","timestamp":"2026-06-12T01:23:43.118220+00:00","details":{"channel":"whatsapp","status":"delivered","attempt":0},"fee":0},{"type":"VALID_CODE_ENTERED","timestamp":"2026-06-12T01:24:47.311201+00:00","details":{"code_tried":"123456","status":"Approved"},"fee":0},{"type":"PHONE_VERIFICATION_APPROVED","timestamp":"2026-06-12T01:24:47.384292+00:00","details":null,"fee":0}],"matches":[]},"vendor_data":"user-1234","metadata":null,"created_at":"2026-06-12T01:24:47.401719+00:00"}'), $result->toArray());
         self::assertSame('e39cb057-92fc-4b59-b84e-02fec29a0f24', $result->requestId);

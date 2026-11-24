@@ -1584,6 +1584,13 @@ namespace Didit;
  *     subject?: string,
  *     body: string,
  * }
+ * @phpstan-type MessagesCapabilitiesRetrieveParams array{
+ *     to: string,
+ * }
+ * @phpstan-type MessagesConfigurationsListParams array{
+ *     limit?: int,
+ *     offset?: int,
+ * }
  * @phpstan-type MessagesConversationsListParams array{
  *     status?: string,
  *     assignee?: string,
@@ -1628,6 +1635,7 @@ namespace Didit;
  *     expires_at?: \DateTimeInterface|string,
  *     correlation_id?: string,
  *     options?: MessagesSendParamsOptions,
+ *     configuration_id?: string,
  * }|array{
  *     to: string,
  *     to_email?: string,
@@ -1640,6 +1648,7 @@ namespace Didit;
  *     expires_at?: \DateTimeInterface|string,
  *     correlation_id?: string,
  *     options?: MessagesSendParamsOptions,
+ *     configuration_id?: string,
  * }
  * @phpstan-type MessagesSendParamsOptions array{
  *     append_opt_out_line?: bool,
@@ -1653,6 +1662,32 @@ namespace Didit;
  *     locale?: string,
  *     limit?: int,
  *     offset?: int,
+ * }
+ * @phpstan-type MessagingConfigurationCreateRequest array{
+ *     name: string,
+ *     from?: string,
+ *     channels?: list<string>,
+ *     status_callback_url?: string,
+ *     inbound_url?: string,
+ *     opt_out?: MessagingConfigurationCreateRequestOptOut,
+ *     append_opt_out_line?: bool,
+ * }
+ * @phpstan-type MessagingConfigurationCreateRequestOptOut array{
+ *     keywords?: list<string>,
+ *     confirmation?: string,
+ * }
+ * @phpstan-type MessagingConfigurationUpdateRequest array{
+ *     name?: string,
+ *     from?: string,
+ *     channels?: list<string>,
+ *     status_callback_url?: string,
+ *     inbound_url?: string,
+ *     opt_out?: MessagingConfigurationUpdateRequestOptOut,
+ *     append_opt_out_line?: bool,
+ * }
+ * @phpstan-type MessagingConfigurationUpdateRequestOptOut array{
+ *     keywords?: list<string>,
+ *     confirmation?: string,
  * }
  * @phpstan-type MonitoringEventCreateRequest array{
  *     event_id: string,
@@ -1857,6 +1892,23 @@ namespace Didit;
  *     factor_id?: string,
  *     verification_id?: string,
  * }
+ * @phpstan-type PhoneCountriesUpdateRequest array{
+ *     countries: list<PhoneCountryUpdate>,
+ * }
+ * @phpstan-type PhoneCountryClosedChannel array{
+ *     channel: string,
+ *     platforms?: list<string>,
+ * }
+ * @phpstan-type PhoneCountryUpdate array{
+ *     country: string,
+ *     sms?: bool,
+ *     voice?: bool,
+ *     whatsapp?: bool,
+ *     silent?: bool,
+ *     route?: string,
+ *     objective?: string,
+ *     closed_channels?: list<PhoneCountryClosedChannel>,
+ * }
  * @phpstan-type PhoneFactorCreateRequest array{
  *     type: string,
  *     user_id: string,
@@ -1875,6 +1927,28 @@ namespace Didit;
  *     limit?: int,
  *     offset?: int,
  *     format?: string,
+ * }
+ * @phpstan-type PhoneFeedbackBatchItem array{
+ *     verification_id?: string,
+ *     phone_number?: string,
+ *     email?: string,
+ *     outcome: string,
+ *     event?: string,
+ *     confidence?: string,
+ *     occurred_at?: \DateTimeInterface|string,
+ * }
+ * @phpstan-type PhoneFeedbackBatchRequest array{
+ *     items: list<PhoneFeedbackBatchItem>,
+ * }
+ * @phpstan-type PhoneFeedbackRequest array{
+ *     verification_id?: string,
+ *     phone_number?: string,
+ *     email?: string,
+ *     outcome: string,
+ *     event?: string,
+ *     confidence?: string,
+ *     occurred_at?: \DateTimeInterface|string,
+ *     note?: string,
  * }
  * @phpstan-type PhoneFraudEvaluateParams array{
  *     phone_number?: string,
@@ -1952,6 +2026,13 @@ namespace Didit;
  *     offset?: int,
  *     format?: string,
  * }
+ * @phpstan-type PhoneLookupsListParams array{
+ *     phone_number?: string,
+ *     created_after?: \DateTimeInterface|string,
+ *     created_before?: \DateTimeInterface|string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
  * @phpstan-type PhoneNetworkRegistrationRequest array{
  *     feature: string,
  *     country: string,
@@ -2018,6 +2099,12 @@ namespace Didit;
  *     signals?: PhoneSendCodeParamsSignals,
  *     vendor_data?: string,
  *     metadata?: array<string, mixed>|null,
+ *     code?: string,
+ *     code_length?: int,
+ *     on_conflict?: string,
+ *     trusted_user?: bool,
+ *     force_challenge?: bool,
+ *     fraud_override?: string,
  * }
  * @phpstan-type PhoneSendCodeParamsOptions array{
  *     code_size?: int,
@@ -2034,6 +2121,34 @@ namespace Didit;
  *     os_version?: string,
  *     app_version?: string,
  *     user_agent?: string,
+ * }
+ * @phpstan-type PhoneSettingsUpdate array{
+ *     verification?: PhoneSettingsUpdateVerification,
+ *     messages?: PhoneSettingsUpdateMessages,
+ *     data_region?: string,
+ * }
+ * @phpstan-type PhoneSettingsUpdateMessages array{
+ *     retention_days?: int,
+ * }
+ * @phpstan-type PhoneSettingsUpdateVerification array{
+ *     code_length?: int,
+ *     valid_minutes?: int,
+ *     max_attempts?: int,
+ *     resend_limit?: int,
+ *     cancel_on_resend?: bool,
+ *     channel_order?: list<string>,
+ *     routing?: string,
+ *     voice?: PhoneSettingsUpdateVerificationVoice,
+ *     email?: PhoneSettingsUpdateVerificationEmail,
+ * }
+ * @phpstan-type PhoneSettingsUpdateVerificationEmail array{
+ *     domain_id?: string,
+ *     from_address?: string,
+ *     from_name?: string,
+ * }
+ * @phpstan-type PhoneSettingsUpdateVerificationVoice array{
+ *     tts_voice?: string,
+ *     speech_rate?: float|int,
  * }
  * @phpstan-type PhoneSilentCoverageParams array{
  *     country?: string,
@@ -2055,6 +2170,27 @@ namespace Didit;
  *     website: string,
  *     monthly_volume?: int|null,
  *     flow_screenshots?: list<string>,
+ * }
+ * @phpstan-type PhoneVerificationApproveRequest array{
+ *     reason?: string,
+ * }
+ * @phpstan-type PhoneVerificationNextRequest array{
+ *     channel?: string,
+ * }
+ * @phpstan-type PhoneVerificationRetryRequest array{
+ *     channel?: string,
+ * }
+ * @phpstan-type PhoneVerificationsListParams array{
+ *     status?: string,
+ *     channel?: string,
+ *     phone_number?: string,
+ *     reference?: string,
+ *     tag?: string,
+ *     created_after?: \DateTimeInterface|string,
+ *     created_before?: \DateTimeInterface|string,
+ *     limit?: int,
+ *     offset?: int,
+ *     format?: string,
  * }
  * @phpstan-type PricingBankVerificationCountryCoverageParams array{
  *     if_none_match?: string,
