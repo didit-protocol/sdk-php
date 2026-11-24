@@ -354,10 +354,11 @@ final class Cases extends BaseResource
     /**
      * Approve staged resolution (4-eyes).
      *
-     * Apply a resolution staged by resolve on a four-eyes blueprint. The caller must be a different
-     * officer than the one who submitted it, otherwise 403. When the resolution names a checker (the
-     * case's `checker`), only that member can approve it: any other caller, including an API key, gets
-     * 403.
+     * Apply a resolution staged by resolve on a four-eyes blueprint. Only a different signed-in person can
+     * approve: the officer who submitted the resolution gets 403, and an API key or MCP token acting as
+     * the application always gets 403 with code `human_approver_required`, leaving the case unchanged.
+     * When the resolution names a checker (the case's `checker`), only that member can approve it. A
+     * successful approval records the approver's email and name on the case's APPROVAL_GRANTED event.
      *
      * `POST /v3/organization/{organization_id}/application/{application_id}/cases/{case_uuid}/approve/`
      *
