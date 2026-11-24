@@ -1564,6 +1564,32 @@ namespace Didit;
  *     email: string,
  *     password: string,
  * }
+ * @phpstan-type MessageConsentUpdate array{
+ *     channel: string,
+ *     status: string,
+ *     source?: string,
+ * }
+ * @phpstan-type MessageConversationUpdate array{
+ *     assignee?: string|null,
+ *     status?: string,
+ *     read_up_to?: string,
+ * }
+ * @phpstan-type MessageConversationWebhookCreate array{
+ *     url: string,
+ *     events?: list<string>,
+ * }
+ * @phpstan-type MessageTemplateContentInput array{
+ *     channel: string,
+ *     language: string,
+ *     subject?: string,
+ *     body: string,
+ * }
+ * @phpstan-type MessagesConversationsListParams array{
+ *     status?: string,
+ *     assignee?: string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
  * @phpstan-type MessagesListParams array{
  *     limit?: int,
  *     offset?: int,
@@ -1620,6 +1646,13 @@ namespace Didit;
  * }
  * @phpstan-type MessagesSettings array{
  *     retention_days: int,
+ * }
+ * @phpstan-type MessagesTemplatesListParams array{
+ *     status?: string,
+ *     channel?: string,
+ *     locale?: string,
+ *     limit?: int,
+ *     offset?: int,
  * }
  * @phpstan-type MonitoringEventCreateRequest array{
  *     event_id: string,
@@ -3312,6 +3345,12 @@ namespace Didit;
  * }
  * @phpstan-type TravelRuleWorkspaceDomainConfirmRequest array{
  *     code: string,
+ * }
+ * @phpstan-type UpdateMessageTemplateRequest array{
+ *     name?: string,
+ *     description?: string,
+ *     variable_examples?: array<string, string>,
+ *     contents?: list<MessageTemplateContentInput>,
  * }
  * @phpstan-type UsersBatchDeleteParams array{
  *     vendor_data_list?: list<string>,

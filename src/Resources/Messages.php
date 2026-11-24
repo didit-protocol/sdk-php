@@ -29,10 +29,19 @@ final class Messages extends BaseResource
 {
     public readonly Messages\Rules $rules;
 
+    public readonly Messages\Templates $templates;
+
+    public readonly Messages\Conversations $conversations;
+
+    public readonly Messages\Consent $consent;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
         $this->rules = new Messages\Rules($requester);
+        $this->templates = new Messages\Templates($requester);
+        $this->conversations = new Messages\Conversations($requester);
+        $this->consent = new Messages\Consent($requester);
     }
 
     /**
