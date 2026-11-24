@@ -9,7 +9,7 @@ namespace Didit;
  */
 final class Version
 {
-    public const VERSION = '2.30.0'; // x-release-please-version
+    public const VERSION = '2.31.0'; // x-release-please-version
 
     private function __construct()
     {
