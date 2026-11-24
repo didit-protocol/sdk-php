@@ -14,7 +14,7 @@ use Didit\Core\Hydrate;
  */
 final class PhoneSilentRegistration extends BaseModel
 {
-    /** The registration: track it with it. */
+    /** The registration: `sr_` followed by 32 hexadecimal characters. */
     public readonly ?string $registrationId;
 
     /** The country it asks approval for. */

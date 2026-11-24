@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Didit\Resources;
 
 use Didit\Core\BaseResource;
+use Didit\Core\BinaryContent;
 use Didit\Core\Operation;
 use Didit\Core\Requester;
 use Didit\Exception\DiditException;
@@ -17,27 +18,40 @@ use Didit\Types;
 /**
  * The `phone` resource.
  *
+ * @phpstan-import-type PhoneAssessRiskBulkParams from Params
  * @phpstan-import-type PhoneCheckCodeParams from Params
  * @phpstan-import-type PhoneRiskRequest from Params
  * @phpstan-import-type PhoneSendCodeParams from Params
  */
 final class Phone extends BaseResource
 {
+    public readonly Phone\Fraud $fraud;
+
+    public readonly Phone\Lists $lists;
+
+    public readonly Phone\RateLimits $rateLimits;
+
+    public readonly Phone\LineTypeOverrides $lineTypeOverrides;
+
     public readonly Phone\Silent $silent;
 
     public readonly Phone\Factors $factors;
 
-    public readonly Phone\SdkKeys $sdkKeys;
-
     public readonly Phone\Network $network;
+
+    public readonly Phone\SdkKeys $sdkKeys;
 
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
+        $this->fraud = new Phone\Fraud($requester);
+        $this->lists = new Phone\Lists($requester);
+        $this->rateLimits = new Phone\RateLimits($requester);
+        $this->lineTypeOverrides = new Phone\LineTypeOverrides($requester);
         $this->silent = new Phone\Silent($requester);
         $this->factors = new Phone\Factors($requester);
-        $this->sdkKeys = new Phone\SdkKeys($requester);
         $this->network = new Phone\Network($requester);
+        $this->sdkKeys = new Phone\SdkKeys($requester);
     }
 
     /**
@@ -105,7 +119,7 @@ final class Phone extends BaseResource
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
      */
-    public function checkCode(array $params, ?RequestOptions $options = null): Types\PhoneCheckCodeResponse
+    public function checkCode(array $params, ?RequestOptions $options = null): Types\PhoneVerificationCheckResponse
     {
         $response = $this->requester->request(new Operation(
             method: 'POST',
@@ -113,6 +127,82 @@ final class Phone extends BaseResource
             bodyTypes: ['json'],
         ), [], $params, $options);
 
-        return Types\PhoneCheckCodeResponse::fromResponse($response);
+        return Types\PhoneVerificationCheckResponse::fromResponse($response);
+    }
+
+    /**
+     * Start a bulk lookup.
+     *
+     * Look up a CSV of numbers as one job: one number per line, up to 100,000 numbers, with `fields`
+     * naming the signals to return for each number. The call answers `202` with the job (`status`
+     * `queued`, `processed` 0, `results_url` `null`). Read it with `GET /v3/phone/risk/bulk/{job_id}/`;
+     * when it is done, download the CSV from `results_url`. `callback_url`, a public HTTPS URL, receives
+     * `{job_id, status, total, results_url}` when the job finishes (described by `PhoneRiskBulkCallback`).
+     *
+     * `POST /v3/phone/risk/bulk/`
+     *
+     * @param PhoneAssessRiskBulkParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function assessRiskBulk(array $params, ?RequestOptions $options = null): Types\PhoneRiskBulkJob
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/phone/risk/bulk/',
+            bodyTypes: ['multipart'],
+        ), [], $params, $options);
+
+        return Types\PhoneRiskBulkJob::fromResponse($response);
+    }
+
+    /**
+     * Get a bulk lookup job.
+     *
+     * Read a bulk risk job of your application: its `status`, how many numbers it has `processed` of its
+     * `total`, and the `results_url` of the CSV once a result file exists. An unknown job, or one of
+     * another application, answers `404`.
+     *
+     * `GET /v3/phone/risk/bulk/{job_id}/`
+     *
+     * @param string $jobId the job, as returned when it was started
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function retrieveRiskBulk(string $jobId, ?RequestOptions $options = null): Types\PhoneRiskBulkJob
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/phone/risk/bulk/{job_id}/',
+        ), ['job_id' => $jobId], [], $options);
+
+        return Types\PhoneRiskBulkJob::fromResponse($response);
+    }
+
+    /**
+     * Download bulk lookup results.
+     *
+     * Download the CSV of a bulk risk job: the column `phone_number` plus one column per requested signal,
+     * one row per number in the order of the uploaded file. A failed job still has the rows it answered.
+     * While no result file exists the answer is `409 results_not_ready`.
+     *
+     * `GET /v3/phone/risk/bulk/{job_id}/results/`
+     *
+     * @param string $jobId the job, as returned when it was started
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function downloadRiskBulkResults(string $jobId, ?RequestOptions $options = null): BinaryContent
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/phone/risk/bulk/{job_id}/results/',
+            accept: 'text/csv, application/json',
+        ), ['job_id' => $jobId], [], $options);
+
+        return BinaryContent::fromResponse($response);
     }
 }

@@ -7,9 +7,10 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * How `id` was matched. `bank_reference` and `route_id` are stable. `derived` is matched by content:
- * it is stable while the bank keeps reporting the entry unchanged, and a correction by the bank can
- * then appear as one `removed` and one `added`.
+ * How `id` was matched within the connection. `bank_reference` and `route_id` are stable. `derived` is
+ * matched by content: it is stable while the bank keeps reporting the entry unchanged, and a
+ * correction by the bank can then appear as one `removed` and one `added`. Across connections only a
+ * `bank_reference` is a reliable key.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

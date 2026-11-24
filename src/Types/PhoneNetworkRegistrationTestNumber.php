@@ -25,7 +25,10 @@ final class PhoneNetworkRegistrationTestNumber extends BaseModel
      */
     public readonly ?string $status;
 
-    /** The verification carrying the code: check it with `POST /v3/phone/check/`. */
+    /**
+     * The verification of the code Didit sent: `pv_` followed by 32 hexadecimal characters. Check the code
+     * with `POST /v3/phone/check/` and this `verification_id`.
+     */
     public readonly ?string $verificationId;
 
     /**

@@ -55,7 +55,7 @@ final class Registrations extends BaseResource
      *
      * `GET /v3/phone/silent/registrations/{registration_id}/`
      *
-     * @param string $registrationId the silent verification registration
+     * @param string $registrationId the registration id, `sr_` followed by 32 hexadecimal characters (an `nr_` id of a silent verification registration works too)
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded

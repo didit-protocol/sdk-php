@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Didit\Tests\Generated;
 
+use Didit\File;
 use Didit\Tests\Support\GeneratedTestCase;
 
 /**
@@ -110,6 +111,7 @@ final class PhoneTest extends GeneratedTestCase
             'enable_social' => true,
             'phone_no_social_presence_action' => 'NO_ACTION',
             'factor_id' => 'factor_id-value',
+            'verification_id' => 'verification_id-value',
         ]);
 
         $request = $this->lastRequest();
@@ -119,9 +121,80 @@ final class PhoneTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"phone_number":"phone_number-value","code":"code-value","duplicated_phone_number_action":"NO_ACTION","disposable_number_action":"NO_ACTION","voip_number_action":"NO_ACTION","enable_enrichment":true,"phone_intelligence_score_action":"NO_ACTION","phone_type_risk_action":"NO_ACTION","recent_port_action":"NO_ACTION","low_phone_trust_action":"NO_ACTION","enable_social":true,"phone_no_social_presence_action":"NO_ACTION","factor_id":"factor_id-value"}', $this->canonicalBody($request));
+        self::assertSame('{"phone_number":"phone_number-value","code":"code-value","duplicated_phone_number_action":"NO_ACTION","disposable_number_action":"NO_ACTION","voip_number_action":"NO_ACTION","enable_enrichment":true,"phone_intelligence_score_action":"NO_ACTION","phone_type_risk_action":"NO_ACTION","recent_port_action":"NO_ACTION","low_phone_trust_action":"NO_ACTION","enable_social":true,"phone_no_social_presence_action":"NO_ACTION","factor_id":"factor_id-value","verification_id":"verification_id-value"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"request_id":"e39cb057-92fc-4b59-b84e-02fec29a0f24","status":"Approved","message":"The verification code is correct.","phone":{"status":"Approved","phone_number_prefix":"+1","phone_number":"4155552671","full_number":"+14155552671","country_code":"US","country_name":"United States","carrier":{"name":"AT&T","type":"mobile"},"is_disposable":false,"is_virtual":false,"verification_method":"whatsapp","verification_attempts":1,"verified_at":"2026-06-12T01:24:47.311323Z","warnings":[],"lifecycle":[{"type":"PHONE_VERIFICATION_MESSAGE_SENT","timestamp":"2026-06-12T01:23:39.580554+00:00","details":{"status":"Success","reason":null,"channel":"whatsapp","actual_channel":"whatsapp","attempt":0,"delivery_status":"delivered"},"fee":0.0509},{"type":"PHONE_DELIVERY_DELIVERED","timestamp":"2026-06-12T01:23:43.118220+00:00","details":{"channel":"whatsapp","status":"delivered","attempt":0},"fee":0},{"type":"VALID_CODE_ENTERED","timestamp":"2026-06-12T01:24:47.311201+00:00","details":{"code_tried":"123456","status":"Approved"},"fee":0},{"type":"PHONE_VERIFICATION_APPROVED","timestamp":"2026-06-12T01:24:47.384292+00:00","details":null,"fee":0}],"matches":[]},"vendor_data":"user-1234","metadata":null,"created_at":"2026-06-12T01:24:47.401719+00:00"}'), $result->toArray());
         self::assertSame('e39cb057-92fc-4b59-b84e-02fec29a0f24', $result->requestId);
+    }
+
+    public function testAssessRiskBulk(): void
+    {
+        $this->queueJson(202, '{"job_id":"8c1f2d3e-5a47-4b90-8e21-7d3a9b6c4f55","status":"queued","total":2400,"processed":0,"results_url":null}');
+
+        $result = $this->client->phone->assessRiskBulk([
+            'file' => File::fromBytes('fake-file-bytes', 'file.jpg', 'image/jpeg'),
+            'fields' => [
+                'format',
+            ],
+            'callback_url' => 'https://example.com/callback',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/phone/risk/bulk/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertStringStartsWith('multipart/form-data; boundary=', $request->getHeaderLine('Content-Type'));
+        self::assertSame([
+            'file' => [
+                'file:file.jpg:image/jpeg:fake-file-bytes',
+            ],
+            'fields' => [
+                'format',
+            ],
+            'callback_url' => [
+                'https://example.com/callback',
+            ],
+        ], $this->multipartFields($request));
+        self::assertSame(202, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"job_id":"8c1f2d3e-5a47-4b90-8e21-7d3a9b6c4f55","status":"queued","total":2400,"processed":0,"results_url":null}'), $result->toArray());
+        self::assertSame('8c1f2d3e-5a47-4b90-8e21-7d3a9b6c4f55', $result->jobId);
+    }
+
+    public function testRetrieveRiskBulk(): void
+    {
+        $this->queueJson(200, '{"job_id":"8c1f2d3e-5a47-4b90-8e21-7d3a9b6c4f55","status":"done","total":2400,"processed":2400,"results_url":"/v3/phone/risk/bulk/8c1f2d3e-5a47-4b90-8e21-7d3a9b6c4f55/results/"}');
+
+        $result = $this->client->phone->retrieveRiskBulk('jobId-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/phone/risk/bulk/jobId-1/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"job_id":"8c1f2d3e-5a47-4b90-8e21-7d3a9b6c4f55","status":"done","total":2400,"processed":2400,"results_url":"/v3/phone/risk/bulk/8c1f2d3e-5a47-4b90-8e21-7d3a9b6c4f55/results/"}'), $result->toArray());
+        self::assertSame('8c1f2d3e-5a47-4b90-8e21-7d3a9b6c4f55', $result->jobId);
+    }
+
+    public function testDownloadRiskBulkResults(): void
+    {
+        $this->queueBinary(200, 'binary-content', 'text/csv');
+
+        $result = $this->client->phone->downloadRiskBulkResults('jobId-1');
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/phone/risk/bulk/jobId-1/results/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('text/csv, application/json', $request->getHeaderLine('Accept'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame('binary-content', $result->contents());
+        self::assertSame('text/csv', $result->contentType());
     }
 }

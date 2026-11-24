@@ -15,7 +15,7 @@ use Didit\Core\Hydrate;
  */
 final class PhoneSdkKey extends BaseModel
 {
-    /** The key. */
+    /** The key: `sk_` followed by 32 hexadecimal characters. */
     public readonly ?string $keyId;
 
     /**

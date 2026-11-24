@@ -10,9 +10,9 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * PhoneCheckCodeResponse.
+ * PhoneVerificationCheckResponse.
  */
-final class PhoneCheckCodeResponse extends BaseModel
+final class PhoneVerificationCheckResponse extends BaseModel
 {
     /**
      * On `Approved`/`Declined`: the session id of the matched verification, identical to the `request_id`
@@ -24,9 +24,10 @@ final class PhoneCheckCodeResponse extends BaseModel
     /**
      * `Approved`, correct code, no declining risk. `Declined`, terminal: a declining risk matched or the
      * attempt budget (3) was exhausted. `Failed`, wrong code, attempts remaining. `Expired or Not Found`,
-     * no pending verification for this number in the last 5 minutes.
+     * no pending verification for this number in the last 5 minutes. For a TOTP factor check (a request
+     * that names `factor_id`) the status is `verified` (the code matched) or `failed`.
      *
-     * Known values: {@see PhoneCheckCodeResponseStatus}.
+     * Known values: {@see PhoneVerificationCheckResponseStatus}.
      */
     public readonly ?string $status;
 
@@ -40,7 +41,7 @@ final class PhoneCheckCodeResponse extends BaseModel
      * Full phone report. Present (non-null) only on finalized outcomes (`Approved`/`Declined`); `null` on
      * `Failed` and absent on `Expired or Not Found`.
      */
-    public readonly ?PhoneCheckCodeResponsePhone $phone;
+    public readonly ?PhoneVerificationCheckResponsePhone $phone;
 
     /** `vendor_data` of the matched verification's session. `null` on `Expired or Not Found`. */
     public readonly ?string $vendorData;
@@ -55,10 +56,16 @@ final class PhoneCheckCodeResponse extends BaseModel
     /** Timestamp of this check response. */
     public readonly ?\DateTimeImmutable $createdAt;
 
-    /** The factor id. */
+    /**
+     * A TOTP factor check only: the id of the factor that was checked, `fa_` followed by 32 hexadecimal
+     * characters. Not present in the answer to a phone code check.
+     */
     public readonly ?string $verificationId;
 
-    /** The `attempts` field. */
+    /**
+     * A TOTP factor check only: the failed codes in the current window including this one. Not present in
+     * the answer to a phone code check.
+     */
     public readonly ?int $attempts;
 
     /**
@@ -70,7 +77,7 @@ final class PhoneCheckCodeResponse extends BaseModel
         $this->requestId = Hydrate::string($data['request_id'] ?? null);
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->message = Hydrate::string($data['message'] ?? null);
-        $this->phone = Hydrate::model($data['phone'] ?? null, PhoneCheckCodeResponsePhone::class);
+        $this->phone = Hydrate::model($data['phone'] ?? null, PhoneVerificationCheckResponsePhone::class);
         $this->vendorData = Hydrate::string($data['vendor_data'] ?? null);
         $this->metadata = Hydrate::assoc($data['metadata'] ?? null);
         $this->createdAt = Hydrate::dateTime($data['created_at'] ?? null);

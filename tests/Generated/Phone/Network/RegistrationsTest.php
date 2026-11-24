@@ -18,7 +18,7 @@ final class RegistrationsTest extends GeneratedTestCase
 {
     public function testList(): void
     {
-        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"registration_id":"nr_01JCP2F4Q8","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved"}]}');
+        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"registration_id":"nr_5b1e7a902c434d688f150a9c3e6d7b22","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved"}]}');
 
         $result = $this->client->phone->network->registrations->list([
             'feature' => 'silent_verification',
@@ -46,12 +46,12 @@ final class RegistrationsTest extends GeneratedTestCase
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\PhoneNetworkRegistrationSummary::class, $result->results);
         self::assertFalse($result->hasNextPage());
-        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"registration_id":"nr_01JCP2F4Q8","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved"}]}'), $result->toArray());
+        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"registration_id":"nr_5b1e7a902c434d688f150a9c3e6d7b22","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved"}]}'), $result->toArray());
     }
 
     public function testCreate(): void
     {
-        $this->queueJson(201, '{"registration_id":"nr_01JCP2F4Q8","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved","networks":[{"name":"Mobile network A","status":"approved","decided_at":"2026-11-20T15:02:00Z","reason":null},{"name":"Mobile network B","status":"in_review","decided_at":null,"reason":null}],"live_at":null,"test_access":"on","test_numbers":[{"phone_number":"+34600000012","status":"verified"}]}');
+        $this->queueJson(201, '{"registration_id":"nr_5b1e7a902c434d688f150a9c3e6d7b22","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved","networks":[{"name":"Mobile network A","status":"approved","decided_at":"2026-11-20T15:02:00Z","reason":null},{"name":"Mobile network B","status":"in_review","decided_at":null,"reason":null}],"live_at":null,"test_access":"on","test_numbers":[{"phone_number":"+34600000012","status":"verified"}]}');
 
         $result = $this->client->phone->network->registrations->create([
             'feature' => 'silent_verification',
@@ -61,7 +61,7 @@ final class RegistrationsTest extends GeneratedTestCase
                 'networks-value',
             ],
             'company_name' => 'company_name-value',
-            'website' => 'https://example.com/callback',
+            'website' => 'website-value',
             'purpose' => 'purpose-value',
             'monthly_volume' => 1,
         ]);
@@ -73,15 +73,15 @@ final class RegistrationsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"feature":"silent_verification","country":"country-value","use_case":"signup","networks":["networks-value"],"company_name":"company_name-value","website":"https://example.com/callback","purpose":"purpose-value","monthly_volume":1}', $this->canonicalBody($request));
+        self::assertSame('{"feature":"silent_verification","country":"country-value","use_case":"signup","networks":["networks-value"],"company_name":"company_name-value","website":"website-value","purpose":"purpose-value","monthly_volume":1}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"registration_id":"nr_01JCP2F4Q8","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved","networks":[{"name":"Mobile network A","status":"approved","decided_at":"2026-11-20T15:02:00Z","reason":null},{"name":"Mobile network B","status":"in_review","decided_at":null,"reason":null}],"live_at":null,"test_access":"on","test_numbers":[{"phone_number":"+34600000012","status":"verified"}]}'), $result->toArray());
-        self::assertSame('nr_01JCP2F4Q8', $result->registrationId);
+        self::assertSame($this->decoded('{"registration_id":"nr_5b1e7a902c434d688f150a9c3e6d7b22","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved","networks":[{"name":"Mobile network A","status":"approved","decided_at":"2026-11-20T15:02:00Z","reason":null},{"name":"Mobile network B","status":"in_review","decided_at":null,"reason":null}],"live_at":null,"test_access":"on","test_numbers":[{"phone_number":"+34600000012","status":"verified"}]}'), $result->toArray());
+        self::assertSame('nr_5b1e7a902c434d688f150a9c3e6d7b22', $result->registrationId);
     }
 
     public function testRetrieve(): void
     {
-        $this->queueJson(200, '{"registration_id":"nr_01JCP2F4Q8","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved","networks":[{"name":"Mobile network A","status":"approved","decided_at":"2026-11-20T15:02:00Z","reason":null},{"name":"Mobile network B","status":"in_review","decided_at":null,"reason":null}],"live_at":null,"test_access":"on","test_numbers":[{"phone_number":"+34600000012","status":"verified"}]}');
+        $this->queueJson(200, '{"registration_id":"nr_5b1e7a902c434d688f150a9c3e6d7b22","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved","networks":[{"name":"Mobile network A","status":"approved","decided_at":"2026-11-20T15:02:00Z","reason":null},{"name":"Mobile network B","status":"in_review","decided_at":null,"reason":null}],"live_at":null,"test_access":"on","test_numbers":[{"phone_number":"+34600000012","status":"verified"}]}');
 
         $result = $this->client->phone->network->registrations->retrieve('registrationId-1');
 
@@ -93,7 +93,7 @@ final class RegistrationsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"registration_id":"nr_01JCP2F4Q8","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved","networks":[{"name":"Mobile network A","status":"approved","decided_at":"2026-11-20T15:02:00Z","reason":null},{"name":"Mobile network B","status":"in_review","decided_at":null,"reason":null}],"live_at":null,"test_access":"on","test_numbers":[{"phone_number":"+34600000012","status":"verified"}]}'), $result->toArray());
-        self::assertSame('nr_01JCP2F4Q8', $result->registrationId);
+        self::assertSame($this->decoded('{"registration_id":"nr_5b1e7a902c434d688f150a9c3e6d7b22","feature":"sim_swap","country":"BR","use_case":"account_recovery","status":"partly_approved","networks":[{"name":"Mobile network A","status":"approved","decided_at":"2026-11-20T15:02:00Z","reason":null},{"name":"Mobile network B","status":"in_review","decided_at":null,"reason":null}],"live_at":null,"test_access":"on","test_numbers":[{"phone_number":"+34600000012","status":"verified"}]}'), $result->toArray());
+        self::assertSame('nr_5b1e7a902c434d688f150a9c3e6d7b22', $result->registrationId);
     }
 }

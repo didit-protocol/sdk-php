@@ -10,9 +10,9 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * PhoneCheckCodeResponsePhoneLifecycle.
+ * PhoneVerificationCheckResponsePhoneLifecycle.
  */
-final class PhoneCheckCodeResponsePhoneLifecycle extends BaseModel
+final class PhoneVerificationCheckResponsePhoneLifecycle extends BaseModel
 {
     /** Event type. */
     public readonly ?string $type;

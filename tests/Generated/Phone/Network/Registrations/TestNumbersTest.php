@@ -17,7 +17,7 @@ final class TestNumbersTest extends GeneratedTestCase
 {
     public function testCreate(): void
     {
-        $this->queueJson(201, '{"phone_number":"+34600000012","status":"code_sent","verification_id":"pv_01JCH6D4T7N2XK8F","test_access":"on"}');
+        $this->queueJson(201, '{"phone_number":"+34600000012","status":"code_sent","verification_id":"pv_ae4f1a368c7a4d259a493f6b0c2d7e55","test_access":"on"}');
 
         $result = $this->client->phone->network->registrations->testNumbers->create('registrationId-1', [
             'phone_number' => 'phone_number-value',
@@ -32,7 +32,7 @@ final class TestNumbersTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"phone_number":"phone_number-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"phone_number":"+34600000012","status":"code_sent","verification_id":"pv_01JCH6D4T7N2XK8F","test_access":"on"}'), $result->toArray());
+        self::assertSame($this->decoded('{"phone_number":"+34600000012","status":"code_sent","verification_id":"pv_ae4f1a368c7a4d259a493f6b0c2d7e55","test_access":"on"}'), $result->toArray());
         self::assertSame('+34600000012', $result->phoneNumber);
     }
 

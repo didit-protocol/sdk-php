@@ -7,17 +7,13 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `unverified` until the first successful check, then `verified`.
+ * A new factor is `unverified` until its first check passes.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
 final class PhoneFactorEnrollmentStatus
 {
     public const UNVERIFIED = 'unverified';
-
-    public const VERIFIED = 'verified';
-
-    public const DISABLED = 'disabled';
 
     private function __construct()
     {

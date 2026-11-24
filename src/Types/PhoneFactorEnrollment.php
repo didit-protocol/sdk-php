@@ -10,7 +10,7 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * The enrollment of a TOTP factor: `totp.uri` is what the authenticator app needs.
+ * A new TOTP factor and the authenticator URI to show as a QR code. The secret is shown only here.
  */
 final class PhoneFactorEnrollment extends BaseModel
 {
@@ -28,7 +28,7 @@ final class PhoneFactorEnrollment extends BaseModel
     public readonly ?string $type;
 
     /**
-     * `unverified` until the first successful check, then `verified`.
+     * A new factor is `unverified` until its first check passes.
      *
      * Known values: {@see PhoneFactorEnrollmentStatus}.
      */

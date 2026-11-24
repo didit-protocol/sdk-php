@@ -12,7 +12,7 @@ namespace Didit\Types;
  * the message. `opted_out`: the recipient opted out of the channel. `expired`: `expires_at` passed
  * before it could go out. `template_required`: WhatsApp only delivers an approved WhatsApp template.
  * `channel_unavailable`: the channel is switched off, not configured, not in your contract or locked
- * until your first top-up. `insufficient_credits`: the balance does not cover it.
+ * until a paid plan or your first top-up. `insufficient_credits`: the balance does not cover it.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

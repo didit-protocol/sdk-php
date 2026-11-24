@@ -10,9 +10,9 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * PhoneCheckCodeResponsePhoneWarnings.
+ * PhoneVerificationCheckResponsePhoneWarnings.
  */
-final class PhoneCheckCodeResponsePhoneWarnings extends BaseModel
+final class PhoneVerificationCheckResponsePhoneWarnings extends BaseModel
 {
     /** Feature that produced the warning. Always `PHONE` here. */
     public readonly ?string $feature;
@@ -32,7 +32,7 @@ final class PhoneCheckCodeResponsePhoneWarnings extends BaseModel
      * Severity. `error` risks decline the verification, `warning` flags it for review, `information` is
      * recorded without affecting the status.
      *
-     * Known values: {@see PhoneCheckCodeResponsePhoneWarningsLogType}.
+     * Known values: {@see PhoneVerificationCheckResponsePhoneWarningsLogType}.
      */
     public readonly ?string $logType;
 

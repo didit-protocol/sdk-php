@@ -29,7 +29,7 @@ final class TestNumbers extends BaseResource
      *
      * `POST /v3/phone/network/registrations/{registration_id}/test-numbers/`
      *
-     * @param string $registrationId the network feature registration
+     * @param string $registrationId the registration id, `nr_` followed by 32 hexadecimal characters, as it was created
      * @param PhoneNetworkRegistrationTestNumberRequest $params
      *
      * @throws DiditException
@@ -57,7 +57,7 @@ final class TestNumbers extends BaseResource
      *
      * `DELETE /v3/phone/network/registrations/{registration_id}/test-numbers/{phone_number}/`
      *
-     * @param string $registrationId the network feature registration
+     * @param string $registrationId the registration id, `nr_` followed by 32 hexadecimal characters, as it was created
      * @param string $phoneNumber The test number, in E.164 and URL-encoded.
      *
      * @throws DiditException

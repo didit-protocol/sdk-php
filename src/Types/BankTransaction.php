@@ -16,8 +16,11 @@ use Didit\Core\Hydrate;
 final class BankTransaction extends BaseModel
 {
     /**
-     * Didit's id, opaque and stored at first sight. The same movement keeps its id across reads, syncs and
-     * renewals. `identity_quality` says how strong that guarantee is.
+     * Didit's id, opaque and stored at first sight, per connection. The same movement keeps its id across
+     * reads, syncs and renewals within one connection; a new connection of the same bank account has new
+     * transaction ids. To recognise a transaction across connections, use the account's `account_ref` with
+     * `bank_reference` (when `identity_quality` is `bank_reference`), or match on content as a probable
+     * match. `identity_quality` says how strong the guarantee is within the connection.
      */
     public readonly ?string $id;
 
@@ -80,13 +83,18 @@ final class BankTransaction extends BaseModel
     /** The `bank_transaction_code` field. */
     public readonly ?string $bankTransactionCode;
 
-    /** The bank's immutable entry reference where it provides one. `null` otherwise, never invented. */
+    /**
+     * The bank's immutable entry reference where it provides one. `null` otherwise, never invented. It is
+     * the same in every connection, so with the account's `account_ref` it is the reliable key across
+     * connections when `identity_quality` is `bank_reference`.
+     */
     public readonly ?string $bankReference;
 
     /**
-     * How `id` was matched. `bank_reference` and `route_id` are stable. `derived` is matched by content:
-     * it is stable while the bank keeps reporting the entry unchanged, and a correction by the bank can
-     * then appear as one `removed` and one `added`.
+     * How `id` was matched within the connection. `bank_reference` and `route_id` are stable. `derived` is
+     * matched by content: it is stable while the bank keeps reporting the entry unchanged, and a
+     * correction by the bank can then appear as one `removed` and one `added`. Across connections only a
+     * `bank_reference` is a reliable key.
      *
      * Known values: {@see BankTransactionIdentityQuality}.
      */

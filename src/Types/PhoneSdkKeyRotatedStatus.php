@@ -15,10 +15,6 @@ final class PhoneSdkKeyRotatedStatus
 {
     public const ACTIVE = 'active';
 
-    public const EXPIRING = 'expiring';
-
-    public const REVOKED = 'revoked';
-
     private function __construct()
     {
     }
