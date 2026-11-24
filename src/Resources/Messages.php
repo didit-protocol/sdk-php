@@ -39,6 +39,8 @@ final class Messages extends BaseResource
 
     public readonly Messages\Configurations $configurations;
 
+    public readonly Messages\Feedback $feedback;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
@@ -48,6 +50,7 @@ final class Messages extends BaseResource
         $this->consent = new Messages\Consent($requester);
         $this->capabilities = new Messages\Capabilities($requester);
         $this->configurations = new Messages\Configurations($requester);
+        $this->feedback = new Messages\Feedback($requester);
     }
 
     /**

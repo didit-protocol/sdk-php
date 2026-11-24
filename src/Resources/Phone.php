@@ -22,6 +22,7 @@ use Didit\Types;
  * @phpstan-import-type PhoneCheckCodeParams from Params
  * @phpstan-import-type PhoneRiskRequest from Params
  * @phpstan-import-type PhoneSendCodeParams from Params
+ * @phpstan-import-type PhoneValidateRequest from Params
  */
 final class Phone extends BaseResource
 {
@@ -51,6 +52,14 @@ final class Phone extends BaseResource
 
     public readonly Phone\Lookups $lookups;
 
+    public readonly Phone\SandboxNumbers $sandboxNumbers;
+
+    public readonly Phone\Stats $stats;
+
+    public readonly Phone\Balance $balance;
+
+    public readonly Phone\Voices $voices;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
@@ -67,6 +76,10 @@ final class Phone extends BaseResource
         $this->countries = new Phone\Countries($requester);
         $this->settings = new Phone\Settings($requester);
         $this->lookups = new Phone\Lookups($requester);
+        $this->sandboxNumbers = new Phone\SandboxNumbers($requester);
+        $this->stats = new Phone\Stats($requester);
+        $this->balance = new Phone\Balance($requester);
+        $this->voices = new Phone\Voices($requester);
     }
 
     /**
@@ -219,5 +232,30 @@ final class Phone extends BaseResource
         ), ['job_id' => $jobId], [], $options);
 
         return BinaryContent::fromResponse($response);
+    }
+
+    /**
+     * Validate and format a phone number.
+     *
+     * Check that a number can exist and return it formatted, without looking anything up: `valid`,
+     * `format.e164`, `format.national` and `country`. Send the number in international format, or a
+     * national number with `country`.
+     *
+     * `POST /v3/phone/validate/`
+     *
+     * @param PhoneValidateRequest $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function validate(array $params, ?RequestOptions $options = null): Types\PhoneValidateResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'POST',
+            path: '/v3/phone/validate/',
+            bodyTypes: ['json'],
+        ), [], $params, $options);
+
+        return Types\PhoneValidateResponse::fromResponse($response);
     }
 }

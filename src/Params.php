@@ -1579,6 +1579,10 @@ namespace Didit;
  *     url: string,
  *     events?: list<string>,
  * }
+ * @phpstan-type MessageFeedbackRequest array{
+ *     outcome: string,
+ *     occurred_at?: \DateTimeInterface|string,
+ * }
  * @phpstan-type MessageTemplateContentInput array{
  *     channel: string,
  *     language: string,
@@ -2083,6 +2087,12 @@ namespace Didit;
  *     metadata?: array<string, mixed>|null,
  *     enable_social?: bool,
  * }
+ * @phpstan-type PhoneSandboxNumberRequest array{
+ *     phone_number: string,
+ *     outcome: string,
+ *     code?: string,
+ *     real_device?: bool,
+ * }
  * @phpstan-type PhoneSdkKeyRequest array{
  *     platform: string,
  *     app_ids: list<string>,
@@ -2172,6 +2182,16 @@ namespace Didit;
  *     monthly_volume?: int|null,
  *     flow_screenshots?: list<string>,
  * }
+ * @phpstan-type PhoneStatsRetrieveParams array{
+ *     product?: string,
+ *     group_by?: string,
+ *     from?: string,
+ *     to?: string,
+ * }
+ * @phpstan-type PhoneValidateRequest array{
+ *     phone_number: string,
+ *     country?: string,
+ * }
  * @phpstan-type PhoneVerificationApproveRequest array{
  *     reason?: string,
  * }
@@ -2192,6 +2212,9 @@ namespace Didit;
  *     limit?: int,
  *     offset?: int,
  *     format?: string,
+ * }
+ * @phpstan-type PhoneVoicesListParams array{
+ *     locale?: string,
  * }
  * @phpstan-type PricingBankVerificationCountryCoverageParams array{
  *     if_none_match?: string,
@@ -3682,6 +3705,11 @@ namespace Didit;
  *     wallet_address: string,
  *     blockchain?: string,
  *     direction?: string,
+ * }
+ * @phpstan-type WebhookCreateRequest array{
+ *     url: string,
+ *     events: list<string>,
+ *     description?: string,
  * }
  * @phpstan-type WebhooksDestinationsCreateParams array{
  *     label: string,
