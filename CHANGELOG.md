@@ -1,5 +1,73 @@
 # Changelog
 
+## [2.29.0](https://github.com/didit-protocol/sdk-php/compare/v2.28.0...v2.29.0) (2026-11-23)
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-23 ([aa2ba83](https://github.com/didit-protocol/sdk-php/commit/aa2ba837aac2cee42225a8e4d9303c6ba323c923))
+
+## [2.28.0](https://github.com/didit-protocol/sdk-php/compare/v2.27.0...v2.28.0) (2026-11-23)
+
+
+### API changes that can break typed code
+
+* **spec:** `phone.check_code()` (`POST /v3/phone/check/`): request body `(anyOf 1)`: type changed from object to any ([2110854](https://github.com/didit-protocol/sdk-php/commit/211085416967b9b6b2eff399d4aa5baf9707f775))
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-23 ([2110854](https://github.com/didit-protocol/sdk-php/commit/211085416967b9b6b2eff399d4aa5baf9707f775))
+
+## [2.27.0](https://github.com/didit-protocol/sdk-php/compare/v2.26.0...v2.27.0) (2026-11-23)
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-23 ([3c041f3](https://github.com/didit-protocol/sdk-php/commit/3c041f31c46b5b9fed9802fc625168f9db523534))
+
+## [2.26.0](https://github.com/didit-protocol/sdk-php/compare/v2.25.0...v2.26.0) (2026-11-23)
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-23 ([a1af5fe](https://github.com/didit-protocol/sdk-php/commit/a1af5fe20ff74a8d0116a13f9ac5138c9539f75d))
+
+## [2.25.0](https://github.com/didit-protocol/sdk-php/compare/v2.24.0...v2.25.0) (2026-11-23)
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-23 ([572b329](https://github.com/didit-protocol/sdk-php/commit/572b329283244fd3e683ccefbc607b5ec817efe0))
+
+## [2.24.0](https://github.com/didit-protocol/sdk-php/compare/v2.23.0...v2.24.0) (2026-11-23)
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-23 ([c1954ce](https://github.com/didit-protocol/sdk-php/commit/c1954ce3f7db097b120060f05dce48c1747a4bd0))
+
+## [2.23.0](https://github.com/didit-protocol/sdk-php/compare/v2.22.0...v2.23.0) (2026-11-23)
+
+
+### Features
+
+* **bank:** Bank data operations and typed bank.* webhook events ([#101](https://github.com/didit-protocol/sdk-php/issues/101)) ([fbb20ec](https://github.com/didit-protocol/sdk-php/commit/fbb20ecea13ef98511cde3f3cbd44f0e6dc604ed))
+
+## [2.22.0](https://github.com/didit-protocol/sdk-php/compare/v2.21.0...v2.22.0) (2026-11-22)
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-22 ([916d482](https://github.com/didit-protocol/sdk-php/commit/916d482049694273612b983f90fa39e52da181c1))
+
+## [2.21.0](https://github.com/didit-protocol/sdk-php/compare/v2.20.0...v2.21.0) (2026-11-22)
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-22 ([ed98671](https://github.com/didit-protocol/sdk-php/commit/ed98671c89f3a430c16619841bafd1d214e2b2ca))
+
 ## [2.20.0](https://github.com/didit-protocol/sdk-php/compare/v2.19.0...v2.20.0) (2026-11-21)
 
 

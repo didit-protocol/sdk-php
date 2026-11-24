@@ -204,7 +204,7 @@ final class Messages extends BaseResource
      * Set how many days a message keeps its text and recipient, from 2 to 365 (default 30). Shortening the
      * retention erases, within the hour, the text and recipient of every message already past the new one
      * (irreversible); the messages themselves, with their status, channel, country, segments, price and
-     * timestamps, stay. Lengthening it applies to the messages not erased yet.
+     * timestamps, stay. Lengthening it applies to the messages whose text and recipient are still held.
      *
      * `PATCH /v3/messages/settings/`
      *

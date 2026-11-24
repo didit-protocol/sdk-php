@@ -105,6 +105,11 @@ namespace Didit;
  * @phpstan-type AuthenticationSetupGetBrandingParams array{
  *     language?: string,
  * }
+ * @phpstan-type AuthenticationSetupGetEmailParams array{
+ *     organization?: string,
+ *     role?: string,
+ *     agent?: string,
+ * }
  * @phpstan-type AuthenticationSetupGetEmailsParams array{
  *     language?: string,
  * }
@@ -132,6 +137,120 @@ namespace Didit;
  *     clabe?: string,
  *     cbu_cvu?: string,
  *     registration_id?: string,
+ * }
+ * @phpstan-type BankConnectionSimulateRequest array{
+ *     action: string,
+ *     days?: int,
+ *     count?: int,
+ * }
+ * @phpstan-type BankLinkCreateRequest array{
+ *     mode?: string,
+ *     connection_id?: string,
+ *     access?: string,
+ *     country?: string,
+ *     institution_id?: string,
+ *     segment?: string,
+ *     data?: list<string>,
+ *     history_days?: int,
+ *     history_from?: string,
+ *     extended_history?: string,
+ *     consent_days?: int,
+ *     ownership?: BankLinkOwnershipRequest,
+ *     end_user?: BankLinkEndUser,
+ *     redirect_url?: string,
+ *     allowed_origins?: list<string>,
+ *     language?: string,
+ *     vendor_data?: string,
+ *     expires_in?: int,
+ *     duplicates?: string,
+ *     allow_one_time_fallback?: bool,
+ *     accept_reduced_grant?: bool,
+ *     sandbox?: BankLinkCreateRequestSandbox,
+ * }
+ * @phpstan-type BankLinkCreateRequestSandbox array{
+ *     persona?: string,
+ *     switches?: list<string>,
+ * }
+ * @phpstan-type BankLinkEndUser array{
+ *     reference?: string,
+ *     email?: string,
+ * }
+ * @phpstan-type BankLinkOwnershipRequest array{
+ *     compare?: string,
+ *     match?: string,
+ *     reference_identity?: BankLinkOwnershipRequestReferenceIdentity,
+ *     session_id?: string,
+ *     business?: BankLinkOwnershipRequestBusiness,
+ *     business_session_id?: string,
+ * }
+ * @phpstan-type BankLinkOwnershipRequestBusiness array{
+ *     legal_name: string,
+ *     registration_id?: string,
+ * }
+ * @phpstan-type BankLinkOwnershipRequestReferenceIdentity array{
+ *     full_name?: string,
+ *     date_of_birth?: string,
+ *     address?: string,
+ *     phone?: string,
+ *     email?: string,
+ * }
+ * @phpstan-type BankLinkSimulateRequest array{
+ *     persona?: string,
+ *     outcome?: string,
+ *     error_code?: string,
+ * }
+ * @phpstan-type BankListAccountsParams array{
+ *     limit?: int,
+ *     cursor?: string,
+ * }
+ * @phpstan-type BankListConnectionsParams array{
+ *     status?: string,
+ *     access?: string,
+ *     institution_id?: string,
+ *     country?: string,
+ *     vendor_data?: string,
+ *     end_user_reference?: string,
+ *     consent_expires_before?: \DateTimeInterface|string,
+ *     created_after?: \DateTimeInterface|string,
+ *     limit?: int,
+ *     cursor?: string,
+ * }
+ * @phpstan-type BankListInstitutionsParams array{
+ *     country?: string,
+ *     segment?: string,
+ *     access?: string,
+ *     q?: string,
+ *     limit?: int,
+ *     cursor?: string,
+ * }
+ * @phpstan-type BankListSyncRunsParams array{
+ *     limit?: int,
+ *     cursor?: string,
+ * }
+ * @phpstan-type BankListTransactionsParams array{
+ *     date_from?: string,
+ *     date_to?: string,
+ *     status?: string,
+ *     limit?: int,
+ *     page_token?: string,
+ * }
+ * @phpstan-type BankRefreshConnectionParams array{
+ *     wait?: bool,
+ *     prefer?: string,
+ * }
+ * @phpstan-type BankRefreshRequest array{
+ *     wait?: bool,
+ * }
+ * @phpstan-type BankRenewLinkRequest array{
+ *     redirect_url?: string,
+ *     allowed_origins?: list<string>,
+ *     language?: string,
+ *     expires_in?: int,
+ * }
+ * @phpstan-type BankSyncTransactionsParams array{
+ *     cursor?: string,
+ *     limit?: int,
+ *     page_token?: string,
  * }
  * @phpstan-type BillingTopUpParams array{
  *     amount_in_dollars: float|int,
@@ -1671,19 +1790,45 @@ namespace Didit;
  *     vendor_data?: string,
  *     metadata?: array<string, mixed>,
  * }
- * @phpstan-type PhoneCheckCodeParams array{
+ * @phpstan-type PhoneFactorCreateRequest array{
+ *     type: string,
+ *     user_id: string,
+ *     friendly_name?: string,
+ *     metadata?: array<string, string>,
+ * }
+ * @phpstan-type PhoneFactorUpdateRequest array{
+ *     friendly_name?: string,
+ *     metadata?: array<string, string>,
+ *     status?: string,
+ * }
+ * @phpstan-type PhoneFactorsListParams array{
+ *     user_id: string,
+ *     type?: string,
+ *     status?: string,
+ *     limit?: int,
+ *     offset?: int,
+ *     format?: string,
+ * }
+ * @phpstan-type PhoneNetworkRegistrationRequest array{
+ *     feature: string,
+ *     country: string,
+ *     use_case: string,
+ *     networks?: list<string>,
+ *     company_name: string,
+ *     website: string,
+ *     purpose?: string,
+ *     monthly_volume?: int,
+ * }
+ * @phpstan-type PhoneNetworkRegistrationTestNumberRequest array{
  *     phone_number: string,
- *     code: string,
- *     duplicated_phone_number_action?: string,
- *     disposable_number_action?: string,
- *     voip_number_action?: string,
- *     enable_enrichment?: bool,
- *     phone_intelligence_score_action?: string,
- *     phone_type_risk_action?: string,
- *     recent_port_action?: string,
- *     low_phone_trust_action?: string,
- *     enable_social?: bool,
- *     phone_no_social_presence_action?: string,
+ * }
+ * @phpstan-type PhoneNetworkRegistrationsListParams array{
+ *     feature?: string,
+ *     country?: string,
+ *     status?: string,
+ *     limit?: int,
+ *     offset?: int,
+ *     format?: string,
  * }
  * @phpstan-type PhoneRiskRequest array{
  *     phone_number: string,
@@ -1692,6 +1837,17 @@ namespace Didit;
  *     vendor_data?: string,
  *     metadata?: array<string, mixed>|null,
  *     enable_social?: bool,
+ * }
+ * @phpstan-type PhoneSdkKeyRequest array{
+ *     platform: string,
+ *     app_ids: list<string>,
+ *     name?: string,
+ * }
+ * @phpstan-type PhoneSdkKeyRotateRequest array{
+ *     overlap_hours?: int,
+ * }
+ * @phpstan-type PhoneSdkKeysListParams array{
+ *     platform?: string,
  * }
  * @phpstan-type PhoneSendCodeParams array{
  *     phone_number: string,
@@ -1715,6 +1871,33 @@ namespace Didit;
  *     os_version?: string,
  *     app_version?: string,
  *     user_agent?: string,
+ * }
+ * @phpstan-type PhoneSilentCoverageParams array{
+ *     country?: string,
+ * }
+ * @phpstan-type PhoneSilentEligibilityParams array{
+ *     phone_number: string,
+ *     ip_address?: string,
+ *     x_publishable_key?: string,
+ * }
+ * @phpstan-type PhoneSilentEligibilityRequest array{
+ *     phone_number: string,
+ *     ip_address?: string,
+ * }
+ * @phpstan-type PhoneSilentRegistrationRequest array{
+ *     country: string,
+ *     networks?: list<string>,
+ *     use_case: string,
+ *     company_name: string,
+ *     website: string,
+ *     monthly_volume?: int,
+ *     flow_screenshots?: list<string>,
+ * }
+ * @phpstan-type PricingBankVerificationCountryCoverageParams array{
+ *     if_none_match?: string,
+ * }
+ * @phpstan-type PricingBankVerificationCoverageParams array{
+ *     if_none_match?: string,
  * }
  * @phpstan-type PricingPriceBookParams array{
  *     if_none_match?: string,
