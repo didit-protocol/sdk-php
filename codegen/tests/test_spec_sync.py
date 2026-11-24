@@ -27,6 +27,15 @@ _major, _minor, _patch = (int(part) for part in CURRENT.split("."))
 NEXT_MINOR = f"{_major}.{_minor + 1}.0"
 
 
+def copy_openapi_baseline(source: Path, target: Path) -> None:
+    """Copy ``source`` (an ``openapi/`` folder) to ``target`` without its recorded deprecations.
+
+    A sync that removes an operation writes ``deprecated-operations.json`` into the working tree before the
+    generator tests run, and the file is committed afterwards; every test here starts with none recorded.
+    """
+    shutil.copytree(source, target, ignore=shutil.ignore_patterns("deprecated-operations.json"))
+
+
 def _sha(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
@@ -53,7 +62,7 @@ class SpecSyncTest(unittest.TestCase):
         tmp = tempfile.TemporaryDirectory()
         self.addCleanup(tmp.cleanup)
         self.root = Path(tmp.name)
-        shutil.copytree(REPO / "openapi", self.root / "openapi")
+        copy_openapi_baseline(REPO / "openapi", self.root / "openapi")
         (self.root / "src").mkdir()
         shutil.copy(REPO / "src" / "Version.php", self.root / "src" / "Version.php")
         self.offline = self.root / "upstream"
@@ -65,6 +74,16 @@ class SpecSyncTest(unittest.TestCase):
         shutil.copy(REPO / "openapi" / "authentication.json", self.offline / "openapi-authentication.json")
         self.summary = self.root / "summary.md"
         self.commit = self.root / "commit.txt"
+
+    def test_fixture_ignores_the_repository_deprecations(self) -> None:
+        # The sync writes this file into the working tree before the generator tests run (run 45224341677).
+        source = self.root / "source"
+        source.mkdir()
+        (source / "verification.json").write_text("{}", "utf-8")
+        (source / "deprecated-operations.json").write_text('{"operations": [{"operation": "x"}]}', "utf-8")
+        copy_openapi_baseline(source, self.root / "copy")
+        self.assertTrue((self.root / "copy" / "verification.json").exists())
+        self.assertFalse((self.root / "copy" / "deprecated-operations.json").exists())
 
     # helpers ----------------------------------------------------------------
 
