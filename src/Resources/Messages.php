@@ -35,6 +35,10 @@ final class Messages extends BaseResource
 
     public readonly Messages\Consent $consent;
 
+    public readonly Messages\Capabilities $capabilities;
+
+    public readonly Messages\Configurations $configurations;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
@@ -42,6 +46,8 @@ final class Messages extends BaseResource
         $this->templates = new Messages\Templates($requester);
         $this->conversations = new Messages\Conversations($requester);
         $this->consent = new Messages\Consent($requester);
+        $this->capabilities = new Messages\Capabilities($requester);
+        $this->configurations = new Messages\Configurations($requester);
     }
 
     /**

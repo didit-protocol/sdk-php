@@ -8,9 +8,10 @@ namespace Didit\Types;
 
 /**
  * `Approved`, correct code, no declining risk. `Declined`, terminal: a declining risk matched or the
- * attempt budget (3) was exhausted. `Failed`, wrong code, attempts remaining. `Expired or Not Found`,
- * no pending verification for this number in the last 5 minutes. For a TOTP factor check (a request
- * that names `factor_id`) the status is `verified` (the code matched) or `failed`.
+ * attempt budget (your `verification.max_attempts` setting, 5 by default) was exhausted. `Failed`,
+ * wrong code, attempts remaining. `Expired or Not Found`, no pending verification for this number in
+ * the last 5 minutes. For a TOTP factor check (a request that names `factor_id`) the status is
+ * `verified` (the code matched) or `failed`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

@@ -55,6 +55,23 @@ final class PhoneVerificationSendResponse extends BaseModel
     public readonly ?array $metadata;
 
     /**
+     * UUID of the phone verification. Pass this value to check the code, retrieve the record, cancel,
+     * change channels, approve or retry. A same-window retry keeps this UUID. Use `request_id` to retrieve
+     * the session decision.
+     */
+    public readonly ?string $verificationId;
+
+    /**
+     * Seconds the code stays valid. A new send returns the full configured window; a same-window retry or
+     * a `reuse` of a pending verification returns the seconds left, because a retry keeps the expiry of
+     * the first send.
+     */
+    public readonly ?int $expiresIn;
+
+    /** The fraud decision for this send. */
+    public readonly ?PhoneVerificationSendResponseFraud $fraud;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -66,5 +83,8 @@ final class PhoneVerificationSendResponse extends BaseModel
         $this->reason = Hydrate::string($data['reason'] ?? null);
         $this->vendorData = Hydrate::string($data['vendor_data'] ?? null);
         $this->metadata = Hydrate::assoc($data['metadata'] ?? null);
+        $this->verificationId = Hydrate::string($data['verification_id'] ?? null);
+        $this->expiresIn = Hydrate::int($data['expires_in'] ?? null);
+        $this->fraud = Hydrate::model($data['fraud'] ?? null, PhoneVerificationSendResponseFraud::class);
     }
 }

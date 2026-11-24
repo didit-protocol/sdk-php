@@ -41,6 +41,16 @@ final class Phone extends BaseResource
 
     public readonly Phone\SdkKeys $sdkKeys;
 
+    public readonly Phone\Verifications $verifications;
+
+    public readonly Phone\Feedback $feedback;
+
+    public readonly Phone\Countries $countries;
+
+    public readonly Phone\Settings $settings;
+
+    public readonly Phone\Lookups $lookups;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
@@ -52,6 +62,11 @@ final class Phone extends BaseResource
         $this->factors = new Phone\Factors($requester);
         $this->network = new Phone\Network($requester);
         $this->sdkKeys = new Phone\SdkKeys($requester);
+        $this->verifications = new Phone\Verifications($requester);
+        $this->feedback = new Phone\Feedback($requester);
+        $this->countries = new Phone\Countries($requester);
+        $this->settings = new Phone\Settings($requester);
+        $this->lookups = new Phone\Lookups($requester);
     }
 
     /**
