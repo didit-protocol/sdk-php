@@ -167,7 +167,10 @@ class SpecSyncTest(unittest.TestCase):
         [entry] = self.read("deprecated-operations.json")["operations"]
         content = entry["operation"]["responses"]["200"]["content"]["application/json"]
         self.assertEqual(content["schema"], schema)
-        self.assertEqual(entry["components"]["schemas"]["SessionImportJob"], baseline["components"]["schemas"]["SessionImportJob"])
+        self.assertEqual(
+            entry["components"]["schemas"]["SessionImportJob"],
+            baseline["components"]["schemas"]["SessionImportJob"],
+        )
         self.assertEqual(content["examples"]["Issued"]["value"], {
             "publishable_key": "sample-publishable-key",
             "status": "issued",
