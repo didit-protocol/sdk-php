@@ -828,6 +828,7 @@ namespace Didit;
  *     phone_number?: string,
  *     right_thumb?: string,
  *     left_thumb?: string,
+ *     cnh_qr_code_image?: string,
  *     score_level?: int,
  *     max_matches?: int,
  *     vehicle_register_number?: string,

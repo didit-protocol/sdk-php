@@ -97,6 +97,7 @@ final class DatabaseValidationTest extends GeneratedTestCase
             'phone_number' => 'phone_number-value',
             'right_thumb' => 'right_thumb-value',
             'left_thumb' => 'left_thumb-value',
+            'cnh_qr_code_image' => 'cnh_qr_code_image-value',
             'score_level' => 1,
             'max_matches' => 1,
             'vehicle_register_number' => 'vehicle_register_number-value',
@@ -325,6 +326,9 @@ final class DatabaseValidationTest extends GeneratedTestCase
             ],
             'left_thumb' => [
                 'left_thumb-value',
+            ],
+            'cnh_qr_code_image' => [
+                'cnh_qr_code_image-value',
             ],
             'score_level' => [
                 '1',
