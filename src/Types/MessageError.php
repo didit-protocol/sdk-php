@@ -17,10 +17,10 @@ final class MessageError extends BaseModel
     /**
      * `invalid_recipient`: the address is not valid for the channel, or the number has no account on it.
      * `unreachable`: the carrier could not reach the device. `rejected`: the carrier or platform refused
-     * the message. `opted_out`: the recipient opted out of the channel. `expired`: `expires_at` passed
-     * before it could go out. `template_required`: WhatsApp only delivers an approved WhatsApp template.
-     * `channel_unavailable`: the channel is switched off, not configured, not in your contract or locked
-     * until a paid plan or your first top-up. `insufficient_credits`: the balance does not cover it.
+     * the message. `opted_out`: the recipient opted out of the channel. On Didit's shared WhatsApp number
+     * two opt-outs can apply: a STOP to the shared number blocks it for every organization that sends from
+     * it, while an organization's own opt-out blocks only that organization. The code alone does not say
+     * which one blocked the attempt. `expired`: `expires_at` passed before it could go out.
      *
      * Known values: {@see MessageErrorCode}.
      */
