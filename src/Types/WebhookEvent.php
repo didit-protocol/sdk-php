@@ -112,6 +112,10 @@ final class WebhookEvent
 
     public const MESSAGE_STATUS_UPDATED = 'message.status.updated';
 
+    public const MESSAGE_RECEIVED = 'message.received';
+
+    public const CONTACT_CONSENT_UPDATED = 'contact.consent.updated';
+
     private function __construct()
     {
     }
