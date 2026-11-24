@@ -7,7 +7,7 @@ import re
 from typing import Any
 
 from .model import (
-    AnyT, ArrayT, DateTimeT, EnumT, FileT, FreeObjT, MapT, Model, ModelT, Scalar, Shape, ShapeT, T, UnionT,
+    ArrayT, DateTimeT, EnumT, FileT, FreeObjT, MapT, Model, ModelT, Scalar, Shape, ShapeT, T, UnionT,
 )
 
 
@@ -23,9 +23,8 @@ class FileSample:
 UUID = "3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f"
 
 
-# Fields whose spec examples look like credentials. Generated tests replace
-# their values, so no committed file carries a token-like string (the
-# repository's secret scan allowlists only openapi/).
+# Fields whose spec examples look like credentials. Generated tests and
+# deprecation records replace their values with placeholders.
 CREDENTIAL_KEY_RE = re.compile(
     r"(token|secret|secret_key|secret_shared_key|api_key|apikey|password|private_key|publishable_key)$", re.I,
 )
