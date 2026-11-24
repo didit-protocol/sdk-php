@@ -18,7 +18,7 @@ final class FactorsTest extends GeneratedTestCase
 {
     public function testList(): void
     {
-        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"factor_id":"fa_01JCH8K2","type":"totp","status":"verified","user_id":"u_481","friendly_name":"Demo App","metadata":{"device":"iPhone 15"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}]}');
+        $this->queueJson(200, '{"count":1,"next":null,"previous":null,"results":[{"factor_id":"fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01","type":"totp","status":"verified","user_id":"u_481","friendly_name":"Demo App","metadata":{"device":"iPhone 15"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}]}');
 
         $result = $this->client->phone->factors->list([
             'user_id' => 'user_id-value',
@@ -46,12 +46,12 @@ final class FactorsTest extends GeneratedTestCase
         self::assertCount(1, $result->results);
         self::assertContainsOnlyInstancesOf(Types\PhoneFactor::class, $result->results);
         self::assertFalse($result->hasNextPage());
-        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"factor_id":"fa_01JCH8K2","type":"totp","status":"verified","user_id":"u_481","friendly_name":"Demo App","metadata":{"device":"iPhone 15"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}]}'), $result->toArray());
+        self::assertSame($this->decoded('{"count":1,"next":null,"previous":null,"results":[{"factor_id":"fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01","type":"totp","status":"verified","user_id":"u_481","friendly_name":"Demo App","metadata":{"device":"iPhone 15"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}]}'), $result->toArray());
     }
 
     public function testCreate(): void
     {
-        $this->queueJson(201, '{"factor_id":"fa_01JCH8K2","type":"totp","status":"unverified","totp":{"uri":"otpauth://totp/Demo%20App:u_481?secret=JBSWY3DP"}}');
+        $this->queueJson(201, '{"factor_id":"fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01","type":"totp","status":"unverified","totp":{"uri":"otpauth://totp/Demo%20App:u_481?secret=JBSWY3DP"}}');
 
         $result = $this->client->phone->factors->create([
             'type' => 'totp',
@@ -71,13 +71,13 @@ final class FactorsTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"type":"totp","user_id":"user_id-value","friendly_name":"friendly_name-value","metadata":{"key":"metadata-value"}}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"factor_id":"fa_01JCH8K2","type":"totp","status":"unverified","totp":{"uri":"otpauth://totp/Demo%20App:u_481?secret=JBSWY3DP"}}'), $result->toArray());
-        self::assertSame('fa_01JCH8K2', $result->factorId);
+        self::assertSame($this->decoded('{"factor_id":"fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01","type":"totp","status":"unverified","totp":{"uri":"otpauth://totp/Demo%20App:u_481?secret=JBSWY3DP"}}'), $result->toArray());
+        self::assertSame('fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01', $result->factorId);
     }
 
     public function testRetrieve(): void
     {
-        $this->queueJson(200, '{"factor_id":"fa_01JCH8K2","type":"totp","status":"verified","user_id":"u_481","friendly_name":"Demo App","metadata":{"device":"iPhone 15"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}');
+        $this->queueJson(200, '{"factor_id":"fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01","type":"totp","status":"verified","user_id":"u_481","friendly_name":"Demo App","metadata":{"device":"iPhone 15"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}');
 
         $result = $this->client->phone->factors->retrieve('factorId-1');
 
@@ -89,13 +89,13 @@ final class FactorsTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"factor_id":"fa_01JCH8K2","type":"totp","status":"verified","user_id":"u_481","friendly_name":"Demo App","metadata":{"device":"iPhone 15"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}'), $result->toArray());
-        self::assertSame('fa_01JCH8K2', $result->factorId);
+        self::assertSame($this->decoded('{"factor_id":"fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01","type":"totp","status":"verified","user_id":"u_481","friendly_name":"Demo App","metadata":{"device":"iPhone 15"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}'), $result->toArray());
+        self::assertSame('fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01', $result->factorId);
     }
 
     public function testUpdate(): void
     {
-        $this->queueJson(200, '{"factor_id":"fa_01JCH8K2","type":"totp","status":"disabled","user_id":"u_481","friendly_name":"Work phone","metadata":{"device":"iPhone 16"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}');
+        $this->queueJson(200, '{"factor_id":"fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01","type":"totp","status":"disabled","user_id":"u_481","friendly_name":"Work phone","metadata":{"device":"iPhone 16"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}');
 
         $result = $this->client->phone->factors->update('factorId-1', [
             'friendly_name' => 'friendly_name-value',
@@ -114,8 +114,8 @@ final class FactorsTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"friendly_name":"friendly_name-value","metadata":{"key":"metadata-value"},"status":"disabled"}', $this->canonicalBody($request));
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"factor_id":"fa_01JCH8K2","type":"totp","status":"disabled","user_id":"u_481","friendly_name":"Work phone","metadata":{"device":"iPhone 16"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}'), $result->toArray());
-        self::assertSame('fa_01JCH8K2', $result->factorId);
+        self::assertSame($this->decoded('{"factor_id":"fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01","type":"totp","status":"disabled","user_id":"u_481","friendly_name":"Work phone","metadata":{"device":"iPhone 16"},"created_at":"2026-11-02T08:14:00Z","last_used_at":"2026-11-21T09:58:00Z"}'), $result->toArray());
+        self::assertSame('fa_3f6c1b528d4e4a7b9c105e2a7d9b1c01', $result->factorId);
     }
 
     public function testDelete(): void

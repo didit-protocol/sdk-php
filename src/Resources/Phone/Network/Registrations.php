@@ -94,7 +94,7 @@ final class Registrations extends BaseResource
      *
      * `GET /v3/phone/network/registrations/{registration_id}/`
      *
-     * @param string $registrationId the network feature registration
+     * @param string $registrationId the registration id, `nr_` followed by 32 hexadecimal characters, as it was created
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded

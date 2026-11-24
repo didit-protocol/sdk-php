@@ -73,6 +73,30 @@ final class SdkKeys extends BaseResource
     }
 
     /**
+     * Revoke a publishable key.
+     *
+     * Revoke a publishable key at once: it stops starting the client SDK's checks immediately, its status
+     * becomes `revoked`, and it can neither be restored nor rotated. Apps that still ship it fail until
+     * they are updated, so issue the replacement first (`POST /v3/phone/sdk-keys/`).
+     *
+     * `DELETE /v3/phone/sdk-keys/{key_id}/`
+     *
+     * @param string $keyId the key id, `sk_` followed by 32 hexadecimal characters
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function revoke(string $keyId, ?RequestOptions $options = null): NoContent
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'DELETE',
+            path: '/v3/phone/sdk-keys/{key_id}/',
+        ), ['key_id' => $keyId], [], $options);
+
+        return NoContent::fromResponse($response);
+    }
+
+    /**
      * Rotate a publishable key with an overlap.
      *
      * Rotate a publishable key without breaking the app versions already installed: Didit issues a new
@@ -82,7 +106,7 @@ final class SdkKeys extends BaseResource
      *
      * `POST /v3/phone/sdk-keys/{key_id}/rotate/`
      *
-     * @param string $keyId the publishable key to rotate
+     * @param string $keyId the key id, `sk_` followed by 32 hexadecimal characters
      * @param PhoneSdkKeyRotateRequest $params
      *
      * @throws DiditException
@@ -97,29 +121,5 @@ final class SdkKeys extends BaseResource
         ), ['key_id' => $keyId], $params, $options);
 
         return Types\PhoneSdkKeyRotated::fromResponse($response);
-    }
-
-    /**
-     * Revoke a publishable key.
-     *
-     * Revoke a publishable key at once: it stops starting the client SDK's checks immediately, its status
-     * becomes `revoked`, and it can neither be restored nor rotated. Apps that still ship it fail until
-     * they are updated, so issue the replacement first (`POST /v3/phone/sdk-keys/`).
-     *
-     * `DELETE /v3/phone/sdk-keys/{key_id}/`
-     *
-     * @param string $keyId the publishable key to revoke
-     *
-     * @throws DiditException
-     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
-     */
-    public function revoke(string $keyId, ?RequestOptions $options = null): NoContent
-    {
-        $response = $this->requester->request(new Operation(
-            method: 'DELETE',
-            path: '/v3/phone/sdk-keys/{key_id}/',
-        ), ['key_id' => $keyId], [], $options);
-
-        return NoContent::fromResponse($response);
     }
 }

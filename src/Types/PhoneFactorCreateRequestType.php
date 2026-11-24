@@ -7,7 +7,7 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * The factor to enroll: `totp`, for an authenticator app.
+ * The factor to enroll: `totp`, an authenticator app. Any other value answers `400 invalid_type`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

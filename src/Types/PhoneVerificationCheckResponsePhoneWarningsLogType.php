@@ -12,7 +12,7 @@ namespace Didit\Types;
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
-final class PhoneCheckCodeResponsePhoneWarningsLogType
+final class PhoneVerificationCheckResponsePhoneWarningsLogType
 {
     public const ERROR = 'error';
 

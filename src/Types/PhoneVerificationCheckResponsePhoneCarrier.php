@@ -12,7 +12,7 @@ use Didit\Core\Hydrate;
 /**
  * Current network serving the number, from the carrier lookup run at finalization.
  */
-final class PhoneCheckCodeResponsePhoneCarrier extends BaseModel
+final class PhoneVerificationCheckResponsePhoneCarrier extends BaseModel
 {
     /** Carrier name. Empty string when the lookup could not identify it. */
     public readonly ?string $name;

@@ -1577,6 +1577,19 @@ namespace Didit;
  * @phpstan-type MessagesListPricesParams array{
  *     country: string,
  * }
+ * @phpstan-type MessagesRulesCreateParams array{
+ *     action: string,
+ *     direction?: string,
+ *     match: MessagesRulesCreateParamsMatch,
+ *     channels?: list<string>,
+ * }
+ * @phpstan-type MessagesRulesCreateParamsMatch array{
+ *     country: string,
+ * }|array{
+ *     prefix: string,
+ * }|array{
+ *     number: string,
+ * }
  * @phpstan-type MessagesSendParams array{
  *     to: string,
  *     to_email?: string,
@@ -1790,8 +1803,13 @@ namespace Didit;
  *     vendor_data?: string,
  *     metadata?: array<string, mixed>,
  * }
+ * @phpstan-type PhoneAssessRiskBulkParams array{
+ *     file: \Didit\File|\Psr\Http\Message\StreamInterface|resource,
+ *     fields?: list<string>,
+ *     callback_url?: string,
+ * }
  * @phpstan-type PhoneCheckCodeParams array{
- *     phone_number?: string,
+ *     phone_number: string,
  *     code: string,
  *     duplicated_phone_number_action?: string,
  *     disposable_number_action?: string,
@@ -1804,6 +1822,7 @@ namespace Didit;
  *     enable_social?: bool,
  *     phone_no_social_presence_action?: string,
  *     factor_id?: string,
+ *     verification_id?: string,
  * }
  * @phpstan-type PhoneFactorCreateRequest array{
  *     type: string,
@@ -1824,6 +1843,82 @@ namespace Didit;
  *     offset?: int,
  *     format?: string,
  * }
+ * @phpstan-type PhoneFraudEvaluateParams array{
+ *     phone_number?: string,
+ *     email?: string,
+ *     action?: string,
+ *     ip_address?: string,
+ *     device_signals?: string,
+ *     existing_user?: bool,
+ *     trusted_user?: bool,
+ *     fraud_override?: string,
+ * }
+ * @phpstan-type PhoneFraudEventsCreateBatchParams array{
+ *     events: list<PhoneFraudEventsCreateBatchParamsEvents>,
+ * }
+ * @phpstan-type PhoneFraudEventsCreateBatchParamsEvents array{
+ *     type?: string,
+ *     phone_number?: string,
+ *     email?: string,
+ *     ip_address?: string,
+ *     device_signals?: string,
+ *     existing_user?: bool,
+ *     occurred_at?: string,
+ *     reference?: string,
+ * }
+ * @phpstan-type PhoneFraudPoliciesListParams array{
+ *     flow?: string,
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type PhoneFraudPolicyCondition array{
+ *     signal: string,
+ *     operator: string,
+ *     value: string,
+ *     weight: int,
+ * }
+ * @phpstan-type PhoneFraudPolicyInput array{
+ *     name?: string,
+ *     flow?: string,
+ *     conditions?: list<PhoneFraudPolicyCondition>,
+ *     threshold?: int,
+ *     action?: string,
+ * }
+ * @phpstan-type PhoneFraudUpdateParams array{
+ *     level?: string,
+ *     rules?: list<PhoneFraudUpdateParamsRules>,
+ *     challenge_channels?: list<string>,
+ *     sim_swap_within?: int,
+ *     daily_cap?: string|null,
+ * }
+ * @phpstan-type PhoneFraudUpdateParamsRules array{
+ *     key: string,
+ *     action: string,
+ *     countries?: list<string>,
+ *     platforms?: list<string>,
+ *     scope?: string,
+ * }
+ * @phpstan-type PhoneLineTypeOverridesCreateParams array{
+ *     phone_number: string,
+ *     line_type: string,
+ *     note?: string,
+ * }
+ * @phpstan-type PhoneListsAddParams array{
+ *     value: string,
+ *     type?: string,
+ *     expires_at?: \DateTimeInterface|string,
+ *     note?: string,
+ * }
+ * @phpstan-type PhoneListsCheckParams array{
+ *     phone_number: string,
+ * }
+ * @phpstan-type PhoneListsListEntriesParams array{
+ *     type?: string,
+ *     search?: string,
+ *     limit?: int,
+ *     offset?: int,
+ *     format?: string,
+ * }
  * @phpstan-type PhoneNetworkRegistrationRequest array{
  *     feature: string,
  *     country: string,
@@ -1832,7 +1927,7 @@ namespace Didit;
  *     company_name: string,
  *     website: string,
  *     purpose?: string,
- *     monthly_volume?: int,
+ *     monthly_volume?: int|null,
  * }
  * @phpstan-type PhoneNetworkRegistrationTestNumberRequest array{
  *     phone_number: string,
@@ -1844,6 +1939,26 @@ namespace Didit;
  *     limit?: int,
  *     offset?: int,
  *     format?: string,
+ * }
+ * @phpstan-type PhoneRateLimitsCreateParams array{
+ *     key: string,
+ *     buckets: list<PhoneRateLimitsCreateParamsBuckets>,
+ * }
+ * @phpstan-type PhoneRateLimitsCreateParamsBuckets array{
+ *     max: int,
+ *     interval: int,
+ * }
+ * @phpstan-type PhoneRateLimitsListParams array{
+ *     limit?: int,
+ *     offset?: int,
+ * }
+ * @phpstan-type PhoneRateLimitsUpdateParams array{
+ *     buckets: list<PhoneRateLimitsUpdateParamsBuckets>,
+ * }
+ * @phpstan-type PhoneRateLimitsUpdateParamsBuckets array{
+ *     bucket_id?: string,
+ *     max?: int,
+ *     interval?: int,
  * }
  * @phpstan-type PhoneRiskRequest array{
  *     phone_number: string,
@@ -1905,7 +2020,7 @@ namespace Didit;
  *     use_case: string,
  *     company_name: string,
  *     website: string,
- *     monthly_volume?: int,
+ *     monthly_volume?: int|null,
  *     flow_screenshots?: list<string>,
  * }
  * @phpstan-type PricingBankVerificationCountryCoverageParams array{

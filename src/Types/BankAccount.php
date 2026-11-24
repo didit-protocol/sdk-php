@@ -14,7 +14,10 @@ use Didit\Core\Hydrate;
  */
 final class BankAccount extends BaseModel
 {
-    /** Account id. Belongs to the connection and never changes while it exists, renewals included. */
+    /**
+     * Account id. Belongs to the connection and never changes while it exists, renewals included; a new
+     * connection of the same bank account has a new id (use `account_ref` to recognise the account).
+     */
     public readonly ?string $id;
 
     /** The `connection_id` field. */
@@ -51,7 +54,8 @@ final class BankAccount extends BaseModel
     /**
      * Identifies the same bank account across connections of one application and environment: a keyed hash
      * of the bank's own identifiers. `null` when the bank gives no reliable identifier. Use it to
-     * recognise a bank account you already know.
+     * recognise a bank account you already know. It is the same for one bank account in every connection
+     * of the application, while `id` and the transaction ids are new in each connection.
      */
     public readonly ?string $accountRef;
 

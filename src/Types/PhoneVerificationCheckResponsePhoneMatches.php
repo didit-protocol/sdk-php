@@ -10,9 +10,9 @@ use Didit\Core\BaseModel;
 use Didit\Core\Hydrate;
 
 /**
- * PhoneCheckCodeResponsePhoneMatches.
+ * PhoneVerificationCheckResponsePhoneMatches.
  */
-final class PhoneCheckCodeResponsePhoneMatches extends BaseModel
+final class PhoneVerificationCheckResponsePhoneMatches extends BaseModel
 {
     /** Session id of the other verification that used this phone number. */
     public readonly ?string $sessionId;

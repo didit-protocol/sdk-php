@@ -16,8 +16,6 @@ final class PhoneNetworkRegistrationTestNumberStatus
 {
     public const CODE_SENT = 'code_sent';
 
-    public const VERIFIED = 'verified';
-
     private function __construct()
     {
     }

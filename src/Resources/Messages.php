@@ -11,6 +11,7 @@ use Didit\Core\Hydrate;
 use Didit\Core\NoContent;
 use Didit\Core\Operation;
 use Didit\Core\Page;
+use Didit\Core\Requester;
 use Didit\Exception\DiditException;
 use Didit\Params;
 use Didit\RequestOptions;
@@ -26,6 +27,14 @@ use Didit\Types;
  */
 final class Messages extends BaseResource
 {
+    public readonly Messages\Rules $rules;
+
+    public function __construct(Requester $requester)
+    {
+        parent::__construct($requester);
+        $this->rules = new Messages\Rules($requester);
+    }
+
     /**
      * List messages.
      *

@@ -59,7 +59,7 @@ final class PhoneNetworkRegistration extends BaseModel
     /**
      * Your test numbers for this registration, up to 5.
      *
-     * @var list<PhoneNetworkRegistrationTestNumber>|null
+     * @var list<PhoneNetworkRegistrationTestNumberSummary>|null
      */
     public readonly ?array $testNumbers;
 
@@ -77,6 +77,6 @@ final class PhoneNetworkRegistration extends BaseModel
         $this->networks = Hydrate::list($data['networks'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneNetworkDecision::class));
         $this->liveAt = Hydrate::dateTime($data['live_at'] ?? null);
         $this->testAccess = Hydrate::string($data['test_access'] ?? null);
-        $this->testNumbers = Hydrate::list($data['test_numbers'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneNetworkRegistrationTestNumber::class));
+        $this->testNumbers = Hydrate::list($data['test_numbers'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneNetworkRegistrationTestNumberSummary::class));
     }
 }

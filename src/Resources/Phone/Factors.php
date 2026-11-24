@@ -28,8 +28,8 @@ final class Factors extends BaseResource
     /**
      * List a user's enrolled factors.
      *
-     * List the factors enrolled for one of your users, so your app can show them and let the user pick the
-     * one to check with. `user_id` is required; `type` and `status` narrow the list.
+     * List the factors enrolled for one of your users, newest first, so your app can show them and let the
+     * user pick the one to check with. `user_id` is required; `type` and `status` narrow the list.
      *
      * `GET /v3/phone/factors/`
      *
@@ -52,8 +52,8 @@ final class Factors extends BaseResource
     /**
      * Enroll a TOTP factor.
      *
-     * Enroll a TOTP factor for one of your users, so they confirm a verification with an authenticator app
-     * instead of a code. `type` is `totp` and `user_id` is your id for the user.
+     * Enroll a TOTP factor for one of your users, so they confirm a verification with the code of an
+     * authenticator app instead of a phone code: `type` is `totp` and `user_id` is your id for the user.
      *
      * `POST /v3/phone/factors/`
      *
@@ -83,7 +83,7 @@ final class Factors extends BaseResource
      *
      * `GET /v3/phone/factors/{factor_id}/`
      *
-     * @param string $factorId the factor
+     * @param string $factorId the factor id, `fa_` followed by 32 hexadecimal characters, as enrollment returned it
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
@@ -101,12 +101,12 @@ final class Factors extends BaseResource
     /**
      * Change a factor's name, metadata or state.
      *
-     * Change a factor without enrolling it again: rename it (`friendly_name`), replace your `metadata`, or
+     * Change a factor without enrolling it again: rename it (`friendly_name`), replace your `metadata`,
      * disable it or turn it back on (`status`). The answer is the factor as it now stands.
      *
      * `PATCH /v3/phone/factors/{factor_id}/`
      *
-     * @param string $factorId the factor to change
+     * @param string $factorId the factor id, `fa_` followed by 32 hexadecimal characters, as enrollment returned it
      * @param PhoneFactorUpdateRequest $params
      *
      * @throws DiditException
@@ -127,13 +127,13 @@ final class Factors extends BaseResource
     /**
      * Remove a factor.
      *
-     * Delete an enrolled factor. The factor is deleted at once: its `factor_id` stops working and the TOTP
-     * secret it held stop verifying, and the deletion cannot be undone. Verifications the factor already
+     * Delete an enrolled factor. The factor is deleted at once: its `factor_id` stops working, the TOTP
+     * secret it held stops verifying, and the deletion cannot be undone. Verifications the factor already
      * completed stay verified, and the user's other factors are not affected.
      *
      * `DELETE /v3/phone/factors/{factor_id}/`
      *
-     * @param string $factorId the factor to delete
+     * @param string $factorId the factor id, `fa_` followed by 32 hexadecimal characters, as enrollment returned it
      *
      * @throws DiditException
      * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded

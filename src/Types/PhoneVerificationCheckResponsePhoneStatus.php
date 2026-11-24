@@ -11,7 +11,7 @@ namespace Didit\Types;
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
-final class PhoneCheckCodeResponsePhoneStatus
+final class PhoneVerificationCheckResponsePhoneStatus
 {
     public const APPROVED = 'Approved';
 

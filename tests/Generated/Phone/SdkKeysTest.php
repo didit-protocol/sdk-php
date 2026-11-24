@@ -17,7 +17,7 @@ final class SdkKeysTest extends GeneratedTestCase
 {
     public function testList(): void
     {
-        $this->queueJson(200, '{"results":[{"key_id":"sk_01JCL2B6","platform":"ios","status":"active"}]}');
+        $this->queueJson(200, '{"results":[{"key_id":"sk_9d3e0f257b694c148f382e5a9b1c6d44","platform":"ios","status":"active"}]}');
 
         $result = $this->client->phone->sdkKeys->list([
             'platform' => 'ios',
@@ -33,12 +33,12 @@ final class SdkKeysTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"results":[{"key_id":"sk_01JCL2B6","platform":"ios","status":"active"}]}'), $result->toArray());
+        self::assertSame($this->decoded('{"results":[{"key_id":"sk_9d3e0f257b694c148f382e5a9b1c6d44","platform":"ios","status":"active"}]}'), $result->toArray());
     }
 
     public function testCreate(): void
     {
-        $this->queueJson(201, '{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z"}');
+        $this->queueJson(201, '{"key_id":"sk_9d3e0f257b694c148f382e5a9b1c6d44","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z"}');
 
         $result = $this->client->phone->sdkKeys->create([
             'platform' => 'ios',
@@ -57,29 +57,8 @@ final class SdkKeysTest extends GeneratedTestCase
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
         self::assertSame('{"platform":"ios","app_ids":["app_ids-value"],"name":"name-value"}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z"}'), $result->toArray());
-        self::assertSame('sk_01JCL2B6', $result->keyId);
-    }
-
-    public function testRotate(): void
-    {
-        $this->queueJson(200, '{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z","previous_expires_at":"2026-11-24T09:00:00Z"}');
-
-        $result = $this->client->phone->sdkKeys->rotate('keyId-1', [
-            'overlap_hours' => 1,
-        ]);
-
-        $request = $this->lastRequest();
-        self::assertSame('POST', $request->getMethod());
-        self::assertSame('verification.didit.me', $request->getUri()->getHost());
-        self::assertSame('/v3/phone/sdk-keys/keyId-1/rotate/', $request->getUri()->getPath());
-        self::assertSame([], $this->queryParams($request));
-        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
-        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"overlap_hours":1}', $this->canonicalBody($request));
-        self::assertSame(200, $result->rawResponse()?->status);
-        self::assertSame($this->decoded('{"key_id":"sk_01JCL2B6","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z","previous_expires_at":"2026-11-24T09:00:00Z"}'), $result->toArray());
-        self::assertSame('sk_01JCL2B6', $result->keyId);
+        self::assertSame($this->decoded('{"key_id":"sk_9d3e0f257b694c148f382e5a9b1c6d44","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z"}'), $result->toArray());
+        self::assertSame('sk_9d3e0f257b694c148f382e5a9b1c6d44', $result->keyId);
     }
 
     public function testRevoke(): void
@@ -96,5 +75,26 @@ final class SdkKeysTest extends GeneratedTestCase
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('', (string) $request->getBody());
         self::assertSame(204, $result->rawResponse()?->status);
+    }
+
+    public function testRotate(): void
+    {
+        $this->queueJson(200, '{"key_id":"sk_9d3e0f257b694c148f382e5a9b1c6d44","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z","previous_expires_at":"2026-11-24T09:00:00Z"}');
+
+        $result = $this->client->phone->sdkKeys->rotate('keyId-1', [
+            'overlap_hours' => 1,
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('POST', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/phone/sdk-keys/keyId-1/rotate/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
+        self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
+        self::assertSame('{"overlap_hours":1}', $this->canonicalBody($request));
+        self::assertSame(200, $result->rawResponse()?->status);
+        self::assertSame($this->decoded('{"key_id":"sk_9d3e0f257b694c148f382e5a9b1c6d44","platform":"ios","publishable_key":"sample-publishable-key","app_ids":["com.demoapp.ios"],"status":"active","created_at":"2026-11-21T09:00:00Z","previous_expires_at":"2026-11-24T09:00:00Z"}'), $result->toArray());
+        self::assertSame('sk_9d3e0f257b694c148f382e5a9b1c6d44', $result->keyId);
     }
 }

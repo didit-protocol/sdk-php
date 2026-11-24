@@ -13,12 +13,12 @@ use Didit\Core\Hydrate;
  * Full phone report. Present (non-null) only on finalized outcomes (`Approved`/`Declined`); `null` on
  * `Failed` and absent on `Expired or Not Found`.
  */
-final class PhoneCheckCodeResponsePhone extends BaseModel
+final class PhoneVerificationCheckResponsePhone extends BaseModel
 {
     /**
      * Final status of the phone verification. Matches the top-level `status` for finalized checks.
      *
-     * Known values: {@see PhoneCheckCodeResponsePhoneStatus}.
+     * Known values: {@see PhoneVerificationCheckResponsePhoneStatus}.
      */
     public readonly ?string $status;
 
@@ -38,7 +38,7 @@ final class PhoneCheckCodeResponsePhone extends BaseModel
     public readonly ?string $countryName;
 
     /** Current network serving the number, from the carrier lookup run at finalization. */
-    public readonly ?PhoneCheckCodeResponsePhoneCarrier $carrier;
+    public readonly ?PhoneVerificationCheckResponsePhoneCarrier $carrier;
 
     /** `true` when the number belongs to a temporary/burner number service. */
     public readonly ?bool $isDisposable;
@@ -62,7 +62,7 @@ final class PhoneCheckCodeResponsePhone extends BaseModel
      * Risk warnings recorded during the verification (duplicate, disposable, VoIP, attempts exceeded,
      * blocklist, etc.). Empty array when there are none.
      *
-     * @var list<PhoneCheckCodeResponsePhoneWarnings>|null
+     * @var list<PhoneVerificationCheckResponsePhoneWarnings>|null
      */
     public readonly ?array $warnings;
 
@@ -73,7 +73,7 @@ final class PhoneCheckCodeResponsePhone extends BaseModel
      * `VALID_CODE_ENTERED`, `INVALID_CODE_ENTERED`, `PHONE_VERIFICATION_APPROVED`,
      * `PHONE_VERIFICATION_DECLINED`, `PHONE_VERIFICATION_IN_REVIEW`, `PHONE_VERIFICATION_EXPIRED`.
      *
-     * @var list<PhoneCheckCodeResponsePhoneLifecycle>|null
+     * @var list<PhoneVerificationCheckResponsePhoneLifecycle>|null
      */
     public readonly ?array $lifecycle;
 
@@ -83,7 +83,7 @@ final class PhoneCheckCodeResponsePhone extends BaseModel
      * first when present (session-derived matches keep query order). Empty array when there are no
      * matches.
      *
-     * @var list<PhoneCheckCodeResponsePhoneMatches>|null
+     * @var list<PhoneVerificationCheckResponsePhoneMatches>|null
      */
     public readonly ?array $matches;
 
@@ -110,15 +110,15 @@ final class PhoneCheckCodeResponsePhone extends BaseModel
         $this->fullNumber = Hydrate::string($data['full_number'] ?? null);
         $this->countryCode = Hydrate::string($data['country_code'] ?? null);
         $this->countryName = Hydrate::string($data['country_name'] ?? null);
-        $this->carrier = Hydrate::model($data['carrier'] ?? null, PhoneCheckCodeResponsePhoneCarrier::class);
+        $this->carrier = Hydrate::model($data['carrier'] ?? null, PhoneVerificationCheckResponsePhoneCarrier::class);
         $this->isDisposable = Hydrate::bool($data['is_disposable'] ?? null);
         $this->isVirtual = Hydrate::bool($data['is_virtual'] ?? null);
         $this->verificationMethod = Hydrate::string($data['verification_method'] ?? null);
         $this->verificationAttempts = Hydrate::int($data['verification_attempts'] ?? null);
         $this->verifiedAt = Hydrate::dateTime($data['verified_at'] ?? null);
-        $this->warnings = Hydrate::list($data['warnings'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneCheckCodeResponsePhoneWarnings::class));
-        $this->lifecycle = Hydrate::list($data['lifecycle'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneCheckCodeResponsePhoneLifecycle::class));
-        $this->matches = Hydrate::list($data['matches'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneCheckCodeResponsePhoneMatches::class));
+        $this->warnings = Hydrate::list($data['warnings'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneVerificationCheckResponsePhoneWarnings::class));
+        $this->lifecycle = Hydrate::list($data['lifecycle'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneVerificationCheckResponsePhoneLifecycle::class));
+        $this->matches = Hydrate::list($data['matches'] ?? null, static fn (mixed $v) => Hydrate::model($v, PhoneVerificationCheckResponsePhoneMatches::class));
         $this->phoneSocial = Hydrate::model($data['phone_social'] ?? null, PhoneSocialFootprint::class);
         $this->phoneIntelligence = Hydrate::model($data['phone_intelligence'] ?? null, PhoneIntelligence::class);
     }
