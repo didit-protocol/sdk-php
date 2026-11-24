@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.33.0](https://github.com/didit-protocol/sdk-php/compare/v2.32.0...v2.33.0) (2026-11-24)
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-24 ([ab19522](https://github.com/didit-protocol/sdk-php/commit/ab19522906391b0ef6be95239fef612a65038521))
+
 ## [2.32.0](https://github.com/didit-protocol/sdk-php/compare/v2.31.0...v2.32.0) (2026-11-24)
 
 
