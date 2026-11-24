@@ -10,8 +10,10 @@ namespace Didit\Types;
  * The Test Bank customer: `personal_basic` (one current account, 60 movements), `business_multi`
  * (three accounts held by a company), `long_history` (one account with 400 days and 1,400 movements; a
  * read returns the last 365 days, so set `history_days` to 365), `pending` (includes pending
- * transactions), `sparse_fields` (no value date, no counterparty IBAN, no bank reference) or
- * `no_ongoing` (a bank that only allows one-time access: use `allow_one_time_fallback`).
+ * transactions), `sparse_fields` (no value date, no counterparty IBAN, no bank reference),
+ * `no_ongoing` (a bank that only allows one-time access: use `allow_one_time_fallback`) or
+ * `multi_currency` (one multi-currency account that the bank lists as an EUR and a USD account on the
+ * same IBAN; a link that selects both...
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -28,6 +30,8 @@ final class BankLinkCreateRequestSandboxPersona
     public const SPARSE_FIELDS = 'sparse_fields';
 
     public const NO_ONGOING = 'no_ongoing';
+
+    public const MULTI_CURRENCY = 'multi_currency';
 
     public const REQUIRES_EMAIL = 'requires_email';
 
