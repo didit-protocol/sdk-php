@@ -7,10 +7,13 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * Overall result aggregated across services with field-level comparisons: any `full_match` →
- * `full_match`; else any `partial_match` → `partial_match`; else `no_match`. Outcome-only services,
- * such as biometric criminal screening, can return `null`; inspect each item in `validations` for its
- * `outcome_code`.
+ * Overall comparison result across the services that compared fields: any `full_match` → `full_match`;
+ * else any `partial_match` → `partial_match`; else `no_match`. Three results override the aggregate
+ * whatever another service returned: a rejected fingerprint comparison floors it to `no_match`, a
+ * fraud-list hit from the South Africa fraud screening floors it to `partial_match`, and a deceased
+ * flag that carries no compared fields floors it to `no_match` (a `DECEASED` answer that does compare
+ * fields, such as Brazil's death check, keeps its own comparison, and a deceased flag alone leaves
+ * `match_typ...
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
