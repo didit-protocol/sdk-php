@@ -14,7 +14,11 @@ use Didit\Core\Hydrate;
  */
 final class PhoneVerificationPrice extends BaseModel
 {
-    /** What it cost, in USD. */
+    /**
+     * What it cost, in USD: the estimated price until `final` is true, then the price billing recorded for
+     * the attempt. Under a contract, your invoice prices each code at the contract's rate, which this
+     * amount does not show. `0.0000` in the sandbox.
+     */
     public readonly ?string $amount;
 
     /** The carrier part, passed on at cost. */
@@ -23,7 +27,11 @@ final class PhoneVerificationPrice extends BaseModel
     /** Didit's fee. */
     public readonly ?string $fee;
 
-    /** false until the carrier reports delivery, then the reported price. */
+    /**
+     * true once billing has recorded the attempt's charge: on its delivery report or, when no delivery
+     * report comes, no later than a few minutes after the code's 5-minute validity ends. Until then
+     * `amount` is the estimated price. Always true in the sandbox, where nothing is charged.
+     */
     public readonly ?bool $final;
 
     /**

@@ -47,8 +47,17 @@ final class BankLink extends BaseModel
     /** When an unredeemed link stops working. */
     public readonly ?\DateTimeImmutable $expiresAt;
 
-    /** The connection this link created or renewed, once `status` is `completed`. */
+    /**
+     * The connection this link produced or renewed. `null` until the link completes, on every kind of
+     * link.
+     */
     public readonly ?string $connectionId;
+
+    /**
+     * The connection a renewal link (`mode: renew`) targets, set when the link is created; `null` on a
+     * link that renews nothing. Always present. `connection_id` stays `null` until the link completes.
+     */
+    public readonly ?string $renewsConnectionId;
 
     /** The ownership result of this link, when it asked for `ownership.compare` other than `none`. */
     public readonly ?string $checkId;
@@ -82,6 +91,7 @@ final class BankLink extends BaseModel
         $this->clientToken = Hydrate::string($data['client_token'] ?? null);
         $this->expiresAt = Hydrate::dateTime($data['expires_at'] ?? null);
         $this->connectionId = Hydrate::string($data['connection_id'] ?? null);
+        $this->renewsConnectionId = Hydrate::string($data['renews_connection_id'] ?? null);
         $this->checkId = Hydrate::string($data['check_id'] ?? null);
         $this->reused = Hydrate::bool($data['reused'] ?? null);
         $this->error = Hydrate::model($data['error'] ?? null, BankLinkError::class);

@@ -32,8 +32,9 @@ final class PhoneVerificationCheckResponsePhoneLifecycle extends BaseModel
     public readonly ?array $details;
 
     /**
-     * USD amount billed for this event. Non-zero only on send events (the delivery price); 0 for code
-     * entries, delivery confirmations, and status events.
+     * USD price of this event. Non-zero only on send events: the send's estimated price until billing
+     * charges it, then the price billing recorded for it. 0 for code entries, delivery confirmations, and
+     * status events, and 0 on every event in the sandbox.
      */
     public readonly ?float $fee;
 

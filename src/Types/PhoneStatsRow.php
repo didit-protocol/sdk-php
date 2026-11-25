@@ -41,7 +41,11 @@ final class PhoneStatsRow extends BaseModel
      */
     public readonly ?float $replyRate;
 
-    /** Spend in USD. */
+    /**
+     * Spend in USD. For `verification` and `lookups`: what Didit charged, debited from your balance or
+     * invoiced under a contract in USD. For `messages`: the price recorded on each message sent. `0.00` in
+     * the sandbox.
+     */
     public readonly ?string $spend;
 
     /**
