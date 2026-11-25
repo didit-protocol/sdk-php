@@ -28,7 +28,7 @@ use Didit\Webhooks\Webhook;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Parses recorded `bank.*` deliveries from the backend through the
+ * Parses recorded and synthetic `bank.*` deliveries through the
  * public `Webhook::verify` path, from signed bodies.
  *
  * @internal
@@ -52,8 +52,29 @@ final class BankEventTest extends TestCase
             self::assertSame($fields['link_id'], $event->linkId);
             self::assertSame($fields['status'], $event->status);
             self::assertSame($fields['connection_id'], $event->connectionId);
+            self::assertArrayNotHasKey('renews_connection_id', $fields);
+            self::assertNull($event->renewsConnectionId);
             self::assertSame($fields['check_id'], $event->checkId);
             self::assertSame($fields['error_code'], $event->errorCode);
+        }
+    }
+
+    public function testBankLinkRenewalTargets(): void
+    {
+        $id = 'cccccccc-0000-4000-8000-000000000001';
+        $cases = [
+            [EventType::BANK_LINK_FAILED, 'renewal', null, $id],
+            [EventType::BANK_LINK_COMPLETED, 'renewal', $id, $id],
+            [EventType::BANK_LINK_FAILED, 'legacy_renewal', $id, null],
+            [EventType::BANK_LINK_COMPLETED, 'new_connection', $id, null],
+        ];
+        foreach ($cases as [$type, $variant, $connectionId, $target]) {
+            $event = $this->event($type, $variant);
+            self::assertInstanceOf(BankLinkEvent::class, $event);
+            self::assertSame($connectionId, $event->connectionId);
+            self::assertSame($target, $event->renewsConnectionId);
+            $data = Hydrate::assoc($event->get('data')) ?? [];
+            self::assertSame('legacy_renewal' !== $variant, \array_key_exists('renews_connection_id', $data));
         }
     }
 
@@ -74,6 +95,23 @@ final class BankEventTest extends TestCase
         self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
         self::assertSame('active', $event->status);
         self::assertSame('pending', $event->revocationStatus);
+        self::assertNull($event->statusReason);
+        self::assertNull($event->endsAt);
+    }
+
+    public function testBankConnectionUpdatesWithoutRevocation(): void
+    {
+        $event = $this->event(EventType::BANK_CONNECTION_UPDATED, 'unpaid_month');
+        self::assertInstanceOf(BankConnectionUpdatedEvent::class, $event);
+        self::assertNull($event->revocationStatus);
+        self::assertSame('insufficient_balance', $event->statusReason);
+        self::assertSame('2026-12-01T09:00:00+00:00', $event->endsAt?->format(\DATE_ATOM));
+
+        $event = $this->event(EventType::BANK_CONNECTION_UPDATED, 'no_end');
+        self::assertInstanceOf(BankConnectionUpdatedEvent::class, $event);
+        self::assertNull($event->revocationStatus);
+        self::assertNull($event->statusReason);
+        self::assertNull($event->endsAt);
     }
 
     public function testBankConnectionConsentExpiringEvent(): void
@@ -122,6 +160,14 @@ final class BankEventTest extends TestCase
         self::assertSame('revoked_by_bank', $event->statusReason);
         self::assertSame('2026-11-22T09:00:00+00:00', $event->endedAt?->format(\DATE_ATOM));
         self::assertSame('2027-02-20T09:00:00+00:00', $event->retainUntil?->format(\DATE_ATOM));
+    }
+
+    public function testUnpaidConnectionRevokedBySystem(): void
+    {
+        $event = $this->event(EventType::BANK_CONNECTION_REVOKED, 'unpaid');
+        self::assertInstanceOf(BankConnectionRevokedEvent::class, $event);
+        self::assertSame('unpaid', $event->statusReason);
+        self::assertSame('system', $event->endedBy);
     }
 
     public function testBankConnectionDeletedEvent(): void
@@ -216,21 +262,25 @@ final class BankEventTest extends TestCase
     }
 
     /**
-     * Replay both backend-signed deliveries from sdk-java PR #108 at 412c4a4.
+     * Replay a signed delivery. The original fixtures from sdk-java PR #108 at 412c4a4 also cover rotation.
      * The rotation case uses the previous secret with the original headers.
      */
-    private function event(string $type): Event
+    private function event(string $type, ?string $variant = null): Event
     {
         $json = file_get_contents(__DIR__ . '/fixtures/bank-deliveries.json');
         self::assertIsString($json);
         /** @var array<string, array{body: string, headers: array<string, string>, secret: string, previous_secret: ?string, now: int}> $deliveries */
         $deliveries = json_decode($json, true, flags: \JSON_THROW_ON_ERROR);
         $name = str_replace('.', '_', $type);
-        $current = $deliveries[$name];
+        $current = $deliveries[null === $variant ? $name : $name . '_' . $variant];
         $event = Webhook::verify($current['body'], $current['headers'], $current['secret'], now: $current['now']);
         self::assertSame(Webhook::HEADER_SIGNATURE, $event->verifiedWith());
         self::assertTrue($event->bodyAuthenticated());
         self::assertSame($type, $event->webhookType);
+
+        if (null !== $variant) {
+            return $event;
+        }
 
         $rotation = $deliveries[$name . '_rotation'];
         self::assertNotNull($rotation['previous_secret']);
