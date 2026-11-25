@@ -159,7 +159,8 @@ final class MonitoringEventDetail extends BaseModel
      * and `bot_score` when sent) with `network_context` completed by IP enrichment (`ip_country`,
      * `ip_country_code`, `ip_city`, `asn_number`, `asn_organization`, `is_vpn_or_tor`, `is_data_center`,
      * `proxy_type`, `connection_type`) for keys you left empty. For an event your backend submitted,
-     * `bot_score` is the integer you sent.
+     * `bot_score` is the integer you sent. For an event submitted from a device with a monitoring token
+     * (the Didit SDKs), `bot_score` is the score Didit decided for that request, an integer from 0 to 100.
      *
      * @var array<string, mixed>|null
      */
@@ -169,8 +170,9 @@ final class MonitoringEventDetail extends BaseModel
      * Field path to provenance: `customer` (sent by your backend), `sdk` (sent through the device lane) or
      * `server` (derived by Didit, such as `received_at` and enriched network fields). Check it before
      * acting on a match. For an event submitted from a device with a monitoring token, the entry
-     * `device_context.bot_score` says who decided that score: `sdk` when the Didit SDK's own report alone
-     * set it, `server` when Didit raised it from the request or decided there is no score.
+     * `device_context.bot_score` says who decided that score: `sdk` when the Didit SDK's own score alone
+     * set it, `server` when Didit decided it from the request or from the device evidence the SDK sent, or
+     * decided there is no score.
      *
      * @var array<string, string>|null
      */
