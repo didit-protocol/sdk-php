@@ -66,8 +66,9 @@ final class BankConnectionConsent extends BaseModel
     public readonly ?\DateTimeImmutable $reconfirmBy;
 
     /**
-     * The last moment the same connection can be revived after the consent ended. After it the person
-     * connects again. It equals `retain_until`.
+     * The last moment the same connection can be renewed with its renewal link after access ended. `null`
+     * while access has not ended and whenever the connection cannot be renewed, so a non-null value is the
+     * test for a renewal and `ended_by` does not decide it. After it the person connects again.
      */
     public readonly ?\DateTimeImmutable $renewableUntil;
 
