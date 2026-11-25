@@ -213,7 +213,6 @@ final class SessionsTest extends GeneratedTestCase
             'decided_to' => '2026-01-15T10:30:00+00:00',
             'country' => 'country-value',
             'document_type' => 'document_type-value',
-            'document_name' => 'document_name-value',
             'region' => 'region-value',
             'didit_internal_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
             'session_type' => 'session_type-value',
@@ -245,7 +244,6 @@ final class SessionsTest extends GeneratedTestCase
             'decided_to' => '2026-01-15T10:30:00+00:00',
             'country' => 'country-value',
             'document_type' => 'document_type-value',
-            'document_name' => 'document_name-value',
             'region' => 'region-value',
             'didit_internal_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
             'session_type' => 'session_type-value',
@@ -333,7 +331,6 @@ final class SessionsTest extends GeneratedTestCase
             'filter_date_to' => '2026-01-15',
             'filter_country' => 'filter_country-value',
             'filter_document_type' => 'filter_document_type-value',
-            'filter_document_name' => 'filter_document_name-value',
             'filter_region' => 'filter_region-value',
             'filter_didit_internal_id' => '3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f',
             'filter_session_type' => 'filter_session_type-value',
@@ -353,7 +350,7 @@ final class SessionsTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"session_numbers":["session_numbers-value"],"delete_all":true,"retain_face_embeddings":true,"face_retention_days":1,"face_retention_deadline":"2026-01-15T10:30:00+00:00","deletion_instruction":"operational_session_delete","instruction_id":"instruction_id-value","filter_status":"filter_status-value","filter_vendor_data":"filter_vendor_data-value","filter_search":"filter_search-value","filter_workflow_id":"filter_workflow_id-value","filter_date_from":"2026-01-15","filter_date_to":"2026-01-15","filter_country":"filter_country-value","filter_document_type":"filter_document_type-value","filter_document_name":"filter_document_name-value","filter_region":"filter_region-value","filter_didit_internal_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","filter_session_type":"filter_session_type-value","filter_api_service":"filter_api_service-value","filter_screened_full_name":"filter_screened_full_name-value","filter_warning":"filter_warning-value","filter_status_initialized_as_in_review":true,"filter_is_kyc_to_be_reviewed":true,"filter_euuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","filter_organization_name":"filter_organization_name-value"}', $this->canonicalBody($request));
+        self::assertSame('{"session_numbers":["session_numbers-value"],"delete_all":true,"retain_face_embeddings":true,"face_retention_days":1,"face_retention_deadline":"2026-01-15T10:30:00+00:00","deletion_instruction":"operational_session_delete","instruction_id":"instruction_id-value","filter_status":"filter_status-value","filter_vendor_data":"filter_vendor_data-value","filter_search":"filter_search-value","filter_workflow_id":"filter_workflow_id-value","filter_date_from":"2026-01-15","filter_date_to":"2026-01-15","filter_country":"filter_country-value","filter_document_type":"filter_document_type-value","filter_region":"filter_region-value","filter_didit_internal_id":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","filter_session_type":"filter_session_type-value","filter_api_service":"filter_api_service-value","filter_screened_full_name":"filter_screened_full_name-value","filter_warning":"filter_warning-value","filter_status_initialized_as_in_review":true,"filter_is_kyc_to_be_reviewed":true,"filter_euuid":"3f2c8a7e-5b1d-4c9a-8e6f-2a1b3c4d5e6f","filter_organization_name":"filter_organization_name-value"}', $this->canonicalBody($request));
         self::assertInstanceOf(Types\SessionsBatchDeleteResponse200::class, $result);
         self::assertSame(200, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"results":[{"session_id":"4c5c7f3a-3b1d-4b7e-9c39-2b4f7e6a1d02","session_number":1001,"face_retention_outcome":"deleted","biometric_template_uuid":null,"biometric_template_expires_at":null,"deleted_child_verifications":0},{"session_id":"b8e1d2c3-4f5a-4b6c-8d7e-9f0a1b2c3d4e","session_number":1002,"face_retention_outcome":"retained_with_user","biometric_template_uuid":"9d2f4b6e-1c3a-4e8f-b7d5-0a1c2e3f4a5b","biometric_template_expires_at":"2027-10-09T10:15:00Z","deleted_child_verifications":0},{"session_id":"7a1e9c2d-5f4b-4c3a-8e2d-1b0a9f8e7d6c","session_number":1003,"face_retention_outcome":"ineligible_no_vendor_user","biometric_template_uuid":null,"biometric_template_expires_at":null,"deleted_child_verifications":0},{"session_id":"c1d2e3f4-a5b6-4c7d-8e9f-0a1b2c3d4e5f","session_number":1004,"face_retention_outcome":"failed_retryable","biometric_template_uuid":null,"biometric_template_expires_at":null,"deleted_child_verifications":0}]}'), $result->toArray());
