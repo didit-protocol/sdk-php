@@ -268,8 +268,15 @@ In the webhook endpoint, verify the raw delivery and look up the link ID saved f
 
 ```php
 use Didit\Webhooks\Events\BankConnectionCreatedEvent;
+use Didit\Webhooks\Events\BankLinkEvent;
 
 $event = $didit->webhooks->verify($rawBody, $headers, $webhookSecret);
+if ($event instanceof BankLinkEvent && $event->linkId === loadBankLinkId($customerReference)) {
+    $renewalTarget = array_key_exists('renews_connection_id', $event->get('data'))
+        ? $event->renewsConnectionId
+        : $event->connectionId;
+}
+
 if ($event instanceof BankConnectionCreatedEvent && null !== $event->connectionId) {
     $link = $didit->bank->getLink(loadBankLinkId($customerReference));
     if (null === $link->connectionId) {
@@ -279,6 +286,10 @@ if ($event instanceof BankConnectionCreatedEvent && null !== $event->connectionI
     }
 }
 ```
+
+A renewal link identifies its target in `data.renews_connection_id` from creation. An explicit null means the link renews nothing. Fall back to `data.connection_id` only when the key is absent, as on an older failed renewal. On current deliveries, `connection_id` identifies the connection produced or renewed and is null until completion.
+
+On `bank.connection.updated`, a pending revocation sets `$event->revocationStatus`. Other updates expose `$event->statusReason` and `$event->endsAt`, both nullable. A `bank.connection.revoked` event with `endedBy` set to `system` and `statusReason` set to `unpaid` means the coming month was unpaid.
 
 The [runnable example](examples/bank_connection.php) saves one customer's hosted URL privately and reports their account count after a successful or partial first sync.
 Bank data needs the `bank-data` permission on the API key and is not part of full access.

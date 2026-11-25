@@ -7,17 +7,17 @@ namespace Didit\Webhooks\Events;
 use Didit\Core\Hydrate;
 
 /**
- * `bank.connection.revoked`: access ended and the bank confirmed it.
+ * `bank.connection.revoked`: access ended.
  */
 final class BankConnectionRevokedEvent extends BankConnectionEvent
 {
     /** The consent status after revocation. */
     public readonly ?string $status;
 
-    /** `end_user`, `bank`, `customer` or `unknown`. */
+    /** `end_user`, `bank`, `customer`, `system` or `unknown`. */
     public readonly ?string $endedBy;
 
-    /** Why the connection is in this status. */
+    /** System revocations include `unpaid` for an unpaid coming month and `collection_complete` after a one-time read. */
     public readonly ?string $statusReason;
 
     /** When access ended. */
