@@ -1,5 +1,19 @@
 # Changelog
 
+## [2.41.0](https://github.com/didit-protocol/sdk-php/compare/v2.40.0...v2.41.0) (2026-11-25)
+
+
+### API changes that can break typed code
+
+* **spec:** `sandbox.list_scenarios()` (`GET /v1/sandbox/scenarios/`): response `sample_identity.documents[].document_name`: removed ([2ff29ca](https://github.com/didit-protocol/sdk-php/commit/2ff29cab2256cde9c8bc22c0de5c452fb7e67df3))
+* **spec:** `sessions.batch_delete()` (`POST /v3/sessions/delete/`): request body `filter_document_name`: removed ([2ff29ca](https://github.com/didit-protocol/sdk-php/commit/2ff29cab2256cde9c8bc22c0de5c452fb7e67df3))
+* **spec:** `sessions.list()` (`GET /v3/sessions/`): query parameter `document_name`: removed ([2ff29ca](https://github.com/didit-protocol/sdk-php/commit/2ff29cab2256cde9c8bc22c0de5c452fb7e67df3))
+
+
+### Features
+
+* **spec:** sync API spec 2026-11-25 ([2ff29ca](https://github.com/didit-protocol/sdk-php/commit/2ff29cab2256cde9c8bc22c0de5c452fb7e67df3))
+
 ## [2.40.0](https://github.com/didit-protocol/sdk-php/compare/v2.39.0...v2.40.0) (2026-11-25)
 
 
