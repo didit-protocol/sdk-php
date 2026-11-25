@@ -23,7 +23,7 @@ final class BankInstitutionSummary extends BaseModel
     /** Country of the bank, ISO 3166-1 alpha-3. */
     public readonly ?string $country;
 
-    /** The address of the bank's logo hosted by Didit. */
+    /** The address of the bank's logo hosted by Didit, or `null` when Didit has no logo for the bank. */
     public readonly ?string $logoUrl;
 
     /**
