@@ -24,7 +24,7 @@ final class BankInstitution extends BaseModel
     /** The `country` field. */
     public readonly ?string $country;
 
-    /** The address of the bank's logo hosted by Didit. */
+    /** The address of the bank's logo hosted by Didit, or `null` when Didit has no logo for the bank. */
     public readonly ?string $logoUrl;
 
     /** IANA time zone the bank's dates are in. */
