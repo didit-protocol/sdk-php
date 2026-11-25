@@ -7,11 +7,12 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * `Declined` when the overall `match_type` triggers a `DECLINE` action (`no_match_action` defaults to
- * `DECLINE`, `partial_match_action` to `NO_ACTION`); `In Review` when no service produced a usable
- * comparison, for example when the only selected service came back `REGISTRY_UNAVAILABLE` or
- * `INCONCLUSIVE`, and when the registry confirmed the identification number but returned a different
- * name while `partial_match_action` is `NO_ACTION`; `Approved` otherwise.
+ * The request's decision. Didit turns the results into warnings and applies this request's actions to
+ * them. The no-match warning (`DATABASE_VALIDATION_NO_MATCH`) is raised by a `no_match` result and,
+ * when no service compared any field (`match_type` is `null`), by a definitive negative answer such as
+ * `DOCUMENT_NOT_FOUND` or a deceased flag; a definitive negative beside another service's full match
+ * raises no warning by itself. A superseded document raises its own warning
+ * (`DATABASE_VALIDATION_DOCUMENT_SUPERSEDED`), decided by the same `no_match_action`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */

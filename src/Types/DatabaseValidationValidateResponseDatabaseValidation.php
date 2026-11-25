@@ -15,11 +15,12 @@ use Didit\Core\Hydrate;
 final class DatabaseValidationValidateResponseDatabaseValidation extends BaseModel
 {
     /**
-     * `Declined` when the overall `match_type` triggers a `DECLINE` action (`no_match_action` defaults to
-     * `DECLINE`, `partial_match_action` to `NO_ACTION`); `In Review` when no service produced a usable
-     * comparison, for example when the only selected service came back `REGISTRY_UNAVAILABLE` or
-     * `INCONCLUSIVE`, and when the registry confirmed the identification number but returned a different
-     * name while `partial_match_action` is `NO_ACTION`; `Approved` otherwise.
+     * The request's decision. Didit turns the results into warnings and applies this request's actions to
+     * them. The no-match warning (`DATABASE_VALIDATION_NO_MATCH`) is raised by a `no_match` result and,
+     * when no service compared any field (`match_type` is `null`), by a definitive negative answer such as
+     * `DOCUMENT_NOT_FOUND` or a deceased flag; a definitive negative beside another service's full match
+     * raises no warning by itself. A superseded document raises its own warning
+     * (`DATABASE_VALIDATION_DOCUMENT_SUPERSEDED`), decided by the same `no_match_action`.
      *
      * Known values: {@see DatabaseValidationValidateResponseDatabaseValidationStatus}.
      */
@@ -48,10 +49,13 @@ final class DatabaseValidationValidateResponseDatabaseValidation extends BaseMod
     public readonly ?array $screenedData;
 
     /**
-     * Overall result aggregated across services with field-level comparisons: any `full_match` →
-     * `full_match`; else any `partial_match` → `partial_match`; else `no_match`. Outcome-only services,
-     * such as biometric criminal screening, can return `null`; inspect each item in `validations` for its
-     * `outcome_code`.
+     * Overall comparison result across the services that compared fields: any `full_match` → `full_match`;
+     * else any `partial_match` → `partial_match`; else `no_match`. Three results override the aggregate
+     * whatever another service returned: a rejected fingerprint comparison floors it to `no_match`, a
+     * fraud-list hit from the South Africa fraud screening floors it to `partial_match`, and a deceased
+     * flag that carries no compared fields floors it to `no_match` (a `DECEASED` answer that does compare
+     * fields, such as Brazil's death check, keeps its own comparison, and a deceased flag alone leaves
+     * `match_typ...
      *
      * Known values: {@see DatabaseValidationValidateResponseDatabaseValidationMatchType}.
      */
