@@ -9,7 +9,10 @@ namespace Didit\Types;
 /**
  * Why the connection is in this status. `collection_complete`: a one-time connection whose read is
  * complete, so its access has ended. `paused_by_customer` is reserved. On a `deleted` connection:
- * `deleted_by_customer`, `consent_lapsed`, `retention_elapsed` or `application_deleted`.
+ * `deleted_by_customer`, `consent_lapsed`, `retention_elapsed` or `application_deleted`. `unpaid`: the
+ * coming month was not paid by 20:00 UTC on the last day of the month before it, so Didit ended access
+ * and removed the connection at the bank; nothing more is charged. `bank.connection.revoked` with this
+ * reason is the final signal of that ending.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
@@ -34,6 +37,8 @@ final class BankConnectionStatusReason
     public const PAUSED_BY_CUSTOMER = 'paused_by_customer';
 
     public const FIRST_SYNC_FAILED = 'first_sync_failed';
+
+    public const UNPAID = 'unpaid';
 
     public const DELETED_BY_CUSTOMER = 'deleted_by_customer';
 
