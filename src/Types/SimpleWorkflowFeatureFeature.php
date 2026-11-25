@@ -33,6 +33,8 @@ final class SimpleWorkflowFeatureFeature
 
     public const DATABASE_VALIDATION = 'DATABASE_VALIDATION';
 
+    public const BANK_VERIFICATION = 'BANK_VERIFICATION';
+
     public const AML = 'AML';
 
     public const IP_ANALYSIS = 'IP_ANALYSIS';
