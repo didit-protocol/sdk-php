@@ -29,6 +29,12 @@ final class BankVerificationResultConnection extends BaseModel
     /** The bank's name. `null` for an account check. */
     public readonly ?string $institutionName;
 
+    /**
+     * The address of the bank's logo hosted by Didit, or `null` when Didit has no logo for the bank.
+     * `null` for an account check, where no bank is picked. Returned with `institution_name`.
+     */
+    public readonly ?string $logoUrl;
+
     /** The account's country, ISO 3166-1 alpha-3. */
     public readonly ?string $institutionCountry;
 
@@ -62,6 +68,7 @@ final class BankVerificationResultConnection extends BaseModel
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->institutionId = Hydrate::string($data['institution_id'] ?? null);
         $this->institutionName = Hydrate::string($data['institution_name'] ?? null);
+        $this->logoUrl = Hydrate::string($data['logo_url'] ?? null);
         $this->institutionCountry = Hydrate::string($data['institution_country'] ?? null);
         $this->oauth = Hydrate::bool($data['oauth'] ?? null);
         $this->connectedAt = Hydrate::dateTime($data['connected_at'] ?? null);
