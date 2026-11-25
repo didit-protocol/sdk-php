@@ -27,11 +27,10 @@ final class BankConnection extends BaseModel
 
     /**
      * `pending`: first sync running. `active`: consent valid. `renewal_required`: the consent ended or the
-     * bank wants the person to sign in again, data readable as last synced and nothing charged. `paused`:
-     * balance too low for the month. `revoked`: access stopped by the person, the bank or you, or ended
-     * because the read of a one-time connection is complete. `deleted`: only `id`, `status`,
-     * `status_reason`, `created_at` and `erasure` remain. The list returns these only for
-     * `status=deleted`; reading one by id always returns it. `failed`: the first sync never succeeded.
+     * bank wants the person to sign in again, data readable as last synced; a month that begins while it
+     * waits is not charged. `paused`: the current month could not be paid, so syncing stops. It resumes by
+     * itself once your balance covers the month: when a credit reaches your wallet, or at the daily check
+     * at 05:30 UTC.
      *
      * Known values: {@see BankConnectionStatus}.
      */
@@ -40,7 +39,10 @@ final class BankConnection extends BaseModel
     /**
      * Why the connection is in this status. `collection_complete`: a one-time connection whose read is
      * complete, so its access has ended. `paused_by_customer` is reserved. On a `deleted` connection:
-     * `deleted_by_customer`, `consent_lapsed`, `retention_elapsed` or `application_deleted`.
+     * `deleted_by_customer`, `consent_lapsed`, `retention_elapsed` or `application_deleted`. `unpaid`: the
+     * coming month was not paid by 20:00 UTC on the last day of the month before it, so Didit ended access
+     * and removed the connection at the bank; nothing more is charged. `bank.connection.revoked` with this
+     * reason is the final signal of that ending.
      *
      * Known values: {@see BankConnectionStatusReason}.
      */
