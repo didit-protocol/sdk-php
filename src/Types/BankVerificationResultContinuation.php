@@ -41,9 +41,10 @@ final class BankVerificationResultContinuation extends BaseModel
     public readonly ?array $offered;
 
     /**
-     * For `institution_unsupported`, the ID of the bank the person could not use: the bank they picked, or
-     * the bank their last attempt ended on. Didit takes it from its own list of banks, never from the
-     * person's device, so a bank that list does not have is `null`. `null` for every other reason.
+     * For `institution_unsupported`, Didit's ID of the bank the person could not use (the same ID as
+     * `connection.institution_id`): the bank they picked, or the bank their last attempt ended on. Didit
+     * takes it from its own list of banks, never from the person's device, so a bank that list does not
+     * have is `null`. `null` for every other reason.
      */
     public readonly ?string $institutionId;
 
