@@ -17,8 +17,11 @@ final class SandboxSampleDocument extends BaseModel
     /** The sample slug that selects this document, or `null` for the default document. */
     public readonly ?string $sandboxSample;
 
-    /** The document the sandbox OCR mock returns. */
-    public readonly ?string $documentName;
+    /**
+     * The type of the document the sandbox OCR mock returns: `P` (Passport), `ID` (Identity Card), `DL`
+     * (Driver's License) or `RP` (Residence Permit). Its issuing country is `id_country`.
+     */
+    public readonly ?string $documentType;
 
     /** Whether this is the document returned when no sample is selected. */
     public readonly ?bool $isDefault;
@@ -51,7 +54,7 @@ final class SandboxSampleDocument extends BaseModel
     {
         parent::__construct($data);
         $this->sandboxSample = Hydrate::string($data['sandbox_sample'] ?? null);
-        $this->documentName = Hydrate::string($data['document_name'] ?? null);
+        $this->documentType = Hydrate::string($data['document_type'] ?? null);
         $this->isDefault = Hydrate::bool($data['is_default'] ?? null);
         $this->firstName = Hydrate::string($data['first_name'] ?? null);
         $this->lastName = Hydrate::string($data['last_name'] ?? null);
