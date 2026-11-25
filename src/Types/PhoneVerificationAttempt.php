@@ -61,8 +61,8 @@ final class PhoneVerificationAttempt extends BaseModel
     public readonly ?\DateTimeImmutable $expiredAt;
 
     /**
-     * True when the attempt has been billed or has a nonzero actual price. See `status` for the delivery
-     * outcome.
+     * True when the attempt has been billed or has a nonzero actual price. Always false in the sandbox,
+     * which charges nothing. See `status` for the delivery outcome.
      */
     public readonly ?bool $charged;
 
