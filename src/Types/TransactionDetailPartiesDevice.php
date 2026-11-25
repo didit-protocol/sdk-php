@@ -52,6 +52,14 @@ final class TransactionDetailPartiesDevice extends BaseModel
     public readonly ?TransactionDetailPartiesDeviceNetworkContext $networkContext;
 
     /**
+     * Further keys of the device context, free-form: the `metadata` that was sent, of any shape, returned
+     * as stored. For the subject (the `APPLICANT` party) of a transaction submitted from a device with a
+     * transaction token (`POST /v1/transactions/`, the Didit SDKs), Didit adds what it read from the
+     * request, such as `bot_score`.
+     */
+    public readonly ?TransactionDetailPartiesDeviceMetadata $metadata;
+
+    /**
      * @param array<string, mixed> $data the decoded JSON object
      */
     public function __construct(array $data)
@@ -69,5 +77,6 @@ final class TransactionDetailPartiesDevice extends BaseModel
         $this->sessionId = Hydrate::string($data['session_id'] ?? null);
         $this->sessionAgeMs = Hydrate::float($data['session_age_ms'] ?? null);
         $this->networkContext = Hydrate::model($data['network_context'] ?? null, TransactionDetailPartiesDeviceNetworkContext::class);
+        $this->metadata = Hydrate::model($data['metadata'] ?? null, TransactionDetailPartiesDeviceMetadata::class);
     }
 }
