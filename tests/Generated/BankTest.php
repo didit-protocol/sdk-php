@@ -330,6 +330,7 @@ final class BankTest extends GeneratedTestCase
             ],
             'language' => 'language-value',
             'expires_in' => 1,
+            'consent_days' => 1,
         ]);
 
         $request = $this->lastRequest();
@@ -339,7 +340,7 @@ final class BankTest extends GeneratedTestCase
         self::assertSame([], $this->queryParams($request));
         self::assertSame(self::API_KEY, $request->getHeaderLine('x-api-key'));
         self::assertSame('application/json', $request->getHeaderLine('Content-Type'));
-        self::assertSame('{"redirect_url":"https://example.com/callback","allowed_origins":["https://example.com/callback"],"language":"language-value","expires_in":1}', $this->canonicalBody($request));
+        self::assertSame('{"redirect_url":"https://example.com/callback","allowed_origins":["https://example.com/callback"],"language":"language-value","expires_in":1,"consent_days":1}', $this->canonicalBody($request));
         self::assertSame(201, $result->rawResponse()?->status);
         self::assertSame($this->decoded('{"id":"0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40","mode":"renew","access":"ongoing","status":"created","url":"https://verify.didit.me/bank/link/example-link-token","client_token":"sample-client-token","expires_at":"2026-11-21T13:00:00Z","connection_id":null,"renews_connection_id":"5e1d2a70-3b94-4c1f-8a6e-d2f07b9c1e35","check_id":null,"reused":false,"error":null,"quote":{"id":"7a3e9c52-1d84-4b06-8f2a-c5e0b9d17a43","lines":[{"meter":"bank_data_connection_month","unit":"connection_month","price_usd":"0.9000"}],"fallback_lines":null,"total_usd":"0.9000","valid_until":"2026-11-21T13:00:00Z","scopes":["accounts","balances","transactions"]},"vendor_data":"client-7731"}'), $result->toArray());
         self::assertSame('0b9c4f1e-6a2d-4e8b-9f31-7c5d2e1a8b40', $result->id);
