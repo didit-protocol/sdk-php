@@ -15,8 +15,8 @@
  },
  "authentication.json": {
   "url": "https://docs.didit.me/openapi-authentication.json",
-  "sha256": "0a67f3316ea7a4309f54488ecd5fbc35d55e1895b776a7de69acdc97b7efb3d9",
-  "fetched_at": "2026-11-26T08:00:51Z"
+  "sha256": "7f781586606333272a42574c6f32833109b6c09998fa88fa13983e80a4e16034",
+  "fetched_at": "2026-11-26T08:57:12Z"
  },
  "breaking-vectors.json": {
   "source": "didit-protocol/sdk-python@3c361f6e873673ed8a55ad7ea000176e6880f8d3 openapi/breaking-vectors.json",
