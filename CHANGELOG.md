@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.42.0](https://github.com/didit-protocol/sdk-php/compare/v2.41.0...v2.42.0) (2026-11-26)
+
+
+### Features
+
+* **webhooks:** Bank link and connection event fields (renews_connection_id, status_reason, ends_at, unpaid) in the hand-written webhook events [sdk-php] ([#179](https://github.com/didit-protocol/sdk-php/issues/179)) ([d5121e2](https://github.com/didit-protocol/sdk-php/commit/d5121e27d8357335a181f13290417dcaffa87479))
+
 ## [2.41.0](https://github.com/didit-protocol/sdk-php/compare/v2.40.0...v2.41.0) (2026-11-25)
 
 
