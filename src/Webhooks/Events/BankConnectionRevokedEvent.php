@@ -14,7 +14,7 @@ final class BankConnectionRevokedEvent extends BankConnectionEvent
     /** The consent status after revocation. */
     public readonly ?string $status;
 
-    /** `end_user`, `bank`, `customer` or `unknown`. */
+    /** `end_user`, `bank`, `customer`, `system` or `unknown`. */
     public readonly ?string $endedBy;
 
     /** Why the connection is in this status. */

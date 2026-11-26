@@ -20,6 +20,13 @@ abstract class BankLinkEvent extends BankEvent
     /** The connection the link created or renewed, when there is one. */
     public readonly ?string $connectionId;
 
+    /**
+     * The connection a renewal link targets, set when the link was created; null on a link that renews
+     * nothing. Absent on an event stored before the field existed: an older failed, cancelled or expired
+     * renewal event carries that connection in `connectionId`.
+     */
+    public readonly ?string $renewsConnectionId;
+
     /** The ownership result, when one was asked for. */
     public readonly ?string $checkId;
 
@@ -38,6 +45,7 @@ abstract class BankLinkEvent extends BankEvent
         $this->linkId = Hydrate::string($data['link_id'] ?? null);
         $this->status = Hydrate::string($data['status'] ?? null);
         $this->connectionId = Hydrate::string($data['connection_id'] ?? null);
+        $this->renewsConnectionId = Hydrate::string($data['renews_connection_id'] ?? null);
         $this->checkId = Hydrate::string($data['check_id'] ?? null);
         $this->errorCode = Hydrate::string($data['error_code'] ?? null);
     }

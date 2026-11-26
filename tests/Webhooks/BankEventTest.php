@@ -52,9 +52,28 @@ final class BankEventTest extends TestCase
             self::assertSame($fields['link_id'], $event->linkId);
             self::assertSame($fields['status'], $event->status);
             self::assertSame($fields['connection_id'], $event->connectionId);
+            self::assertSame($fields['renews_connection_id'] ?? null, $event->renewsConnectionId);
             self::assertSame($fields['check_id'], $event->checkId);
             self::assertSame($fields['error_code'], $event->errorCode);
         }
+    }
+
+    public function testBankLinkEventReadsRenewsConnectionId(): void
+    {
+        $event = Event::fromPayload([
+            'webhook_type' => EventType::BANK_LINK_COMPLETED,
+            'data' => [
+                'link_id' => 'bbbbbbbb-0000-4000-8000-000000000005',
+                'status' => 'completed',
+                'connection_id' => 'cccccccc-0000-4000-8000-000000000001',
+                'renews_connection_id' => 'cccccccc-0000-4000-8000-000000000001',
+                'check_id' => null,
+                'error_code' => null,
+            ],
+        ]);
+
+        self::assertInstanceOf(BankLinkCompletedEvent::class, $event);
+        self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->renewsConnectionId);
     }
 
     public function testBankConnectionCreatedEvent(): void
@@ -192,6 +211,34 @@ final class BankEventTest extends TestCase
         self::assertInstanceOf(BankSyncRecoveredEvent::class, $event);
         self::assertSame('cccccccc-0000-4000-8000-000000000001', $event->connectionId);
         self::assertSame('eeeeeeee-0000-4000-8000-000000000002', $event->syncId);
+    }
+
+    public function testBankConnectionUpdatedStatusChangeShape(): void
+    {
+        $paused = Event::fromPayload([
+            'webhook_type' => EventType::BANK_CONNECTION_UPDATED,
+            'connection_id' => 'cccccccc-0000-4000-8000-000000000001',
+            'status' => 'paused',
+            'status_reason' => 'insufficient_balance',
+            'ends_at' => '2026-12-22T09:00:00Z',
+        ]);
+
+        self::assertInstanceOf(BankConnectionUpdatedEvent::class, $paused);
+        self::assertSame('insufficient_balance', $paused->statusReason);
+        self::assertSame('2026-12-22T09:00:00+00:00', $paused->endsAt?->format(\DATE_ATOM));
+        self::assertNull($paused->revocationStatus);
+
+        $paid = Event::fromPayload([
+            'webhook_type' => EventType::BANK_CONNECTION_UPDATED,
+            'connection_id' => 'cccccccc-0000-4000-8000-000000000001',
+            'status' => 'active',
+            'status_reason' => null,
+            'ends_at' => null,
+        ]);
+
+        self::assertInstanceOf(BankConnectionUpdatedEvent::class, $paid);
+        self::assertNull($paid->statusReason);
+        self::assertNull($paid->endsAt);
     }
 
     /**
