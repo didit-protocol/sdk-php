@@ -246,6 +246,7 @@ namespace Didit;
  *     allowed_origins?: list<string>,
  *     language?: string,
  *     expires_in?: int,
+ *     consent_days?: int,
  * }
  * @phpstan-type BankSyncTransactionsParams array{
  *     cursor?: string,
