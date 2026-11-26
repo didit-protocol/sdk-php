@@ -246,6 +246,9 @@ match (true) {
 - Didit retries deliveries with the same `eventId`: use it to ignore duplicates.
 
 Events: `StatusUpdatedEvent`, `DataUpdatedEvent`, `UserStatusUpdatedEvent`, `UserDataUpdatedEvent`, `BusinessStatusUpdatedEvent`, `BusinessDataUpdatedEvent`, `ActivityCreatedEvent`, `TransactionCreatedEvent`, `TransactionStatusUpdatedEvent`, `TravelRuleStatusUpdatedEvent`, `WorkflowComplianceChangedEvent`, `KybRegistrySearchResolvedEvent`, the bank events (`bank.link.*`, `bank.connection.*`, `bank.data.updated`, `bank.sync.*`) and `UnknownEvent`, all in `Didit\Webhooks\Events`.
+The four `bank.link.*` events read `renewsConnectionId`: the connection a renewal link targets, `null` on a link that renews nothing and on events stored before it existed. An older failed renewal may carry its target only in `connectionId`, so use `$event->renewsConnectionId ?? $event->connectionId` to find the connection a link is about.
+`BankConnectionUpdatedEvent` has two shapes: a revocation starting reads `revocationStatus` (`'pending'`), every other update reads `statusReason` (`'insufficient_balance'`, `'first_sync_failed'` or `null`) and `endsAt` (a `DateTimeImmutable` or `null`); the fields of the other shape read `null`.
+`BankConnectionRevokedEvent` may read `endedBy` `'system'` with `statusReason` `'unpaid'`: Didit ended the connection because its coming month was not paid.
 Webhook receivers for plain PHP, Laravel and Symfony are in [examples/webhooks/](examples/webhooks/).
 
 ## Bank data
