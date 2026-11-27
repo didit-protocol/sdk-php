@@ -7,7 +7,12 @@ declare(strict_types=1);
 namespace Didit\Types;
 
 /**
- * State of the link. `completed`, `cancelled`, `expired` and `failed` are final.
+ * State of the link. `completed`, `cancelled`, `expired` and `failed` are final. A person who cancels
+ * or declines at the bank, whose bank cannot be reached or does not accept the sign-in, or who meets
+ * an unexpected error while the connection is completed, does not end the link: it stays `opened` and
+ * the person can try again. A first connection returns to the list of banks. A renewal returns to its
+ * own step, where the person can try the same bank again or choose Not now, which ends the link as
+ * `cancelled`.
  *
  * Known values. The API may add values: compare with these constants and keep a default branch.
  */
