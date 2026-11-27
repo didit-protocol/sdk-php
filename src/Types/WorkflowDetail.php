@@ -38,6 +38,9 @@ final class WorkflowDetail extends BaseModel
      */
     public readonly ?string $workflowType;
 
+    /** Whether the hosted phone welcome screen offers the QR code and link to continue on another device. */
+    public readonly ?bool $isWelcomeHandoffEnabled;
+
     /** Whether this is the application's default workflow. */
     public readonly ?bool $isDefault;
 
@@ -169,6 +172,7 @@ final class WorkflowDetail extends BaseModel
         $this->workflowId = Hydrate::string($data['workflow_id'] ?? null);
         $this->workflowLabel = Hydrate::string($data['workflow_label'] ?? null);
         $this->workflowType = Hydrate::string($data['workflow_type'] ?? null);
+        $this->isWelcomeHandoffEnabled = Hydrate::bool($data['is_welcome_handoff_enabled'] ?? null);
         $this->isDefault = Hydrate::bool($data['is_default'] ?? null);
         $this->isArchived = Hydrate::bool($data['is_archived'] ?? null);
         $this->version = Hydrate::int($data['version'] ?? null);
