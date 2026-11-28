@@ -57,11 +57,10 @@ final class SessionDecisionIdVerifications extends BaseModel
     public readonly ?SessionDecisionIdVerificationsIdLookup $idLookup;
 
     /**
-     * Credential evidence. Present only when `verification_method` is `wallet`; `null` otherwise. UAE PASS
-     * (`provider` `uae_pass`) is outcome only: the identity fields of this ID verification (`full_name`,
-     * `first_name`, `last_name`, `date_of_birth`, `nationality`, the document numbers) stay `null`,
-     * `attributes` holds only whether each detail declared in `expected_details` matched, and nothing UAE
-     * PASS shared about the person is returned or kept.
+     * Credential evidence. Present only when `verification_method` is `wallet`; `null` otherwise. A UAE
+     * PASS sign-in (`provider` `uae_pass`) returns the verified identity like every other wallet: the
+     * identity fields of this ID verification carry what UAE PASS verified, and `attributes` holds its
+     * extra attributes.
      */
     public readonly ?SessionDecisionIdVerificationsWalletVerification $walletVerification;
 
