@@ -1160,8 +1160,7 @@ final class Sessions extends BaseResource
      * Declare the stored drafts as the company's key people. This is the hosted Key People step under your
      * API key: Didit decides from the role settings and ownership thresholds of the workflow which parties
      * must be verified, creates one individual KYC session (or a KYB sub-session for a corporate owner)
-     * for each of them, sends the emails the workflow asks for, and advances the session. Each child
-     * session is billed like in the hosted flow. The drafts are consumed.
+     * for each of them, sends the emails the workflow asks for, and advances the session.
      *
      * `POST /v3/session/{sessionId}/kyb/parties/submit/`
      *
