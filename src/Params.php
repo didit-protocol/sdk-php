@@ -2083,6 +2083,7 @@ namespace Didit;
  * }
  * @phpstan-type PhoneRiskRequest array{
  *     phone_number: string,
+ *     tier?: string,
  *     country_code?: string,
  *     signals?: RiskSignals,
  *     vendor_data?: string,

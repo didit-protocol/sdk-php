@@ -39,7 +39,25 @@ final class PhoneRiskResponsePhone extends BaseModel
     /** Current network serving the number. `null` when the lookup could not resolve a carrier. */
     public readonly ?PhoneRiskResponsePhoneCarrier $carrier;
 
-    /** `true` when the number belongs to a temporary or burner number service. */
+    /**
+     * Carrier that first issued the number, before any port. Empty string when the lookup could not
+     * identify it.
+     */
+    public readonly ?string $originalCarrier;
+
+    /** `true` when the number has moved from its original carrier to the current one. */
+    public readonly ?bool $isPorted;
+
+    /**
+     * `true` when the number is a valid, dialable number for its country. An invalid number is answered by
+     * the prefilter and is not billed.
+     */
+    public readonly ?bool $isValid;
+
+    /**
+     * `true` when the lookup identifies the number as temporary. Coverage varies, so a negative flag alone
+     * cannot rule out a temporary number.
+     */
     public readonly ?bool $isDisposable;
 
     /** `true` when the line type is virtual (`voip`, `isp`, or `vpn`). */
@@ -89,10 +107,12 @@ final class PhoneRiskResponsePhone extends BaseModel
     public readonly ?PhoneIntelligence $enrichment;
 
     /**
-     * Social footprint of the phone number: the online platforms it is registered on. Present only when
-     * `enable_social` was set and the check completed. Every count may be null when no data was returned
-     * for it. `profiles_registered: 0` means the platforms were checked and the phone number was found on
-     * none of them - a valid, billable answer and a common synthetic-identity signal.
+     * Social footprint of the phone number: the online platforms it is registered on. Returned when a
+     * requested social check completes. Request it with `tier: "social"` on a Phone Risk lookup, or with
+     * `enable_social: true` on a risk-tier lookup or Phone Verification check. Every count may be null
+     * when no data was returned for it. `profiles_registered: 0` means the platforms were checked and the
+     * phone number was found on none of them - a valid, billable answer and a common synthetic-identity
+     * signal.
      */
     public readonly ?PhoneSocialFootprint $phoneSocial;
 
@@ -109,6 +129,9 @@ final class PhoneRiskResponsePhone extends BaseModel
         $this->countryCode = Hydrate::string($data['country_code'] ?? null);
         $this->countryName = Hydrate::string($data['country_name'] ?? null);
         $this->carrier = Hydrate::model($data['carrier'] ?? null, PhoneRiskResponsePhoneCarrier::class);
+        $this->originalCarrier = Hydrate::string($data['original_carrier'] ?? null);
+        $this->isPorted = Hydrate::bool($data['is_ported'] ?? null);
+        $this->isValid = Hydrate::bool($data['is_valid'] ?? null);
         $this->isDisposable = Hydrate::bool($data['is_disposable'] ?? null);
         $this->isVirtual = Hydrate::bool($data['is_virtual'] ?? null);
         $this->verificationMethod = Hydrate::string($data['verification_method'] ?? null);

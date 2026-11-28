@@ -85,9 +85,8 @@ final class Phone extends BaseResource
     /**
      * Risk-score a phone number.
      *
-     * Resolve a phone number and return carrier, line-type, porting, disposable-number, cross-session
-     * match, and normalized risk-intelligence signals without sending an OTP. The endpoint creates an API
-     * session and returns its id as `request_id`.
+     * Look up a phone number without sending an OTP, at one of three tiers chosen with `tier`. The
+     * endpoint creates an API session and returns its id as `request_id`.
      *
      * `POST /v3/phone/risk/`
      *
