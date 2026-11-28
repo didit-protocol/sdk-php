@@ -34,6 +34,26 @@ final class PricingTest extends GeneratedTestCase
         self::assertSame('USD', $result->currency);
     }
 
+    public function testKybRegistry(): void
+    {
+        $this->queueJson(200, '{"AL":{"name":"Albania","validated":false,"tiers":{"basic":{"available":true,"price_usd":"2.00"},"shareholders":{"available":true,"price_usd":"5.00"},"ubo":{"available":true,"price_usd":"9.00"}},"monitoring":{"available":false,"price_usd":"2.00"}},"ES":{"name":"Spain","validated":true,"tiers":{"basic":{"available":true,"price_usd":"2.00"},"shareholders":{"available":true,"price_usd":"5.00"},"ubo":{"available":true,"price_usd":"9.00"}},"monitoring":{"available":false,"price_usd":"2.00"}},"XK":{"name":"Kosovo","validated":false,"tiers":{"basic":{"available":true,"price_usd":"2.00"},"shareholders":{"available":true,"price_usd":"5.00"},"ubo":{"available":true,"price_usd":"9.00"}},"monitoring":{"available":false,"price_usd":"2.00"}}}');
+
+        $result = $this->client->pricing->kybRegistry([
+            'if_none_match' => 'if_none_match-value',
+        ]);
+
+        $request = $this->lastRequest();
+        self::assertSame('GET', $request->getMethod());
+        self::assertSame('verification.didit.me', $request->getUri()->getHost());
+        self::assertSame('/v3/organization/kyb-registry-pricing/', $request->getUri()->getPath());
+        self::assertSame([], $this->queryParams($request));
+        self::assertSame('', $request->getHeaderLine('x-api-key'));
+        self::assertSame('', $request->getHeaderLine('Authorization'));
+        self::assertSame('if_none_match-value', $request->getHeaderLine('If-None-Match'));
+        self::assertSame('', (string) $request->getBody());
+        self::assertSame($this->decoded('{"AL":{"name":"Albania","validated":false,"tiers":{"basic":{"available":true,"price_usd":"2.00"},"shareholders":{"available":true,"price_usd":"5.00"},"ubo":{"available":true,"price_usd":"9.00"}},"monitoring":{"available":false,"price_usd":"2.00"}},"ES":{"name":"Spain","validated":true,"tiers":{"basic":{"available":true,"price_usd":"2.00"},"shareholders":{"available":true,"price_usd":"5.00"},"ubo":{"available":true,"price_usd":"9.00"}},"monitoring":{"available":false,"price_usd":"2.00"}},"XK":{"name":"Kosovo","validated":false,"tiers":{"basic":{"available":true,"price_usd":"2.00"},"shareholders":{"available":true,"price_usd":"5.00"},"ubo":{"available":true,"price_usd":"9.00"}},"monitoring":{"available":false,"price_usd":"2.00"}}}'), $result->data);
+    }
+
     public function testPriceBook(): void
     {
         $this->queueJson(200, '{"currency":"USD","plans":[{"key":"free","price_usd_month":"0.00","price_usd_year":null,"discount_percent":0,"transactions_included_per_month":1000},{"key":"growth","price_usd_month":"99.00","price_usd_year":"1128.00","discount_percent":4,"transactions_included_per_month":10000},{"key":"scale","price_usd_month":"299.00","price_usd_year":"3408.00","discount_percent":10,"transactions_included_per_month":100000},{"key":"enterprise","price_usd_month":null,"price_usd_year":null,"discount_percent":null,"transactions_included_per_month":null}],"white_label_usd":"0.10","messages_fee_usd":"0.02","message_fee_usd_by_channel":{"sms":"0.02","whatsapp":"0.004"},"lines":[{"key":"message_email","product":"identity","feature":"email","unit":"message","list_price_usd":"0.02"}]}');

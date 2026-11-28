@@ -742,6 +742,7 @@ namespace Didit;
  *     color_button_text_1?: string,
  *     color_button_text_2?: string,
  *     color_pill_text?: string,
+ *     appearance?: string,
  *     border_radius_panel?: int,
  *     border_radius_buttons?: int,
  *     font_family?: string,
@@ -2221,6 +2222,9 @@ namespace Didit;
  *     if_none_match?: string,
  * }
  * @phpstan-type PricingBankVerificationCoverageParams array{
+ *     if_none_match?: string,
+ * }
+ * @phpstan-type PricingKybRegistryParams array{
  *     if_none_match?: string,
  * }
  * @phpstan-type PricingPriceBookParams array{
