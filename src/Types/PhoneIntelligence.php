@@ -27,6 +27,14 @@ final class PhoneIntelligence extends BaseModel
     /** Stability of the line's network. */
     public readonly ?float $networkStabilityIndex;
 
+    /**
+     * Whether the line could be reached on its network at the time of the lookup: `reachable`,
+     * `unreachable` or `unknown`. `null` when reachability was not checked.
+     *
+     * Known values: {@see PhoneIntelligenceReachability}.
+     */
+    public readonly ?string $reachability;
+
     /** `true` when the number looks disposable or virtual. */
     public readonly ?bool $isDisposable;
 
@@ -57,6 +65,7 @@ final class PhoneIntelligence extends BaseModel
         $this->phoneTypeRisk = Hydrate::string($data['phone_type_risk'] ?? null);
         $this->phoneTrustIndex = Hydrate::float($data['phone_trust_index'] ?? null);
         $this->networkStabilityIndex = Hydrate::float($data['network_stability_index'] ?? null);
+        $this->reachability = Hydrate::string($data['reachability'] ?? null);
         $this->isDisposable = Hydrate::bool($data['is_disposable'] ?? null);
         $this->isPorted = Hydrate::bool($data['is_ported'] ?? null);
         $this->isRecentlyPorted = Hydrate::bool($data['is_recently_ported'] ?? null);

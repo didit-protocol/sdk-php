@@ -14,7 +14,7 @@ use Didit\Core\Hydrate;
  */
 final class PhoneRiskResponsePhoneCarrier extends BaseModel
 {
-    /** Carrier name. Empty string when the lookup could not identify it. */
+    /** Current carrier name. Empty string when the lookup could not identify it. */
     public readonly ?string $name;
 
     /**
