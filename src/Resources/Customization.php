@@ -23,9 +23,9 @@ final class Customization extends BaseResource
     /**
      * Get branding customization.
      *
-     * Returns the white-label branding for the application resolved from the API key: colors, fonts,
-     * border radii, logo URLs and UI/UX options. Custom domain and white-label email settings are managed
-     * only in the Business Console and are not part of this response.
+     * Returns the white-label branding for the application resolved from the API key: appearance, colors,
+     * fonts, border radii, logo URLs and UI/UX options. Custom domain and white-label email settings are
+     * managed only in the Business Console and are not part of this response.
      *
      * `GET /v3/customization/`
      *
@@ -44,10 +44,10 @@ final class Customization extends BaseResource
     /**
      * Update branding customization.
      *
-     * Partial update of the application's white-label branding. Send `application/json` to change colors,
-     * fonts, radii and UI options, or `multipart/form-data` to upload logo images. Only the fields you
-     * include are changed. Custom domain and white-label email cannot be set through this endpoint, use
-     * the Business Console for those.
+     * Partial update of the application's white-label branding. Send `application/json` to change
+     * appearance, colors, fonts, radii and UI options, or `multipart/form-data` to upload logo images.
+     * Only the fields you include are changed. Custom domain and white-label email cannot be set through
+     * this endpoint, use the Business Console for those.
      *
      * `PATCH /v3/customization/`
      *

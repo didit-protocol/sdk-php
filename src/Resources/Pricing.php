@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace Didit\Resources;
 
 use Didit\Core\BaseResource;
+use Didit\Core\JsonResponse;
 use Didit\Core\Operation;
 use Didit\Exception\DiditException;
 use Didit\Params;
@@ -18,6 +19,7 @@ use Didit\Types;
  *
  * @phpstan-import-type PricingBankVerificationCountryCoverageParams from Params
  * @phpstan-import-type PricingBankVerificationCoverageParams from Params
+ * @phpstan-import-type PricingKybRegistryParams from Params
  * @phpstan-import-type PricingPriceBookParams from Params
  */
 final class Pricing extends BaseResource
@@ -43,6 +45,32 @@ final class Pricing extends BaseResource
         ), [], [], $options);
 
         return Types\BankVerificationPricing::fromResponse($response);
+    }
+
+    /**
+     * Get KYB registry prices by country (public, unauthenticated).
+     *
+     * Returns the list price of a KYB registry check in every country, for each data tier: Lite (`basic`),
+     * Shareholders (`shareholders`) and UBOs (`ubo`), plus continuous registry monitoring. Use it to quote
+     * a registry step before you build a workflow, or to show KYB prices in your own product.
+     *
+     * `GET /v3/organization/kyb-registry-pricing/`
+     *
+     * @param PricingKybRegistryParams $params
+     *
+     * @throws DiditException
+     * @throws \InvalidArgumentException when a path parameter is empty, "." or "..", or a parameter value cannot be encoded
+     */
+    public function kybRegistry(array $params = [], ?RequestOptions $options = null): JsonResponse
+    {
+        $response = $this->requester->request(new Operation(
+            method: 'GET',
+            path: '/v3/organization/kyb-registry-pricing/',
+            auth: 'none',
+            headers: ['if_none_match' => 'If-None-Match'],
+        ), [], $params, $options);
+
+        return JsonResponse::fromResponse($response);
     }
 
     /**

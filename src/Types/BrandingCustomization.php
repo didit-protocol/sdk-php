@@ -55,6 +55,16 @@ final class BrandingCustomization extends BaseModel
     /** The `color_pill_text` field. */
     public readonly ?string $colorPillText;
 
+    /**
+     * `brand` (default for new and existing customizations) uses your colors on every device.
+     * `match_device` uses your colors on light devices and a dark background with your branding on dark
+     * devices. `dark` uses the dark background with your branding on every device. Without custom colors,
+     * the default Didit look follows the device for all three values.
+     *
+     * Known values: {@see BrandingAppearance}.
+     */
+    public readonly ?string $appearance;
+
     /** The `border_radius_panel` field. */
     public readonly ?int $borderRadiusPanel;
 
@@ -123,6 +133,7 @@ final class BrandingCustomization extends BaseModel
         $this->colorButtonText1 = Hydrate::string($data['color_button_text_1'] ?? null);
         $this->colorButtonText2 = Hydrate::string($data['color_button_text_2'] ?? null);
         $this->colorPillText = Hydrate::string($data['color_pill_text'] ?? null);
+        $this->appearance = Hydrate::string($data['appearance'] ?? null);
         $this->borderRadiusPanel = Hydrate::int($data['border_radius_panel'] ?? null);
         $this->borderRadiusButtons = Hydrate::int($data['border_radius_buttons'] ?? null);
         $this->fontFamily = Hydrate::string($data['font_family'] ?? null);
