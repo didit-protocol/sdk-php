@@ -2970,6 +2970,11 @@ namespace Didit;
  *     face_match_max_attempts?: int,
  *     session_expiration_time?: int,
  * }
+ * @phpstan-type TelegramLinkRequest array{
+ *     to: string,
+ *     expires_in?: int,
+ *     from?: string,
+ * }
  * @phpstan-type TransactionRuleAction array{
  *     type: string,
  *     value?: int,

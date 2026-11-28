@@ -15,6 +15,8 @@ final class MessageChannelPriceChannel
 
     public const WHATSAPP = 'whatsapp';
 
+    public const TELEGRAM = 'telegram';
+
     public const EMAIL = 'email';
 
     private function __construct()

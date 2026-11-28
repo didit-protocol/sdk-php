@@ -41,6 +41,8 @@ final class Messages extends BaseResource
 
     public readonly Messages\Feedback $feedback;
 
+    public readonly Messages\TelegramLinks $telegramLinks;
+
     public function __construct(Requester $requester)
     {
         parent::__construct($requester);
@@ -51,6 +53,7 @@ final class Messages extends BaseResource
         $this->capabilities = new Messages\Capabilities($requester);
         $this->configurations = new Messages\Configurations($requester);
         $this->feedback = new Messages\Feedback($requester);
+        $this->telegramLinks = new Messages\TelegramLinks($requester);
     }
 
     /**
@@ -79,10 +82,11 @@ final class Messages extends BaseResource
     /**
      * Send a message.
      *
-     * Send a transactional SMS, WhatsApp or email message to a phone number or an email address, now or
-     * scheduled, from one of your templates or as free text. Free text goes out on SMS and email; WhatsApp
-     * delivers only an approved template, except inside a 24-hour reply window (the person wrote to you
-     * first), so a message that lists WhatsApp uses `template_id` for it to go out there.
+     * Send a transactional SMS, WhatsApp, Telegram or email message to a phone number or an email address,
+     * now or scheduled, from one of your templates or as free text. Free text goes out on SMS, email and
+     * Telegram; WhatsApp delivers only an approved template, except inside a 24-hour reply window (the
+     * person wrote to you first), so a message that lists WhatsApp uses `template_id` for it to go out
+     * there.
      *
      * `POST /v3/messages/`
      *
@@ -111,9 +115,9 @@ final class Messages extends BaseResource
      * What one message costs your organization on each channel to a country: SMS per segment (carrier
      * price plus Didit's fee), WhatsApp per message (WhatsApp's utility rate plus Didit's fee from Didit's
      * number; from your own connected WhatsApp Business account, `carrier` is `0.0000`: WhatsApp bills its
-     * rate to your account directly and Didit charges only its fee), email flat. Your plan's discount is
-     * applied to the fee. The SMS carrier part is an estimate; the billed one is the price the carrier
-     * reports.
+     * rate to your account directly and Didit charges only its fee), Telegram per message, email flat.
+     * Your plan's discount is applied to the fee. The SMS carrier part is an estimate; the billed one is
+     * the price the carrier reports.
      *
      * `GET /v3/messages/prices/`
      *
